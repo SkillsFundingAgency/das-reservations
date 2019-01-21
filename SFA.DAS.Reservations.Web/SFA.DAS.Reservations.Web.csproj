@@ -16,4 +16,9 @@
     <ProjectReference Include="..\src\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
 </Project>
