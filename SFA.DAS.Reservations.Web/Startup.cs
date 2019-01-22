@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Models.Configuration;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -45,9 +46,12 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //services.Configure<ReservationsConfiguration>()
+            services.Configure<ReservationsConfiguration>(Configuration);
+
+            //todo: other dependent services here
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
