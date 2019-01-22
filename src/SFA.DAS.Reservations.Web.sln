@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Web", "..\SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj", "{F20ABA1D-C45D-46EA-AF6C-21BF15FE4268}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Web", "SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj", "{F20ABA1D-C45D-46EA-AF6C-21BF15FE4268}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Infrastructure", "SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj", "{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}"
 EndProject
