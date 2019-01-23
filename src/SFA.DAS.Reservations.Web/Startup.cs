@@ -1,12 +1,16 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -46,11 +50,18 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.Configure<ReservationsConfiguration>(Configuration);
+            var serviceProvider = services.BuildServiceProvider();
 
+            services.Configure<ReservationsConfiguration>(Configuration);
+            //services.AddAndConfigureAuthentication(Configuration, serviceProvider.GetService<IEmployerAccountService>());
+            services.AddAuthorizationService();
+            services.AddMvc(options => options.Filters.Add(new AuthorizeFilter(PolicyNames.HasEmployerAccount)))
+                .AddControllersAsServices()
+                .AddSessionStateTempDataProvider()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(1));//todo: make configurable
             //todo: other dependent services here
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
@@ -71,6 +82,7 @@ namespace SFA.DAS.Reservations.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
