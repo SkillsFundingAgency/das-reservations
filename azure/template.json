@@ -20,7 +20,7 @@
     },
     "variables": {
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "appServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvapi-as')]"
+        "appServiceName": "[concat(variables('resourceNamePrefix'), '-rsrv-as')]"
     },
     "resources": [
         {
