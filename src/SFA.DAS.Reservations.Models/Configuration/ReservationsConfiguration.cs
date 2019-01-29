@@ -1,12 +1,9 @@
 ﻿namespace SFA.DAS.Reservations.Models.Configuration
 {
-    public class ReservationsConfiguration : IReservationsConfiguration
+    public class ReservationsConfiguration
     {
-        public IdentityServerConfiguration Identity { get; set; }
+        public string SomeValue { get; set; }
+        
     }
 
-    public interface IReservationsConfiguration
-    {
-        IdentityServerConfiguration Identity { get; set; }
-    }
 }

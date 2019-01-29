@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Models.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -49,13 +50,22 @@ namespace SFA.DAS.Reservations.Web
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            
+            services.AddOptions();
+
+            services.Configure<ReservationsConfiguration>(Configuration.GetSection("Reservations"));
+            services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
+            services.Configure<IdentityServerConfiguration>(Configuration.GetSection("Identity"));
+            services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
 
             var serviceProvider = services.BuildServiceProvider();
 
-            services.Configure<ReservationsConfiguration>(Configuration);
-            //services.AddAndConfigureAuthentication(Configuration, serviceProvider.GetService<IEmployerAccountService>());
+            var config = serviceProvider.GetService<IOptions<IdentityServerConfiguration>>();
+            services.AddAndConfigureAuthentication(config, serviceProvider.GetService<IEmployerAccountService>());
             services.AddAuthorizationService();
-            services.AddMvc(options => options.Filters.Add(new AuthorizeFilter(PolicyNames.HasEmployerAccount)))
+            services.AddMvc(
+                    options => options.Filters.Add(new AuthorizeFilter(PolicyNames.HasEmployerAccount))
+                    )
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

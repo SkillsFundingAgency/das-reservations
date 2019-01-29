@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SFA.DAS.Reservations.Models.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Configuration
@@ -28,7 +30,16 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 
             var configItem = (ConfigurationItem)result.Result;
 
-            Data = JsonConvert.DeserializeObject<Dictionary<string, string>>(configItem.Data);            
+            var jsonObject = JObject.Parse(configItem.Data);
+
+            foreach (var child in jsonObject.Children())
+            {
+                foreach (var jToken in child.Children().Children())
+                {
+                    var child1 = (JProperty) jToken;
+                    Data.Add($"{child.Path}:{child1.Name}", child1.Value.ToString());
+                }
+            }    
         }
 
         private CloudTable GetTable()

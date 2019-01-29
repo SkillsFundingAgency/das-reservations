@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Models.Configuration;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
         public static void AddAndConfigureAuthentication(
             this IServiceCollection services,
-            IReservationsConfiguration configuration, 
+            IOptions<IdentityServerConfiguration> configuration, 
             IEmployerAccountService accountsSvc)
         {
             services
@@ -48,23 +49,21 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
                 }).AddOpenIdConnect(options =>
                 {
-
-                    options.ClientId = configuration.Identity.ClientId;
-                    options.ClientSecret = configuration.Identity.ClientSecret;
-                    options.AuthenticationMethod =
-                        (OpenIdConnectRedirectBehavior) configuration.Identity.AuthenticationMethod;
-                    options.Authority = configuration.Identity.Authority;
-                    options.ResponseType = configuration.Identity.ResponseType;
-                    options.SaveTokens = configuration.Identity.SaveTokens;
-
-                    var scopes = configuration.Identity.Scopes.Split(' ');
+                    options.ClientId = configuration.Value.ClientId;
+                    options.ClientSecret = configuration.Value.ClientSecret;
+                    options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
+                    options.Authority = configuration.Value.BaseAddress;
+                    options.ResponseType = configuration.Value.ResponseType;
+                    options.SaveTokens = configuration.Value.SaveTokens;
+                    options.GetClaimsFromUserInfoEndpoint = false;
+                    var scopes = configuration.Value.Scopes.Split(' ');
                     foreach (var scope in scopes)
                     {
                         options.Scope.Add(scope);
                     }
 
-                    var mapUniqueJsonKeys = configuration.Identity.MapUniqueJsonKey.Split(' ');
-                    options.ClaimActions.MapUniqueJsonKey(mapUniqueJsonKeys[0], mapUniqueJsonKeys[1]);
+                    //var mapUniqueJsonKeys = configuration.Value.MapUniqueJsonKey.Split(' ');
+                    //options.ClaimActions.MapUniqueJsonKey(mapUniqueJsonKeys[0], mapUniqueJsonKeys[1]);
                     options.Events.OnTokenValidated = async (ctx) => await PopulateAccountsClaim(ctx, accountsSvc);
 
                 })
