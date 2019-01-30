@@ -27,7 +27,6 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
-                        policy.Requirements.Add(new EmployerAccountRequirement());
                     });
             });
 
@@ -53,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                     options.ClientSecret = configuration.Value.ClientSecret;
                     options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
                     options.Authority = configuration.Value.BaseAddress;
-                    options.ResponseType = configuration.Value.ResponseType;
+                    options.ResponseType = "code";
                     options.SaveTokens = configuration.Value.SaveTokens;
                     options.GetClaimsFromUserInfoEndpoint = false;
                     var scopes = configuration.Value.Scopes.Split(' ');
@@ -62,8 +61,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                         options.Scope.Add(scope);
                     }
 
-                    //var mapUniqueJsonKeys = configuration.Value.MapUniqueJsonKey.Split(' ');
-                    //options.ClaimActions.MapUniqueJsonKey(mapUniqueJsonKeys[0], mapUniqueJsonKeys[1]);
+                    options.ClaimActions.MapUniqueJsonKey("sub", "id");
                     options.Events.OnTokenValidated = async (ctx) => await PopulateAccountsClaim(ctx, accountsSvc);
 
                 })
@@ -90,13 +88,14 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             var path = context.Request.Path.Value;
             path = path.EndsWith("/") ? path.Substring(0, path.Length - 1) : path;
 
+            //TODO
             if (path.Contains("Home/Index") || path.Equals($"/Accounts/{routeData.Values["employerAccountId"]}"))
             {
                 //default path
                 context.Response.Redirect(context.RedirectUri);
             }
             else
-            { 
+            {
                 //custom
                 context.Response.Redirect(context.Request.PathBase + $"/Accounts/{routeData.Values["employerAccountId"]}/Home/Index");
             }
