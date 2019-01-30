@@ -2,11 +2,11 @@
 {
     public class ClaimIdentifierConfiguration
     {
-        public string ClaimsBaseUrl { get; set; }
-        public string Id { get; set; }
-        public string GivenName { get; set; }
-        public string FamilyName { get; set; }
-        public string Email { get; set; }
-        public string DisplayName { get; set; }
+        public const string ClaimsBaseUrl = "http://das/employer/identity/claims/";
+        public const string Id = "id";
+        public const string GivenName = "given_name";
+        public const string FamilyName = "family_name";
+        public const string Email = "email_address";
+        public const string DisplayName = "display_name";
     }
 }

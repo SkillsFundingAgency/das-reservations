@@ -17,7 +17,9 @@ namespace SFA.DAS.Reservations.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration _configuration;
+
+        public Startup()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -36,10 +38,8 @@ namespace SFA.DAS.Reservations.Web
                     )
                 .Build();
 
-            Configuration = config;
+            _configuration = config;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,9 +53,9 @@ namespace SFA.DAS.Reservations.Web
             
             services.AddOptions();
 
-            services.Configure<ReservationsConfiguration>(Configuration.GetSection("Reservations"));
+            services.Configure<ReservationsConfiguration>(_configuration.GetSection("Reservations"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
-            services.Configure<IdentityServerConfiguration>(Configuration.GetSection("Identity"));
+            services.Configure<IdentityServerConfiguration>(_configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
 
             var serviceProvider = services.BuildServiceProvider();
@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(1));//todo: make configurable
             //todo: other dependent services here
 
-            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
