@@ -65,7 +65,6 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<IEmployerAccountService, EmployerAccountService>();
 
             var serviceProvider = services.BuildServiceProvider();
-            var s5ervice = serviceProvider.GetService<IEmployerAccountService>();
 
             var config = serviceProvider.GetService<IOptions<IdentityServerConfiguration>>();
             services.AddAndConfigureAuthentication(config, serviceProvider.GetService<IEmployerAccountService>());
