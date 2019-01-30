@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
             services.Configure<IdentityServerConfiguration>(_configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
-            services.Configure<IAccountApiConfiguration>(Configuration.GetSection("AccountApi"));
+            services.Configure<IAccountApiConfiguration>(_configuration.GetSection("AccountApi"));
             //services.AddSingleton(cfg => cfg.GetService<IOptions<Reservations.Models.Configuration.IAccountApiConfiguration>>().Value);
             //AccountApiConfiguration
             services.AddTransient<IAccountApiClient, AccountApiClient>();
