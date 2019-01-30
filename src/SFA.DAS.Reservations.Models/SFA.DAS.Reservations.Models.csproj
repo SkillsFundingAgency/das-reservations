@@ -8,4 +8,10 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SFA.DAS.EAS.Account.Api.Client">
+      <HintPath>..\..\..\..\Users\danielashton\.nuget\packages\sfa.das.account.api.client\1.4.1\lib\netstandard2.0\SFA.DAS.EAS.Account.Api.Client.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
