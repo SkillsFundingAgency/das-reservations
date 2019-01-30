@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Models.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
+using SFA.DAS.EAS.Account.Api.Client;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -57,6 +58,10 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
             services.Configure<IdentityServerConfiguration>(_configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
+            services.Configure<IAccountApiConfiguration>(Configuration.GetSection("AccountApi"));
+            //services.AddSingleton(cfg => cfg.GetService<IOptions<Reservations.Models.Configuration.IAccountApiConfiguration>>().Value);
+            //AccountApiConfiguration
+            services.AddTransient<IAccountApiClient, AccountApiClient>();
 
             var serviceProvider = services.BuildServiceProvider();
 
