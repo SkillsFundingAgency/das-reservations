@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Web", "SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj", "{F20ABA1D-C45D-46EA-AF6C-21BF15FE4268}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web", "SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj", "{F20ABA1D-C45D-46EA-AF6C-21BF15FE4268}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Infrastructure", "SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj", "{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Infrastructure", "SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj", "{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Models", "SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj", "{C61C9E16-B344-4FC7-98C4-B16436855B18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Models", "SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj", "{C61C9E16-B344-4FC7-98C4-B16436855B18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{429FE184-B674-47C2-971C-87AFC7411D47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Infrastructure.UnitTests", "SFA.DAS.Reservations.Infrastructure.UnitTests\SFA.DAS.Reservations.Infrastructure.UnitTests.csproj", "{DDDA5440-96C8-452D-A4FD-FF09581E2738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +31,16 @@ Global
 		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DDDA5440-96C8-452D-A4FD-FF09581E2738} = {429FE184-B674-47C2-971C-87AFC7411D47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92493938-AEBD-43A6-936E-DC0B25100216}
