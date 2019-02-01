@@ -20,12 +20,13 @@
     },
     "variables": {
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "appServiceName": "[concat(variables('resourceNamePrefix'), '-rsrv-as')]"
+        "employerAppServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvemp-as')]",
+        "providerAppServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvprv-as')]"
     },
     "resources": [
         {
             "apiVersion": "2017-05-10",
-            "name": "applicationInsights",
+            "name": "employerApplicationInsights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -35,17 +36,17 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('employerAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('employerAppServiceName')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "appService",
+            "name": "employerAppService",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -55,7 +56,7 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('employerAppServiceName')]"
                     },
                     "appServicePlanName": {
                         "value": "[parameters('sharedAppServicePlanName')]"
@@ -66,7 +67,7 @@
                     "appServiceAppSettings": {
                         "value": [
                             {
-                                "name": "EnvironmentName",
+                                "name": "Environment",
                                 "value": "[parameters('environmentName')]"
                             },
                             {
@@ -75,7 +76,80 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('applicationInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('employerApplicationInsights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "AuthType",
+                                "value": "employer"
+                            }
+                        ]
+                    },
+                    "customHostName": {
+                        "value": ""
+                    },
+                    "certificateThumbprint": {
+                        "value": ""
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "providerApplicationInsights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/application-insights.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('providerAppServiceName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('providerAppServiceName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "providerAppService",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/app-service.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[variables('providerAppServiceName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('sharedAppServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[parameters('sharedResourceGroup')]"
+                    },
+                    "appServiceAppSettings": {
+                        "value": [
+                            {
+                                "name": "Environment",
+                                "value": "[parameters('environmentName')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('providerApplicationInsights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "AuthType",
+                                "value": "provider"
                             }
                         ]
                     },
@@ -90,9 +164,13 @@
         }
     ],
     "outputs": {
-        "appServiceName": {
+        "employerAppServiceName": {
             "type": "string",
-            "value": "[variables('appServiceName')]"
+            "value": "[variables('employerAppServiceName')]"
+        },
+        "providerAppServiceName": {
+            "type": "string",
+            "value": "[variables('providerAppServiceName')]"
         }
     }
 }
