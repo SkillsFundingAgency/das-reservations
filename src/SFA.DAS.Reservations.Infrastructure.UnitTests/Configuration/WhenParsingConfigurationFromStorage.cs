@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Models.Configuration;
@@ -15,18 +16,17 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             _storageConfigParser = new StorageConfigParser();
         }
 
-        //[Test]
-        //public void Then_The_Data_Is_Not_Added_To_The_Dictionary_If_Not_Valid()
-        //{
-        //    //Arrange
-        //    var configItem = new ConfigurationItem {Data = "{"};
+        [Test]
+        public void Then_The_Data_Is_Not_Added_To_The_Dictionary_If_Not_Valid()
+        {
+            //Arrange
+            var configItem = new ConfigurationItem { Data = "{" };
 
-        //    //Act
-        //    var actual = _storageConfigParser.ParseConfig(configItem);
+            //Act Assert
+            Assert.Throws<JsonReaderException>(()=>_storageConfigParser.ParseConfig(configItem));
 
-        //    //Act
-        //    Assert.IsNotNull(actual);
-        //}
+            
+        }
 
 
         [Test]
@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             //Act
             var actual = _storageConfigParser.ParseConfig(configItem);
 
-            //Act
+            //Assert
             Assert.IsNotNull(actual);
         }
 
@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             //Act
             var actual = _storageConfigParser.ParseConfig(configItem);
 
-            //Act
+            //Assert
             Assert.IsNotNull(actual);
             Assert.IsNotEmpty(actual);
             Assert.Contains(new KeyValuePair<string,string>("Configuration:Item1", "Value1"), actual);
@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             //Act
             var actual = _storageConfigParser.ParseConfig(configItem);
 
-            //Act
+            //Assert
             Assert.IsNotNull(actual);
             Assert.IsNotEmpty(actual);
             Assert.AreEqual(3,actual.Count);
