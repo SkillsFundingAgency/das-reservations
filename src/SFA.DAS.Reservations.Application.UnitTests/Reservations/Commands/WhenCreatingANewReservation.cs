@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
@@ -13,43 +14,58 @@ using SFA.DAS.Reservations.Models;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 {
+    [TestFixture]
     public class WhenCreatingANewReservation
     {
-        [Test, MoqAutoData]
-        public async Task Then_It_Validates_The_Command(
-            CreateReservationCommand command,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            [Frozen] Mock<IApiClient> mockApiClient,
-            CreateReservationCommandHandler commandHandler)
+        private Mock<IValidator<CreateReservationCommand>> _mockValidator;
+        private Mock<IApiClient> _mockApiClient;
+        private CreateReservationCommandHandler _commandHandler;
+        private Reservation _reservation;
+
+        [SetUp]
+        public void Arrange()
         {
-            mockValidator
-                .Setup(validator => validator.ValidateAsync(command))
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization{ConfigureMembers = true});
+
+            _reservation = fixture.Create<Reservation>();
+            var reservationJson = JsonConvert.SerializeObject(_reservation);
+
+            _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
 
-            mockApiClient
+            _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
+            _mockApiClient
                 .Setup(client => client.CreateReservation(It.IsAny<long>(), It.IsAny<string>()))
-                .ReturnsAsync("");
+                .ReturnsAsync(reservationJson);
 
-            await commandHandler.Handle(command, CancellationToken.None);
+            _commandHandler = fixture.Create<CreateReservationCommandHandler>();
+        }
 
-            mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+        [Test, MoqAutoData]
+        public async Task Then_It_Validates_The_Command(
+            CreateReservationCommand command)
+        {
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
         }
 
         [Test, MoqAutoData]
         public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
             CreateReservationCommand command,
             ValidationResult validationResult,
-            string propertyName,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            CreateReservationCommandHandler commandHandler)
+            string propertyName)
         {
             validationResult.AddError(propertyName);
 
-            mockValidator
+            _mockValidator
                 .Setup(validator => validator.ValidateAsync(command))
                 .ReturnsAsync(validationResult);
 
-            Func<Task> act = async () => { await commandHandler.Handle(command, CancellationToken.None); };
+            Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
             act.Should().ThrowExactly<ArgumentException>()
                 .Which.ParamName.Contains(propertyName).Should().BeTrue();
@@ -57,48 +73,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, MoqAutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
-            CreateReservationCommand command,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            [Frozen] Mock<IApiClient> mockApiClient,
-            CreateReservationCommandHandler commandHandler)
+            CreateReservationCommand command)
         {
             var expectedJson = JsonConvert.SerializeObject(command);
 
-            mockValidator
-                .Setup(validator => validator.ValidateAsync(command))
-                .ReturnsAsync(new ValidationResult());
+            await _commandHandler.Handle(command, CancellationToken.None);
 
-            mockApiClient
-                .Setup(client => client.CreateReservation(command.AccountId, expectedJson))
-                .ReturnsAsync("");
-
-            await commandHandler.Handle(command, CancellationToken.None);
-
-            mockApiClient.Verify(client => client.CreateReservation(command.AccountId, expectedJson), Times.Once);
+            _mockApiClient.Verify(client => client.CreateReservation(command.AccountId, expectedJson), Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task Then_Returns_Response_From_Reservation_Api(
-            CreateReservationCommand command,
-            Reservation reservation,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            [Frozen] Mock<IApiClient> mockApiClient,
-            CreateReservationCommandHandler commandHandler)
+            CreateReservationCommand command)
         {
-            var commandJson = JsonConvert.SerializeObject(command);
-            var reservationJson = JsonConvert.SerializeObject(reservation);
+            var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
-            mockValidator
-                .Setup(validator => validator.ValidateAsync(command))
-                .ReturnsAsync(new ValidationResult());
-
-            mockApiClient
-                .Setup(client => client.CreateReservation(command.AccountId, commandJson))
-                .ReturnsAsync(reservationJson);
-
-            var result  = await commandHandler.Handle(command, CancellationToken.None);
-
-            result.Reservation.Should().BeEquivalentTo(reservation);
+            result.Reservation.Should().BeEquivalentTo(_reservation);
         }
     }
 }
