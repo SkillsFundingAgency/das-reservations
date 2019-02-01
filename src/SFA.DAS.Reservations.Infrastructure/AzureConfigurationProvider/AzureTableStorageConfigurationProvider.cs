@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
-namespace SFA.DAS.Reservations.Infrastructure.Configuration
+namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
 {
     public class AzureTableStorageConfigurationProvider : ConfigurationProvider
     {

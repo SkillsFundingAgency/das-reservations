@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Reservations.Models.Configuration
+﻿namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
 {
     public class ClaimIdentifierConfiguration
     {

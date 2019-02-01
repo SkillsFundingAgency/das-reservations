@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace SFA.DAS.Reservations.Infrastructure.Configuration
+namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
 {
     public static class AzureTableStorageConfigurationExtensions
     {

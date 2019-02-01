@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EAS.Account.Api.Client;
 
-namespace SFA.DAS.Reservations.Models.Configuration
+namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
 {
     public class AccountApiConfiguration : IAccountApiConfiguration
     {
