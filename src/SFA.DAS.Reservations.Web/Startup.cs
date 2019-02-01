@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,11 +9,11 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
-using SFA.DAS.EAS.Account.Api.Client;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Web.AppStart;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -54,24 +55,37 @@ namespace SFA.DAS.Reservations.Web
             
             services.AddOptions();
 
-            services.Configure<ReservationsConfiguration>(_configuration.GetSection("Reservations"));
-            services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
-            services.Configure<IdentityServerConfiguration>(_configuration.GetSection("Identity"));
-            services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
-            services.Configure<Reservations.Models.Configuration.AccountApiConfiguration>(_configuration.GetSection("AccountApi"));
-            services.AddSingleton<IAccountApiConfiguration,Reservations.Models.Configuration.AccountApiConfiguration>(cfg => cfg.GetService<IOptions<Reservations.Models.Configuration.AccountApiConfiguration>> ().Value);
-            //AccountApiConfiguration
-            services.AddTransient<IAccountApiClient, AccountApiClient>();
-            services.AddTransient<IEmployerAccountService, EmployerAccountService>();
+            var isEmployerAuth = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+            var isProviderAuth = _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
+
+            if (isEmployerAuth)
+            {
+                services.AddEmployerConfiguration(_configuration);
+            }
+            else if (isProviderAuth)
+            {
+                services.AddProviderConfiguration(_configuration);
+            }
 
             var serviceProvider = services.BuildServiceProvider();
 
-            var config = serviceProvider.GetService<IOptions<IdentityServerConfiguration>>();
-            services.AddAndConfigureAuthentication(config, serviceProvider.GetService<IEmployerAccountService>());
             services.AddAuthorizationService();
+
+            if (isEmployerAuth)
+            {
+                services.AddAndConfigureEmployerAuthentication(serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(), serviceProvider.GetService<IEmployerAccountService>());
+            }
+
+            if (isProviderAuth)
+            {
+                services.AddAndConfigureProviderAuthentication(serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>());
+            }
+            
             services.AddMvc(
-                    options => options.Filters.Add(new AuthorizeFilter(PolicyNames.HasEmployerAccount))
-                    )
+                    options =>
+                    {
+                        options.Filters.Add(new AuthorizeFilter());
+                    })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

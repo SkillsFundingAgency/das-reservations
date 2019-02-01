@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Api
 {

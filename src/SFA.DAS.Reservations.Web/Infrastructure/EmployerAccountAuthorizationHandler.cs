@@ -7,7 +7,7 @@ using SFA.DAS.Reservations.Models.Authentication;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
-    public class EmployerAccountHandler : AuthorizationHandler<EmployerAccountRequirement>
+    public class EmployerAccountAuthorizationHandler : AuthorizationHandler<EmployerAccountRequirement>
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerAccountRequirement requirement)
         {

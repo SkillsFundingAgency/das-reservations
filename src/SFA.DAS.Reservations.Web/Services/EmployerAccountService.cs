@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.Services
     public class EmployerAccountService : IEmployerAccountService
     {
         private readonly IAccountApiClient _accountApiClient;
-
+        
         public EmployerAccountService(IAccountApiClient accountApiClient)
         {
             _accountApiClient = accountApiClient;
@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.Services
             return (EmployerIdentifier)context.Items[ContextItemKeys.EmployerIdentifier];
         }
 
-        private async Task<string> getUserRole(EmployerIdentifier employerAccount, string userId)
+        private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
         {
             var accounts = await _accountApiClient.GetAccountUsers(employerAccount.AccountId);
 
@@ -53,9 +53,9 @@ namespace SFA.DAS.Reservations.Web.Services
 
             var identifiersToRemove = new List<EmployerIdentifier>();
 
-            foreach (var employerIdentifier in values)
+            foreach (var employerIdentifier in employerIdentifiers)
             {
-                var result = await getUserRole(employerIdentifier, userId);
+                var result = await GetUserRole(employerIdentifier, userId);
 
                 if (result != null)
                 {
@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Web.Services
         {
             var accounts = await GetEmployerIdentifiersAsync(userId);
 
-            accounts = await GetUserRoles(accounts.ToList(), userId);
+            accounts = await GetUserRoles(accounts, userId);
 
             var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
             var associatedAccountsClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, accountsAsJson,

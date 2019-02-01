@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
 {

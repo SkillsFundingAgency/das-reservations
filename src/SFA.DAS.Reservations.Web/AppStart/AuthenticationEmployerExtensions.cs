@@ -4,36 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Models.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure
+namespace SFA.DAS.Reservations.Web.AppStart
 {
-    public static class AuthenticationExtensions
+    public static class AuthenticationEmployerExtensions
     {
-        public static void AddAuthorizationService(this IServiceCollection services)
-        {
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(
-                    PolicyNames
-                        .HasEmployerAccount
-                    , policy =>
-                    {
-                        policy.RequireAuthenticatedUser();
-                        policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
-                    });
-            });
-
-            services.AddSingleton<IAuthorizationHandler, EmployerAccountHandler>();
-        }
-
-        public static void AddAndConfigureAuthentication(
+        public static void AddAndConfigureEmployerAuthentication(
             this IServiceCollection services,
             IOptions<IdentityServerConfiguration> configuration, 
             IEmployerAccountService accountsSvc)
@@ -60,10 +43,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                     {
                         options.Scope.Add(scope);
                     }
-
                     options.ClaimActions.MapUniqueJsonKey("sub", "id");
                     options.Events.OnTokenValidated = async (ctx) => await PopulateAccountsClaim(ctx, accountsSvc);
-
                 })
                 .AddCookie(options =>
                 {
