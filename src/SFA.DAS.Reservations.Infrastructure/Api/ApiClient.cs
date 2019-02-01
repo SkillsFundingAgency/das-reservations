@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -16,14 +17,30 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _apiOptions = apiOptions;
         }
 
-        public async Task<string> GetReservations()
+        public async Task<string> GetReservations(long accountId)
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await client.GetAsync($"{_apiOptions.Value.Url}api/accounts/1/reservations").ConfigureAwait(false);
+                var response = await client.GetAsync($"{_apiOptions.Value.Url}api/accounts/{accountId}/reservations").ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task<string> CreateReservation(long accountId, string json)
+        {
+            var accessToken = await GetAccessTokenAsync();
+            using (var client = new HttpClient())//not unit testable using directly
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"{_apiOptions.Value.Url}api/accounts/{accountId}/reservations", stringContent).ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
 

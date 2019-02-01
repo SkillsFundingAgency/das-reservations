@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj" />
   </ItemGroup>
 

@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests
         public static IFixture FixtureFactory()
         {
             var fixture = new Fixture();
-            fixture.Customize(new AutoMoqCustomization());
+            fixture.Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
             return fixture;
         }
