@@ -23,12 +23,10 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             var configItem = new ConfigurationItem { Data = "{" };
 
             //Act Assert
-            Assert.Throws<JsonReaderException>(()=>_storageConfigParser.ParseConfig(configItem));
-
+            Assert.Throws<JsonReaderException>(()=>_storageConfigParser.ParseConfig(configItem,""));
             
         }
-
-
+        
         [Test]
         public void Then_The_Data_Is_Not_Added_To_The_Dictionary_It_Does_Not_Exist()
         {
@@ -36,7 +34,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             var configItem = new ConfigurationItem { Data = "{}" };
 
             //Act
-            var actual = _storageConfigParser.ParseConfig(configItem);
+            var actual = _storageConfigParser.ParseConfig(configItem,"");
 
             //Assert
             Assert.IsNotNull(actual);
@@ -49,7 +47,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
             var configItem = new ConfigurationItem { Data = "{\"Configuration\":{\"Item1\":\"Value1\"}}" };
 
             //Act
-            var actual = _storageConfigParser.ParseConfig(configItem);
+            var actual = _storageConfigParser.ParseConfig(configItem,"");
 
             //Assert
             Assert.IsNotNull(actual);
@@ -58,21 +56,39 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
         }
 
         [Test]
-        public void Then_Complex_Configuration_Structures_Are_Added_To_The_Dictionary()
+        public void Then_The_Default_SectionName_Is_Used_For_Single_Level_ConfigurationObjects()
         {
             //Arrange
-            var configItem = new ConfigurationItem { Data = "{\"Configuration\":{\"Item1\":\"Value1\",\"Item2\":\"Value2\"}, \"Configuration2\":{\"Item3\":\"Value3\"}}" };
-
+            var configItem = new ConfigurationItem { Data = "{\"Item1\":\"Value1\",\"Item2\":\"Value2\"}" };
+            
             //Act
-            var actual = _storageConfigParser.ParseConfig(configItem);
+            var actual = _storageConfigParser.ParseConfig(configItem, "Section");
 
             //Assert
             Assert.IsNotNull(actual);
             Assert.IsNotEmpty(actual);
-            Assert.AreEqual(3,actual.Count);
+            Assert.Contains(new KeyValuePair<string, string>("Section:Item1", "Value1"), actual);
+            Assert.Contains(new KeyValuePair<string, string>("Section:Item2", "Value2"), actual);
+        }
+
+        [Test]
+        public void Then_Complex_Configuration_Structures_Are_Added_To_The_Dictionary()
+        {
+            //Arrange
+            var configItem = new ConfigurationItem { Data = "{\"Item1\":\"Value1\",\"Item2\":\"Value2\",\"Configuration\":{\"Item1\":\"Value1\",\"Item2\":\"Value2\"}, \"Configuration2\":{\"Item3\":\"Value3\"}}" };
+
+            //Act
+            var actual = _storageConfigParser.ParseConfig(configItem,"Section");
+
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.IsNotEmpty(actual);
+            Assert.AreEqual(5,actual.Count);
             Assert.Contains(new KeyValuePair<string, string>("Configuration:Item1", "Value1"), actual);
             Assert.Contains(new KeyValuePair<string, string>("Configuration:Item2", "Value2"), actual);
             Assert.Contains(new KeyValuePair<string, string>("Configuration2:Item3", "Value3"), actual);
+            Assert.Contains(new KeyValuePair<string, string>("Section:Item1", "Value1"), actual);
+            Assert.Contains(new KeyValuePair<string, string>("Section:Item2", "Value2"), actual);
         }
     }
 }

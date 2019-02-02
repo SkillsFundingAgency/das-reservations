@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
-using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.AppStart;
@@ -35,6 +33,7 @@ namespace SFA.DAS.Reservations.Web
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     builder["ConfigurationStorageConnectionString"],
+                    builder["ConfigNames"].Split(","),
                     builder["Environment"],
                     builder["Version"]
                     )
