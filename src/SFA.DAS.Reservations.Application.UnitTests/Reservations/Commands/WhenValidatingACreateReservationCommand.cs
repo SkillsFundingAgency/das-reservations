@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                AccountId = 0,
+                AccountId = "0",
                 StartDate = DateTime.Today
             };
 
@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                AccountId = 1,
+                AccountId = "1",
                 StartDate = DateTime.MinValue
             };
 
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                AccountId = -1,
+                AccountId = "0",
                 StartDate = DateTime.MinValue
             };
 
@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                AccountId = 1,
+                AccountId = "1",
                 StartDate = DateTime.Today
             };
 

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
@@ -16,6 +17,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             _mediator = mediator;
         }
+
         // GET
         public IActionResult Welcome()
         {
@@ -24,9 +26,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("create")]
-        public IActionResult PostCreate()
+        public async Task<IActionResult> PostCreate()
         {
-            _mediator.Send(new CreateReservationCommand());
+            var accountId = RouteData.Values["employerAccountId"].ToString(); //todo: get from elsewhere???
+
+            var command = new CreateReservationCommand
+            {
+                AccountId = accountId
+            };
+            await _mediator.Send(command);
             return null;
         }
     }

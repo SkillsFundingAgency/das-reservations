@@ -22,6 +22,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
         private Reservation _reservation;
+        private Mock<IHashingService> _mockHashingService;
+        private long _expectedAccountId;
 
         [SetUp]
         public void Arrange()
@@ -31,6 +33,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _reservation = fixture.Create<Reservation>();
             var reservationJson = JsonConvert.SerializeObject(_reservation);
+            _expectedAccountId = fixture.Create<long>();
 
             _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
             _mockValidator
@@ -41,6 +44,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockApiClient
                 .Setup(client => client.CreateReservation(It.IsAny<long>(), It.IsAny<string>()))
                 .ReturnsAsync(reservationJson);
+
+            _mockHashingService = fixture.Freeze<Mock<IHashingService>>();
+            _mockHashingService
+                .Setup(service => service.DecodeValue(It.IsAny<string>()))
+                .Returns(_expectedAccountId);
 
             _commandHandler = fixture.Create<CreateReservationCommandHandler>();
         }
@@ -73,14 +81,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
+        public async Task Then_Decodes_The_AccountId(
+            CreateReservationCommand command)
+        {
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Once);
+        }
+
+        [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
             CreateReservationCommand command)
         {
-            var expectedJson = JsonConvert.SerializeObject(command);
+            var request = new CreateReservationApiRequest
+            {
+                AccountId = _expectedAccountId,
+                StartDate = command.StartDate
+            };
+            var expectedJson = JsonConvert.SerializeObject(request);
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.CreateReservation(command.AccountId, expectedJson), Times.Once);
+            _mockApiClient.Verify(client => client.CreateReservation(_expectedAccountId, expectedJson), Times.Once);
         }
 
         [Test, AutoData]
