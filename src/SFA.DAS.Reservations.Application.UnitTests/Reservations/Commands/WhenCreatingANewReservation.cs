@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
@@ -44,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _commandHandler = fixture.Create<CreateReservationCommandHandler>();
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task Then_It_Validates_The_Command(
             CreateReservationCommand command)
         {
@@ -53,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
             CreateReservationCommand command,
             ValidationResult validationResult,
@@ -71,7 +72,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Which.ParamName.Contains(propertyName).Should().BeTrue();
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
             CreateReservationCommand command)
         {
@@ -82,7 +83,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockApiClient.Verify(client => client.CreateReservation(command.AccountId, expectedJson), Times.Once);
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task Then_Returns_Response_From_Reservation_Api(
             CreateReservationCommand command)
         {

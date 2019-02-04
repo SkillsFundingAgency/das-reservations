@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenValidatingACreateReservationCommand
     {
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
             CreateReservationValidator validator)
         {
@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .WhichValue.Equals($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task And_StartDate_Is_MinValue_Then_Invalid(
             CreateReservationValidator validator)
         {
@@ -67,7 +67,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .And.ContainKey(nameof(CreateReservationCommand.StartDate));
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task And_All_Fields_Valid_Then_Valid(
             CreateReservationValidator validator)
         {
