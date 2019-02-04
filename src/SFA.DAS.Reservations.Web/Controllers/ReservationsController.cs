@@ -29,12 +29,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> PostCreate()
         {
             var accountId = RouteData.Values["employerAccountId"].ToString(); //todo: get from elsewhere???
-
             var command = new CreateReservationCommand
             {
                 AccountId = accountId
             };
+
             await _mediator.Send(command);
+            
             return null;
         }
     }

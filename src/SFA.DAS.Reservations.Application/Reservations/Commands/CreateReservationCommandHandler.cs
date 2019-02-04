@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Newtonsoft.Json;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Models;
@@ -53,10 +54,5 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 Reservation = reservation
             };
         }
-    }
-
-    public interface IHashingService
-    {
-        long DecodeValue(string id);
     }
 }
