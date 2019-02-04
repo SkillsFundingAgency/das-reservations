@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -7,12 +9,14 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
 {
     public class AzureTableStorageConfigurationProvider : ConfigurationProvider
     {
+        private readonly string[] _configName;
         private readonly string _environment;
         private readonly string _version;
         private readonly CloudStorageAccount _storageAccount;
 
-        public AzureTableStorageConfigurationProvider(string connection, string environment, string version)
+        public AzureTableStorageConfigurationProvider(string connection,string[] configName, string environment, string version)
         {
+            _configName = configName;
             _environment = environment;
             _version = version;
             _storageAccount = CloudStorageAccount.Parse(connection);
@@ -21,13 +25,20 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
         public override void Load()
         {
             var table = GetTable();
-            var operation = GetOperation("SFA.DAS.Reservations.Web", _environment, _version);
-            var result = table.ExecuteAsync(operation).Result;
+            foreach (var config in _configName)
+            {
+                var configParams = config.Split(":");
+                var configDefaultSectionName = configParams.Length > 1 ? configParams[1] : string.Empty;
 
-            var configItem = (ConfigurationItem)result.Result;
+                var operation = GetOperation(configParams[0], _environment, _version);
+                var result = table.ExecuteAsync(operation).Result;
 
-            Data = new StorageConfigParser().ParseConfig(configItem);
-    
+                var configItem = (ConfigurationItem)result.Result;
+                
+                var data = new StorageConfigParser().ParseConfig(configItem, configDefaultSectionName);
+                data.ToList().ForEach(x => Data.Add(x.Key, x.Value));
+            }
+            
         }
 
         private CloudTable GetTable()
