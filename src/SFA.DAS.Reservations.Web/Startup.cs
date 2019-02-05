@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,9 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -90,6 +94,9 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(1));//todo: make configurable
             //todo: other dependent services here
+            services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
+            services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
+            services.AddTransient<IApiClient,ApiClient>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
