@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("create")]
         public async Task<IActionResult> PostCreate()
         {
-            var accountId = RouteData.Values["employerAccountId"].ToString(); //todo: get from elsewhere???
+            var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
             {
                 AccountId = accountId
@@ -37,6 +37,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             await _mediator.Send(command);
             
             return null;
+        }
+
+        // GET
+        [Route("confirmation")]
+        public IActionResult Confirmation()
+        {
+            return View();
         }
     }
 }
