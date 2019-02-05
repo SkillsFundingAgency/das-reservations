@@ -1,8 +1,12 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
@@ -14,20 +18,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCallingPostCreate
     {
         [Test]
-        public void Then_Sends_Create_Reservation_Command()
+        public async Task Then_Sends_Create_Reservation_Command()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
             var mockMediator = fixture.Freeze<Mock<IMediator>>();
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", "asd908sd");
 
-            controller.PostCreate();
+            await controller.PostCreate();
 
             mockMediator.Verify(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()));
         }
 
         [Test, AutoData]
-        public void Then_Sets_AccountId_On_The_Command(
+        public async Task Then_Sets_The_Correct_Values_On_The_Command(
             string accountId)
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
@@ -35,14 +39,27 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", accountId);
 
-            controller.PostCreate();
+            await controller.PostCreate();
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
-                    command.AccountId == accountId), It.IsAny<CancellationToken>()));
+                    command.AccountId == accountId && 
+                    command.StartDate == DateTime.Today
+                        ), It.IsAny<CancellationToken>()));
         }
 
-        // then redirects
-        // then ..
+        [Test, AutoData]
+        public async Task Then_Redirects_To_The_Confirmation_View(
+            string accountId)
+        {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+            var controller = fixture.Create<ReservationsController>();
+            controller.RouteData.Values.Add("employerAccountId", accountId);
+
+            var result = await controller.PostCreate() as RedirectToActionResult;
+
+            result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
+            result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));
+        }
     }
 }

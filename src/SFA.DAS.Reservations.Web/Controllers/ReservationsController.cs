@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,12 +32,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
             {
-                AccountId = accountId
+                AccountId = accountId,
+                StartDate = DateTime.Today
             };
 
-            await _mediator.Send(command);
+            var createResult = await _mediator.Send(command);
             
-            return null;
+            return RedirectToAction(nameof(ReservationsController.Confirmation), new {createResult.Reservation});
         }
 
         // GET
