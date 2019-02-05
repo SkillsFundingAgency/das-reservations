@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", "asd908sd");
 
-            await controller.PostCreate();
+            await controller.Create();
 
             mockMediator.Verify(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()));
         }
@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", accountId);
 
-            await controller.PostCreate();
+            await controller.Create();
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", accountId);
 
-            var result = await controller.PostCreate() as RedirectToActionResult;
+            var result = await controller.Create() as RedirectToActionResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
             result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));

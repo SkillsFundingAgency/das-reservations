@@ -26,8 +26,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
-        [Route("create")]
-        public async Task<IActionResult> PostCreate()
+        public async Task<IActionResult> Create()
         {
             var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
