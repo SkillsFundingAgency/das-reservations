@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
-            services.AddSingleton<IHashids>(new Hashids("some hash salt", 6));//todo: get salt, length and alphabet from config 
+            services.AddSingleton<IHashids>(new Hashids("SFA: digital apprenticeship service", 6, "46789BCDFGHJKLMNPRSTVWXY"));//todo: get salt, length and alphabet from config 
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }

@@ -21,12 +21,24 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddTransient<IAccountApiClient, AccountApiClient>();
             services.AddTransient<IEmployerAccountService, EmployerAccountService>();
             services.AddSingleton<IAuthorizationHandler, EmployerAccountAuthorizationHandler>();
+
+            AddSharedConfiguration(services, configuration);
         }
 
         public static void AddProviderConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
+
+            AddSharedConfiguration(services, configuration);
+        }
+
+        private static void AddSharedConfiguration(
+            IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
+            services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
         }
     }
 }
