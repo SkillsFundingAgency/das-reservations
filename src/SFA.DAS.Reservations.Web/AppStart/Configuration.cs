@@ -39,6 +39,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             services.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
+            services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
+            services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
         }
     }
 }

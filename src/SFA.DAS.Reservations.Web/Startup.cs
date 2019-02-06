@@ -86,6 +86,7 @@ namespace SFA.DAS.Reservations.Web
                 services.AddAndConfigureProviderAuthentication(serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>());
             }
             
+            var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
             services.AddMvc(
                     options =>
                     {
@@ -94,13 +95,12 @@ namespace SFA.DAS.Reservations.Web
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(1));//todo: make configurable
-            //todo: other dependent services here
+            services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
-            services.AddSingleton<IHashids>(new Hashids("SFA: digital apprenticeship service", 6, "46789BCDFGHJKLMNPRSTVWXY"));//todo: get salt, length and alphabet from config 
+            services.AddSingleton<IHashids>(new Hashids(reservationsWebConfig.HashSalt, reservationsWebConfig.HashLength, reservationsWebConfig.HashAlphabet));
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
