@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var createResult = await _mediator.Send(command);
             
-            return RedirectToAction(nameof(ReservationsController.Confirmation), new {createResult.Reservation});
+            return RedirectToAction(nameof(Confirmation), new {employerAccountId = accountId});
         }
 
         // GET

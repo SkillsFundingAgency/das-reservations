@@ -60,6 +60,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
             result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));
+            result.RouteValues.Should().ContainKey("employerAccountId")
+                .WhichValue.Should().Be(accountId);
         }
     }
 }
