@@ -2,9 +2,9 @@
 {
     public class ReservationsWebConfiguration
     {
-        public string HashSalt { get; set; }
-        public int HashLength { get; set; }
-        public string HashAlphabet { get; set; }
+        public string EmployerAccountHashSalt { get; set; }
+        public int EmployerAccountHashLength { get; set; }
+        public string EmployerAccountHashAlphabet { get; set; }
         public double SessionTimeoutHours { get; set; }
     }
 }

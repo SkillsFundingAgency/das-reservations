@@ -100,7 +100,10 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
-            services.AddSingleton<IHashids>(new Hashids(reservationsWebConfig.HashSalt, reservationsWebConfig.HashLength, reservationsWebConfig.HashAlphabet));
+            services.AddSingleton<IHashids>(new Hashids(
+                reservationsWebConfig.EmployerAccountHashSalt, 
+                reservationsWebConfig.EmployerAccountHashLength, 
+                reservationsWebConfig.EmployerAccountHashAlphabet));
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
