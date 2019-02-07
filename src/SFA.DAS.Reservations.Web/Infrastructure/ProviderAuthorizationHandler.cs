@@ -24,8 +24,6 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 return Task.CompletedTask;
             }
                 
-
-            //mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
             context.Succeed(requirement);
 
             return Task.CompletedTask;
