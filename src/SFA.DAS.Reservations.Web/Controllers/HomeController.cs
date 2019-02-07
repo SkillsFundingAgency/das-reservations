@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
-                    RedirectUri = "https://localhost:5001/{ukprn}/reservations",
+                    RedirectUri = "",
                     AllowRefresh = true
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
