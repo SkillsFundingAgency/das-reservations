@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Services;
@@ -86,6 +87,8 @@ namespace SFA.DAS.Reservations.Web
             //todo: other dependent services here
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            services.AddSingleton(
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger("reservations-web"));//todo: what is this categoryName meant to be
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
