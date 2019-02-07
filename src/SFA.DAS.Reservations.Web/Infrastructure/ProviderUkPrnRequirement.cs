@@ -2,7 +2,8 @@
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
-    public class EmployerAccountRequirement : IAuthorizationRequirement
+    public class ProviderUkPrnRequirement : IAuthorizationRequirement
     {
+
     }
 }
