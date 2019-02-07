@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -22,19 +25,21 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 {
                     options.MetadataAddress = configuration.Value.MetadataAddress;
                     options.Wtrealm = configuration.Value.Wtrealm;
-                    options.CallbackPath = "/Home/Index";
+                    options.CallbackPath = "/{ukprn}/reservations";
                     options.Events.OnSecurityTokenValidated =  async (ctx) =>
                     {
                         await PopulateProviderClaims(ctx);
                     };
                     
-                }).AddCookie(options => { options.ReturnUrlParameter = "/Home/Index"; }); ;
+                }).AddCookie(options => { options.ReturnUrlParameter = "/{ukprn}/reservations"; }); ;
         }
 
         private static Task PopulateProviderClaims(SecurityTokenValidatedContext ctx)
         {
-            var providerId = ctx.Principal.Claims;
-            
+            var providerId = ctx.Principal.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn))
+                .Value;
+            ctx.HttpContext.Items.Add(ProviderClaims.ProviderUkprn,providerId);
+            ctx.Principal.Identities.First().AddClaim(new Claim(ProviderClaims.ProviderUkprn,providerId));
             return Task.CompletedTask;
         }
     }

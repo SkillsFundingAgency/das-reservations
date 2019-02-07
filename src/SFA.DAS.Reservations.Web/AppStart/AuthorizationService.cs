@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
+                        policy.Requirements.Add(new EmployerAccountRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames
@@ -25,6 +26,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(ProviderClaims.ProviderUkprn);
+                        policy.Requirements.Add(new ProviderUkPrnRequirement());
                     });
             });
         }

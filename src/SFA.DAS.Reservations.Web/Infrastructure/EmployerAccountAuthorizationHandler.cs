@@ -11,8 +11,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerAccountRequirement requirement)
         {
-            if (!(context.Resource is AuthorizationFilterContext mvcContext) ||
-                !mvcContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId)) 
+            if (!(context.Resource is AuthorizationFilterContext mvcContext) || !mvcContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId)) 
                 return Task.CompletedTask;
 
             if (!context.User.HasClaim(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)))
