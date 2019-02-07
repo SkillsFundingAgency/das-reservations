@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -19,6 +18,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/signout", Name="employer-signout")]
         public IActionResult SignOut(string ukprn="", string employerAccountId="")
         {
+            _logger.LogDebug($"User signed out {ukprn}{employerAccountId}");
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 WsFederationDefaults.AuthenticationScheme);
-          }
+          
         }
     }
 }
