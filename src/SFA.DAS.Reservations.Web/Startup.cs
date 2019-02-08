@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -25,23 +26,17 @@ namespace SFA.DAS.Reservations.Web
     {
         private readonly IConfiguration _configuration;
 
-        public Startup()
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
-                    builder["ConfigurationStorageConnectionString"],
-                    builder["ConfigNames"].Split(","),
-                    builder["Environment"],
-                    builder["Version"]
+                    configuration["ConfigurationStorageConnectionString"],
+                    configuration["ConfigNames"].Split(","),
+                    configuration["Environment"],
+                    configuration["Version"]
                     )
                 .Build();
 
@@ -106,6 +101,8 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashAlphabet));
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            services.AddSingleton(
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger("reservations-web"));//todo: what is this categoryName meant to be
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

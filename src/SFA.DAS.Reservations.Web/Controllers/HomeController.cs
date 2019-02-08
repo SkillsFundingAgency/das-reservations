@@ -1,19 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.Reservations.Web.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
-    [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
     public class HomeController : Controller
-    {
-        public IActionResult Index()
+    {    
+        private readonly ILogger _logger;
+
+        public HomeController(ILogger logger)
         {
-            return View();
+            _logger = logger;
+        }
+
+        [Route("{ukprn}/signout",Name = "provider-signout")]
+        [Route("accounts/{employerAccountId}/signout", Name="employer-signout")]
+        public IActionResult SignOut(string ukprn="", string employerAccountId="")
+        {
+            _logger.LogDebug($"User signed out {ukprn}{employerAccountId}");
+            return SignOut(
+                new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+                {
+                    RedirectUri = "",
+                    AllowRefresh = true
+                },
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                WsFederationDefaults.AuthenticationScheme);
+          
         }
     }
 }
