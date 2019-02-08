@@ -101,8 +101,6 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashAlphabet));
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-            services.AddSingleton(
-                serviceProvider.GetService<ILoggerFactory>().CreateLogger("reservations-web"));//todo: what is this categoryName meant to be
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
