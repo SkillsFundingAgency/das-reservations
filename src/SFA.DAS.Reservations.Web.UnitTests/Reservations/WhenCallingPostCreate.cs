@@ -17,21 +17,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     [TestFixture]
     public class WhenCallingPostCreate
     {
-        [Test]
-        public async Task Then_Sends_Create_Reservation_Command()
-        {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
-            var mockMediator = fixture.Freeze<Mock<IMediator>>();
-            var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", "asd908sd");
-
-            await controller.Create();
-
-            mockMediator.Verify(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()));
-        }
-
         [Test, AutoData]
-        public async Task Then_Sets_The_Correct_Values_On_The_Command(
+        public async Task Then_Sends_Command_With_Correct_Values_Set(
             string accountId)
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});

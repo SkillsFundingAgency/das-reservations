@@ -29,10 +29,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             
             _mockHashIds = fixture.Freeze<Mock<IHashids>>();
             _mockHashIds
-                .Setup(hashids => hashids.DecodeLong(It.IsAny<string>()))
+                .Setup(hashids => hashids.DecodeLong(_encodedId))
                 .Returns(_decodedId);
             _mockHashIds
-                .Setup(hashids => hashids.EncodeLong(It.IsAny<long[]>()))
+                .Setup(hashids => hashids.EncodeLong(_decodedId[0]))
                 .Returns(_encodedId);
 
             _hashingService = fixture.Create<HashingService>();
@@ -51,22 +51,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         }
 
         [Test, AutoData]
-        public void Then_Numeric_HashValue_Should_Equal_DecodeValue(
-            string idToDecode)
+        public void Then_Numeric_HashValue_Should_Equal_DecodeValue()
         {
             //Act
-            var actualValue = _hashingService.DecodeValue(idToDecode);
+            var actualValue = _hashingService.DecodeValue(_encodedId);
 
             //Assert
             actualValue.Should().Be(_decodedId[0]);
         }
 
         [Test, AutoData]
-        public void Then_HashValue_Should_Equal_EncodedValue(
-            long id)
+        public void Then_HashValue_Should_Equal_EncodedValue()
         {
             //Act
-            var actualValue = _hashingService.HashValue(id);
+            var actualValue = _hashingService.HashValue(_decodedId[0]);
 
             //Assert
             actualValue.Should().Be(_encodedId);

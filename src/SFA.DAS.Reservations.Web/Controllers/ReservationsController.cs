@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 StartDate = DateTime.Today
             };
 
-            var createResult = await _mediator.Send(command);
+            await _mediator.Send(command);
             
             return RedirectToAction(nameof(Confirmation), new {employerAccountId = accountId});
         }
