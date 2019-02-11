@@ -12,6 +12,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
     {
         [Test, MoqAutoData]
         public void Then_It_Sets_And_Decodes_AccountId(
+            string url,
             long expectedAccountId,
             [Frozen] string hashedAccountId,
             [Frozen] Mock<Func<string, long>> decodeFunc)
@@ -21,7 +22,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                 .Returns(expectedAccountId);
 
             // note: I've had to construct here as using autodata doesn't inject the mock func for some reason
-            var request = new CreateReservationApiRequest(decodeFunc.Object, hashedAccountId, DateTime.Today);
+            var request = new CreateReservationApiRequest(url, decodeFunc.Object, hashedAccountId, DateTime.Today);
             
             var accountId = request.AccountId;
 
@@ -35,6 +36,14 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             CreateReservationApiRequest request)
         {
             request.StartDate.Should().Be(startDate);
+        }
+
+        [Test, MoqAutoData]
+        public void Then_It_Sets_Url(
+            [Frozen] string url,
+            CreateReservationApiRequest request)
+        {
+            request.Url.Should().Be(url);
         }
     }
 }

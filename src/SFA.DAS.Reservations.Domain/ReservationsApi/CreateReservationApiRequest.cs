@@ -2,12 +2,17 @@
 
 namespace SFA.DAS.Reservations.Domain.ReservationsApi
 {
-    public class CreateReservationApiRequest
+    public class CreateReservationApiRequest : BaseApiRequest
     {
         private readonly Func<string, long> _decodeFunc;
         private readonly string _hashedAccountId;
 
-        public CreateReservationApiRequest(Func<string, long> decodeFunc, string hashedAccountId, DateTime startDate)
+        public CreateReservationApiRequest(
+            string url, 
+            Func<string, long> decodeFunc, 
+            string hashedAccountId, 
+            DateTime startDate) 
+            : base(url)
         {
             _decodeFunc = decodeFunc;
             _hashedAccountId = hashedAccountId;
@@ -17,5 +22,15 @@ namespace SFA.DAS.Reservations.Domain.ReservationsApi
         public long AccountId => _decodeFunc(_hashedAccountId);
 
         public DateTime StartDate { get; }
+    }
+
+    public abstract class BaseApiRequest
+    {
+        protected BaseApiRequest(string url)
+        {
+            Url = url;
+        }
+
+        public string Url { get; }
     }
 }
