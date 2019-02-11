@@ -40,13 +40,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                         .Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var decodedAccountId = _hashingService.DecodeValue(command.AccountId);
             var apiRequest = new CreateReservationApiRequest (
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 command.StartDate);
 
-            var reservationJson = await _apiClient.CreateReservation(decodedAccountId, JsonConvert.SerializeObject(apiRequest));
+            var reservationJson = await _apiClient.CreateReservation(apiRequest.AccountId, JsonConvert.SerializeObject(apiRequest));
 
             var reservation = JsonConvert.DeserializeObject<Reservation>(reservationJson);
             return new CreateReservationResult

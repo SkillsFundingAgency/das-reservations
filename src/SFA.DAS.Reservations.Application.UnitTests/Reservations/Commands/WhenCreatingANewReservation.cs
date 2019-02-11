@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Exactly(2));
+            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Once);
         }
 
         [Test, AutoData]
