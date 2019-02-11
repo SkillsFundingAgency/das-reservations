@@ -41,11 +41,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             }
 
             var decodedAccountId = _hashingService.DecodeValue(command.AccountId);
-            var apiRequest = new CreateReservationApiRequest
-            {
-                AccountId = decodedAccountId,
-                StartDate = command.StartDate
-            };
+            var apiRequest = new CreateReservationApiRequest (
+                _hashingService.DecodeValue, 
+                command.AccountId, 
+                command.StartDate);
 
             var reservationJson = await _apiClient.CreateReservation(decodedAccountId, JsonConvert.SerializeObject(apiRequest));
 

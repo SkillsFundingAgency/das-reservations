@@ -88,18 +88,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Once);
+            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Exactly(2));
         }
 
         [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
             CreateReservationCommand command)
         {
-            var request = new CreateReservationApiRequest
-            {
-                AccountId = _expectedAccountId,
-                StartDate = command.StartDate
-            };
+            var request = new CreateReservationApiRequest(
+                _mockHashingService.Object.DecodeValue, 
+                command.AccountId, 
+                command.StartDate);
             var expectedJson = JsonConvert.SerializeObject(request);
 
             await _commandHandler.Handle(command, CancellationToken.None);
