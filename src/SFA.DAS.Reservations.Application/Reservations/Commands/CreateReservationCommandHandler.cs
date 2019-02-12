@@ -7,9 +7,9 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
-using SFA.DAS.Reservations.Domain.ReservationsApi;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Models;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
@@ -50,11 +50,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 command.AccountId, 
                 command.StartDate);
 
-            var reservationJson = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
+            var response = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
 
             return new CreateReservationResult
             {
-                Reservation = null
+                Reservation = new Reservation {Id = response.ReservationId}
             };
         }
     }

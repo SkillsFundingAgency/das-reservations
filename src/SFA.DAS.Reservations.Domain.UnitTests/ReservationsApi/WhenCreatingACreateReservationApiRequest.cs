@@ -4,7 +4,6 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
-using SFA.DAS.Reservations.Domain.ReservationsApi;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
 {
@@ -40,11 +39,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         }
 
         [Test, AutoData]
-        public void Then_It_Sets_Url(
+        public void Then_It_Sets_CreateUrl(
             [Frozen] string url,
             CreateReservation request)
         {
-            request.BaseUrl.Should().Be(url);
+            request.CreateUrl.Should().Be($"{url}api/accounts/{request.AccountId}/reservations");
         }
     }
 }

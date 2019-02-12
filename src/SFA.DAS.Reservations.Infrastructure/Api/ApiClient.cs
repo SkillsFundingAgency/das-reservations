@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Domain.ReservationsApi;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Api

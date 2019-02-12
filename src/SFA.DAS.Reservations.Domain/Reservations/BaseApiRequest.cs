@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SFA.DAS.Reservations.Domain.ReservationsApi
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public abstract class BaseApiRequest
     {
@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Domain.ReservationsApi
         }
 
         [JsonIgnore]
-        public string BaseUrl { get; }
+        protected string BaseUrl { get; }
         [JsonIgnore]
         public abstract string CreateUrl { get; }
         [JsonIgnore]

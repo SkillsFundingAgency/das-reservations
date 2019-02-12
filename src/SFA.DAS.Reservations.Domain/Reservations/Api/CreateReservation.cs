@@ -1,5 +1,4 @@
 ﻿using System;
-using SFA.DAS.Reservations.Domain.ReservationsApi;
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
@@ -24,7 +23,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 
         public DateTime StartDate { get; }
 
-        public override string CreateUrl => $"{BaseUrl}api/accounts/{_hashedAccountId}/reservations";
+        public override string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public override string GetUrl => throw new NotImplementedException();
     }
 }

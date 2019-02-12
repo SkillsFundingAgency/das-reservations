@@ -6,15 +6,12 @@ using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
-using SFA.DAS.Reservations.Domain.ReservationsApi;
 using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Models;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 {
@@ -24,7 +21,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private Mock<IValidator<CreateReservationCommand>> _mockValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
-        private Reservation _reservation;
         private ReservationResponse _apiResponse;
         private Mock<IHashingService> _mockHashingService;
         private long _expectedAccountId;
@@ -35,7 +31,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
-            _reservation = fixture.Create<Reservation>();
             _apiResponse = fixture.Create<ReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
@@ -84,42 +79,25 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Which.ParamName.Contains(propertyName).Should().BeTrue();
         }
 
-        [Test, AutoData, Ignore("todo: remove IF not required for url")]
-        public async Task Then_Decodes_The_AccountId(
-            CreateReservationCommand command)
-        {
-            await _commandHandler.Handle(command, CancellationToken.None);
-
-            _mockHashingService.Verify(service => service.DecodeValue(command.AccountId), Times.Once);
-        }
-
         [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
-            string url,
             CreateReservationCommand command)
-        {
-            var request = new CreateReservation(
-                url,
-                _mockHashingService.Object.DecodeValue, 
-                command.AccountId, 
-                command.StartDate);
-            
+        {           
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
-                //apiRequest.Url == request.Url &&
-                apiRequest.AccountId == request.AccountId &&
+                apiRequest.AccountId == _expectedAccountId &&
                 apiRequest.StartDate == command.StartDate))
                 , Times.Once);
         }
 
-        [Test, AutoData, Ignore("todo: map response")]
+        [Test, AutoData]
         public async Task Then_Returns_Response_From_Reservation_Api(
             CreateReservationCommand command)
         {
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
-            result.Reservation.Should().BeEquivalentTo(_reservation);
+            result.Reservation.Id.Should().Be(_apiResponse.ReservationId);
         }
     }
 }
