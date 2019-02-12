@@ -19,8 +19,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        // GET
-        public IActionResult Welcome()
+        [Route("apprenticeship-training")]
+        public IActionResult ApprenticeshipTraining()
         {
             return View();
         }
