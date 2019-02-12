@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
-                .WhichValue.Equals($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
+                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
         }
 
         [Test, AutoData]
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CreateReservationCommand.StartDate))
-                .WhichValue.Equals($"{nameof(CreateReservationCommand.StartDate)} has not been supplied");
+                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.StartDate)} has not been supplied");
         }
 
         [Test, AutoData]
