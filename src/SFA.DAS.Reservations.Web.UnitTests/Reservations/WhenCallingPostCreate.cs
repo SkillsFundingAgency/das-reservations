@@ -1,0 +1,54 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.NUnit3;
+using FluentAssertions;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Web.Controllers;
+
+namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+{
+    [TestFixture]
+    public class WhenCallingPostCreate
+    {
+        [Test, AutoData]
+        public async Task Then_Sends_Command_With_Correct_Values_Set(
+            string accountId)
+        {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+            var mockMediator = fixture.Freeze<Mock<IMediator>>();
+            var controller = fixture.Create<ReservationsController>();
+            controller.RouteData.Values.Add("employerAccountId", accountId);
+
+            await controller.Create();
+
+            mockMediator.Verify(mediator => 
+                mediator.Send(It.Is<CreateReservationCommand>(command => 
+                    command.AccountId == accountId && 
+                    command.StartDate == DateTime.Today
+                        ), It.IsAny<CancellationToken>()));
+        }
+
+        [Test, AutoData]
+        public async Task Then_Redirects_To_The_Confirmation_View(
+            string accountId)
+        {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+            var controller = fixture.Create<ReservationsController>();
+            controller.RouteData.Values.Add("employerAccountId", accountId);
+
+            var result = await controller.Create() as RedirectToActionResult;
+
+            result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
+            result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));
+            result.RouteValues.Should().ContainKey("employerAccountId")
+                .WhichValue.Should().Be(accountId);
+        }
+    }
+}

@@ -1,8 +1,12 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Api
@@ -16,18 +20,36 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _apiOptions = apiOptions;
         }
 
-        public async Task<string> GetReservations()
+        public async Task<IEnumerable<TResponse>> Get<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await client.GetAsync($"{_apiOptions.Value.Url}api/accounts/1/reservations").ConfigureAwait(false);
+                var response = await client.GetAsync(request.GetUrl).ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<IEnumerable<TResponse>>(json);
+            }
+        }
 
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        public async Task<TResponse> Create<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
+        {
+            var accessToken = await GetAccessTokenAsync();
+            using (var client = new HttpClient())//not unit testable using directly
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var jsonRequest = JsonConvert.SerializeObject(request);
+                var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                
+                var response = await client.PostAsync(request.CreateUrl, stringContent).ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+                var jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<TResponse>(jsonResponse);
             }
         }
 

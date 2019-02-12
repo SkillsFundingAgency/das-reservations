@@ -3,7 +3,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 
-namespace SFA.DAS.Reservations.Application.UnitTests
+namespace SFA.DAS.Reservations.Web.UnitTests
 {
     public class MoqAutoDataAttribute : AutoDataAttribute
     {
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests
         public static IFixture FixtureFactory()
         {
             var fixture = new Fixture();
-            fixture.Customize(new AutoMoqCustomization());
+            fixture.Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
             return fixture;
         }

@@ -1,45 +1,103 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 {
+    [TestFixture]
     public class WhenCreatingANewReservation
     {
-        [Test, MoqAutoData]
-        public async Task Then_It_Validates_The_Command(
-            CreateReservationCommand command,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            CreateReservationCommandHandler commandHandler)
-        {
-            await commandHandler.Handle(command, CancellationToken.None);
+        private Mock<IValidator<CreateReservationCommand>> _mockValidator;
+        private Mock<IApiClient> _mockApiClient;
+        private CreateReservationCommandHandler _commandHandler;
+        private ReservationResponse _apiResponse;
+        private Mock<IHashingService> _mockHashingService;
+        private long _expectedAccountId;
 
-            mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+        [SetUp]
+        public void Arrange()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization{ConfigureMembers = true});
+
+            _apiResponse = fixture.Create<ReservationResponse>();
+            _expectedAccountId = fixture.Create<long>();
+
+            _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
+            _mockApiClient
+                .Setup(client => client.Create<CreateReservation, ReservationResponse>(It.IsAny<CreateReservation>()))
+                .ReturnsAsync(_apiResponse);
+
+            _mockHashingService = fixture.Freeze<Mock<IHashingService>>();
+            _mockHashingService
+                .Setup(service => service.DecodeValue(It.IsAny<string>()))
+                .Returns(_expectedAccountId);
+
+            _commandHandler = fixture.Create<CreateReservationCommandHandler>();
         }
 
-        [Test, MoqAutoData, Ignore("raison d'être")]
+        [Test, AutoData]
+        public async Task Then_It_Validates_The_Command(
+            CreateReservationCommand command)
+        {
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+        }
+
+        [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
             CreateReservationCommand command,
             ValidationResult validationResult,
-            string propertyName,
-            [Frozen] Mock<IValidator<CreateReservationCommand>> mockValidator,
-            CreateReservationCommandHandler commandHandler)
+            string propertyName)
         {
             validationResult.AddError(propertyName);
-            var result = commandHandler.Handle(command, CancellationToken.None);
+
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(validationResult);
+
+            Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
+
+            act.Should().ThrowExactly<ArgumentException>()
+                .Which.ParamName.Contains(propertyName).Should().BeTrue();
         }
 
-        
+        [Test, AutoData]
+        public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
+            CreateReservationCommand command)
+        {           
+            await _commandHandler.Handle(command, CancellationToken.None);
 
-        [Test, Ignore("raison d'être")]
-        public void Then_The_Reservation_Is_Mapped_To_The_Api_Type()
+            _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
+                apiRequest.AccountId == _expectedAccountId &&
+                apiRequest.StartDate == command.StartDate))
+                , Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task Then_Returns_Response_From_Reservation_Api(
+            CreateReservationCommand command)
         {
+            var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
+            result.Reservation.Id.Should().Be(_apiResponse.ReservationId);
         }
     }
 }

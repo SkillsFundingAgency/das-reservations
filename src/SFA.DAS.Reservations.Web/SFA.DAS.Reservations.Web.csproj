@@ -7,6 +7,8 @@
 
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="6.0.0" />
+    <PackageReference Include="mediatr.extensions.microsoft.dependencyinjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="microsoft.aspnetcore.mvc.viewfeatures" Version="2.2.0" />
@@ -22,6 +24,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
   </ItemGroup>
 

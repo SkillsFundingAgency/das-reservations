@@ -13,9 +13,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{429FE184
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Infrastructure.UnitTests", "SFA.DAS.Reservations.Infrastructure.UnitTests\SFA.DAS.Reservations.Infrastructure.UnitTests.csproj", "{DDDA5440-96C8-452D-A4FD-FF09581E2738}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Application", "SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj", "{97D5D578-B8A2-46F9-AA1B-BBED699887D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Application", "SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj", "{97D5D578-B8A2-46F9-AA1B-BBED699887D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Application.UnitTests", "SFA.DAS.Reservations.Application.UnitTests\SFA.DAS.Reservations.Application.UnitTests.csproj", "{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Application.UnitTests", "SFA.DAS.Reservations.Application.UnitTests\SFA.DAS.Reservations.Application.UnitTests.csproj", "{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web.UnitTests", "SFA.DAS.Reservations.Web.UnitTests\SFA.DAS.Reservations.Web.UnitTests.csproj", "{DD46209A-CA75-4223-B61B-F7D355DD010C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Domain", "SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj", "{945C9EDA-02A4-4652-9BDD-4535714FE430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Domain.UnitTests", "SFA.DAS.Reservations.Domain.UnitTests\SFA.DAS.Reservations.Domain.UnitTests.csproj", "{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +53,18 @@ Global
 		{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD46209A-CA75-4223-B61B-F7D355DD010C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD46209A-CA75-4223-B61B-F7D355DD010C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD46209A-CA75-4223-B61B-F7D355DD010C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD46209A-CA75-4223-B61B-F7D355DD010C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{945C9EDA-02A4-4652-9BDD-4535714FE430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{945C9EDA-02A4-4652-9BDD-4535714FE430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{945C9EDA-02A4-4652-9BDD-4535714FE430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{945C9EDA-02A4-4652-9BDD-4535714FE430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +72,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DDDA5440-96C8-452D-A4FD-FF09581E2738} = {429FE184-B674-47C2-971C-87AFC7411D47}
 		{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57} = {429FE184-B674-47C2-971C-87AFC7411D47}
+		{DD46209A-CA75-4223-B61B-F7D355DD010C} = {429FE184-B674-47C2-971C-87AFC7411D47}
+		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A} = {429FE184-B674-47C2-971C-87AFC7411D47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92493938-AEBD-43A6-936E-DC0B25100216}
