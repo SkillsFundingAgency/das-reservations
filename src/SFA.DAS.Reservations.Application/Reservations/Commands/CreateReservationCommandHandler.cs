@@ -3,27 +3,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.ReservationsApi;
 using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Models;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
         private readonly IValidator<CreateReservationCommand> _validator;
+        private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
 
         public CreateReservationCommandHandler(
             IValidator<CreateReservationCommand> validator, 
+            IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             IHashingService hashingService)
         {
             _validator = validator;
+            _apiOptions = apiOptions;
             _apiClient = apiClient;
             _hashingService = hashingService;
         }
@@ -41,16 +44,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             }
 
             var apiRequest = new CreateReservationApiRequest (
+                $"{_apiOptions.Value.Url}api/accounts/{/*todo:decoded value*/1}/reservations",// could get decoded id from itself, after ctor, a bit gross.
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 command.StartDate);
 
-            var reservationJson = await _apiClient.CreateReservation(apiRequest.AccountId, JsonConvert.SerializeObject(apiRequest));
+            var reservationJson = await _apiClient.Create<CreateReservationApiRequest, CreateReservationApiResponse>(apiRequest);
 
-            var reservation = JsonConvert.DeserializeObject<Reservation>(reservationJson);
             return new CreateReservationResult
             {
-                Reservation = reservation
+                Reservation = null
             };
         }
     }

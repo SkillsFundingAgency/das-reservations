@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.Reservations.Domain.ReservationsApi
 {
@@ -31,6 +32,7 @@ namespace SFA.DAS.Reservations.Domain.ReservationsApi
             Url = url;
         }
 
+        [JsonIgnore]
         public string Url { get; }
     }
 }

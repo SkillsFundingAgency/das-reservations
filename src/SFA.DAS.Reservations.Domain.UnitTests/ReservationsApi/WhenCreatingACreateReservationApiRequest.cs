@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             accountId.Should().Be(expectedAccountId);
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public void Then_It_Sets_StartDate(
             [Frozen] DateTime startDate,
             CreateReservationApiRequest request)
@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             request.StartDate.Should().Be(startDate);
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public void Then_It_Sets_Url(
             [Frozen] string url,
             CreateReservationApiRequest request)
