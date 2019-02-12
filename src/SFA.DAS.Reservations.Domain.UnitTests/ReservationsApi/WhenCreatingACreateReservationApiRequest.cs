@@ -3,6 +3,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.ReservationsApi;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
@@ -22,7 +23,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                 .Returns(expectedAccountId);
 
             // note: I've had to construct here as using autodata doesn't inject the mock func for some reason
-            var request = new CreateReservationApiRequest(url, decodeFunc.Object, hashedAccountId, DateTime.Today);
+            var request = new CreateReservation(url, decodeFunc.Object, hashedAccountId, DateTime.Today);
             
             var accountId = request.AccountId;
 
@@ -33,7 +34,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         [Test, AutoData]
         public void Then_It_Sets_StartDate(
             [Frozen] DateTime startDate,
-            CreateReservationApiRequest request)
+            CreateReservation request)
         {
             request.StartDate.Should().Be(startDate);
         }
@@ -41,7 +42,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         [Test, AutoData]
         public void Then_It_Sets_Url(
             [Frozen] string url,
-            CreateReservationApiRequest request)
+            CreateReservation request)
         {
             request.BaseUrl.Should().Be(url);
         }

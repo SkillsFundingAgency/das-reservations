@@ -1,14 +1,14 @@
 ﻿using System;
-using Newtonsoft.Json;
+using SFA.DAS.Reservations.Domain.ReservationsApi;
 
-namespace SFA.DAS.Reservations.Domain.ReservationsApi
+namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class CreateReservationApiRequest : BaseApiRequest
+    public class CreateReservation : BaseApiRequest
     {
         private readonly Func<string, long> _decodeFunc;
         private readonly string _hashedAccountId;
 
-        public CreateReservationApiRequest(
+        public CreateReservation(
             string baseUrl, 
             Func<string, long> decodeFunc, 
             string hashedAccountId, 

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.ReservationsApi;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Models;
@@ -24,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
         private Reservation _reservation;
-        private CreateReservationApiResponse _apiResponse;
+        private ReservationResponse _apiResponse;
         private Mock<IHashingService> _mockHashingService;
         private long _expectedAccountId;
 
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
             _reservation = fixture.Create<Reservation>();
-            _apiResponse = fixture.Create<CreateReservationApiResponse>();
+            _apiResponse = fixture.Create<ReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
             _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
@@ -45,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
             _mockApiClient
-                .Setup(client => client.Create<CreateReservationApiRequest, CreateReservationApiResponse>(It.IsAny<CreateReservationApiRequest>()))
+                .Setup(client => client.Create<CreateReservation, ReservationResponse>(It.IsAny<CreateReservation>()))
                 .ReturnsAsync(_apiResponse);
 
             _mockHashingService = fixture.Freeze<Mock<IHashingService>>();
@@ -97,7 +98,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             string url,
             CreateReservationCommand command)
         {
-            var request = new CreateReservationApiRequest(
+            var request = new CreateReservation(
                 url,
                 _mockHashingService.Object.DecodeValue, 
                 command.AccountId, 
@@ -105,7 +106,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.Create<CreateReservationApiRequest, CreateReservationApiResponse>(It.Is<CreateReservationApiRequest>(apiRequest => 
+            _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
                 //apiRequest.Url == request.Url &&
                 apiRequest.AccountId == request.AccountId &&
                 apiRequest.StartDate == command.StartDate))

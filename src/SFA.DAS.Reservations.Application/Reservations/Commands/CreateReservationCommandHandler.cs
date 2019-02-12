@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.ReservationsApi;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -43,13 +44,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                         .Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var apiRequest = new CreateReservationApiRequest (
+            var apiRequest = new CreateReservation (
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 command.StartDate);
 
-            var reservationJson = await _apiClient.Create<CreateReservationApiRequest, CreateReservationApiResponse>(apiRequest);
+            var reservationJson = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
 
             return new CreateReservationResult
             {
