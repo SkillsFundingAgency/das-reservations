@@ -9,11 +9,11 @@ namespace SFA.DAS.Reservations.Domain.ReservationsApi
         private readonly string _hashedAccountId;
 
         public CreateReservationApiRequest(
-            string url, 
+            string baseUrl, 
             Func<string, long> decodeFunc, 
             string hashedAccountId, 
             DateTime startDate) 
-            : base(url)
+            : base(baseUrl)
         {
             _decodeFunc = decodeFunc;
             _hashedAccountId = hashedAccountId;
@@ -23,16 +23,8 @@ namespace SFA.DAS.Reservations.Domain.ReservationsApi
         public long AccountId => _decodeFunc(_hashedAccountId);
 
         public DateTime StartDate { get; }
-    }
 
-    public abstract class BaseApiRequest
-    {
-        protected BaseApiRequest(string url)
-        {
-            Url = url;
-        }
-
-        [JsonIgnore]
-        public string Url { get; }
+        public override string CreateUrl => $"{BaseUrl}api/accounts/{_hashedAccountId}/reservations";
+        public override string GetUrl => throw new NotImplementedException();
     }
 }

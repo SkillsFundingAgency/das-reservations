@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             }
 
             var apiRequest = new CreateReservationApiRequest (
-                $"{_apiOptions.Value.Url}api/accounts/{/*todo:decoded value*/1}/reservations",// could get decoded id from itself, after ctor, a bit gross.
+                _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 command.StartDate);

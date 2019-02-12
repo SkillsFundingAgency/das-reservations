@@ -20,14 +20,14 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _apiOptions = apiOptions;
         }
 
-        public async Task<IEnumerable<TResponse>> GetMany<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
+        public async Task<IEnumerable<TResponse>> Get<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await client.GetAsync(request.Url).ConfigureAwait(false);
+                var response = await client.GetAsync(request.GetUrl).ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
                 var jsonRequest = JsonConvert.SerializeObject(request);
                 var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
                 
-                var response = await client.PostAsync(request.Url, stringContent).ConfigureAwait(false);
+                var response = await client.PostAsync(request.CreateUrl, stringContent).ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
                 var jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

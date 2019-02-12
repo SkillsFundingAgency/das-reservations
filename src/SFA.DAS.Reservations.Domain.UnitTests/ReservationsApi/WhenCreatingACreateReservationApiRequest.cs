@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             [Frozen] string url,
             CreateReservationApiRequest request)
         {
-            request.Url.Should().Be(url);
+            request.BaseUrl.Should().Be(url);
         }
     }
 }
