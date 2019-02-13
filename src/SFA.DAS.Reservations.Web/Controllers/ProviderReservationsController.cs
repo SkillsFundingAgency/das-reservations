@@ -10,7 +10,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            
+            return View(RouteData.Values["ukprn"]);
         }
     }
 }

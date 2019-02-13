@@ -1,5 +1,12 @@
-﻿@{
+﻿@model string
+@{
     ViewData["Title"] = "Reservations";
+
+    var routeData = new Dictionary<string, string>
+    {
+        { "ukprn", @Model },
+        { "employerAccountId", "JKXR9B"} //todo: this will eventually come from the employer selection page
+    };
 }
 
 <h1 class="govuk-heading-xl">Get funding for non-levy employers</h1>
@@ -10,6 +17,6 @@
     <li>an estimate of which month the apprenticeship training course will start, which can be flexible up to 3 months</li>
     <li>an idea of the <a href="#">apprenticeship training</a> the apprentice will take, which can be changed later</li>
 </ul>
-<a href="#" role="button" draggable="false" class="govuk-button govuk-button--start">
+<a href="@($"/{routeData["ukprn"]}/accounts/{routeData["employerAccountId"]}/reservations/apprenticeship-training")" role="button" draggable="false" class="govuk-button govuk-button--start">
     Start
 </a>
