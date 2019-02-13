@@ -3,13 +3,48 @@
 }
 
 <h1 class="govuk-heading-xl">Apprenticeship training</h1>
-<p class="govuk-body-l">Use this service to secure government funding for a non-levy employer to train an apprentice. Government funding will pay for part or all of the cost of training an apprentice.</p>
-<p class="govuk-body">Before you start you will need:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li><a href="#">permission</a> from a non-levy employer that you can secure funds for them</li>
-    <li>an estimate of which month the apprenticeship training course will start, which can be flexible up to 3 months</li>
-    <li>an idea of the <a href="#">apprenticeship training</a> the apprentice will take, which can be changed later</li>
-</ul>
-<a href="#" role="button" draggable="false" class="govuk-button govuk-button--start">
-    Start
-</a>
+
+
+<form asp-controller="Reservations" asp-action="ApprenticeshipTraining" method="post">
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h2 class="govuk-fieldset__heading">
+                    When will the apprenticeship training start?
+                </h2>
+            </legend>
+            <span id="choose-start-date-hint" class="govuk-hint">
+                The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
+            </span>
+            <div class="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="training-start-date-1" name="training-start-date" type="radio" value="feb">
+                    <label class="govuk-label govuk-radios__label" for="training-start-date-1">
+                        February 2019
+                    </label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="training-start-date-2" name="training-start-date" type="radio" value="mar">
+                    <label class="govuk-label govuk-radios__label" for="training-start-date-2">
+                        March 2019
+                    </label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="training-start-date-3" name="training-start-date" type="radio" value="apr">
+                    <label class="govuk-label govuk-radios__label" for="training-start-date-3">
+                        April 2019
+                    </label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="training-start-date-4" name="training-start-date" type="radio" value="may">
+                    <label class="govuk-label govuk-radios__label" for="training-start-date-4">
+                        May 2019
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <button type="submit" class="govuk-button">
+        Save and continue
+    </button>
+</form>

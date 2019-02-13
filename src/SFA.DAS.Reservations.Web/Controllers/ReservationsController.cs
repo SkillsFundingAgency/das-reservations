@@ -9,7 +9,9 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
+    //[Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
     [Route("accounts/{employerAccountId}/reservations")]
+    //[Route("{ukprn}/reservations")]
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;
