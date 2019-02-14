@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -16,16 +18,29 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly IStartDateService _startDateService;
 
-        public ReservationsController(IMediator mediator)
+        public ReservationsController(IMediator mediator, IStartDateService startDateService)
         {
             _mediator = mediator;
+            _startDateService = startDateService;
         }
 
         [Route("apprenticeship-training")]
-        public IActionResult ApprenticeshipTraining(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
-            return View();
+            var dates = await _startDateService.GetStartDates();
+            
+            var viewModel = new ApprenticeshipTrainingViewModel
+            {
+                PossibleStartDates = dates.Select(date => new StartDateViewModel
+                {
+                    Value = $"{date:yyyy-MM}",
+                    Label = $"{date:MMMM yyyy}"
+                })
+            };
+
+            return View(viewModel);
         }
 
         [Route("apprenticeship-training")]
@@ -34,6 +49,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             await Task.CompletedTask;
             return RedirectToAction(nameof(Confirmation), routeModel);
+        }
+
+        // GET
+        [Route("review")]
+        public IActionResult Review(ReservationsRouteModel routeModel)
+        {
+            return null;
+        }
+
+        // GET
+        [Route("confirmation")]
+        public IActionResult Confirmation(ReservationsRouteModel routeModel)
+        {
+            return View();
         }
 
         [HttpPost]
@@ -49,20 +78,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             await _mediator.Send(command);
             
             return RedirectToAction(nameof(Confirmation), new {employerAccountId = accountId});
-        }
-
-        // GET
-        [Route("review")]
-        public IActionResult Review(ReservationsRouteModel routeModel)
-        {
-            return null;
-        }
-
-        // GET
-        [Route("confirmation")]
-        public IActionResult Confirmation(ReservationsRouteModel routeModel)
-        {
-            return View();
         }
     }
 }
