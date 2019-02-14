@@ -17,6 +17,13 @@
     <li>an estimate of which month the apprenticeship training course will start, which can be flexible up to 3 months</li>
     <li>an idea of the <a href="#">apprenticeship training</a> the apprentice will take, which can be changed later</li>
 </ul>
+<form method="post" action="@($"/{routeData["ukprn"]}/accounts/{routeData["employerAccountId"]}/reservations/create")">
+    <button type="submit" draggable="false" class="govuk-button govuk-button--start">
+        Start
+    </button>
+</form>
+<!-- todo: swap back to a href in next story (e.g. MF-71)
 <a href="@($"/{routeData["ukprn"]}/accounts/{routeData["employerAccountId"]}/reservations/apprenticeship-training")" role="button" draggable="false" class="govuk-button govuk-button--start">
     Start
 </a>
+-->

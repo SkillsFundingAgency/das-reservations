@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     //[Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]//todo: separate story to get both policies working (poss. as a single policy)
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
+    //[Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
     [Route("{ukprn:int}/accounts/{employerAccountId}/reservations", Name = "provider-reservations")]
     public class ReservationsController : Controller
     {
@@ -36,8 +36,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToAction(nameof(Confirmation), routeModel);
         }
 
+        [Route("create")]
         [HttpPost]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
         {
             var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
@@ -48,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             await _mediator.Send(command);
             
-            return RedirectToAction(nameof(Confirmation), new {employerAccountId = accountId});
+            return RedirectToAction(nameof(Confirmation), routeModel);
         }
 
         // GET
