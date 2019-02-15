@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
@@ -19,36 +20,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     {
         [Test, AutoData]
         public async Task Then_Sends_Command_With_Correct_Values_Set(
-            string accountId)
+            ReservationsRouteModel routeModel)
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
             var mockMediator = fixture.Freeze<Mock<IMediator>>();
             var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", accountId);
-
-            await controller.Create();
+            
+            await controller.Create(routeModel);
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
-                    command.AccountId == accountId && 
+                    command.AccountId == routeModel.EmployerAccountId && 
                     command.StartDate == DateTime.Today
                         ), It.IsAny<CancellationToken>()));
         }
 
         [Test, AutoData]
         public async Task Then_Redirects_To_The_Confirmation_View(
-            string accountId)
+            ReservationsRouteModel routeModel)
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
             var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", accountId);
 
-            var result = await controller.Create() as RedirectToActionResult;
+            var result = await controller.Create(routeModel) as RedirectToActionResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
             result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));
             result.RouteValues.Should().ContainKey("employerAccountId")
-                .WhichValue.Should().Be(accountId);
+                .WhichValue.Should().Be(routeModel.EmployerAccountId);
         }
     }
 }

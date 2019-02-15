@@ -49,36 +49,36 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
         {
             await Task.CompletedTask;//todo: save form data to cache
-            return RedirectToAction(nameof(Confirmation), routeModel);
+            return RedirectToAction(nameof(Review), routeModel);//this also defaults to the employer route which then throws error for provider as no ukprn in the route.
         }
 
         // GET
         [Route("review")]
         public IActionResult Review(ReservationsRouteModel routeModel)
         {
-            return null;
+            return View(routeModel);
         }
 
         // GET
         [Route("confirmation")]
         public IActionResult Confirmation(ReservationsRouteModel routeModel)
         {
-            return View();
+            return View(routeModel);
         }
 
+        [Route("create")]
         [HttpPost]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
         {
-            var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
             {
-                AccountId = accountId,
+                AccountId = routeModel.EmployerAccountId,
                 StartDate = DateTime.Today
             };
 
             await _mediator.Send(command);
             
-            return RedirectToAction(nameof(Confirmation), new {employerAccountId = accountId});
+            return RedirectToAction(nameof(Confirmation), routeModel);
         }
     }
 }
