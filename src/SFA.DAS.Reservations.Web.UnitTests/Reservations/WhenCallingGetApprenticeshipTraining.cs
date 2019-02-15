@@ -49,9 +49,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             }).OrderBy(model => model.Value);
 
             var result = await controller.ApprenticeshipTraining(routeModel);
-            result.Should().BeOfType<ViewResult>()
+            var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
-                .Which.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
+                .Subject;
+            
+            viewModel.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
+            viewModel.RouteModel.Should().BeSameAs(routeModel);
         }
     }
 }

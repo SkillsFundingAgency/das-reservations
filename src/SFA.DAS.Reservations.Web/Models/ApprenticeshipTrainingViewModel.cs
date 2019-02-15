@@ -4,6 +4,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ApprenticeshipTrainingViewModel
     {
+        public ReservationsRouteModel RouteModel { get; set; }
         public IEnumerable<StartDateViewModel> PossibleStartDates { get; set; }
     }
 

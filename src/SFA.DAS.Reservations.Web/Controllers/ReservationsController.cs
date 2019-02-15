@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     //[Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]//todo: separate story to get both policies working (poss. as a single policy)
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
+    //[Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
     [Route("{ukprn:int}/accounts/{employerAccountId}/reservations", Name = "provider-reservations")]
     public class ReservationsController : Controller
     {
@@ -33,6 +33,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             
             var viewModel = new ApprenticeshipTrainingViewModel
             {
+                RouteModel = routeModel,
                 PossibleStartDates = dates.Select(date => new StartDateViewModel
                 {
                     Value = $"{date:yyyy-MM}",
@@ -47,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
         {
-            await Task.CompletedTask;
+            await Task.CompletedTask;//todo: save form data to cache
             return RedirectToAction(nameof(Confirmation), routeModel);
         }
 

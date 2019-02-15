@@ -6,7 +6,7 @@
 <h1 class="govuk-heading-xl">Apprenticeship training</h1>
 
 
-<form asp-controller="Reservations" asp-action="ApprenticeshipTraining" method="post">
+<form method="post" action="@($"/{Model.RouteModel.Ukprn}/accounts/{Model.RouteModel.EmployerAccountId}/reservations/apprenticeship-training")">
     <div class="govuk-form-group">
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -27,30 +27,6 @@
                         </label>
                     </div>
                 }
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="training-start-date-1" name="training-start-date" type="radio" value="feb">
-                    <label class="govuk-label govuk-radios__label" for="training-start-date-1">
-                        February 2019
-                    </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="training-start-date-2" name="training-start-date" type="radio" value="mar">
-                    <label class="govuk-label govuk-radios__label" for="training-start-date-2">
-                        March 2019
-                    </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="training-start-date-3" name="training-start-date" type="radio" value="apr">
-                    <label class="govuk-label govuk-radios__label" for="training-start-date-3">
-                        April 2019
-                    </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="training-start-date-4" name="training-start-date" type="radio" value="may">
-                    <label class="govuk-label govuk-radios__label" for="training-start-date-4">
-                        May 2019
-                    </label>
-                </div>
             </div>
         </fieldset>
     </div>
