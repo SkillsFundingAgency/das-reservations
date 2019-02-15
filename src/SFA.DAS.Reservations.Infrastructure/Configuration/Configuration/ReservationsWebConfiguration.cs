@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
+﻿using System;
+
+namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
 {
     public class ReservationsWebConfiguration
     {
@@ -6,5 +8,6 @@
         public int EmployerAccountHashLength { get; set; }
         public string EmployerAccountHashAlphabet { get; set; }
         public double SessionTimeoutHours { get; set; }
+        public DateTime? CurrentDateTime { get; set; }
     }
 }

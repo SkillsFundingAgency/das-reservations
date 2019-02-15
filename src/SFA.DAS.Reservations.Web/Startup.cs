@@ -14,10 +14,12 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
 
 namespace SFA.DAS.Reservations.Web
@@ -99,8 +101,13 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashSalt, 
                 reservationsWebConfig.EmployerAccountHashLength, 
                 reservationsWebConfig.EmployerAccountHashAlphabet));
+            services.AddTransient<IStartDateService, StartDateService>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+
+            services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
+                ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
+                : new CurrentDateTime());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
