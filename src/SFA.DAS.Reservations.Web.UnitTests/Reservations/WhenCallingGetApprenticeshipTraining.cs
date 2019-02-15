@@ -46,12 +46,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             {
                 Value = date.ToString("yyyy-MM"), 
                 Label = date.ToString("MMMM yyyy")
-            });
+            }).OrderBy(model => model.Value);
 
             var result = await controller.ApprenticeshipTraining(routeModel);
             result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
-                .Which.PossibleStartDates.Count().Should().Be(mappedDates.Count()); // todo: for some reason .AllBeEquivalentTo(mappedDates) isn't working
+                .Which.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
         }
     }
 }

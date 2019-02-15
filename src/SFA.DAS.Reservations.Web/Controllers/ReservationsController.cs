@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Value = $"{date:yyyy-MM}",
                     Label = $"{date:MMMM yyyy}"
-                })
+                }).OrderBy(model => model.Value)
             };
 
             return View(viewModel);
