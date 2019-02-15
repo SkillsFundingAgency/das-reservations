@@ -24,18 +24,27 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
 
             dates.ToList().Should().Contain(date => 
                 date.Month == now.Month && 
-                date.Year == now.Year);
+                date.Year == now.Year &&
+                date.Day == 1 &&
+                date.Hour == 0);
         }
 
-        [Test, MoqAutoData, Ignore("todo")]
+        [Test, MoqAutoData]
         public async Task Then_Returns_The_Next_Five_Months_After_This_Month(
             [Frozen] Mock<ICurrentDateTime> mockCurrentDateTime, 
             StartDateService startDateService)
         {
             var now = mockCurrentDateTime.Object.Now;
+            var expectedDates = new List<DateTime>();
+            for (var i = 0; i < 6; i++)
+            {
+                expectedDates.Add(now.AddMonths(i).AddDays(1-now.Day).Date);
+            }
+
             var dates = await startDateService.GetStartDates();
 
-            // todo: check other months in loop
+            dates.Count().Should().Be(6);
+            dates.Should().BeEquivalentTo(expectedDates);
         }
     }
 
@@ -50,9 +59,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
 
         public async Task<IEnumerable<DateTime>> GetStartDates()
         {
-            await Task.CompletedTask;
+            await Task.CompletedTask; // this service will need to read rules at some point in the future.
+
+            var now = _currentDateTime.Now;
             var datesToReturn = new List<DateTime>();
-            datesToReturn.Add(_currentDateTime.Now);
+            for (var i = 0; i < 6; i++)
+            {
+                var dateToAdd = now.AddMonths(i).AddDays(1-now.Day).Date;
+                datesToReturn.Add(dateToAdd);
+            }
             return datesToReturn;
         }
     }
