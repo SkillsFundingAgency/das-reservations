@@ -20,13 +20,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             StartDateService startDateService)
         {
             var now = mockCurrentDateTime.Object.Now;
+            var expectedDate = now.AddDays(1 - now.Day).Date;
+
             var dates = await startDateService.GetStartDates();
 
-            dates.ToList().Should().Contain(date => 
-                date.Month == now.Month && 
-                date.Year == now.Year &&
-                date.Day == 1 &&
-                date.Hour == 0);
+            dates.ToList().Should().Contain(expectedDate);
         }
 
         [Test, MoqAutoData]
@@ -45,30 +43,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
 
             dates.Count().Should().Be(6);
             dates.Should().BeEquivalentTo(expectedDates);
-        }
-    }
-
-    public class StartDateService : IStartDateService
-    {
-        private readonly ICurrentDateTime _currentDateTime;
-
-        public StartDateService(ICurrentDateTime currentDateTime)
-        {
-            _currentDateTime = currentDateTime;
-        }
-
-        public async Task<IEnumerable<DateTime>> GetStartDates()
-        {
-            await Task.CompletedTask; // this service will need to read rules at some point in the future.
-
-            var now = _currentDateTime.Now;
-            var datesToReturn = new List<DateTime>();
-            for (var i = 0; i < 6; i++)
-            {
-                var dateToAdd = now.AddMonths(i).AddDays(1-now.Day).Date;
-                datesToReturn.Add(dateToAdd);
-            }
-            return datesToReturn;
         }
     }
 }
