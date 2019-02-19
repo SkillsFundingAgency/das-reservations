@@ -28,6 +28,14 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireClaim(ProviderClaims.ProviderUkprn);
                         policy.Requirements.Add(new ProviderUkPrnRequirement());
                     });
+                options.AddPolicy(
+                    PolicyNames.HasProviderOrEmployerAccount, policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        policy.RequireAssertion(context => context.User.HasClaim(c =>
+                            c.Type.Equals(ProviderClaims.ProviderUkprn) ||
+                            c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)));
+                    });
             });
         }
     }
