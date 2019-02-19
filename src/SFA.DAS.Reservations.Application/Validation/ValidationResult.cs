@@ -23,6 +23,8 @@ namespace SFA.DAS.Reservations.Application.Validation
             ValidationDictionary.Add(propertyName, validationError);
         }
 
+        public List<string> ErrorList => ValidationDictionary.Select(c => c.Key + "|" + c.Value).ToList();
+
         public bool IsValid()
         {
             if (ValidationDictionary == null)

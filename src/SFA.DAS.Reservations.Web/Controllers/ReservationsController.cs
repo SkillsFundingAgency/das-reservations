@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -28,17 +30,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
         public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, int? ukPrn)
         {
-            var dates = await _startDateService.GetStartDates();
             
-            var viewModel = new ApprenticeshipTrainingViewModel
-            {
-                RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
-                PossibleStartDates = dates.Select(date => new StartDateViewModel
-                {
-                    Value = $"{date:yyyy-MM}",
-                    Label = $"{date:MMMM yyyy}"
-                }).OrderBy(model => model.Value)
-            };
+            
+            var viewModel = await BuildApprenticeshipTrainingViewModel(ukPrn);
 
             return View(viewModel);
         }
@@ -51,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToAction(nameof(Review), routeModel);//this also defaults to the employer route which then throws error for provider as no ukprn in the route.
         }
 
-        
+
         [Route("review")]
         public IActionResult Review(ReservationsRouteModel routeModel)
         {
@@ -64,23 +58,52 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
         {
-            var command = new CreateReservationCommand
+            try
             {
-                AccountId = employerAccountId,
-                StartDate = trainingStartDate
-            };
+                var command = new CreateReservationCommand
+                {
+                    AccountId = employerAccountId,
+                    StartDate = trainingStartDate
+                };
 
-            await _mediator.Send(command);
+                await _mediator.Send(command);
+                
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
+                return View("ApprenticeshipTraining", model);
+            }
 
             return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created");
+
         }
 
         // GET
+
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-reservation-created")]
         [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-reservation-created")]
         public IActionResult Confirmation()
         {
             return View();
+        }
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
+        {
+            var dates = await _startDateService.GetStartDates();
+            return new ApprenticeshipTrainingViewModel
+            {
+                RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
+                PossibleStartDates = dates.Select(date => new StartDateViewModel
+                {
+                    Value = $"{date:yyyy-MM}",
+                    Label = $"{date:MMMM yyyy}"
+                }).OrderBy(model => model.Value)
+            };
         }
     }
 }

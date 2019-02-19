@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -12,18 +14,26 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
     [TestFixture]
     public class WhenCallingPostCreate
     {
+        private IFixture _fixture;
+
+        [SetUp]
+        public void Arrange()
+        {
+            _fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
+        }
+
         [Test, AutoData]
         public async Task Then_Sends_Command_With_Correct_Values_Set(string employerAccountId)
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
-            var mockMediator = fixture.Freeze<Mock<IMediator>>();
-            var controller = fixture.Create<ReservationsController>();
+            var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            var controller = _fixture.Create<ReservationsController>();
             var expectedStartDate = "2018-10";
 
             await controller.Create(employerAccountId,null, expectedStartDate);
@@ -38,9 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, AutoData]
         public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(string employerAccountId)
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
-            var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", employerAccountId);
+            var controller = _fixture.Create<ReservationsController>();
 
             var result = await controller.Create(employerAccountId,null, "2018-10") as RedirectToRouteResult;
 
@@ -51,14 +59,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, AutoData]
         public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, int ukPrn)
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
-            var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", employerAccountId);
+            var controller = _fixture.Create<ReservationsController>();
 
             var result = await controller.Create(employerAccountId, ukPrn, "2018-10") as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be("provider-reservation-created");
+        }
+
+        [Test, AutoData]
+        public async Task Then_Redisplays_The_View_If_There_Is_A_Validation_Error_From_The_Command(string employerAccountId)
+        {
+            var mediator = new Mock<IMediator>();
+            mediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "StartDate|The StartDate field is not valid." }), null, null));
+            var controller = new ReservationsController(mediator.Object, Mock.Of<IStartDateService>());
+
+            var actual = await controller.Create("123r", null, "201");
+
+            Assert.IsNotNull(actual);
+            var actualViewResult = actual as ViewResult;
+            Assert.IsNotNull(actualViewResult);
+            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
+            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("StartDate"));
         }
     }
 }
