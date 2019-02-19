@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     {
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
-            ReservationsRouteModel routeModel,
+            string employerAccountId,
             IEnumerable<DateTime> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
@@ -27,14 +27,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
    
-            await controller.ApprenticeshipTraining(routeModel);
+            await controller.ApprenticeshipTraining(employerAccountId, null);
 
             mockStartDateService.Verify(provider => provider.GetStartDates(), Times.Once);
         }
 
         [Test, MoqAutoData]
-        public async Task Then_It_Returns_The_Apprenticeship_Training_View(
-            ReservationsRouteModel routeModel,
+        public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Dates(
+            string employerAccountId,
             IEnumerable<DateTime> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
@@ -48,13 +48,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Label = date.ToString("MMMM yyyy")
             }).OrderBy(model => model.Value);
 
-            var result = await controller.ApprenticeshipTraining(routeModel);
+            var result = await controller.ApprenticeshipTraining(employerAccountId, null);
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
                 .Subject;
             
             viewModel.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
-            viewModel.RouteModel.Should().BeSameAs(routeModel);
         }
     }
 }

@@ -11,10 +11,7 @@ using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
-    //[Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]//todo: separate story to get both policies working (poss. as a single policy)
-    [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    //[Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
-    [Route("{ukprn:int}/accounts/{employerAccountId}/reservations", Name = "provider-reservations")]
+    [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;
@@ -27,13 +24,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [Route("apprenticeship-training")]
-        public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
+        public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, int? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
             
             var viewModel = new ApprenticeshipTrainingViewModel
             {
-                RouteModel = routeModel,
+                RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
                 PossibleStartDates = dates.Select(date => new StartDateViewModel
                 {
                     Value = $"{date:yyyy-MM}",
@@ -52,33 +51,38 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToAction(nameof(Review), routeModel);//this also defaults to the employer route which then throws error for provider as no ukprn in the route.
         }
 
-        // GET
+        
         [Route("review")]
         public IActionResult Review(ReservationsRouteModel routeModel)
         {
             return View(routeModel);
         }
 
-        // GET
-        [Route("confirmation")]
-        public IActionResult Confirmation(ReservationsRouteModel routeModel)
-        {
-            return View(routeModel);
-        }
-
-        [Route("create")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]
+        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
         [HttpPost]
-        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
         {
+            var startDateComponents = trainingStartDate.Split("-");
+
             var command = new CreateReservationCommand
             {
-                AccountId = routeModel.EmployerAccountId,
-                StartDate = DateTime.Today
+                AccountId = employerAccountId,
+                StartDate = new DateTime(Convert.ToInt32(startDateComponents[0]), Convert.ToInt32(startDateComponents[1]),1)
             };
 
             await _mediator.Send(command);
-            
-            return RedirectToAction(nameof(Confirmation), routeModel);
+
+            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created");
+        }
+
+        // GET
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-reservation-created")]
+        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-reservation-created")]
+        public IActionResult Confirmation()
+        {
+            return View();
         }
     }
 }

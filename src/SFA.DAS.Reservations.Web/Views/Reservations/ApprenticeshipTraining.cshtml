@@ -6,7 +6,7 @@
 <h1 class="govuk-heading-xl">Apprenticeship training</h1>
 
 
-<form method="post" action="@($"/{Model.RouteModel.Ukprn}/accounts/{Model.RouteModel.EmployerAccountId}/reservations/apprenticeship-training")">
+<form method="post" asp-route="@Model.RouteName">
     <div class="govuk-form-group">
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -21,7 +21,7 @@
                 @foreach (var possibleStartDate in Model.PossibleStartDates)
                 {
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Value" name="training-start-date" type="radio" value="@possibleStartDate.Value">
+                        <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Value" name="trainingStartDate" type="radio" value="@possibleStartDate.Value">
                         <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Value">
                             @possibleStartDate.Label
                         </label>

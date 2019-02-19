@@ -16,8 +16,6 @@ namespace SFA.DAS.Reservations.Web.Services
 
         public async Task<IEnumerable<DateTime>> GetStartDates()
         {
-            await Task.CompletedTask; // this service will need to read rules at some point in the future.
-
             var now = _currentDateTime.Now;
             var datesToReturn = new List<DateTime>();
             for (var i = 0; i < 6; i++)
@@ -25,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.Services
                 var dateToAdd = now.AddMonths(i).AddDays(1-now.Day).Date;
                 datesToReturn.Add(dateToAdd);
             }
-            return datesToReturn;
+            return await Task.FromResult(datesToReturn);
         }
     }
 }
