@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
-                command.StartDate);
+                new DateTime());
 
             var response = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
 

@@ -64,12 +64,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
         {
-            var startDateComponents = trainingStartDate.Split("-");
-
             var command = new CreateReservationCommand
             {
                 AccountId = employerAccountId,
-                StartDate = new DateTime(Convert.ToInt32(startDateComponents[0]), Convert.ToInt32(startDateComponents[1]),1)
+                StartDate = trainingStartDate
             };
 
             await _mediator.Send(command);

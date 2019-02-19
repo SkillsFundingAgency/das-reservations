@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
                     command.AccountId == employerAccountId && 
-                    command.StartDate == new DateTime(2018,10,01)
+                    command.StartDate == expectedStartDate
                         ), It.IsAny<CancellationToken>()));
         }
 
