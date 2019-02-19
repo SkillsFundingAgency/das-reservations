@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = fixture.Create<ReservationsController>();
             controller.RouteData.Values.Add("employerAccountId", routeModel.EmployerAccountId);
 
-            await controller.Create(routeModel);
+            await controller.Create(routeModel.EmployerAccountId,null);
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
@@ -37,19 +37,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_Redirects_To_The_Confirmation_View(
-            ReservationsRouteModel routeModel)
+        public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(string employerAccountId)
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
             var controller = fixture.Create<ReservationsController>();
-            controller.RouteData.Values.Add("employerAccountId", routeModel.EmployerAccountId);
+            controller.RouteData.Values.Add("employerAccountId", employerAccountId);
 
-            var result = await controller.Create(routeModel) as RedirectToActionResult;
+            var result = await controller.Create(employerAccountId,null) as RedirectToRouteResult;
 
-            result.Should().NotBeNull($"result was not a {typeof(RedirectToActionResult)}");
-            result.ActionName.Should().Be(nameof(ReservationsController.Confirmation));
-            result.RouteValues.Should().ContainKey("employerAccountId")
-                .WhichValue.Should().Be(routeModel.EmployerAccountId);
+            result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
+            result.RouteName.Should().Be("employer-reservation-created");
+        }
+
+        [Test, AutoData]
+        public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, int ukPrn)
+        {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
+            var controller = fixture.Create<ReservationsController>();
+            controller.RouteData.Values.Add("employerAccountId", employerAccountId);
+
+            var result = await controller.Create(employerAccountId, ukPrn) as RedirectToRouteResult;
+
+            result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
+            result.RouteName.Should().Be("provider-reservation-created");
         }
     }
 }

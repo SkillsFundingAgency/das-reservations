@@ -1,12 +1,6 @@
-﻿@model string
+﻿@model int
 @{
     ViewData["Title"] = "Reservations";
-
-    var routeData = new Dictionary<string, string>
-    {
-        { "ukprn", @Model },
-        { "employerAccountId", "JKXR9B"} //todo: this will eventually come from the employer selection page
-    };
 }
 
 <h1 class="govuk-heading-xl">Get funding for non-levy employers</h1>
@@ -17,13 +11,13 @@
     <li>an estimate of which month the apprenticeship training course will start, which can be flexible up to 3 months</li>
     <li>an idea of the <a href="#">apprenticeship training</a> the apprentice will take, which can be changed later</li>
 </ul>
-<form method="post" action="@($"/{routeData["ukprn"]}/accounts/{routeData["employerAccountId"]}/reservations/create")">
-    <button type="submit" draggable="false" class="govuk-button govuk-button--start">
-        Start
-    </button>
+@{
+    var routeData = new Dictionary<string,string>
+    {
+        {"employerAccountId","JKXR9B"}
+    };
+}
+<form asp-route="provider-create-reservation" asp-all-route-data="@routeData" method="post">
+    <button type="submit">Start</button>
 </form>
-<!-- todo: swap back to a href in next story (e.g. MF-71)
-<a href="@($"/{routeData["ukprn"]}/accounts/{routeData["employerAccountId"]}/reservations/apprenticeship-training")" role="button" draggable="false" class="govuk-button govuk-button--start">
-    Start
-</a>
--->
+@*<a asp-route="provider-apprenticeship-training" asp-route-ukPrn="10000896" asp-route-employerAccountId="JKXR9B" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@

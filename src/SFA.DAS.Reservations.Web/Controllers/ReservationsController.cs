@@ -9,10 +9,7 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
-    //[Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]//todo: separate story to get both policies working (poss. as a single policy)
-    [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    //[Route("accounts/{employerAccountId}/reservations")] //todo: why defaults to this route, not using provider?
-    [Route("{ukprn:int}/accounts/{employerAccountId}/reservations", Name = "provider-reservations")]
+    [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;
@@ -22,34 +19,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        [Route("apprenticeship-training")]
-        public IActionResult ApprenticeshipTraining(ReservationsRouteModel routeModel)
-        {
-            return View();
-        }
-
-        [Route("apprenticeship-training")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]
+        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
         [HttpPost]
-        public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
+        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn)
         {
-            await Task.CompletedTask;
-            return RedirectToAction(nameof(Confirmation), routeModel);
-        }
-
-        [Route("create")]
-        [HttpPost]
-        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
-        {
-            var accountId = RouteData.Values["employerAccountId"].ToString();
             var command = new CreateReservationCommand
             {
-                AccountId = accountId,
+                AccountId = employerAccountId,
                 StartDate = DateTime.Today
             };
 
             await _mediator.Send(command);
-            
-            return RedirectToAction(nameof(Confirmation), routeModel);
+
+            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created");
         }
 
         // GET
@@ -60,8 +43,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        [Route("confirmation")]
-        public IActionResult Confirmation(ReservationsRouteModel routeModel)
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-reservation-created")]
+        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-reservation-created")]
+        public IActionResult Confirmation()
         {
             return View();
         }
