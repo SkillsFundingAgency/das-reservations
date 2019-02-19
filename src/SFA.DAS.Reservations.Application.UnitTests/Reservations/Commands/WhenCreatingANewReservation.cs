@@ -56,6 +56,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_It_Validates_The_Command(
             CreateReservationCommand command)
         {
+            command.StartDate = "2019-01";
+
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
@@ -82,12 +84,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
             CreateReservationCommand command)
-        {           
+        {
+            command.StartDate = "2019-01";
+
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == new DateTime()))
+                apiRequest.StartDate == new DateTime(2019,01,01)))
                 , Times.Once);
         }
 
@@ -95,6 +99,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Returns_Response_From_Reservation_Api(
             CreateReservationCommand command)
         {
+            command.StartDate = "2019-01";
+
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
             result.Reservation.Id.Should().Be(_apiResponse.ReservationId);

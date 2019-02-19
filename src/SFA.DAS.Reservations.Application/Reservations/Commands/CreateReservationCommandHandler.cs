@@ -44,11 +44,15 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                         .Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
+            var startDateComponents = command.StartDate.Split("-");
+            var startYear = Convert.ToInt32(startDateComponents[0]);
+            var startMonth = Convert.ToInt32(startDateComponents[1]);
+
             var apiRequest = new CreateReservation (
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
-                new DateTime());
+                new DateTime(startYear, startMonth, 1));
 
             var response = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
 
