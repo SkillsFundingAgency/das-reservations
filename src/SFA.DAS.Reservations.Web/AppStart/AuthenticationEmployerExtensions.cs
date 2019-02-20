@@ -36,6 +36,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
                     options.Authority = configuration.Value.BaseAddress;
                     options.ResponseType = "code";
+                    options.ResponseMode = "query";
                     options.SaveTokens = configuration.Value.SaveTokens;
                     options.GetClaimsFromUserInfoEndpoint = false;
                     var scopes = configuration.Value.Scopes.Split(' ');

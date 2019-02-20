@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -126,7 +125,32 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                Secure = CookieSecurePolicy.Always,
+                //MinimumSameSitePolicy = SameSiteMode.None
+            });
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Response.Headers.ContainsKey("X-Frame-Options"))
+                {
+                    context.Response.Headers.Remove("X-Frame-Options");
+                }
+
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+
+                await next();
+
+                if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+                {
+                    //Re-execute the request so the user gets the error page
+                    var originalPath = context.Request.Path.Value;
+                    context.Items["originalPath"] = originalPath;
+                    context.Request.Path = "/error/404";
+                    await next();
+                }
+            });
             app.UseAuthentication();
 
             app.UseMvc(routes =>
