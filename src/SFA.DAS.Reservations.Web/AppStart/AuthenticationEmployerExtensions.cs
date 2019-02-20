@@ -36,7 +36,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
                     options.Authority = configuration.Value.BaseAddress;
                     options.ResponseType = "code";
-                    options.ResponseMode = "query";
                     options.SaveTokens = configuration.Value.SaveTokens;
                     options.GetClaimsFromUserInfoEndpoint = false;
                     var scopes = configuration.Value.Scopes.Split(' ');
@@ -52,6 +51,10 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.AccessDeniedPath = new PathString("/Service/AccessDenied");
                     options.ExpireTimeSpan = TimeSpan.FromHours(1);
                     options.Events.OnRedirectToAccessDenied = RedirectToAccessDenied;
+                    options.AccessDeniedPath = "/403.html";
+                    options.Cookie.Name = "SFA.DAS.Reservations.Web.Auth";
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.SlidingExpiration = true;
                 });
         }
 
