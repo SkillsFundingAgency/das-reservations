@@ -34,6 +34,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.ClientId = configuration.Value.ClientId;
                     options.ClientSecret = configuration.Value.ClientSecret;
                     options.Authority = configuration.Value.BaseAddress;
+                    options.MetadataAddress = $"{configuration.Value.BaseAddress}/.well-known/openid-configuration";
                     options.ResponseType = "code";
                     
                     var scopes = configuration.Value.Scopes.Split(' ');
