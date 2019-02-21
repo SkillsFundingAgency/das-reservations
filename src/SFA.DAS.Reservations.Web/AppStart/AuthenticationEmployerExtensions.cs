@@ -53,6 +53,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.Cookie.Name = "SFA.DAS.Reservations.Web.Auth";
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.SlidingExpiration = true;
+                    options.Cookie.SameSite = SameSiteMode.None;
                 });
         }
 
