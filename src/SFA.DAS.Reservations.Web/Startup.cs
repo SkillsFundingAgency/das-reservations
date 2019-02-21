@@ -2,6 +2,7 @@
 using System.IO;
 using HashidsNet;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -81,7 +82,9 @@ namespace SFA.DAS.Reservations.Web
             {
                 services.AddAndConfigureProviderAuthentication(serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>());
             }
-            
+
+            services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
+
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
             services.AddMvc(
                     options =>
@@ -107,6 +110,8 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
