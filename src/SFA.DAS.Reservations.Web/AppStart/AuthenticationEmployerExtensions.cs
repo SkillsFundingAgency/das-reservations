@@ -33,11 +33,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 {
                     options.ClientId = configuration.Value.ClientId;
                     options.ClientSecret = configuration.Value.ClientSecret;
-                    options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
                     options.Authority = configuration.Value.BaseAddress;
                     options.ResponseType = "code";
-                    options.SaveTokens = configuration.Value.SaveTokens;
-                    options.GetClaimsFromUserInfoEndpoint = false;
+                    
                     var scopes = configuration.Value.Scopes.Split(' ');
                     foreach (var scope in scopes)
                     {
@@ -51,7 +49,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.AccessDeniedPath = new PathString("/Service/AccessDenied");
                     options.ExpireTimeSpan = TimeSpan.FromHours(1);
                     options.Events.OnRedirectToAccessDenied = RedirectToAccessDenied;
-                    options.AccessDeniedPath = "/403.html";
                     options.Cookie.Name = "SFA.DAS.Reservations.Web.Auth";
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.SlidingExpiration = true;
@@ -72,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             var routeData = context.HttpContext.GetRouteData();
             var path = context.Request.Path.Value;
             path = path.EndsWith("/") ? path.Substring(0, path.Length - 1) : path;
-
+            
             //TODO
             if (path.Contains("Home/Index") || path.Equals($"/Accounts/{routeData.Values["employerAccountId"]}"))
             {
