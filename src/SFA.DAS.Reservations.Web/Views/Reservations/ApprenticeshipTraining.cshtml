@@ -1,0 +1,83 @@
+﻿@using System.Text
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model ApprenticeshipTrainingViewModel
+@{
+    ViewData["Title"] = "Reservations - Apprenticeship training";
+}
+
+<h1 class="govuk-heading-xl">Apprenticeship training</h1>
+
+
+<form method="post" asp-route="@Model.RouteName">
+    
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    @{
+                        var errorStringBuilder = new StringBuilder();
+                        var errorCount = ViewData.ModelState.ErrorCount;
+                        var loopCount = 1;
+                        foreach (var error in ViewData.ModelState)
+                        {
+                            if (error.Value.ValidationState == ModelValidationState.Invalid)
+                            {
+                                errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose a date</a></li>");
+                                if (loopCount == errorCount - 1)
+                                {
+                                    errorStringBuilder.Append(" and ");
+                                }
+                                else if (loopCount != errorCount)
+                                {
+                                    errorStringBuilder.Append(", ");
+                                }
+
+                                loopCount++;
+                            }
+                        }
+                    }
+                    @Html.Raw(errorStringBuilder.ToString())
+                </ul>
+            </div>
+        </div>
+    }
+    
+    <div class="govuk-form-group @(ViewData.ModelState.IsValid?"":"govuk-form-group--error")">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h2 class="govuk-fieldset__heading">
+                    When will the apprenticeship training start?
+                </h2>
+            </legend>
+            <span id="choose-start-date-hint" class="govuk-hint">
+                The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
+            </span>
+            @if (ViewData.ModelState.ContainsKey("StartDate"))
+            {
+                <span id="startDate" class="govuk-error-message">
+                    Select a start date
+                </span>
+            }
+            
+
+            <div class="govuk-radios">
+                @foreach (var possibleStartDate in Model.PossibleStartDates)
+                {
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Value" name="trainingStartDate" type="radio" value="@possibleStartDate.Value">
+                        <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Value">
+                            @possibleStartDate.Label
+                        </label>
+                    </div>
+                }
+            </div>
+        </fieldset>
+    </div>
+    <button type="submit" class="govuk-button">
+        Save and continue
+    </button>
+</form>

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Models;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
@@ -37,18 +40,19 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             var validationResult = await _validator.ValidateAsync(command);
             if (!validationResult.IsValid())
             {
-                throw new ArgumentException(
-                    "The following parameters have failed validation", 
-                    validationResult.ValidationDictionary
-                        .Select(c => c.Key)
-                        .Aggregate((item1, item2) => item1 + ", " + item2));
+                throw new ValidationException(
+                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
+
+            var startDateComponents = command.StartDate.Split("-");
+            var startYear = Convert.ToInt32(startDateComponents[0]);
+            var startMonth = Convert.ToInt32(startDateComponents[1]);
 
             var apiRequest = new CreateReservation (
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
-                command.StartDate);
+                new DateTime(startYear, startMonth, 1));
 
             var response = await _apiClient.Create<CreateReservation, ReservationResponse>(apiRequest);
 

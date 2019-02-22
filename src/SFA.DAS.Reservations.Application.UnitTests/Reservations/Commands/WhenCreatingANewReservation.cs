@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -12,6 +14,7 @@ using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
+using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 {
@@ -56,6 +59,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_It_Validates_The_Command(
             CreateReservationCommand command)
         {
+            command.StartDate = "2019-01";
+
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
@@ -75,19 +80,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<ArgumentException>()
-                .Which.ParamName.Contains(propertyName).Should().BeTrue();
+            act.Should().ThrowExactly<ValidationException>()
+                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 
         [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
             CreateReservationCommand command)
-        {           
+        {
+            command.StartDate = "2019-01";
+
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == command.StartDate))
+                apiRequest.StartDate == new DateTime(2019,01,01)))
                 , Times.Once);
         }
 
@@ -95,6 +102,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Returns_Response_From_Reservation_Api(
             CreateReservationCommand command)
         {
+            command.StartDate = "2019-01";
+
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
             result.Reservation.Id.Should().Be(_apiResponse.ReservationId);

@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 AccountId = "0",
-                StartDate = DateTime.Today
+                StartDate = "2018-09"
             };
 
             var result = await validator.ValidateAsync(command);
@@ -29,14 +29,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .WhichValue.Should().Be($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
         }
 
-        [Test, AutoData]
-        public async Task And_StartDate_Is_MinValue_Then_Invalid(
-            CreateReservationValidator validator)
+        [TestCase("19-a")]
+        [TestCase("19-")]
+        [TestCase("a-1")]
+        [TestCase("1-1")]
+        [TestCase("a-a")]
+        [TestCase("a")]
+        [TestCase("-")]
+        public async Task And_StartDate_Is_Not_In_The_Correct_Format_Then_Invalid(string startDate)
         {
+            var validator = new CreateReservationValidator();
             var command = new CreateReservationCommand
             {
                 AccountId = "1",
-                StartDate = DateTime.MinValue
+                StartDate = startDate
             };
 
             var result = await validator.ValidateAsync(command);
@@ -55,7 +61,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 AccountId = "0",
-                StartDate = DateTime.MinValue
+                StartDate = ""
             };
 
             var result = await validator.ValidateAsync(command);
@@ -74,7 +80,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 AccountId = "1",
-                StartDate = DateTime.Today
+                StartDate = "2019-07"
             };
 
             var result = await validator.ValidateAsync(command);

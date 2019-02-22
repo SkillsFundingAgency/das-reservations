@@ -1,0 +1,12 @@
+﻿@model ReservationsRouteModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<h1 class="govuk-heading-xl">Review page</h1>
+
+<form method="post" action="@($"/{Model.Ukprn}/accounts/{Model.EmployerAccountId}/reservations/create")">
+    <button type="submit" draggable="false" class="govuk-button">
+        Confirm
+    </button>
+</form>

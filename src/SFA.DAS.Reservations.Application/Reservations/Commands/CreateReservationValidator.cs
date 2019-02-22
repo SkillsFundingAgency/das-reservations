@@ -15,10 +15,37 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 result.AddError(nameof(item.AccountId));
             }
 
-            if (item.StartDate == DateTime.MinValue)
+            if (string.IsNullOrEmpty(item.StartDate))
             {
                 result.AddError(nameof(item.StartDate));
             }
+            else
+            {
+                var dateSplit = item.StartDate.Split("-");
+
+                if (dateSplit.Length != 2)
+                {
+                    result.AddError(nameof(item.StartDate));
+                    return Task.FromResult(result);
+                }
+
+                var yearValid = int.TryParse(dateSplit[0], out var year);
+                var monthValid = int.TryParse(dateSplit[1], out var month);
+
+                if (!yearValid || !monthValid)
+                {
+                    result.AddError(nameof(item.StartDate));
+                    return Task.FromResult(result);
+                }
+
+                var startDate = DateTime.TryParse($"{year}-{month}-01", out var parseDateTime);
+
+                if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
+                {
+                    result.AddError(nameof(item.StartDate));
+                }
+            }
+            
 
             return Task.FromResult(result);
         }

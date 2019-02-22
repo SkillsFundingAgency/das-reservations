@@ -2,6 +2,7 @@
 using System.IO;
 using HashidsNet;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,15 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
 
 namespace SFA.DAS.Reservations.Web
@@ -80,7 +82,9 @@ namespace SFA.DAS.Reservations.Web
             {
                 services.AddAndConfigureProviderAuthentication(serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>());
             }
-            
+
+            services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
+
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
             services.AddMvc(
                     options =>
@@ -99,8 +103,15 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashSalt, 
                 reservationsWebConfig.EmployerAccountHashLength, 
                 reservationsWebConfig.EmployerAccountHashAlphabet));
+            services.AddTransient<IStartDateService, StartDateService>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+
+            services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
+                ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
+                : new CurrentDateTime());
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -119,7 +130,32 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                Secure = CookieSecurePolicy.Always,
+                MinimumSameSitePolicy = SameSiteMode.None
+            });
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Response.Headers.ContainsKey("X-Frame-Options"))
+                {
+                    context.Response.Headers.Remove("X-Frame-Options");
+                }
+
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+
+                await next();
+
+                if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+                {
+                    //Re-execute the request so the user gets the error page
+                    var originalPath = context.Request.Path.Value;
+                    context.Items["originalPath"] = originalPath;
+                    context.Request.Path = "/error/404";
+                    await next();
+                }
+            });
             app.UseAuthentication();
 
             app.UseMvc(routes =>
