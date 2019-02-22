@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
             _mockApiClient
-                .Setup(client => client.Create<CreateReservation, ReservationResponse>(It.IsAny<CreateReservation>()))
+                .Setup(client => client.Create<ReservationApiRequest, ReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(_apiResponse);
 
             _mockHashingService = fixture.Freeze<Mock<IHashingService>>();
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.Create<CreateReservation, ReservationResponse>(It.Is<CreateReservation>(apiRequest => 
+            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, ReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
                 apiRequest.StartDate == new DateTime(2019,01,01)))
                 , Times.Once);
