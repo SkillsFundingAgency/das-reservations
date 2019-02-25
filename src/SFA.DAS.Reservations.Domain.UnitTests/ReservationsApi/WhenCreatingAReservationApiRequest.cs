@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             decode.Setup(func => func("ABC34r")).Returns(123);
             var request = new ReservationApiRequest("http://test/", decode.Object,"ABC34r",DateTime.Today, expectedId);
 
-            request.GetUrl.Should().Be($"http://test/api/accounts/123/reservations/{expectedId}");
+            request.GetUrl.Should().Be($"http://test/api/reservations/{expectedId}");
         }
     }
 }

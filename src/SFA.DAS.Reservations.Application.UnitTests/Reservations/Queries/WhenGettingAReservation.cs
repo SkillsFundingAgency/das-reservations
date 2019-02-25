@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
                     x.Get<ReservationApiRequest, GetReservationResponse>(
                         It.Is<ReservationApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/accounts/{ExpectedAccountId}/reservations/{_expectedReservationId}"))))
+                                $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))
                 .ReturnsAsync(new GetReservationResponse
                 {
                     ReservationId = _expectedReservationId
@@ -88,7 +88,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             var actual = await _handler.Handle(command, new CancellationToken());
 
             //Assert
-            Assert.AreEqual(_expectedReservationId, actual.ReservationId);
             Assert.AreEqual(_expectedReservationId, actual.ReservationId);
         }
     }

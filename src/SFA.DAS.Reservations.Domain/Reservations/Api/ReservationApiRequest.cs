@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public DateTime StartDate { get; }
 
         public override string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
-        public override string GetUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations/{_id}";
+        public override string GetUrl => $"{BaseUrl}api/reservations/{_id}";
     }
 
 }
