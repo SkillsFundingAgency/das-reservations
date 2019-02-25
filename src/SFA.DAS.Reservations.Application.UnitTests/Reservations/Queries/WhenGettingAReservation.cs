@@ -27,6 +27,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         private const long ExpectedAccountId = 44321;
         private const string ExpectedHashedId = "TGF45";
         private const string ExpectedBaseUrl = "https://test.local/reservation/";
+        private DateTime _expectedStartDate = DateTime.Now.AddDays(-20);
+        private DateTime _expectedExpiryDate = DateTime.Now.AddDays(30);
 
         [SetUp]
         public void Arrange()
@@ -45,7 +47,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
                                 $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))
                 .ReturnsAsync(new GetReservationResponse
                 {
-                    ReservationId = _expectedReservationId
+                    ReservationId = _expectedReservationId,
+                    StartDate = _expectedStartDate,
+                    ExpiryDate = _expectedExpiryDate
                 });
 
             _hashingService = new Mock<IHashingService>();
@@ -86,6 +90,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 
             //Assert
             Assert.AreEqual(_expectedReservationId, actual.ReservationId);
+            Assert.AreEqual(_expectedStartDate, actual.StartDate);
+            Assert.AreEqual(_expectedExpiryDate, actual.ExpiryDate);
         }
     }
 }

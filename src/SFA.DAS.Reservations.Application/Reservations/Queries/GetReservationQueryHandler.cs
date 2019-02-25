@@ -47,7 +47,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
 
             return new GetReservationResult
             {
-                ReservationId = result.ReservationId
+                ReservationId = result.ReservationId,
+                StartDate = result.StartDate,
+                ExpiryDate = result.ExpiryDate
             };
         }
     }
