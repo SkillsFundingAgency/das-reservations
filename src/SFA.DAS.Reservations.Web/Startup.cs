@@ -2,7 +2,6 @@
 using System.IO;
 using HashidsNet;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -97,6 +97,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
+            services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
             services.AddSingleton<IHashids>(new Hashids(
@@ -110,8 +111,6 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
-
-           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
