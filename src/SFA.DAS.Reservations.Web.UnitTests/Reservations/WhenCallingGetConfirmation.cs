@@ -40,9 +40,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var result = await controller.Confirmation(routeModel);
 
-            result.Should().BeOfType<ViewResult>()
-                .Which.Model.Should().BeOfType<ConfirmationViewModel>()
-                .Which.ReservationId.Should().Be(mediatorResult.ReservationId);
+            var model = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ConfirmationViewModel>().Subject;
+
+            model.ReservationId.Should().Be(mediatorResult.ReservationId);
+            model.StartDate.Should().Be(mediatorResult.StartDate);
+            model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
         }
     }
 }
