@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _apiOptions = apiOptions;
         }
 
-        public async Task<IEnumerable<TResponse>> Get<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
+        public async Task<TResponse> Get<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
 
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonConvert.DeserializeObject<IEnumerable<TResponse>>(json);
+                return JsonConvert.DeserializeObject<TResponse>(json);
             }
         }
 

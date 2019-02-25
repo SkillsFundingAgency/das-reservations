@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 new DateTime(startYear, startMonth, 1),
                 Guid.Empty);
 
-            var response = await _apiClient.Create<ReservationApiRequest, ReservationResponse>(apiRequest);
+            var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
 
             return new CreateReservationResult
             {

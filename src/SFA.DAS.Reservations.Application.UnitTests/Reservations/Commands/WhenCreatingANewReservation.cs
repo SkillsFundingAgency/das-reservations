@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private Mock<IValidator<CreateReservationCommand>> _mockValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
-        private ReservationResponse _apiResponse;
+        private CreateReservationResponse _apiResponse;
         private Mock<IHashingService> _mockHashingService;
         private long _expectedAccountId;
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
-            _apiResponse = fixture.Create<ReservationResponse>();
+            _apiResponse = fixture.Create<CreateReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
             _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
             _mockApiClient
-                .Setup(client => client.Create<ReservationApiRequest, ReservationResponse>(It.IsAny<ReservationApiRequest>()))
+                .Setup(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(_apiResponse);
 
             _mockHashingService = fixture.Freeze<Mock<IHashingService>>();
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, ReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
+            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
                 apiRequest.StartDate == new DateTime(2019,01,01)))
                 , Times.Once);

@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class ReservationResponse
+    public class GetReservationResponse
     {
         public Guid ReservationId { get; set; }
     }
