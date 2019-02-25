@@ -1,9 +1,11 @@
-﻿@{
+﻿@model ConfirmationViewModel
+@{
     ViewData["Title"] = "Reservations";
 }
 <div class="govuk-panel govuk-panel--confirmation">
     <h1 class="govuk-panel__title">
         Apprenticeship funds reserved
     </h1>
+    <p>Id: @Model.ReservationId</p>
 </div>
 
