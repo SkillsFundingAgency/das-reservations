@@ -3,9 +3,9 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries
 {
-    public class GetReservationCommandValidator : IValidator<GetReservationCommand>
+    public class GetReservationQueryValidator : IValidator<GetReservationQuery>
     {
-        public Task<ValidationResult> ValidateAsync(GetReservationCommand item)
+        public Task<ValidationResult> ValidateAsync(GetReservationQuery item)
         {
             throw new System.NotImplementedException();
         }

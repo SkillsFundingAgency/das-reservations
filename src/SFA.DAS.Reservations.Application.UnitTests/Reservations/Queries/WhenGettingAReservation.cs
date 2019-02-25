@@ -19,8 +19,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
     public class WhenGettingAReservation
     {
-        private GetReservationCommandHandler _handler;
-        private Mock<IValidator<GetReservationCommand>> _validator;
+        private GetReservationQueryHandler _handler;
+        private Mock<IValidator<GetReservationQuery>> _validator;
         private Mock<IApiClient> _apiClient;
         private Mock<IHashingService> _hashingService;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
@@ -32,8 +32,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         [SetUp]
         public void Arrange()
         {
-            _validator = new Mock<IValidator<GetReservationCommand>>();
-            _validator.Setup(x => x.ValidateAsync(It.Is<GetReservationCommand>(c =>
+            _validator = new Mock<IValidator<GetReservationQuery>>();
+            _validator.Setup(x => x.ValidateAsync(It.Is<GetReservationQuery>(c =>
                     c.Id.Equals(_expectedReservationId) && c.AccountId.Equals(ExpectedHashedId))))
                 .ReturnsAsync(new ValidationResult());
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
             _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
 
-            _handler = new GetReservationCommandHandler(_validator.Object, _apiClient.Object, _hashingService.Object,
+            _handler = new GetReservationQueryHandler(_validator.Object, _apiClient.Object, _hashingService.Object,
                 _options.Object);
         }
 
@@ -64,21 +64,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         {
             //Arrange
             _validator
-                .Setup(x => x.ValidateAsync(It.IsAny<GetReservationCommand>()))
+                .Setup(x => x.ValidateAsync(It.IsAny<GetReservationQuery>()))
                 .ThrowsAsync(new ValidationException(
                     new System.ComponentModel.DataAnnotations.ValidationResult("Error", new List<string>()), null,
                     null));
 
             //Act Assert
             Assert.ThrowsAsync<ValidationException>(async () =>
-                await _handler.Handle(new GetReservationCommand(), new CancellationToken()));
+                await _handler.Handle(new GetReservationQuery(), new CancellationToken()));
         }
 
         [Test]
         public async Task Then_The_Reservation_Is_Returned_By_Id()
         {
             //Arrange
-            var command = new GetReservationCommand
+            var command = new GetReservationQuery
             {
                 Id = _expectedReservationId,
                 AccountId = ExpectedHashedId

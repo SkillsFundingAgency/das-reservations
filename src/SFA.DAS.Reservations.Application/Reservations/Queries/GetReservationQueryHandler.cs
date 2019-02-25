@@ -15,14 +15,14 @@ using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries
 {
-    public class GetReservationCommandHandler : IRequestHandler<GetReservationCommand, GetReservationResult>
+    public class GetReservationQueryHandler : IRequestHandler<GetReservationQuery, GetReservationResult>
     {
-        private readonly IValidator<GetReservationCommand> _validator;
+        private readonly IValidator<GetReservationQuery> _validator;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
         private ReservationsApiConfiguration _options;
 
-        public GetReservationCommandHandler(IValidator<GetReservationCommand> validator, IApiClient apiClient, IHashingService hashingService, IOptions<ReservationsApiConfiguration> options)
+        public GetReservationQueryHandler(IValidator<GetReservationQuery> validator, IApiClient apiClient, IHashingService hashingService, IOptions<ReservationsApiConfiguration> options)
         {
             _validator = validator;
             _apiClient = apiClient;
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
             _options = options.Value;
         }
 
-        public async Task<GetReservationResult> Handle(GetReservationCommand request, CancellationToken cancellationToken)
+        public async Task<GetReservationResult> Handle(GetReservationQuery request, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(request);
 

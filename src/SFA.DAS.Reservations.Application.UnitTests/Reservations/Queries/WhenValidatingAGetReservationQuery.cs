@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
-    class WhenValidatingAGetReservationCommand
+    class WhenValidatingAGetReservationQuery
     {
     }
 }
