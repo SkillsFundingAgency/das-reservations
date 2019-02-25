@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
@@ -19,14 +16,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
     {
         private readonly IValidator<GetReservationQuery> _validator;
         private readonly IApiClient _apiClient;
-        private readonly IHashingService _hashingService;
+
         private ReservationsApiConfiguration _options;
 
-        public GetReservationQueryHandler(IValidator<GetReservationQuery> validator, IApiClient apiClient, IHashingService hashingService, IOptions<ReservationsApiConfiguration> options)
+        public GetReservationQueryHandler(IValidator<GetReservationQuery> validator, IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
         {
             _validator = validator;
             _apiClient = apiClient;
-            _hashingService = hashingService;
             _options = options.Value;
         }
 
@@ -42,8 +38,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
 
             var apiRequest = new ReservationApiRequest(
                 _options.Url,
-                _hashingService.DecodeValue,
-                request.AccountId,
+                null,
+                null,
                 DateTime.MinValue, 
                 request.Id);
 

@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         {
             _validator = new Mock<IValidator<GetReservationQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.Is<GetReservationQuery>(c =>
-                    c.Id.Equals(_expectedReservationId) && c.AccountId.Equals(ExpectedHashedId))))
+                    c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());
 
 
@@ -55,8 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
             _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
 
-            _handler = new GetReservationQueryHandler(_validator.Object, _apiClient.Object, _hashingService.Object,
-                _options.Object);
+            _handler = new GetReservationQueryHandler(_validator.Object, _apiClient.Object, _options.Object);
         }
 
         [Test]
@@ -80,8 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             //Arrange
             var command = new GetReservationQuery
             {
-                Id = _expectedReservationId,
-                AccountId = ExpectedHashedId
+                Id = _expectedReservationId
             };
 
             //Act
