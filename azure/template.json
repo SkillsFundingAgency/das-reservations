@@ -5,6 +5,9 @@
         "resourceEnvironmentName": {
             "type": "string"
         },
+        "serviceName": {
+            "type": "string"
+        },
         "environmentName": {
             "type": "string"
         },
@@ -22,19 +25,20 @@
         }
     },
     "variables": {
-        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "employerAppServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvemp-as')]",
-        "providerAppServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvprv-as')]"
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
+        "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]"
     },
     "resources": [
         {
             "apiVersion": "2017-05-10",
-            "name": "employerApplicationInsights",
+            "name": "employer-application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/application-insights.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -49,12 +53,12 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "employerAppService",
+            "name": "employer-app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/app-service.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -79,7 +83,7 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('employerApplicationInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('employer-application-insights').outputs.InstrumentationKey.value]"
                             },
                             {
                                 "name": "AuthType",
@@ -102,12 +106,12 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "providerApplicationInsights",
+            "name": "provider-application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/application-insights.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -122,12 +126,12 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "providerAppService",
+            "name": "provider-app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/app-service.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -152,7 +156,7 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('providerApplicationInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
                             },
                             {
                                 "name": "AuthType",
