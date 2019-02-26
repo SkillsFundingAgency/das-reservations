@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             return new CreateReservationResult
             {
-                Reservation = new Reservation {Id = response.ReservationId}
+                Reservation = new Reservation {Id = response.Id}
             };
         }
     }
