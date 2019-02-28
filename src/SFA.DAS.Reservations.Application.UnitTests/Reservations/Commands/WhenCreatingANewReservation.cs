@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == new DateTime(2019,01,01)))
+                apiRequest.StartDate == "2019-Jan-01"))
                 , Times.Once);
         }
 

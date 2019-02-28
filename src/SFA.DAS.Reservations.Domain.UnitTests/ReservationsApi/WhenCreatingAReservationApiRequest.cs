@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             [Frozen] DateTime startDate,
             ReservationApiRequest request)
         {
-            request.StartDate.Should().Be(startDate);
+            request.StartDate.Should().Be(startDate.ToString("yyyy-MMM-dd"));
         }
 
         [Test, AutoData]
