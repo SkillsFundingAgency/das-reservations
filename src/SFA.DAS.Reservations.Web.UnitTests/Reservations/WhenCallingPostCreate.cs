@@ -30,9 +30,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_Sends_Command_With_Correct_Values_Set(string employerAccountId)
+        public async Task Then_Sends_Command_With_Correct_Values_Set(string employerAccountId, CreateReservationResult createReservationResult)
         {
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
             var expectedStartDate = "2018-10";
 
@@ -46,25 +49,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(string employerAccountId)
+        public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(string employerAccountId, CreateReservationResult createReservationResult)
         {
+            var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
             var result = await controller.Create(employerAccountId,null, "2018-10") as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be("employer-reservation-created");
+            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
         }
 
         [Test, AutoData]
-        public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, int ukPrn)
+        public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, int ukPrn, CreateReservationResult createReservationResult)
         {
+            var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
             var result = await controller.Create(employerAccountId, ukPrn, "2018-10") as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be("provider-reservation-created");
+            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
         }
 
         [Test, AutoData]

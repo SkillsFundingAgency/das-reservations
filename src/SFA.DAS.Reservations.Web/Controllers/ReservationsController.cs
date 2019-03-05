@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -58,6 +59,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
         {
+            CreateReservationResult result;
+
             try
             {
                 var command = new CreateReservationCommand
@@ -66,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     StartDate = trainingStartDate
                 };
 
-                await _mediator.Send(command);
+                result = await _mediator.Send(command);
                 
             }
             catch (ValidationException e)
@@ -80,18 +83,30 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("ApprenticeshipTraining", model);
             }
 
-            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created");
-
+            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
         }
 
         // GET
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-reservation-created")]
-        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-reservation-created")]
-        public IActionResult Confirmation()
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create/{id}", Name = "provider-reservation-created")]
+        [Route("accounts/{employerAccountId}/reservations/create/{id}", Name = "employer-reservation-created")]
+        public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
-            return View();
+            var query = new GetReservationQuery
+            {
+                Id = routeModel.Id.Value 
+            };
+            var queryResult = await _mediator.Send(query);
+
+            var model = new ConfirmationViewModel
+            {
+                ReservationId = queryResult.ReservationId,
+                StartDate = queryResult.StartDate,
+                ExpiryDate = queryResult.ExpiryDate
+            };
+            return View(model);
         }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
