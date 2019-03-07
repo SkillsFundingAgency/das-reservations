@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
@@ -19,6 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     public class WhenCachingANewReservation
     {
         private Mock<IValidator<BaseCreateReservationCommand>> _mockValidator;
+        private Mock<ICacheStorageService> _mockCacheStorageService;
         private CacheReservationCommandHandler _commandHandler;
 
         [SetUp]
@@ -31,6 +33,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CacheReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
+
+            _mockCacheStorageService = fixture.Freeze<Mock<ICacheStorageService>>();
+/*            _mockCacheStorageService
+                .Setup(service => service.SaveToCache(It.IsAny<string>(), It.IsAny<CacheReservationCommand>(), It.IsAny<int>()))
+                .Returns()*/
 
             _commandHandler = fixture.Create<CacheReservationCommandHandler>();
         }
@@ -62,6 +69,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             act.Should().ThrowExactly<ValidationException>()
                 .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+        }
+
+        [Test, AutoData]
+        public async Task Then_Calls_Cache_Service_To_Save_Reservation(
+            CacheReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCacheStorageService.Verify(service => service.SaveToCache(command.Id.ToString(), command, 1));
         }
     }
 }
