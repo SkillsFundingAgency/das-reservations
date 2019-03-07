@@ -105,6 +105,7 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashLength, 
                 reservationsWebConfig.EmployerAccountHashAlphabet));
             services.AddTransient<IStartDateService, StartDateService>();
+            services.AddTransient<ICacheStorageService, CacheStorageService>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
@@ -120,7 +121,7 @@ namespace SFA.DAS.Reservations.Web
             {
                 services.AddStackExchangeRedisCache(options =>
                 {
-                    options.Configuration = "localhost"; //todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
+                    options.Configuration = "localhost"; // todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
                 });
             }
         }

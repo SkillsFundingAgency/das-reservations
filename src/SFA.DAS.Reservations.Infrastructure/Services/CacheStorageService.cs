@@ -2,14 +2,15 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure
+namespace SFA.DAS.Reservations.Infrastructure.Services
 {
-    public class CacheHelper
+    public class CacheStorageService : ICacheStorageService
     {
         private readonly IDistributedCache _distributedCache;
 
-        public CacheHelper(IDistributedCache distributedCache)
+        public CacheStorageService(IDistributedCache distributedCache)
         {
             _distributedCache = distributedCache;
         }
