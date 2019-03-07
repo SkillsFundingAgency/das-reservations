@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Web
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
