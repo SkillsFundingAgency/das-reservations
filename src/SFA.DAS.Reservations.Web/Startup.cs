@@ -111,6 +111,18 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
+
+            if (_configuration["Environment"] == "LOCAL")
+            {
+                services.AddDistributedMemoryCache();
+            }
+            else
+            {
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = "localhost"; //todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
