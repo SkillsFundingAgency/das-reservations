@@ -16,13 +16,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
-        private readonly IValidator<CreateReservationCommand> _validator;
+        private readonly IValidator<BaseCreateReservationCommand> _validator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
 
         public CreateReservationCommandHandler(
-            IValidator<CreateReservationCommand> validator, 
+            IValidator<BaseCreateReservationCommand> validator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             IHashingService hashingService)
