@@ -92,9 +92,10 @@
         if (selectEl) {
 
             accessibleAutocomplete.enhanceSelectElement({
-                autoselect: true,
-                defaultValue: selectEl.options[selectEl.options.selectedIndex].innerHTML,
                 minLength: 3,
+                autoselect: false, 
+                displayMenu: 'overlay',
+                placeholder: 'Search for an apprenticeship',
                 selectElement: selectEl
             });
 
