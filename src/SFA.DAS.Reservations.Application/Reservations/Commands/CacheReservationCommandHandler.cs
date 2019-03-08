@@ -29,9 +29,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
+            if (!command.Id.HasValue)
+            {
+                command.Id = Guid.NewGuid();
+            }
+
             await _cacheStorageService.SaveToCache(command.Id.ToString(), command, 1);
             
-            return new CacheReservationResult{Id = Guid.Empty};
+            return new CacheReservationResult{Id = command.Id.GetValueOrDefault()};
         }
     }
 }

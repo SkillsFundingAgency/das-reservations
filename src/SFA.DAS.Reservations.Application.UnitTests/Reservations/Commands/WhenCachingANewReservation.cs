@@ -10,6 +10,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.UnitTests.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
@@ -35,9 +36,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .ReturnsAsync(new ValidationResult());
 
             _mockCacheStorageService = fixture.Freeze<Mock<ICacheStorageService>>();
-/*            _mockCacheStorageService
-                .Setup(service => service.SaveToCache(It.IsAny<string>(), It.IsAny<CacheReservationCommand>(), It.IsAny<int>()))
-                .Returns()*/
 
             _commandHandler = fixture.Create<CacheReservationCommandHandler>();
         }
@@ -75,11 +73,25 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Calls_Cache_Service_To_Save_Reservation(
             CacheReservationCommand command)
         {
-            command.StartDate = "2019-01";
+            command.Id = null;
+            var originalCommand = command.Clone();
 
-            await _commandHandler.Handle(command, CancellationToken.None);
+            var result = await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCacheStorageService.Verify(service => service.SaveToCache(command.Id.ToString(), command, 1));
+            _mockCacheStorageService.Verify(service => service.SaveToCache(It.IsAny<string>(), command, 1));
+            result.Id.Should().NotBe(originalCommand.Id.GetValueOrDefault());
+            result.Id.Should().NotBeEmpty();
+        }
+
+        [Test, AutoData]
+        public async Task And_Is_Existing_Cache_Item_Then_Calls_Cache_Service_Using_Same_Key(
+            CacheReservationCommand command)
+        {
+            var originalCommand = command.Clone();
+            var result = await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCacheStorageService.Verify(service => service.SaveToCache(originalCommand.Id.ToString(), command, 1));
+            result.Id.Should().Be(originalCommand.Id.Value);
         }
     }
 }
