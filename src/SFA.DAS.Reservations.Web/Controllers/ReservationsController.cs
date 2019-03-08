@@ -41,8 +41,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             await Task.CompletedTask;//todo: save form data to cache using mediator
             var redirectRouteName = routeModel.Ukprn == null ? 
-                "employer-create-reservation" : 
-                "provider-create-reservation";
+                "employer-review" : 
+                "provider-review";
 
             return RedirectToRoute(redirectRouteName, routeModel);
         }
