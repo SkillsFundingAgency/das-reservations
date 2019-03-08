@@ -59,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
+        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate, string courseId)
         {
             CreateReservationResult result;
 
@@ -68,7 +68,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CreateReservationCommand
                 {
                     AccountId = employerAccountId,
-                    StartDate = trainingStartDate
+                    StartDate = trainingStartDate,
+                    CourseId = courseId
                 };
 
                 result = await _mediator.Send(command);

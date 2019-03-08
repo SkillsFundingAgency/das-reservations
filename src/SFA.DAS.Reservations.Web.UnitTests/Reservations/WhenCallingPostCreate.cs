@@ -12,8 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
-using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
@@ -38,13 +39,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
             var expectedStartDate = "2018-10";
+            var expectedCourseId = "123-1";
 
-            await controller.Create(employerAccountId,null, expectedStartDate);
+            await controller.Create(employerAccountId,null, expectedStartDate, expectedCourseId);
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
                     command.AccountId == employerAccountId && 
-                    command.StartDate == expectedStartDate
+                    command.StartDate == expectedStartDate &&
+                    command.CourseId.Equals(expectedCourseId)
                         ), It.IsAny<CancellationToken>()));
         }
 
@@ -57,7 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
-            var result = await controller.Create(employerAccountId,null, "2018-10") as RedirectToRouteResult;
+            var result = await controller.Create(employerAccountId,null, "2018-10", null) as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be("employer-reservation-created");
@@ -73,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
-            var result = await controller.Create(employerAccountId, ukPrn, "2018-10") as RedirectToRouteResult;
+            var result = await controller.Create(employerAccountId, ukPrn, "2018-10", null) as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be("provider-reservation-created");
@@ -86,9 +89,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "StartDate|The StartDate field is not valid." }), null, null));
+            mediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult(){Courses = new List<Course>()});
+            
             var controller = new ReservationsController(mediator.Object, Mock.Of<IStartDateService>());
 
-            var actual = await controller.Create("123r", null, "201");
+            var actual = await controller.Create("123r", null, "201", null);
 
             Assert.IsNotNull(actual);
             var actualViewResult = actual as ViewResult;
