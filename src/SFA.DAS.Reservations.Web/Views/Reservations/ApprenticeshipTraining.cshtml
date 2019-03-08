@@ -46,37 +46,47 @@
         </div>
     }
     
-    <div class="govuk-form-group @(ViewData.ModelState.IsValid?"":"govuk-form-group--error")">
+    <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h2 class="govuk-fieldset__heading">
-                    When will the apprenticeship training start?
-                </h2>
+            <h2 class="govuk-fieldset__heading">
+                Which apprenticeship training will the apprentice take? (optional)
+            </h2>
             </legend>
-            <span id="choose-start-date-hint" class="govuk-hint">
-                The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
-            </span>
-            @if (ViewData.ModelState.ContainsKey("StartDate"))
-            {
-                <span id="startDate" class="govuk-error-message">
-                    Select a start date
-                </span>
-            }
-            
-
-            <div class="govuk-radios">
-                @foreach (var possibleStartDate in Model.PossibleStartDates)
-                {
-                    <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Value" name="trainingStartDate" type="radio" value="@possibleStartDate.Value">
-                        <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Value">
-                            @possibleStartDate.Label
-                        </label>
-                    </div>
-                }
-            </div>
+                <partial name="_CourseSearch" />
         </fieldset>
     </div>
+
+    <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h2 class="govuk-fieldset__heading">
+                        When will the apprenticeship training start?
+                    </h2>
+                </legend>
+                <span id="choose-start-date-hint" class="govuk-hint">
+                    The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
+                </span>
+                @if (ViewData.ModelState.ContainsKey("StartDate"))
+                {
+                    <span id="startDate" class="govuk-error-message">
+                        Select a start date
+                    </span>
+                }
+
+                <div class="govuk-radios">
+                    @foreach (var possibleStartDate in Model.PossibleStartDates)
+                    {
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Value" name="trainingStartDate" type="radio" value="@possibleStartDate.Value">
+                            <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Value">
+                                @possibleStartDate.Label
+                            </label>
+                        </div>
+                    }
+                </div>
+            </fieldset>
+        </div>
     <button type="submit" class="govuk-button">
         Save and continue
     </button>
