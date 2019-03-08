@@ -105,7 +105,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = queryResult.ReservationId,
                 StartDate = queryResult.StartDate,
-                ExpiryDate = queryResult.ExpiryDate
+                ExpiryDate = queryResult.ExpiryDate,
+                Course = queryResult.Course
             };
             return View(model);
         }
