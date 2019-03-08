@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -37,14 +38,30 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
-        public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
+        public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
-            await Task.CompletedTask;//todo: save form data to cache using mediator
-            var redirectRouteName = routeModel.Ukprn == null ? 
+            CacheReservationResult result;
+
+            try
+            {
+                var command = new CacheReservationCommand
+                {
+                    StartDate = formModel.StartDate
+                };
+
+                result = await _mediator.Send(command);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            var routeName = routeModel.Ukprn == null ? 
                 "employer-review" : 
                 "provider-review";
 
-            return RedirectToRoute(redirectRouteName, routeModel);
+            return RedirectToRoute(routeName, routeModel);
         }
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review", Name = "provider-review")]
@@ -71,7 +88,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 };
 
                 result = await _mediator.Send(command);
-                
             }
             catch (ValidationException e)
             {
@@ -81,7 +97,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
-                return View("ApprenticeshipTraining", model);
+                return View("ApprenticeshipTraining", model);//todo: view dependenant on ukprn.
             }
 
             return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
