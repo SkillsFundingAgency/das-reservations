@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 {
     public class GetReservationResult
     {
