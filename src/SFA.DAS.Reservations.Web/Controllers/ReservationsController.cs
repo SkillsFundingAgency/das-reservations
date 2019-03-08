@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -111,6 +112,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
+
+            var coursesResult = await _mediator.Send(new GetCoursesQuery());
+
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
@@ -118,7 +122,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Value = $"{date:yyyy-MM}",
                     Label = $"{date:MMMM yyyy}"
-                }).OrderBy(model => model.Value)
+                }).OrderBy(model => model.Value),
+                Courses = coursesResult.Courses
             };
         }
     }
