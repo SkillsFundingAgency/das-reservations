@@ -2,7 +2,7 @@
 ﻿
 <label class="govuk-label govuk-label--m" for="course-search">Which apprenticeship training will the apprentice take? (optional)</label>
 <select id="course-search" name="courseId" class="govuk-select">
-    <option value="0">Search for an apprenticeship </option>
+    <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
         <option value="@course.Id">@course.Title - Level: @course.Level</option>
