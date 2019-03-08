@@ -1,7 +1,10 @@
-﻿<div>
+﻿@model ApprenticeshipTrainingViewModel
+
+<div>
     <select>
-        <option>One</option>
-        <option>Two</option>
-        <option>Three</option>
+        @foreach (var course in Model.Courses)
+        {
+            <option>@course.Title - Level: @course.Level</option>
+        }
     </select>
 </div>
