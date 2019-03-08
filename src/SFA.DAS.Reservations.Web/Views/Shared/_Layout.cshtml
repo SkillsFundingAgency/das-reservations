@@ -87,7 +87,19 @@
     <script>
         window.DASFrontend.initAll()
     </script>
+    <script>
+        var selectEl = document.querySelector('#course-search');
+        if (selectEl) {
 
+            accessibleAutocomplete.enhanceSelectElement({
+                autoselect: true,
+                defaultValue: selectEl.options[selectEl.options.selectedIndex].innerHTML,
+                minLength: 3,
+                selectElement: selectEl
+            });
+
+        }
+    </script>
 
 </body>
 
