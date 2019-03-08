@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -26,31 +24,34 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _startDateService = startDateService;
         }
 
-        [Route("apprenticeship-training")]
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
         public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, int? ukPrn)
         {
-            
-            
+            // todo: get existing training details if exist, get from mediator call
             var viewModel = await BuildApprenticeshipTrainingViewModel(ukPrn);
 
             return View(viewModel);
         }
 
-        [Route("apprenticeship-training")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
         {
-            await Task.CompletedTask;//todo: save form data to cache
-            return RedirectToAction(nameof(Review), routeModel);//this also defaults to the employer route which then throws error for provider as no ukprn in the route.
+            await Task.CompletedTask;//todo: save form data to cache using mediator
+            var redirectRouteName = routeModel.Ukprn == null ? 
+                "employer-create-reservation" : 
+                "provider-create-reservation";
+
+            return RedirectToRoute(redirectRouteName, routeModel);
         }
 
-
-        [Route("review")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review", Name = "provider-review")]
+        [Route("accounts/{employerAccountId}/reservations/review", Name = "employer-review")]
         public IActionResult Review(ReservationsRouteModel routeModel)
         {
-            return View(routeModel);
+            return View(routeModel);//todo: update view to hit create end point below
         }
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]
