@@ -67,11 +67,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 "employer-review" : 
                 "provider-review";
 
-            return RedirectToRoute(routeName, routeModel);//todo: include guid in route
+            return RedirectToRoute(routeName, routeModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review", Name = "provider-review")]
-        [Route("accounts/{employerAccountId}/reservations/review", Name = "employer-review")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review/{id}", Name = "provider-review")]
+        [Route("accounts/{employerAccountId}/reservations/review/{id}", Name = "employer-review")]
         public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult result;
