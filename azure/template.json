@@ -31,15 +31,13 @@
     "certificateThumbprintsToLoad": {
       "type": "string"
     },
-    "CdnUrl": {
+    "cdnUrl": {
       "type": "string"
-    } 
+    }
   },
   "variables": {
-    "deploymentUrlBase":
-      "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "resourceNamePrefix":
-      "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+    "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
     "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]"
   },
@@ -104,7 +102,7 @@
               },
               {
                 "name": "Cdn:Url",
-                "value": "[parameters('CdnUrl')]"
+                "value": "[parameters('cdnUrl')]"
               },
               {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -120,94 +118,105 @@
               }
             ]
           },
-          "customHostName",
-          {
-          "value": ""
+          "customHostName": {
+            "value": ""
+          },
+          "certificateThumbprint": {
+            "value": ""
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "provider-application-insights",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+          "contentVersion": "1.0.0.0"
         },
-        "certificateThumbprint",
-        {
-        "value": ""
+        "parameters": {
+          "appInsightsName": {
+            "value": "[variables('providerAppServiceName')]"
+          },
+          "attachedService": {
+            "value": "[variables('providerAppServiceName')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "provider-app-service",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServiceName": {
+            "value": "[variables('providerAppServiceName')]"
+          },
+          "appServicePlanName": {
+            "value": "[parameters('sharedAppServicePlanName')]"
+          },
+          "appServicePlanResourceGroup": {
+            "value": "[parameters('sharedResourceGroup')]"
+          },
+          "appServiceAppSettings": {
+            "value": [
+              {
+                "name": "Environment",
+                "value": "[parameters('environmentName')]"
+              },
+              {
+                "name": "ConfigurationStorageConnectionString",
+                "value": "[parameters('configurationStorageConnectionString')]"
+              },
+              {
+                "name": "ConfigNames",
+                "value": "[parameters('configNames')]"
+              },
+              {
+                "name": "Version",
+                "value": "[parameters('version')]"
+              },
+              {
+                "name": "Cdn:Url",
+                "value": "[parameters('cdnUrl')]"
+              },
+              {
+                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
+              },
+              {
+                "name": "AuthType",
+                "value": "provider"
+              }
+            ]
+          },
+          "customHostName": {
+            "value": ""
+          },
+          "certificateThumbprint": {
+            "value": ""
+          }
+        }
       }
     }
-}},
-        {
-            "apiVersion": "2017-05-10",
-            "name": "provider-application-insights",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appInsightsName": {
-                        "value": "[variables('providerAppServiceName')]"
-                    },
-                    "attachedService": {
-                        "value": "[variables('providerAppServiceName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2017-05-10",
-            "name": "provider-app-service",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appServiceName": {
-                        "value": "[variables('providerAppServiceName')]"
-                    },
-                    "appServicePlanName": {
-                        "value": "[parameters('sharedAppServicePlanName')]"
-                    },
-                    "appServicePlanResourceGroup": {
-                        "value": "[parameters('sharedResourceGroup')]"
-                    },
-                    "appServiceAppSettings": {
-                        "value": [
-                            {
-                                "name": "Environment",
-                                "value": "[parameters('environmentName')]"
-                            },
-                            {
-                                "name": "ConfigurationStorageConnectionString",
-                                "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
-                            },
-                            {
-                                "name": "AuthType",
-                                "value": "provider"
-                            }
-                        ]
-                    },
-                    "customHostName": {
-                        "value": ""
-                    },
-                    "certificateThumbprint": {
-                        "value": ""
-                    }
-                }
-            }
-        }
-    ],
-    "outputs": {
-        "employerAppServiceName": {
-            "type": "string",
-            "value": "[variables('employerAppServiceName')]"
-        },
-        "providerAppServiceName": {
-            "type": "string",
-            "value": "[variables('providerAppServiceName')]"
-        }
+  ],
+  "outputs": {
+    "employerAppServiceName": {
+      "type": "string",
+      "value": "[variables('employerAppServiceName')]"
+    },
+    "providerAppServiceName": {
+      "type": "string",
+      "value": "[variables('providerAppServiceName')]"
     }
+  }
 }
