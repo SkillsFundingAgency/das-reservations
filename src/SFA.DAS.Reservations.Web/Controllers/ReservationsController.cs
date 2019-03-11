@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -93,12 +92,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
-                return View("Error", model);//todo: setup view correctly.
+                return View("Error");//todo: setup view correctly.
             }
+            
+            var routeName = routeModel.Ukprn == null ? 
+                "employer-create-reservation" : 
+                "provider-create-reservation";
 
             var viewModel = new ReviewViewModel
             {
+                RouteName = routeName,
                 RouteModel = routeModel,
                 StartDate = result.StartDate
             };

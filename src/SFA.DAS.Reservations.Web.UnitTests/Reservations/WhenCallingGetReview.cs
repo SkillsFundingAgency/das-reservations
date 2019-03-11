@@ -52,6 +52,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.StartDate.Should().Be(cachedReservationResult.StartDate);
         }
 
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_Then_Uses_Provider_Route(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel formModel,
+            ReservationsController controller)
+        {
+            var result = await controller.Review(routeModel) as ViewResult;
+
+            ((ReviewViewModel) result.Model).RouteName.Should().Be("provider-create-reservation");
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_Then_Uses_Provider_Route(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel formModel,
+            ReservationsController controller)
+        {
+            routeModel.Ukprn = null;
+            var result = await controller.Review(routeModel) as ViewResult;
+
+            ((ReviewViewModel) result.Model).RouteName.Should().Be("employer-create-reservation");
+        }
+
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
