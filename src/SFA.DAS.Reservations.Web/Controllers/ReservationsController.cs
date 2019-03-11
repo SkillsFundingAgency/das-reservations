@@ -66,13 +66,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 "employer-review" : 
                 "provider-review";
 
-            return RedirectToRoute(routeName, routeModel);
+            return RedirectToRoute(routeName, routeModel);//todo: include guid in route
         }
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review", Name = "provider-review")]
         [Route("accounts/{employerAccountId}/reservations/review", Name = "employer-review")]
         public IActionResult Review(ReservationsRouteModel routeModel)
         {
+            //todo: get reservation from cache.
             return View(routeModel);//todo: update view to hit create end point below
         }
 
