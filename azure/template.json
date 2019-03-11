@@ -31,7 +31,7 @@
     "certificateThumbprintsToLoad": {
       "type": "string"
     },
-    "CdnUrl": {
+    "cdnUrl": {
       "type": "string"
     }
   },
@@ -104,7 +104,7 @@
               },
               {
                 "name": "Cdn:Url",
-                "value": "[parameters('CdnUrl')]"
+                "value": "[parameters('cdnUrl')]"
               },
               {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -189,7 +189,7 @@
               },
               {
                 "name": "Cdn:Url",
-                "value": "[parameters('CdnUrl')]"
+                "value": "[parameters('cdnUrl')]"
               },
               {
                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
