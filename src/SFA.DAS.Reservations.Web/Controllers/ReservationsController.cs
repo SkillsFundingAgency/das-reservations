@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CacheReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
-                    StartDate = formModel.StartDate
+                    StartDate = formModel.TrainingStartDate
                 };
 
                 result = await _mediator.Send(command);
@@ -166,7 +166,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var dates = await _startDateService.GetStartDates();
             return new ApprenticeshipTrainingViewModel
             {
-                RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
+                RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
                 PossibleStartDates = dates.Select(date => new StartDateViewModel
                 {
                     Value = $"{date:yyyy-MM}",

@@ -85,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var mediator = new Mock<IMediator>();
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "StartDate|The StartDate field is not valid." }), null, null));
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
             var controller = new ReservationsController(mediator.Object, Mock.Of<IStartDateService>());
 
             var actual = await controller.Create("123r", null, "201");
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var actualViewResult = actual as ViewResult;
             Assert.IsNotNull(actualViewResult);
             Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
-            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("StartDate"));
+            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("TrainingStartDate"));
         }
     }
 }

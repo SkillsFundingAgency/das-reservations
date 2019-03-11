@@ -2,7 +2,7 @@
 {
     public class ApprenticeshipTrainingFormModel
     {
-        public string StartDate { get; set; }
+        public string TrainingStartDate { get; set; }
         public string TrainingCourse { get; set; }
     }
 }
