@@ -6,7 +6,6 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
@@ -54,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             await controller.PostApprenticeshipTraining(routeModel, formModel);
 
             mockMediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheReservationCommand>(command => 
+                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
                     command.AccountId == routeModel.EmployerAccountId &&
                     command.StartDate == formModel.StartDate
                     // todo and course == ...
@@ -68,7 +67,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Mock<IMediator> mockMediator)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CacheReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "StartDate|The StartDate field is not valid." }), null, null));
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
             
