@@ -4,15 +4,15 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries
 {
-    public class GetReservationQueryValidator : IValidator<GetReservationQuery>
+    public class ReservationQueryValidator : IValidator<IReservationQuery>
     {
-        public  Task<ValidationResult> ValidateAsync(GetReservationQuery item)
+        public  Task<ValidationResult> ValidateAsync(IReservationQuery query)
         {
             var result = new ValidationResult();
 
-            if (item.Id == Guid.Empty)
+            if (query.Id == Guid.Empty)
             {
-                result.AddError(nameof(item.Id));
+                result.AddError(nameof(query.Id));
             }
 
             return Task.FromResult(result);

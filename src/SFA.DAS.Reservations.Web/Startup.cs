@@ -97,7 +97,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<BaseCreateReservationCommand>), typeof(CreateReservationValidator));
-            services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationQueryValidator));
+            services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(ReservationQueryValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
             services.AddSingleton<IHashids>(new Hashids(
@@ -120,9 +120,9 @@ namespace SFA.DAS.Reservations.Web
             else
             {
                 services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = "localhost"; // todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
-                });
+                    {
+                        options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
+                    });
             }
         }
 
