@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -76,12 +77,25 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             GetCachedReservationResult result;
 
-            var query = new GetCachedReservationQuery
+            try
             {
-                Id = routeModel.Id.GetValueOrDefault()
-            };
+                var query = new GetCachedReservationQuery
+                {
+                    Id = routeModel.Id.GetValueOrDefault()
+                };
 
-            result = await _mediator.Send(query);
+                result = await _mediator.Send(query);
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                return View("Error", model);//todo: setup view correctly.
+            }
 
             var viewModel = new ReviewViewModel
             {
