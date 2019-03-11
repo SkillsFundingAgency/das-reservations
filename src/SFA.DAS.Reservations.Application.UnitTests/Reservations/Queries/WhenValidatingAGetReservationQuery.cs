@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
     {
         [Test, AutoData]
         public async Task And_No_Id_Then_Invalid(
-            GetReservationQueryValidator validator)
+            ReservationQueryValidator validator)
         {
             var query = new GetReservationQuery();
             
@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         [Test, AutoData]
         public async Task And_All_Fields_Valid_Then_Valid(
             GetReservationQuery query,
-            GetReservationQueryValidator validator)
+            ReservationQueryValidator validator)
         {
             var result = await validator.ValidateAsync(query);
 

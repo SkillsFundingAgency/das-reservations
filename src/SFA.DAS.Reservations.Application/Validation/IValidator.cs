@@ -4,6 +4,6 @@ namespace SFA.DAS.Reservations.Application.Validation
 {
     public interface IValidator<in T>
     {
-        Task<ValidationResult> ValidateAsync(T item);
+        Task<ValidationResult> ValidateAsync(T query);
     }
 }

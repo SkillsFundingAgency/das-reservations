@@ -6,26 +6,26 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationValidator : IValidator<BaseCreateReservationCommand>
     {
-        public Task<ValidationResult> ValidateAsync(BaseCreateReservationCommand item)
+        public Task<ValidationResult> ValidateAsync(BaseCreateReservationCommand query)
         {
             var result = new ValidationResult();
 
-            if (item.AccountId == "0")
+            if (query.AccountId == "0")
             {
-                result.AddError(nameof(item.AccountId));
+                result.AddError(nameof(query.AccountId));
             }
 
-            if (string.IsNullOrEmpty(item.StartDate))
+            if (string.IsNullOrEmpty(query.StartDate))
             {
-                result.AddError(nameof(item.StartDate));
+                result.AddError(nameof(query.StartDate));
             }
             else
             {
-                var dateSplit = item.StartDate.Split("-");
+                var dateSplit = query.StartDate.Split("-");
 
                 if (dateSplit.Length != 2)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(query.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!yearValid || !monthValid)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(query.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(query.StartDate));
                 }
             }
             
