@@ -62,6 +62,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("ApprenticeshipTraining", model);//todo: view dependent on ukprn.
             }
 
+            routeModel.Id = result.Id;
             var routeName = routeModel.Ukprn == null ? 
                 "employer-review" : 
                 "provider-review";

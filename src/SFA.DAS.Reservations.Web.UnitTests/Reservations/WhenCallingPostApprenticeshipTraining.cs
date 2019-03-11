@@ -6,7 +6,6 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
@@ -59,6 +58,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     command.StartDate == formModel.StartDate
                     // todo and course == ...
                     ), It.IsAny<CancellationToken>()));
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Adds_Guid_To_RouteModel(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel formModel,
+            CacheReservationResult cacheReservationResult,
+            [Frozen] Mock<IMediator> mockMediator, 
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<CacheReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cacheReservationResult);
+
+            var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
+
+            result.RouteValues.Should().ContainKey("Id")
+                .WhichValue.Should().Be(cacheReservationResult.Id);
         }
 
         [Test, AutoData]//note cannot use autodata to construct controller here due to modelmetadata usage.
