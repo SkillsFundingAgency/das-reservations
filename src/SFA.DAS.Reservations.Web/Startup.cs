@@ -120,9 +120,9 @@ namespace SFA.DAS.Reservations.Web
             else
             {
                 services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = "localhost"; // todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
-                });
+                    {
+                        options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
+                    });
             }
         }
 
