@@ -33,6 +33,21 @@
     },
     "cdnUrl": {
       "type": "string"
+    },
+    "employerCustomHostname": {
+      "type": "string"
+    },
+    "providerCustomHostname": {
+      "type": "string"
+    },
+    "employerCertificateName": {
+      "type": "string"
+    },
+    "providerCertificateName": {
+      "type": "string"
+    },
+    "certificateResourceGroup": {
+      "type": "string"
     }
   },
   "variables": {
@@ -121,10 +136,11 @@
             ]
           },
           "customHostName": {
-            "value": ""
+            "value": "[parameters('employerCustomHostname')]"
           },
           "certificateThumbprint": {
-            "value": ""
+            "value":
+              "[reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('employerCertificateName')), '2016-03-01').Thumbprint]"
           }
         }
       }
@@ -202,10 +218,11 @@
             ]
           },
           "customHostName": {
-            "value": ""
+            "value": "[parameters('providerCustomHostname')]"
           },
           "certificateThumbprint": {
-            "value": ""
+            "value":
+              "[reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('providerCertificateName')), '2016-03-01').Thumbprint]"
           }
         }
       }
