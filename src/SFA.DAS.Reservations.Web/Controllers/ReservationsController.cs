@@ -59,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
-                return View("ApprenticeshipTraining", model);//todo: view dependent on ukprn.
+                return View("ApprenticeshipTraining", model);
             }
 
             routeModel.Id = result.Id;
@@ -70,8 +70,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review/{id}", Name = "provider-review")]
-        [Route("accounts/{employerAccountId}/reservations/review/{id}", Name = "employer-review")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/review", Name = "provider-review")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = "employer-review")]
         public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult result;
@@ -105,11 +105,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RouteModel = routeModel,
                 StartDate = result.StartDate
             };
-            return View(viewModel);//todo: update view to hit create end point below
+            return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]
-        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-create-reservation")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
@@ -134,7 +134,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
-                return View("ApprenticeshipTraining", model);//todo: view dependent on ukprn.
+                return View("ApprenticeshipTraining", model);
             }
 
             return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
@@ -142,8 +142,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create/{id}", Name = "provider-reservation-created")]
-        [Route("accounts/{employerAccountId}/reservations/create/{id}", Name = "employer-reservation-created")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-reservation-created")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
             var query = new GetReservationQuery
