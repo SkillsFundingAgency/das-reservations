@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -46,15 +45,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CacheReservationCommand
                 {
+                    AccountId = routeModel.EmployerAccountId,
                     StartDate = formModel.StartDate
                 };
 
                 result = await _mediator.Send(command);
             }
-            catch (Exception e)
+            catch (ValidationException e)
             {
-                Console.WriteLine(e);
-                throw;
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                return View("ApprenticeshipTraining", model);//todo: view dependent on ukprn.
             }
 
             var routeName = routeModel.Ukprn == null ? 
@@ -97,7 +102,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
-                return View("ApprenticeshipTraining", model);//todo: view dependenant on ukprn.
+                return View("ApprenticeshipTraining", model);//todo: view dependent on ukprn.
             }
 
             return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
@@ -124,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(model);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
             return new ApprenticeshipTrainingViewModel
