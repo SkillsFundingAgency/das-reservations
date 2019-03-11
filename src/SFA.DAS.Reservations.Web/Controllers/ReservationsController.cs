@@ -83,7 +83,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             result = await _mediator.Send(query);
 
-            return View(routeModel);//todo: update view to hit create end point below
+            var viewModel = new ReviewViewModel
+            {
+                RouteModel = routeModel,
+                StartDate = result.StartDate
+            };
+            return View(viewModel);//todo: update view to hit create end point below
         }
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]

@@ -32,12 +32,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_ViewModel(
             ReservationsRouteModel routeModel,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+
             var result = await controller.Review(routeModel);
-            result.Should().BeOfType<ViewResult>()
-                .Which.Model.Should().BeOfType<ReservationsRouteModel>()
-                .Which.Should().BeSameAs(routeModel);
+
+            var viewModel = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ReviewViewModel>().Subject;
+
+            viewModel.RouteModel.Should().BeEquivalentTo(routeModel);
+            viewModel.StartDate.Should().Be(cachedReservationResult.StartDate);
         }
     }
 }
