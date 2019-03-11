@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var command = new CacheReservationCommand
+                var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
                     StartDate = formModel.TrainingStartDate

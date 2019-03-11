@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
-            services.AddScoped(typeof(IValidator<BaseCreateReservationCommand>), typeof(CreateReservationValidator));
+            services.AddScoped(typeof(IValidator<ICreateReservationCommand>), typeof(CreateReservationCommandValidator));
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(ReservationQueryValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();

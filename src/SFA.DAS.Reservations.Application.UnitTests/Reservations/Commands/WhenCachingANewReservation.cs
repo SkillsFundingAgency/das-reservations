@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCachingANewReservation
     {
-        private Mock<IValidator<BaseCreateReservationCommand>> _mockValidator;
+        private Mock<IValidator<ICreateReservationCommand>> _mockValidator;
         private Mock<ICacheStorageService> _mockCacheStorageService;
         private CacheReservationCommandHandler _commandHandler;
 
@@ -30,9 +30,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
-            _mockValidator = fixture.Freeze<Mock<IValidator<BaseCreateReservationCommand>>>();
+            _mockValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
             _mockValidator
-                .Setup(validator => validator.ValidateAsync(It.IsAny<CacheReservationCommand>()))
+                .Setup(validator => validator.ValidateAsync(It.IsAny<CacheCreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
 
             _mockCacheStorageService = fixture.Freeze<Mock<ICacheStorageService>>();
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public async Task Then_It_Validates_The_Command(
-            CacheReservationCommand command)
+            CacheCreateReservationCommand command)
         {
             command.StartDate = "2019-01";
 
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
-            CacheReservationCommand command,
+            CacheCreateReservationCommand command,
             ValidationResult validationResult,
             string propertyName)
         {
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public async Task Then_Calls_Cache_Service_To_Save_Reservation(
-            CacheReservationCommand command)
+            CacheCreateReservationCommand command)
         {
             command.Id = null;
             var originalCommand = command.Clone();
@@ -85,7 +85,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public async Task And_Is_Existing_Cache_Item_Then_Calls_Cache_Service_Using_Same_Key(
-            CacheReservationCommand command)
+            CacheCreateReservationCommand command)
         {
             var originalCommand = command.Clone();
             var result = await _commandHandler.Handle(command, CancellationToken.None);
