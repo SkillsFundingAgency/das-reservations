@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public string RouteName { get; set; }
         public ReservationsRouteModel RouteModel { get; set; }
-        public DateTime StartDate { get; set; }
+        public string StartDate { get; set; }
     }
 }

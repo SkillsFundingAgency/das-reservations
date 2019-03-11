@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Models;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries
@@ -30,18 +29,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var reservation = await _cacheService.RetrieveFromCache<Reservation>(request.Id.ToString());
+            var reservation = await _cacheService.RetrieveFromCache<GetCachedReservationResult>(request.Id.ToString());
 
-            if (reservation == null)
-            {
-                return new GetCachedReservationResult();
-            }
-
-            return new GetCachedReservationResult
-            {
-                ReservationId = reservation.Id,
-                StartDate = reservation.StartDate
-            };
+            return reservation;
         }
     }
 }

@@ -5,23 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Models;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
     public class WhenGettingAReservationFromCache
     {
-        private const long ExpectedAccountId = 44321;
+        private const string ExpectedAccountId = "44321";
 
         private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<ICacheStorageService> _cacheService;
         private GetCachedReservationQueryHandler _handler;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
-        private readonly DateTime _expectedStartDate = DateTime.Now.AddDays(-20);
+        private readonly string _expectedStartDate = DateTime.Now.AddDays(-20).ToString();
 
         [SetUp]
         public void Arrange()
@@ -32,8 +32,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
                 .ReturnsAsync(new ValidationResult());
            
             _cacheService = new Mock<ICacheStorageService>();
-            _cacheService.Setup(x => x.RetrieveFromCache<Reservation>(_expectedReservationId.ToString()))
-                .ReturnsAsync(new Reservation
+            _cacheService.Setup(x => x.RetrieveFromCache<GetCachedReservationResult>(_expectedReservationId.ToString()))
+                .ReturnsAsync(new GetCachedReservationResult
                 {
                     Id = _expectedReservationId,
                     AccountId = ExpectedAccountId,
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             var actual = await _handler.Handle(command, new CancellationToken());
 
             //Assert
-            Assert.AreEqual(_expectedReservationId, actual.ReservationId);
+            Assert.AreEqual(_expectedReservationId, actual.Id);
             Assert.AreEqual(_expectedStartDate, actual.StartDate);
         }
     }

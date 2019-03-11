@@ -4,8 +4,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public interface ICreateReservationCommand
     {
-        Guid? Id { get; }
-        string AccountId { get; }
-        string StartDate { get; }
+        Guid? Id { get; set; }
+        string AccountId { get; set; }
+        string StartDate { get; set; }
     }
 }
