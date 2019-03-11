@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .WhichValue.Should().Be(cacheReservationResult.Id);
         }
 
-        [Test, AutoData]//note cannot use autodata to construct controller here due to modelmetadata usage.
+        [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,

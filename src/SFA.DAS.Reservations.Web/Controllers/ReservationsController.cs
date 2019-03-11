@@ -72,9 +72,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/review", Name = "provider-review")]
         [Route("accounts/{employerAccountId}/reservations/review", Name = "employer-review")]
-        public IActionResult Review(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
-            //todo: get reservation from cache.
+            GetCachedReservationResult result;
+
+            var query = new GetCachedReservationQuery
+            {
+                Id = routeModel.Id.GetValueOrDefault()
+            };
+
+            result = await _mediator.Send(query);
+
             return View(routeModel);//todo: update view to hit create end point below
         }
 
