@@ -112,19 +112,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
+        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
         {
-            CreateReservationResult result;
+            GetCachedReservationResult cachedReservationResult;
 
             try
             {
-                var command = new CreateReservationCommand
+                var query = new GetCachedReservationQuery
                 {
-                    AccountId = employerAccountId,
-                    StartDate = trainingStartDate
+                    Id = routeModel.Id.GetValueOrDefault()
                 };
 
-                result = await _mediator.Send(command);
+                cachedReservationResult = await _mediator.Send(query);
             }
             catch (ValidationException e)
             {
@@ -133,11 +132,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
+                return View("Error");//todo: setup view correctly.
+            }
+
+            try
+            {
+                var command = new CreateReservationCommand
+                {
+                    AccountId = cachedReservationResult.AccountId,
+                    StartDate = cachedReservationResult.StartDate,
+                    Id = cachedReservationResult.Id
+                };
+
+                await _mediator.Send(command);
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                var model = await BuildApprenticeshipTrainingViewModel(1234);
                 return View("ApprenticeshipTraining", model);
             }
 
-            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
+            return RedirectToRoute(routeModel.Ukprn.HasValue ? "provider-reservation-created" : "employer-reservation-created", routeModel);
         }
 
         // GET
