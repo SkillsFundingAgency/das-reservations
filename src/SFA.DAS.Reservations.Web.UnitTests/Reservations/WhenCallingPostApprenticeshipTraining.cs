@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CacheReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cacheReservationResult);
 
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
