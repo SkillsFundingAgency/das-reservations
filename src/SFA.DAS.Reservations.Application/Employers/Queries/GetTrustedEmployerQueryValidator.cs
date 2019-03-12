@@ -1,0 +1,21 @@
+﻿using System;
+using System.Threading.Tasks;
+using SFA.DAS.Reservations.Application.Validation;
+
+namespace SFA.DAS.Reservations.Application.Employers.Queries
+{
+    public class GetTrustedEmployerQueryValidator : IValidator<GetTrustedEmployersQuery>
+    {
+        public Task<ValidationResult> ValidateAsync(GetTrustedEmployersQuery query)
+        {
+            var result = new ValidationResult();
+
+            if (query.UkPrn == default(long))
+            {
+                result.AddError(nameof(query.UkPrn));
+            }
+
+            return Task.FromResult(result);
+        }
+    }
+}

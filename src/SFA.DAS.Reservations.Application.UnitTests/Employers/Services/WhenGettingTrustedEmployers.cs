@@ -113,6 +113,5 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             //Assert
             result.Should().BeEquivalentTo(_expectedEmployers);
         }
-
     }
 }
