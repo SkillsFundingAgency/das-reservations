@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -57,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
+        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate, string courseId)
         {
             CreateReservationResult result;
 
@@ -66,7 +68,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CreateReservationCommand
                 {
                     AccountId = employerAccountId,
-                    StartDate = trainingStartDate
+                    StartDate = trainingStartDate,
+                    CourseId = courseId
                 };
 
                 result = await _mediator.Send(command);
@@ -102,7 +105,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = queryResult.ReservationId,
                 StartDate = queryResult.StartDate,
-                ExpiryDate = queryResult.ExpiryDate
+                ExpiryDate = queryResult.ExpiryDate,
+                Course = queryResult.Course
             };
             return View(model);
         }
@@ -110,6 +114,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
+
+            var coursesResult = await _mediator.Send(new GetCoursesQuery());
+
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
@@ -117,7 +124,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Value = $"{date:yyyy-MM}",
                     Label = $"{date:MMMM yyyy}"
-                }).OrderBy(model => model.Value)
+                }).OrderBy(model => model.Value),
+                Courses = coursesResult.Courses
             };
         }
     }

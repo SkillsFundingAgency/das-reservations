@@ -1,11 +1,9 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CreateReservationCommand : IRequest<CreateReservationResult>
+    public class CreateReservationCommand : BaseCreateReservationCommand, IRequest<CreateReservationResult>
     {
-        public string AccountId { get; set; }
-        public string StartDate { get; set; }
+
     }
 }

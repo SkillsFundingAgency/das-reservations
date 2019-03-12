@@ -12,18 +12,23 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             string baseUrl, 
             Func<string, long> decodeFunc, 
             string hashedAccountId, 
-            DateTime startDate, Guid id) 
+            DateTime startDate, 
+            Guid id, 
+            string courseId = null) 
             : base(baseUrl)
         {
             _decodeFunc = decodeFunc;
             _hashedAccountId = hashedAccountId;
             _id = id;
             StartDate = startDate.ToString("yyyy-MMM-dd");
+            CourseId = courseId;
         }
 
         public long AccountId => _decodeFunc(_hashedAccountId);
 
         public string StartDate { get; }
+
+        public string CourseId { get; }
 
         public override string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public override string GetUrl => $"{BaseUrl}api/reservations/{_id}";

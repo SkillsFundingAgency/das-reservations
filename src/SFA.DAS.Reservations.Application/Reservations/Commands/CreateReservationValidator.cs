@@ -4,9 +4,9 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CreateReservationValidator : IValidator<CreateReservationCommand>
+    public class CreateReservationValidator : IValidator<BaseCreateReservationCommand>
     {
-        public Task<ValidationResult> ValidateAsync(CreateReservationCommand item)
+        public Task<ValidationResult> ValidateAsync(BaseCreateReservationCommand item)
         {
             var result = new ValidationResult();
 

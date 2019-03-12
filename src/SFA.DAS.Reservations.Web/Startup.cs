@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -32,7 +33,7 @@ namespace SFA.DAS.Reservations.Web
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -96,7 +97,7 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
-            services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
+            services.AddScoped(typeof(IValidator<BaseCreateReservationCommand>), typeof(CreateReservationValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
@@ -105,12 +106,25 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashLength, 
                 reservationsWebConfig.EmployerAccountHashAlphabet));
             services.AddTransient<IStartDateService, StartDateService>();
+            services.AddTransient<ICacheStorageService, CacheStorageService>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
+
+            if (_configuration["Environment"] == "LOCAL")
+            {
+                services.AddDistributedMemoryCache();
+            }
+            else
+            {
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = "localhost"; // todo: get from config (add to config) reservationsWebConfig.RedisCacheConnectionString
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
