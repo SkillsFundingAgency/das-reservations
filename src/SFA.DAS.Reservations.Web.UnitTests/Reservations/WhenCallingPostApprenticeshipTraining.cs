@@ -56,8 +56,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
                     command.AccountId == routeModel.EmployerAccountId &&
-                    command.StartDate == formModel.TrainingStartDate
-                    // todo and course == ...
+                    command.StartDate == formModel.TrainingStartDate &&
+                    command.CourseId == formModel.TrainingCourse
                     ), It.IsAny<CancellationToken>()));
         }
 

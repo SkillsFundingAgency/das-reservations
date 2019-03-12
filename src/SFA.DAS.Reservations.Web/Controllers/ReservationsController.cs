@@ -48,7 +48,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
-                    StartDate = formModel.TrainingStartDate
+                    StartDate = formModel.TrainingStartDate,
+                    CourseId = formModel.TrainingCourse
                 };
 
                 result = await _mediator.Send(command);
