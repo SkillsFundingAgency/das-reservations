@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
                     command.AccountId == routeModel.EmployerAccountId &&
                     command.StartDate == formModel.TrainingStartDate &&
-                    command.CourseId == formModel.TrainingCourse
+                    command.CourseId == formModel.CourseId
                     ), It.IsAny<CancellationToken>()));
         }
 

@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     AccountId = routeModel.EmployerAccountId,
                     StartDate = formModel.TrainingStartDate,
-                    CourseId = formModel.TrainingCourse
+                    CourseId = formModel.CourseId
                 };
 
                 result = await _mediator.Send(command);
