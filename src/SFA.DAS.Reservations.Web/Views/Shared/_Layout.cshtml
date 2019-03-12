@@ -90,15 +90,14 @@
     <script>
         var selectEl = document.querySelector('#course-search');
         if (selectEl) {
-
             accessibleAutocomplete.enhanceSelectElement({
                 minLength: 3,
-                autoselect: false, 
+                autoselect: true,
+                defaultValue: '',
                 displayMenu: 'overlay',
                 placeholder: 'Search for an apprenticeship',
                 selectElement: selectEl
             });
-
         }
     </script>
 
