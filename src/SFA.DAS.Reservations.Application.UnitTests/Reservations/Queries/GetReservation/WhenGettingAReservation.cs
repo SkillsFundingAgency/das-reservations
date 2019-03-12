@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -16,7 +17,7 @@ using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationR
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
-    public class WhenGettingAReservation
+    public class WhenGettingCourses
     {
         private GetReservationQueryHandler _handler;
         private Mock<IValidator<IReservationQuery>> _validator;

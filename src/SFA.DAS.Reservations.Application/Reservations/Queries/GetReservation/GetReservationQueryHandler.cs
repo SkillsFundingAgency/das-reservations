@@ -10,7 +10,7 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 {
     public class GetReservationQueryHandler : IRequestHandler<GetReservationQuery, GetReservationResult>
     {
@@ -49,7 +49,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries
             {
                 ReservationId = result.ReservationId,
                 StartDate = result.StartDate,
-                ExpiryDate = result.ExpiryDate
+                ExpiryDate = result.ExpiryDate,
+                Course = result.Course
             };
         }
     }

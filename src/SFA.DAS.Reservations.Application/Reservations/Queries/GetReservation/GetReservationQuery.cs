@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 {
     public class GetReservationQuery : IReservationQuery, IRequest<GetReservationResult>
     {

@@ -46,12 +46,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             var startYear = Convert.ToInt32(startDateComponents[0]);
             var startMonth = Convert.ToInt32(startDateComponents[1]);
 
-            var apiRequest = new ReservationApiRequest (
+            var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id.GetValueOrDefault());
+                command.Id.GetValueOrDefault(),
+                command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
 

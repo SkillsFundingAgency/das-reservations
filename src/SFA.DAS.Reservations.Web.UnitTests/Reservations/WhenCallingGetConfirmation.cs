@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -7,7 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -46,6 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.ReservationId.Should().Be(mediatorResult.ReservationId);
             model.StartDate.Should().Be(mediatorResult.StartDate);
             model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
+            model.Course.Should().BeEquivalentTo(mediatorResult.Course);
         }
     }
 }

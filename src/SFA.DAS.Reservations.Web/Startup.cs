@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -97,7 +98,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<ICreateReservationCommand>), typeof(CreateReservationCommandValidator));
-            services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(ReservationQueryValidator));
+            services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
             services.AddSingleton<IHashids>(new Hashids(

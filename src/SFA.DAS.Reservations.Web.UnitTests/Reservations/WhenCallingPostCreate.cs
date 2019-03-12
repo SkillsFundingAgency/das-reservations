@@ -13,6 +13,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -67,7 +69,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
                     command.AccountId == cachedReservationResult.AccountId && 
                     command.StartDate == cachedReservationResult.StartDate &&
-                    command.Id == cachedReservationResult.Id
+                    command.Id == cachedReservationResult.Id &&
+                    command.CourseId == cachedReservationResult.CourseId
                         ), It.IsAny<CancellationToken>()));
         }
 
@@ -119,6 +122,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(cachedReservationResult);
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult(){Courses = new List<Course>()});
+            
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
 
             var actual = await controller.Create(routeModel);

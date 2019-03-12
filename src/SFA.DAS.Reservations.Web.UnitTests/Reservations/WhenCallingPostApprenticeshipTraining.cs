@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -82,11 +83,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,
+            GetCoursesResult coursesResult,
             Mock<IMediator> mockMediator)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(coursesResult);
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
             
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel);

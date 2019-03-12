@@ -85,17 +85,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public async Task Then_Calls_Reservation_Api_To_Create_Reservation(
+        public async Task Then_Calls_Reservation_Api_To_Create_Reservation_Without_Course(
             CreateReservationCommand command)
         {
             command.StartDate = "2019-01";
+            command.CourseId = null;
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == "2019-Jan-01"))
-                , Times.Once);
+                apiRequest.StartDate == "2019-Jan-01" &&
+                apiRequest.CourseId == null)), Times.Once);
         }
 
         [Test, AutoData]
@@ -107,6 +108,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
             result.Reservation.Id.Should().Be(_apiResponse.Id);
+        }
+
+        [Test, AutoData]
+        public async Task Then_Calls_Reservation_Api_To_Create_Reservation_With_Course(
+            CreateReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+            command.CourseId = "123-1";
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
+                    apiRequest.AccountId == _expectedAccountId &&
+                    apiRequest.StartDate == "2019-Jan-01" &&
+                    apiRequest.CourseId.Equals("123-1"))), Times.Once);
         }
     }
 }
