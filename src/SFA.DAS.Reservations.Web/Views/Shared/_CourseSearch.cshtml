@@ -1,6 +1,9 @@
 @model ApprenticeshipTrainingViewModel
 ﻿
-<label class="govuk-label govuk-label--m" for="course-search">Which apprenticeship training will the apprentice take? (optional)</label>
+<h2 class="govuk-heading-m" >Which apprenticeship training will the apprentice take? (optional)</h2>
+<label class="govuk-label" for="course-search">
+    Search for a course
+</label>
 <select id="course-search" name="courseId" class="govuk-select">
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
