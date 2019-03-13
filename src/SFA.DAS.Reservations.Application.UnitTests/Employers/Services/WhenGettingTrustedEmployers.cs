@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
 {
     public class WhenGettingTrustedEmployers
     {
-        private const long ExpectedUkPrn = 12345;
+        private const uint ExpectedUkPrn = 12345;
 
         private ProviderPermissionsService _providerPermissionsService;
         private Mock<IProviderRelationshipsApiClient> _providerRelationsApiClient;
@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             //Act
             try
             {
-                await _providerPermissionsService.GetTrustedEmployers(default(long));
+                await _providerPermissionsService.GetTrustedEmployers(default(uint));
             }
             catch (Exception)
             {
@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
         public void Then_Will_Throw_Exception_If_Ukprn_Is_Not_Set()
         {
             //Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(long)));
+            Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
         }
 
         [Test]

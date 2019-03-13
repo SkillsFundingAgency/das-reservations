@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
 {
     public class WhenIGetTrustedEmployers
     {
-        public const long ExpectedUkPrn = 12345;
+        public const uint ExpectedUkPrn = 12345;
 
         private GetTrustedEmployersQueryHandler _handler;
         private Mock<IProviderPermissionsService> _providerPermissionsService;

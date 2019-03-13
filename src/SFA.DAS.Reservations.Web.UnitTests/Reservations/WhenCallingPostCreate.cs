@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, int ukPrn, CreateReservationResult createReservationResult)
+        public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(string employerAccountId, uint ukPrn, CreateReservationResult createReservationResult)
         {
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
             mockMediator

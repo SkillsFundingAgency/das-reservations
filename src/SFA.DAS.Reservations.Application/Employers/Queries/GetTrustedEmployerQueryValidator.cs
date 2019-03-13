@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries
         {
             var result = new ValidationResult();
 
-            if (query.UkPrn == default(long))
+            if (query.UkPrn == default(uint))
             {
                 result.AddError(nameof(query.UkPrn));
             }

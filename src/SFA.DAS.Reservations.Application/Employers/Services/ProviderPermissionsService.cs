@@ -19,9 +19,9 @@ namespace SFA.DAS.Reservations.Application.Employers.Services
             _apiClient = apiClient;
         }
 
-        public async Task<IEnumerable<Employer>> GetTrustedEmployers(long ukPrn)
+        public async Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn)
         {
-            if (ukPrn == default(long))
+            if (ukPrn == default(uint))
             {
                 throw new ArgumentException("Ukprn must be set to a non default value", nameof(ukPrn));
             }

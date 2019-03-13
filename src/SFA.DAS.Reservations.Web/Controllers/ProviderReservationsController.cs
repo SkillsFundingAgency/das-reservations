@@ -25,7 +25,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ChooseEmployer(long ukPrn)
+        [Route("chooseEmployer")]
+        public async Task<IActionResult> ChooseEmployer(uint ukPrn)
         {
             var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = ukPrn});
 

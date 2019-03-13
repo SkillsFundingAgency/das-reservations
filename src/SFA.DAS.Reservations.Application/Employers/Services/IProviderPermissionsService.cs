@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Application.Employers.Services
 {
     public interface IProviderPermissionsService
     {
-        Task<IEnumerable<Employer>> GetTrustedEmployers(long ukPrn);
+        Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn);
     }
 }

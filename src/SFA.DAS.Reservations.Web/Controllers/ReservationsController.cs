@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("apprenticeship-training")]
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
-        public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, int? ukPrn)
+        public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, uint? ukPrn)
         {
             
             
@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string employerAccountId, int? ukPrn, string trainingStartDate)
+        public async Task<IActionResult> Create(string employerAccountId, uint? ukPrn, string trainingStartDate)
         {
             CreateReservationResult result;
 
@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(model);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(int? ukPrn)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(uint? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
             return new ApprenticeshipTrainingViewModel

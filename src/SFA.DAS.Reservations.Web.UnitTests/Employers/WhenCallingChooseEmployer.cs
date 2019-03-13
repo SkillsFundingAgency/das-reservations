@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
     {
         [Test, MoqAutoData]
         public async Task Then_It_Calls_ProviderPermissions_Service_To_Get_Employers(
-            long ukPrn,
+            uint ukPrn,
             IEnumerable<Employer> expectedEmployers,
             [Frozen] Mock<IMediator> mockMediator,
             ProviderReservationsController controller)
@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Trusted_Employers(
-            long ukPrn,
+            uint ukPrn,
             IEnumerable<Employer> expectedEmployers,
             [Frozen] Mock<IMediator> mockMediator,
             ProviderReservationsController controller)
