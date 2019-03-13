@@ -31,18 +31,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                     AccountId = 1,
                     AccountPublicHashedId = "ABC111",
                     AccountName = "account 1",
-                    LegalEntityId = 11,
-                    LegalEntityPublicHashedId = "DEF111",
-                    LegalEntityName = "entity 1"
+                    AccountLegalEntityId = 11,
+                    AccountLegalEntityPublicHashedId = "DEF111",
+                    AccountLegalEntityName = "entity 1"
                 },
                 new Employer
                 {
                     AccountId = 2,
                     AccountPublicHashedId = "ABC222",
                     AccountName = "account 2",
-                    LegalEntityId = 22,
-                    LegalEntityPublicHashedId = "DEF222",
-                    LegalEntityName = "entity 2"
+                    AccountLegalEntityId = 22,
+                    AccountLegalEntityPublicHashedId = "DEF222",
+                    AccountLegalEntityName = "entity 2"
                 }
             };
 

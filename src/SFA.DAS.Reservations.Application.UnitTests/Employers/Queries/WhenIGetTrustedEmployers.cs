@@ -33,15 +33,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
                 {
                     AccountId = 1,
                     AccountName = "account 1",
-                    LegalEntityId = 11,
-                    LegalEntityName = "Entity 1"
+                    AccountLegalEntityId = 11,
+                    AccountLegalEntityName = "Entity 1"
                 },
                 new Employer
                 {
                     AccountId = 2,
                     AccountName = "account 2",
-                    LegalEntityId = 22,
-                    LegalEntityName = "Entity 2"
+                    AccountLegalEntityId = 22,
+                    AccountLegalEntityName = "Entity 2"
                 }
             };
             

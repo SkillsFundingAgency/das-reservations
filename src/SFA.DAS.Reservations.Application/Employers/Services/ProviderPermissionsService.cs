@@ -38,9 +38,9 @@ namespace SFA.DAS.Reservations.Application.Employers.Services
                 AccountId = e.AccountId,
                 AccountPublicHashedId = e.AccountPublicHashedId,
                 AccountName = e.AccountName,
-                LegalEntityId = e.AccountLegalEntityId,
-                LegalEntityPublicHashedId = e.AccountLegalEntityPublicHashedId,
-                LegalEntityName = e.AccountLegalEntityName
+                AccountLegalEntityId = e.AccountLegalEntityId,
+                AccountLegalEntityPublicHashedId = e.AccountLegalEntityPublicHashedId,
+                AccountLegalEntityName = e.AccountLegalEntityName
             }).ToArray();
 
         }
