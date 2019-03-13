@@ -6,26 +6,26 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandValidator : IValidator<ICreateReservationCommand>
     {
-        public Task<ValidationResult> ValidateAsync(ICreateReservationCommand query)
+        public Task<ValidationResult> ValidateAsync(ICreateReservationCommand command)
         {
             var result = new ValidationResult();
 
-            if (query.AccountId == "0")
+            if (command.AccountId == "0")
             {
-                result.AddError(nameof(query.AccountId));
+                result.AddError(nameof(command.AccountId));
             }
 
-            if (string.IsNullOrEmpty(query.StartDate))
+            if (string.IsNullOrEmpty(command.StartDate))
             {
-                result.AddError(nameof(query.StartDate));
+                result.AddError(nameof(command.StartDate));
             }
             else
             {
-                var dateSplit = query.StartDate.Split("-");
+                var dateSplit = command.StartDate.Split("-");
 
                 if (dateSplit.Length != 2)
                 {
-                    result.AddError(nameof(query.StartDate));
+                    result.AddError(nameof(command.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!yearValid || !monthValid)
                 {
-                    result.AddError(nameof(query.StartDate));
+                    result.AddError(nameof(command.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
                 {
-                    result.AddError(nameof(query.StartDate));
+                    result.AddError(nameof(command.StartDate));
                 }
             }
             

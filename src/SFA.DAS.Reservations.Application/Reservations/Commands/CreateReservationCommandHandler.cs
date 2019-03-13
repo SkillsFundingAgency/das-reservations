@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id.GetValueOrDefault(),
+                command.Id,
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

@@ -151,7 +151,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 await _mediator.Send(command);
 
-                await _mediator.Send(new DeleteCachedReservationCommand {Id = cachedReservationResult.Id.GetValueOrDefault()});
+                await _mediator.Send(new DeleteCachedReservationCommand {Id = cachedReservationResult.Id});
             }
             catch (ValidationException e)
             {
