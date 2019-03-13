@@ -15,7 +15,7 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetReservation
 {
     public class WhenGettingCourses
     {
