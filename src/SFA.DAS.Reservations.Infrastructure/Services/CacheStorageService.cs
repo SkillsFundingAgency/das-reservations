@@ -30,5 +30,10 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             var json = await _distributedCache.GetStringAsync(key);
             return json == null ? default(T) : JsonConvert.DeserializeObject<T>(json);
         }
+
+        public async Task DeleteFromCache(string key)
+        {
+            await _distributedCache.RemoveAsync(key);
+        }
     }
 }

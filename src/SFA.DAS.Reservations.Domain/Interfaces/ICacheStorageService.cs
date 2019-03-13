@@ -6,5 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
     {
         Task<T> RetrieveFromCache<T>(string key);
         Task SaveToCache<T>(string key, T item, int expirationInHours);
+        Task DeleteFromCache(string key);
     }
 }

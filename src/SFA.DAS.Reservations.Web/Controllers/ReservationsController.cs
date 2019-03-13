@@ -150,6 +150,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 };
 
                 await _mediator.Send(command);
+
+                // todo: delete cached reservation
             }
             catch (ValidationException e)
             {
