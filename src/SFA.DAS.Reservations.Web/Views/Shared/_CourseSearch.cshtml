@@ -1,13 +1,13 @@
 @model ApprenticeshipTrainingViewModel
 ﻿
 <label class="govuk-label govuk-label--m" for="course-search">Which apprenticeship training will the apprentice take? (optional)</label>
-<select id="course-search" name="courseId" class="govuk-select">
+<select id="course-search" name="courseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
         <option value="@course.Id">@course.Title - Level: @course.Level</option>
     }
 </select>
-<span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
+<span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4" >
     This information can be changed later.
 </span>
