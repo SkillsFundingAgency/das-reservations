@@ -26,9 +26,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
         {
             _expectedCourses = new List<Course>
             {
-                new Course{Id = "1", Title = "Course 1", Level = 1},
-                new Course{Id = "2", Title = "Course 2", Level = 2},
-                new Course{Id = "3", Title = "Course 3", Level = 3}
+                new Course("1","Course 1",1),
+                new Course("2","Course 2",2),
+                new Course("3","Course 3",3),
+                
             };
 
             _apiClient = new Mock<IApiClient>();

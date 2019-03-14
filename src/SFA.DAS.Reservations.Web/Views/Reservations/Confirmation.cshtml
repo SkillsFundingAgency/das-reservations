@@ -21,9 +21,6 @@
       
         <dd class="govuk-summary-list__actions">
           
-            <a class="govuk-link" href="">
-            </a>
-          
         </dd>
       
     </dl>
@@ -35,7 +32,10 @@
         <dd class="govuk-summary-list__value">
             @Model.StartDate.ToString("MMMM yyyy") to @Model.ExpiryDate.ToString("MMMM yyyy")
         </dd>
-      
+        <dd class="govuk-summary-list__actions">
+          
+        </dd>
+
     </dl>
   
     <dl class="govuk-summary-list__row">
@@ -43,12 +43,14 @@
             Apprenticeship training
         </dt>
         <dd class="govuk-summary-list__value">
-            @if (Model.Course != null)
-            {
-                @: @Model.Course.Title - Level: @Model.Course.Level
-            }
+            
+            @Model.Course.CourseDescription
+
         </dd>
-      
+        <dd class="govuk-summary-list__actions">
+          
+        </dd>
+
     </dl>
   
 </div>
