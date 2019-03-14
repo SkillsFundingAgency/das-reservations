@@ -20,11 +20,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             StartDateService startDateService)
         {
             var now = mockCurrentDateTime.Object.Now;
-            var expectedDate = now.AddDays(1 - now.Day).Date;
+            var expectedStartDate = now.AddDays(1 - now.Day).Date;
+            var threeMonthsFromNow = now.AddMonths(3);
+            var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
+            var expectedExpiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
 
             var dates = await startDateService.GetStartDates();
 
-            dates.ToList().Should().Contain(expectedDate);
+            dates.ToList().Should().Contain(model => model.StartDate == expectedStartDate /*&& model.ExpiryDate == expectedExpiryDate*/);
         }
 
         [Test, MoqAutoData]
@@ -33,10 +36,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             StartDateService startDateService)
         {
             var now = mockCurrentDateTime.Object.Now;
-            var expectedDates = new List<DateTime>();
+            var expectedDates = new List<StartDateModel>();
             for (var i = 0; i < 6; i++)
             {
-                expectedDates.Add(now.AddMonths(i).AddDays(1-now.Day).Date);
+                expectedDates.Add(new StartDateModel
+                {
+                    StartDate = now.AddMonths(i).AddDays(1-now.Day).Date
+                });
             }
 
             var dates = await startDateService.GetStartDates();

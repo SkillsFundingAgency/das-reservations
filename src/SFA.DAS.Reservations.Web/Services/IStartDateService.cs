@@ -6,6 +6,12 @@ namespace SFA.DAS.Reservations.Web.Services
 {
     public interface IStartDateService
     {
-        Task<IEnumerable<DateTime>> GetStartDates();
+        Task<IEnumerable<StartDateModel>> GetStartDates();
+    }
+
+    public class StartDateModel
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
             string employerAccountId,
-            IEnumerable<DateTime> expectedStartDates,
+            IEnumerable<StartDateModel> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
         {
@@ -35,17 +35,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Dates(
             string employerAccountId,
-            IEnumerable<DateTime> expectedStartDates,
+            IEnumerable<StartDateModel> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
         {
             mockStartDateService
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
-            var mappedDates = expectedStartDates.Select(date => new StartDateViewModel
+            var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel
             {
-                Value = date.ToString("yyyy-MM"), 
-                Label = date.ToString("MMMM yyyy")
+                Value = startDateModel.StartDate.ToString("yyyy-MM"), 
+                Label = startDateModel.StartDate.ToString("MMMM yyyy")
             }).OrderBy(model => model.Value);
 
             var result = await controller.ApprenticeshipTraining(employerAccountId, null);

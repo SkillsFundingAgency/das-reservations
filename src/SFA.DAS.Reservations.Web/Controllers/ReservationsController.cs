@@ -200,8 +200,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
                 PossibleStartDates = dates.Select(date => new StartDateViewModel
                 {
-                    Value = $"{date:yyyy-MM}",
-                    Label = $"{date:MMMM yyyy}"
+                    Value = $"{date.StartDate:yyyy-MM}",
+                    Label = $"{date.StartDate:MMMM yyyy}"
                 }).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses
             };
