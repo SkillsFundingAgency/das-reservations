@@ -44,14 +44,8 @@
         </dt>
         <dd class="govuk-summary-list__value">
             
-            @if (Model.Course != null && !Model.Course.Title.ToUpper().Equals("UNKNOWN"))
-            {
-                @: @Model.Course.Title - Level: @Model.Course.Level
-            }
-            else
-            {
-                @: Unknown
-            }
+            @Model.Course.CourseDescription
+
         </dd>
       
     </dl>

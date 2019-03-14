@@ -1,4 +1,7 @@
-﻿namespace SFA.DAS.Reservations.Domain.Courses
+﻿using System;
+using System.Reflection.Metadata.Ecma335;
+
+namespace SFA.DAS.Reservations.Domain.Courses
 {
     public class Course
     {
@@ -9,8 +12,11 @@
             Level = level;
 
         }
-        public string Id { get;  }
-        public string Title { get;  }
+
+        public string Id { get; }
+        public string Title { get; }
         public int Level { get; }
+        public string CourseDescription => Title.Equals("UNKNOWN",StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title} - Level {Level}";
     }
 }
+
