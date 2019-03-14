@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -198,10 +199,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
-                PossibleStartDates = dates.Select(date => new StartDateViewModel
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel
                 {
-                    Value = $"{date.StartDate:yyyy-MM}",
-                    Label = $"{date.StartDate:MMMM yyyy}"
+                    Id = $"{startDateModel.StartDate:yyyy-MM}",
+                    Value = JsonConvert.SerializeObject(startDateModel),
+                    Label = $"{startDateModel.StartDate:MMMM yyyy}"
                 }).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses
             };

@@ -6,6 +6,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
@@ -44,11 +45,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(expectedStartDates);
             var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel
             {
-                Value = startDateModel.StartDate.ToString("yyyy-MM"), 
+                Id = startDateModel.StartDate.ToString("yyyy-MM"),
+                Value = JsonConvert.SerializeObject(startDateModel),
                 Label = startDateModel.StartDate.ToString("MMMM yyyy")
             }).OrderBy(model => model.Value);
-
+            
             var result = await controller.ApprenticeshipTraining(employerAccountId, null);
+
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
                 .Subject;
