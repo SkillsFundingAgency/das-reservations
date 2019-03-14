@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using HashidsNet;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +11,11 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.ProviderRelationships.Api.Client;
+using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
+using SFA.DAS.ProviderRelationships.Api.Client.Http;
+using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -21,15 +27,19 @@ using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Stubs;
+using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
 namespace SFA.DAS.Reservations.Web
 {
     public class Startup
     {
+        private readonly IHostingEnvironment _environment;
         private readonly IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
+            _environment = environment;
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
@@ -98,6 +108,9 @@ namespace SFA.DAS.Reservations.Web
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationQueryValidator));
+            services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
+            services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
+
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IHashingService, HashingService>();
             services.AddSingleton<IHashids>(new Hashids(
@@ -111,6 +124,9 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
+            
+
+            AddProviderRelationsApi(services, _configuration, _environment);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -163,6 +179,30 @@ namespace SFA.DAS.Reservations.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private static void AddProviderRelationsApi(IServiceCollection services, IConfiguration configuration,
+            IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>();
+            }
+            else
+            {
+                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClient>();
+                services.AddScoped<IRestHttpClient, RestHttpClient>();
+
+                services.AddSingleton<HttpClient>(provider =>
+                    new HttpClientFactory(provider.GetService<ProviderRelationshipsApiClientConfiguration>()
+                        .AzureActiveDirectoryClient).CreateHttpClient());
+
+                services.Configure<AzureActiveDirectoryClientConfiguration>(configuration.GetSection("AzureActiveDirectoryClient"));
+                services.AddSingleton(config => new ProviderRelationshipsApiClientConfiguration
+                {
+                    AzureActiveDirectoryClient = config.GetService<IOptions<AzureActiveDirectoryClientConfiguration>>().Value
+                });
+            }
         }
     }
 }

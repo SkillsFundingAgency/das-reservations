@@ -1,2 +1,7 @@
 ﻿@model ChooseEmployerViewModel
 
+@foreach (var employer in Model.Employers)
+{
+    <p>@employer.AccountLegalEntityName</p>
+}
+
