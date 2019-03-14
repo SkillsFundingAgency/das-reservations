@@ -16,6 +16,7 @@
                     Employer
                 </dt>
                 <dd class="govuk-summary-list__value">
+                    @Model.EmployerDescription
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link" href="">
@@ -28,7 +29,7 @@
                     Apprenticeship training start date
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    @Model.StartDate
+                    @Model.StartDateDescription
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link" href="">
@@ -41,10 +42,7 @@
                     Apprenticeship training
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    @if (Model.CourseId != null)
-                    {
-                        @Model.CourseDescription
-                    }
+                    @Model.CourseDescription
                     <br />
                     <details class="govuk-details">
                         <summary class="govuk-details__summary">

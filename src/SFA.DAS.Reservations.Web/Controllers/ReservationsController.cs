@@ -81,7 +81,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = "employer-review")]
         public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
-            GetCachedReservationResult result;
+            GetCachedReservationResult cachedReservation;
 
             try
             {
@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Id = routeModel.Id.GetValueOrDefault()
                 };
 
-                result = await _mediator.Send(query);
+                cachedReservation = await _mediator.Send(query);
             }
             catch (ValidationException e)
             {
@@ -110,7 +110,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 RouteName = routeName,
                 RouteModel = routeModel,
-                StartDate = result.StartDate
+                StartDateDescription = cachedReservation.StartDateDescription,
+                CourseDescription = cachedReservation.CourseDescription,
+                EmployerDescription = cachedReservation.EmployerDescription
             };
             return View(viewModel);
         }
