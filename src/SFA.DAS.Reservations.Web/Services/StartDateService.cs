@@ -20,13 +20,24 @@ namespace SFA.DAS.Reservations.Web.Services
             var datesToReturn = new List<StartDateModel>();
             for (var i = 0; i < 6; i++)
             {
-                var startDate = now.AddMonths(i).AddDays(1-now.Day).Date;
-                datesToReturn.Add(new StartDateModel
-                {
-                    StartDate = startDate
-                });
+                var model = BuildStartDateModel(now.AddMonths(i));
+                datesToReturn.Add(model);
             }
             return await Task.FromResult(datesToReturn);
+        }
+
+        private StartDateModel BuildStartDateModel(DateTime now)
+        {
+            var startDate = now.AddDays(1 - now.Day).Date;
+            var threeMonthsFromNow = now.AddMonths(3);
+            var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
+            var expiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
+
+            return new StartDateModel
+            {
+                StartDate = startDate,
+                ExpiryDate = expiryDate
+            };
         }
     }
 }

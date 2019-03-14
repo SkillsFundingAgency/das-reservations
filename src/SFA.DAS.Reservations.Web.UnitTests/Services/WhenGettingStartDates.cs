@@ -20,14 +20,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             StartDateService startDateService)
         {
             var now = mockCurrentDateTime.Object.Now;
-            var expectedStartDate = now.AddDays(1 - now.Day).Date;
-            var threeMonthsFromNow = now.AddMonths(3);
-            var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
-            var expectedExpiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
+            var expectedStartDateModel = BuildStartDateModel(now);
 
             var dates = await startDateService.GetStartDates();
 
-            dates.ToList().Should().Contain(model => model.StartDate == expectedStartDate /*&& model.ExpiryDate == expectedExpiryDate*/);
+            dates.ToList().Should().Contain(model => model.StartDate == expectedStartDateModel.StartDate && model.ExpiryDate == expectedStartDateModel.ExpiryDate);
         }
 
         [Test, MoqAutoData]
@@ -39,16 +36,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             var expectedDates = new List<StartDateModel>();
             for (var i = 0; i < 6; i++)
             {
-                expectedDates.Add(new StartDateModel
-                {
-                    StartDate = now.AddMonths(i).AddDays(1-now.Day).Date
-                });
+                var startDateModel = BuildStartDateModel(now.AddMonths(i));
+                expectedDates.Add(startDateModel);
             }
 
             var dates = await startDateService.GetStartDates();
 
             dates.Count().Should().Be(6);
             dates.Should().BeEquivalentTo(expectedDates);
+        }
+
+        private StartDateModel BuildStartDateModel(DateTime now)
+        {
+            var startDate = now.AddDays(1 - now.Day).Date;
+            var threeMonthsFromNow = now.AddMonths(3);
+            var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
+            var expiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
+
+            return new StartDateModel
+            {
+                StartDate = startDate,
+                ExpiryDate = expiryDate
+            };
         }
     }
 }
