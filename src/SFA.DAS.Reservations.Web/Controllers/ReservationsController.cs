@@ -9,6 +9,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -47,13 +48,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
             try
             {
                 var startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+                var course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
 
                 var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
-                    CourseId = formModel.CourseId
+                    CourseId = course.Id,
+                    CourseDescription = $"{course.Title} - Level {course.Level}"
                 };
 
                 result = await _mediator.Send(command);
