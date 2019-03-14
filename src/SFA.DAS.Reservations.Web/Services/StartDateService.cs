@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Services
 {

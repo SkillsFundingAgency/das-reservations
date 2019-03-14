@@ -46,10 +46,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
+                var startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+
                 var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
-                    StartDate = formModel.TrainingStartDate,
+                    StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
+                    StartDateDescription = startDateModel.ToString(),
                     CourseId = formModel.CourseId
                 };
 
