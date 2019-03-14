@@ -1,0 +1,42 @@
+﻿@model ConfirmEmployerViewModel
+
+
+<h1 class="govuk-heading-xl">Confirm employer</h1>
+
+<p class="">@Model.AccountLegalEntityName</p>
+<p class="">Account name: @Model.AccountName</p>
+
+
+<form method="post" action="">
+
+    <div class="govuk-form-group @(ViewData.ModelState.IsValid?"":"govuk-form-group--error")">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h2 class="govuk-fieldset__heading">
+                    Is this the employer you would like to create a cohort for?
+                </h2>
+            </legend>
+
+            <div class="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" type="radio" id="yes" name="yes" value="Yes" />
+                    <label class="govuk-radios__label" for="yes">Yes, use @Model.AccountLegalEntityName</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" type="radio" id="no" name="yes" value="No" />
+                    <label class="govuk-radios__label" for="no">No, choose a different employer</label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <button type="submit" class="govuk-button">
+        Continue
+    </button>
+</form>
+
+
+
+
+
+
+

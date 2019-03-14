@@ -124,7 +124,6 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
                 ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
                 : new CurrentDateTime());
-            
 
             AddProviderRelationsApi(services, _configuration, _environment);
         }
