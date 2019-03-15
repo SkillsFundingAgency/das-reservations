@@ -107,13 +107,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("Error");//todo: setup view correctly.
             }
             
-            var routeName = routeModel.Ukprn == null ? 
+            var confirmRouteName = routeModel.Ukprn == null ? 
                 "employer-create-reservation" : 
                 "provider-create-reservation";
+            var changeRouteName = routeModel.Ukprn == null ? 
+                "employer-apprenticeship-training" : 
+                "provider-apprenticeship-training";
 
             var viewModel = new ReviewViewModel
             {
-                RouteName = routeName,
+                ConfirmRouteName = confirmRouteName,
+                ChangeRouteName = changeRouteName,
                 RouteModel = routeModel,
                 StartDateDescription = cachedReservation.StartDateDescription,
                 CourseDescription = cachedReservation.CourseDescription,
