@@ -30,10 +30,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
-        public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, int? ukPrn)
+        public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
-            // todo: get existing training details if exist, get from mediator call
-            var viewModel = await BuildApprenticeshipTrainingViewModel(ukPrn);
+            GetCachedReservationResult cachedReservation = null;
+
+            if (routeModel.Id.HasValue)
+            {
+                cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+                //todo: error handling if fails validation e.g. id not found
+            }
+            
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
 
             return View(viewModel);
         }
