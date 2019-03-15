@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_No_Ukprn_Then_Uses_Provider_Route(
+        public async Task And_No_Ukprn_Then_Uses_Employer_Route(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
