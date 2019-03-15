@@ -169,7 +169,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(1234);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
 
