@@ -37,12 +37,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Dates(
+        public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Values(
             ReservationsRouteModel routeModel,
             IEnumerable<StartDateModel> expectedStartDates,
+            GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IStartDateService> mockStartDateService,
+            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
             mockStartDateService
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
@@ -60,6 +65,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Subject;
             
             viewModel.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
+            viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
+            viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
         }
 
         [Test, MoqAutoData]

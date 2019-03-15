@@ -28,8 +28,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _startDateService = startDateService;
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "provider-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "employer-apprenticeship-training")]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult cachedReservation = null;
@@ -40,13 +40,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found
             }
             
-            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn, cachedReservation?.CourseId, cachedReservation?.StartDate);
 
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "provider-create-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
@@ -211,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(model);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn, string courseId = null, string startDate = null)
         {
             var dates = await _startDateService.GetStartDates();
 
@@ -226,7 +226,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Value = JsonConvert.SerializeObject(startDateModel),
                     Label = $"{startDateModel.StartDate:MMMM yyyy}"
                 }).OrderBy(model => model.Value),
-                Courses = coursesResult.Courses
+                Courses = coursesResult.Courses,
+                CourseId = courseId,
+                TrainingStartDate = startDate
             };
         }
     }
