@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
                     CourseId = course.Id,
-                    CourseDescription = $"{course.Title} - Level {course.Level}"
+                    CourseDescription = $"{course.Title} - Level: {course.Level}"
                 };
 
                 result = await _mediator.Send(command);
