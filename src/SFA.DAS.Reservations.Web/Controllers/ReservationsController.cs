@@ -48,15 +48,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             try
             {
                 var startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
-                var course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
+                Course course = null;
+                if (!string.IsNullOrWhiteSpace(formModel.CourseId))
+                    course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
 
                 var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
-                    CourseId = course.Id,
-                    CourseDescription = $"{course.Title} - Level: {course.Level}"
+                    CourseId = course?.Id,
+                    CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
                 };
 
                 result = await _mediator.Send(command);

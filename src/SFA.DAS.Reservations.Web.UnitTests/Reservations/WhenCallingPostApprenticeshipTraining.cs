@@ -81,6 +81,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task And_No_Course_Then_Caches_Draft_Reservation(
+            ReservationsRouteModel routeModel,
+            StartDateModel startDateModel,
+            ApprenticeshipTrainingFormModel formModel,
+            [Frozen] Mock<IMediator> mockMediator, 
+            ReservationsController controller)
+        {
+            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.CourseId = null;
+
+            await controller.PostApprenticeshipTraining(routeModel, formModel);
+
+            mockMediator.Verify(mediator => 
+                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
+                    command.AccountId == routeModel.EmployerAccountId &&
+                    command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
+                    command.StartDateDescription == startDateModel.ToString() &&
+                    command.CourseId == null &&
+                    command.CourseDescription == "Unknown"
+                ), It.IsAny<CancellationToken>()));
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Adds_Guid_To_RouteModel(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
