@@ -10,7 +10,7 @@
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
-        <option value="@JsonConvert.SerializeObject(course)">@course.Title - Level: @course.Level</option>
+        <option value="@JsonConvert.SerializeObject(course)" @(course.Id.Equals(Model.CourseId)?"selected":"") >@course.Title - Level: @course.Level</option>
     }
 </select>
 <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4" >
