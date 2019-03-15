@@ -1,40 +1,61 @@
 ﻿@model ChooseEmployerViewModel
 
 
-<h1 class="govuk-heading-xl">Choose an employer</h1>
-<p class="govuk-body-l">This is the employer you are creating a cohort on the behalf of.</p>
+@{
+    ViewBag.Title = "Choose Employer";
+}
 
-<p class="govuk-body-l">@Model.Employers.Count() results found.</p>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-<table class="govuk-table">
-    <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-        <th class="govuk-table__header" scope="col">Employer</th>
-        <th class="govuk-table__header" scope="col">Account name</th>
-        <th class="govuk-table__header" scope="col" colspan="2">Agreement ID</th>
-    </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        
-    @foreach (var employer in Model.Employers)
-    {
-        <tr class="govuk-table__row">
-            <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
-            <td class="govuk-table__cell">@employer.AccountName</td>
-            <td class="govuk-table__cell">12456</td>
-            <td class="govuk-table__cell govuk-table__cell--numeric">
-                <form method="post" action="confirmEmployer">
-                    <input type="hidden" name="AccountId" value="@employer.AccountId" />
-                    <input type="hidden" name="AccountPublicHashedId" value="@employer.AccountPublicHashedId" />
-                    <input type="hidden" name="AccountName" value="@employer.AccountName" />
-                    <input type="hidden" name="AccountLegalEntityId" value="@employer.AccountLegalEntityId" />
-                    <input type="hidden" name="AccountLegalEntityPublicHashedId" value="@employer.AccountLegalEntityPublicHashedId" />
-                    <input type="hidden" name="AccountLegalEntityName" value="@employer.AccountLegalEntityName" />
-                    <button type="submit" class="govuk-button">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></button>
-                </form>
-            </td>
-        </tr>
-    }
+        <h1 class="govuk-heading-xl">Choose an employer</h1>
+        <p>This is the employer you are creating a cohort on the behalf of.</p>
+       
+        <p>@Model.Employers.Count() result@(Model.Employers.Count() != 1 ? "s" : null) found.</p>
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="col">Employer</th>
+                <th class="govuk-table__header" scope="col">Account name</th>
+                <th class="govuk-table__header" scope="col">Agreement ID</th>
+                <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>
+            </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+            @foreach (var employer in Model.Employers)
+            {
+                var viewModel = new ConfirmEmployerViewModel
+                {
+                    AccountId = employer.AccountId,
+                    AccountPublicHashedId = employer.AccountPublicHashedId,
+                    AccountName = employer.AccountName,
+                    AccountLegalEntityId = employer.AccountLegalEntityId,
+                    AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                    AccountLegalEntityName = employer.AccountLegalEntityName
+                };
 
-    </tbody>
-</table>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</td>
+                    <td class="govuk-table__cell">@employer.AccountName</td>
+                    <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric">
+                        <a class="govuk-link" href="@Url.Action("ConfirmEmployer", new
+                                 {
+                                     UkPrn = ViewContext.RouteData.Values["ukPrn"],
+                                     AccountId = employer.AccountId,
+                                     AccountPublicHashedId = employer.AccountPublicHashedId,
+                                     AccountName = employer.AccountName,
+                                     AccountLegalEntityId = employer.AccountLegalEntityId,
+                                     AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                                     AccountLegalEntityName = employer.AccountLegalEntityName
+                                 })">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+

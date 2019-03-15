@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View();
         }
 
-        
+        [HttpGet]
         [Route("chooseEmployer")]
         public async Task<IActionResult> ChooseEmployer(uint ukPrn)
         {
@@ -38,11 +38,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        
+        [HttpGet]
         [Route("confirmEmployer")]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("confirmEmployer")]
+        public IActionResult ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
+        {
+            return View("ConfirmEmployer", viewModel);
         }
     }
 }

@@ -1,42 +1,95 @@
-﻿@model ConfirmEmployerViewModel
+﻿@using System.Text
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model ConfirmEmployerViewModel
+@{
+    ViewBag.Title = "Confirm Employer";
+}
 
+<div class="grid-row">
+    <div class="column-two-thirds">
 
-<h1 class="govuk-heading-xl">Confirm employer</h1>
-
-<p class="">@Model.AccountLegalEntityName</p>
-<p class="">Account name: @Model.AccountName</p>
-
-
-<form method="post" action="">
-
-    <div class="govuk-form-group @(ViewData.ModelState.IsValid?"":"govuk-form-group--error")">
-        <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h2 class="govuk-fieldset__heading">
-                    Is this the employer you would like to create a cohort for?
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
                 </h2>
-            </legend>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        @{
+                            var errorStringBuilder = new StringBuilder();
+                            var errorCount = ViewData.ModelState.ErrorCount;
+                            var loopCount = 1;
+                            foreach (var error in ViewData.ModelState)
+                            {
+                                if (error.Value.ValidationState == ModelValidationState.Invalid)
+                                {
+                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose an option</a></li>");
+                                    if (loopCount == errorCount - 1)
+                                    {
+                                        errorStringBuilder.Append(" and ");
+                                    }
+                                    else if (loopCount != errorCount)
+                                    {
+                                        errorStringBuilder.Append(", ");
+                                    }
 
-            <div class="govuk-radios">
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" type="radio" id="yes" name="yes" value="Yes" />
-                    <label class="govuk-radios__label" for="yes">Yes, use @Model.AccountLegalEntityName</label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" type="radio" id="no" name="yes" value="No" />
-                    <label class="govuk-radios__label" for="no">No, choose a different employer</label>
+                                    loopCount++;
+                                }
+                            }
+                        }
+                        @Html.Raw(errorStringBuilder.ToString())
+                    </ul>
                 </div>
             </div>
-        </fieldset>
+        }
+
+        <h1 class="govuk-heading-xl">Confirm employer</h1>
+        <div>
+        <span class="govuk-heading-l">@Model.AccountLegalEntityName</span>
+        <span class="govuk-caption-xl">Account name: @Model.AccountName</span>
+            <span class="govuk-caption-xl">Agreement ID: @Model.AccountLegalEntityPublicHashedId</span>
+        </div>
+        
+        <form action="@Url.Action("ConfirmEmployer")" method="POST">
+
+            @Html.HiddenFor(model => model.AccountLegalEntityName)
+            @Html.HiddenFor(model => model.AccountLegalEntityPublicHashedId)
+            @Html.HiddenFor(model => model.AccountName)
+            @Html.HiddenFor(model => model.AccountPublicHashedId)
+
+
+
+            <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "":"govuk-form-group--error")">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            Is this the employer you would like to create a cohort for?
+                        </h1>
+                    </legend>
+                    @if (ViewData.ModelState.ContainsKey("Confirm"))
+                    {
+                        <span id="confirm-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> Please choose an option
+                        </span>
+                    }
+                    <div class="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="confirm-yes" name="Confirm" type="radio" value="True">
+                            <label class="govuk-label govuk-radios__label" for="confirm-yes">
+                                Yes, use @Model.AccountLegalEntityName
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="confirm-no" name="Confirm" type="radio" value="False">
+                            <label class="govuk-label govuk-radios__label" for="confirm-no">
+                                No, choose a different employer
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <button type="submit" class="govuk-button">Continue</button>
+        </form>
     </div>
-    <button type="submit" class="govuk-button">
-        Continue
-    </button>
-</form>
-
-
-
-
-
-
-
+</div>

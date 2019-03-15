@@ -8,5 +8,7 @@
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string AccountLegalEntityName { get; set; }
+
+        public bool? Confirm { get; set; }
     }
 }
