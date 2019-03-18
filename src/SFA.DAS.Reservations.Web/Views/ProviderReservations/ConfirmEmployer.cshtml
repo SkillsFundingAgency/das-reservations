@@ -67,7 +67,7 @@
                             Is this the employer you would like to create a cohort for?
                         </h1>
                     </legend>
-                    @if (ViewData.ModelState.ContainsKey("Confirm"))
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Confirm"))
                     {
                         <span id="confirm-error" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span> Please choose an option

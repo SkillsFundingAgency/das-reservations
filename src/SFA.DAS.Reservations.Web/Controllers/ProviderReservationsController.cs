@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +51,26 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("confirmEmployer")]
         public IActionResult ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
+            if (!viewModel.Confirm.HasValue)
+            {
+                ModelState.AddModelError("Confirm", "You must pick an option");
+                return View("ConfirmEmployer", viewModel);
+            }
+
+            try
+            {
+
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                return View("ConfirmEmployer", viewModel);
+            }
+
             return View("ConfirmEmployer", viewModel);
         }
     }
