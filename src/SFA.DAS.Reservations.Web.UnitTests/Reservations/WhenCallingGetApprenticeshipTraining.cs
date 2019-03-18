@@ -8,7 +8,6 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -51,12 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockStartDateService
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
-            var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel
-            {
-                Id = startDateModel.StartDate.ToString("yyyy-MM"),
-                Value = JsonConvert.SerializeObject(startDateModel),
-                Label = startDateModel.StartDate.ToString("MMMM yyyy")
-            }).OrderBy(model => model.Value);
+            var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel(startDateModel)).OrderBy(model => model.Value);
             
             var result = await controller.ApprenticeshipTraining(routeModel);
 

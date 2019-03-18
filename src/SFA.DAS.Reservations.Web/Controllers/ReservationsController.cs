@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -220,12 +221,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
-                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel
-                {
-                    Id = $"{startDateModel.StartDate:yyyy-MM}",
-                    Value = JsonConvert.SerializeObject(startDateModel),
-                    Label = $"{startDateModel.StartDate:MMMM yyyy}"
-                }).OrderBy(model => model.Value),
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses,
                 CourseId = courseId,
                 TrainingStartDate = startDate
