@@ -135,7 +135,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var query = new GetCachedReservationQuery
                 {
                     Id = routeModel.Id.GetValueOrDefault()
-
                 };
 
                 cachedReservationResult = await _mediator.Send(query);

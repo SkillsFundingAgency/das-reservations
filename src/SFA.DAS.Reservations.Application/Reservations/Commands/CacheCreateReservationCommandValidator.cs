@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CreateReservationCommandValidator : IValidator<CreateReservationCommand>
+    public class CacheCreateReservationCommandValidator
     {
-        public Task<ValidationResult> ValidateAsync(CreateReservationCommand command)
+        public Task<ValidationResult> ValidateAsync(CacheCreateReservationCommand command)
         {
             var result = new ValidationResult();
 
@@ -17,7 +19,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             if (string.IsNullOrEmpty(command.StartDate))
             {
-                result.AddError(nameof(command.StartDate));
+                if (command.Id.HasValue)
+                {
+                    result.AddError(nameof(command.StartDate));
+                }
             }
             else
             {

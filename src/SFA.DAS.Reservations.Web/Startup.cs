@@ -107,7 +107,8 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
-            services.AddScoped(typeof(IValidator<ICreateReservationCommand>), typeof(CreateReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<CacheCreateReservationCommand>), typeof(CacheCreateReservationCommandValidator));
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();

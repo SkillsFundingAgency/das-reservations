@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCreatingANewReservation
     {
-        private Mock<IValidator<ICreateReservationCommand>> _mockValidator;
+        private Mock<IValidator<CreateReservationCommand>> _mockValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
         private CreateReservationResponse _apiResponse;
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _apiResponse = fixture.Create<CreateReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
-            _mockValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
+            _mockValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
             _mockValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());

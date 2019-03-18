@@ -16,13 +16,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
-        private readonly IValidator<ICreateReservationCommand> _validator;
+        private readonly IValidator<CreateReservationCommand> _validator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
 
         public CreateReservationCommandHandler(
-            IValidator<ICreateReservationCommand> validator, 
+            IValidator<CreateReservationCommand> validator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             IHashingService hashingService)
@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 _hashingService.DecodeValue, 
                 command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id,
+                command.Id.Value,
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

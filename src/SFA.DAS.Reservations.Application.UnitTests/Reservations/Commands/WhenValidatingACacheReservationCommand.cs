@@ -8,13 +8,13 @@ using SFA.DAS.Reservations.Application.Reservations.Commands;
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 {
     [TestFixture]
-    public class WhenValidatingACreateReservationCommand
+    public class WhenValidatingACacheReservationCommand
     {
         [Test, AutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
-            CreateReservationCommandValidator validator)
+            CacheCreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
                 AccountId = "0",
@@ -26,8 +26,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
-                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
+                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountId))
+                .WhichValue.Should().Be($"{nameof(CacheCreateReservationCommand.AccountId)} has not been supplied");
+        }
+
+        [Test]
+        public async Task And_No_CommandId_And_No_StartDate_Then_Valid()
+        {
+            var validator = new CacheCreateReservationCommandValidator();
+
+            var command = new CacheCreateReservationCommand
+            {
+                AccountId = "1"
+            };
+
+            var result = await validator.ValidateAsync(command);
+
+            Assert.IsTrue(result.IsValid());
         }
 
         [TestCase("19-a")]
@@ -39,8 +54,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         [TestCase("-")]
         public async Task And_StartDate_Is_Not_In_The_Correct_Format_Then_Invalid(string startDate)
         {
-            var validator = new CreateReservationCommandValidator();
-            var command = new CreateReservationCommand
+            var validator = new CacheCreateReservationCommandValidator();
+            var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
                 AccountId = "1",
@@ -52,16 +67,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.StartDate))
-                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.StartDate)} has not been supplied");
+                .Should().ContainKey(nameof(CacheCreateReservationCommand.StartDate))
+                .WhichValue.Should().Be($"{nameof(CacheCreateReservationCommand.StartDate)} has not been supplied");
         }
 
         [Test, AutoData]
         public async Task And_All_Fields_Invalid_Then_Returns_All_Errors(
-            CreateReservationCommandValidator validator)
+            CacheCreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
+                Id = Guid.NewGuid(),
                 AccountId = "0",
                 StartDate = ""
             };
@@ -71,15 +87,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(2);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
-                .And.ContainKey(nameof(CreateReservationCommand.StartDate));
+                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountId))
+                .And.ContainKey(nameof(CacheCreateReservationCommand.StartDate));
         }
 
         [Test, AutoData]
         public async Task And_All_Fields_Valid_Then_Valid(
-            CreateReservationCommandValidator validator)
+            CacheCreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 AccountId = "1",
                 StartDate = "2019-07"
