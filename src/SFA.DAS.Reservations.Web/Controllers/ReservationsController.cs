@@ -222,7 +222,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
                 PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
-                Courses = coursesResult.Courses,
+                Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 TrainingStartDate = startDate
             };
