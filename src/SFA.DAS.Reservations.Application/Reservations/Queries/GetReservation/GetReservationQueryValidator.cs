@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 {
-    public class GetReservationQueryValidator : IValidator<GetReservationQuery>
+    public class GetReservationQueryValidator : IValidator<IReservationQuery>
     {
-        public  Task<ValidationResult> ValidateAsync(GetReservationQuery query)
+        public  Task<ValidationResult> ValidateAsync(IReservationQuery query)
         {
             var result = new ValidationResult();
 

@@ -4,28 +4,28 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CreateReservationValidator : IValidator<CreateReservationCommand>
+    public class CreateReservationCommandValidator : IValidator<ICreateReservationCommand>
     {
-        public Task<ValidationResult> ValidateAsync(CreateReservationCommand item)
+        public Task<ValidationResult> ValidateAsync(ICreateReservationCommand command)
         {
             var result = new ValidationResult();
 
-            if (item.AccountId == "0")
+            if (command.AccountId == "0")
             {
-                result.AddError(nameof(item.AccountId));
+                result.AddError(nameof(command.AccountId));
             }
 
-            if (string.IsNullOrEmpty(item.StartDate))
+            if (string.IsNullOrEmpty(command.StartDate))
             {
-                result.AddError(nameof(item.StartDate));
+                result.AddError(nameof(command.StartDate));
             }
             else
             {
-                var dateSplit = item.StartDate.Split("-");
+                var dateSplit = command.StartDate.Split("-");
 
                 if (dateSplit.Length != 2)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(command.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!yearValid || !monthValid)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(command.StartDate));
                     return Task.FromResult(result);
                 }
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
                 if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
                 {
-                    result.AddError(nameof(item.StartDate));
+                    result.AddError(nameof(command.StartDate));
                 }
             }
             

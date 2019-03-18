@@ -3,7 +3,7 @@ using MediatR;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries
 {
-    public class GetReservationQuery : IRequest<GetReservationResult>
+    public class GetCachedReservationQuery : IReservationQuery, IRequest<GetCachedReservationResult>
     {
         public Guid Id { get; set; }
     }

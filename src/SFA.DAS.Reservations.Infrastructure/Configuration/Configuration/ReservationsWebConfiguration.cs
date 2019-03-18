@@ -9,5 +9,6 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
         public string EmployerAccountHashAlphabet { get; set; }
         public double SessionTimeoutHours { get; set; }
         public DateTime? CurrentDateTime { get; set; }
+        public string RedisCacheConnectionString { get; set; }
     }
 }

@@ -2,9 +2,9 @@
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetReservation
 {
     [TestFixture]
     class WhenValidatingAGetReservationQuery

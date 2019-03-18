@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -14,12 +15,12 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetReservation
 {
-    public class WhenGettingAReservation
+    public class WhenGettingCourses
     {
         private GetReservationQueryHandler _handler;
-        private Mock<IValidator<GetReservationQuery>> _validator;
+        private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<IApiClient> _apiClient;
         private Mock<IHashingService> _hashingService;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
@@ -33,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
         [SetUp]
         public void Arrange()
         {
-            _validator = new Mock<IValidator<GetReservationQuery>>();
+            _validator = new Mock<IValidator<IReservationQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.Is<GetReservationQuery>(c =>
                     c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());

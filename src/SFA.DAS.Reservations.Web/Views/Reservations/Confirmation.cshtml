@@ -43,7 +43,10 @@
             Apprenticeship training
         </dt>
         <dd class="govuk-summary-list__value">
-            
+            @if (Model.Course != null)
+            {
+                @: @Model.Course.Title - Level: @Model.Course.Level
+            }
         </dd>
       
     </dl>

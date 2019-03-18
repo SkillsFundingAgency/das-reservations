@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -26,51 +28,40 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _startDateService = startDateService;
         }
 
-        [Route("apprenticeship-training")]
         [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
         public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, uint? ukPrn)
         {
-            
-            
+            // todo: get existing training details if exist, get from mediator call
             var viewModel = await BuildApprenticeshipTrainingViewModel(ukPrn);
 
             return View(viewModel);
         }
 
-        [Route("apprenticeship-training")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
-        public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel)//todo: change model to be args from form
+        public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
-            await Task.CompletedTask;//todo: save form data to cache
-            return RedirectToAction(nameof(Review), routeModel);//this also defaults to the employer route which then throws error for provider as no ukprn in the route.
-        }
-
-
-        [Route("review")]
-        public IActionResult Review(ReservationsRouteModel routeModel)
-        {
-            return View(routeModel);
-        }
-
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create", Name = "provider-create-reservation")]
-        [Route("accounts/{employerAccountId}/reservations/create", Name = "employer-create-reservation")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string employerAccountId, uint? ukPrn, string trainingStartDate)
-        {
-            CreateReservationResult result;
+            CacheReservationResult result;
 
             try
             {
-                var command = new CreateReservationCommand
+                var startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+                Course course = null;
+                if (!string.IsNullOrWhiteSpace(formModel.CourseId))
+                    course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
+
+                var command = new CacheCreateReservationCommand
                 {
-                    AccountId = employerAccountId,
-                    StartDate = trainingStartDate
+                    AccountId = routeModel.EmployerAccountId,
+                    StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
+                    StartDateDescription = startDateModel.ToString(),
+                    CourseId = course?.Id,
+                    CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
                 };
 
                 result = await _mediator.Send(command);
-                
             }
             catch (ValidationException e)
             {
@@ -79,17 +70,118 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(ukPrn);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
 
-            return RedirectToRoute(ukPrn.HasValue ? "provider-reservation-created" : "employer-reservation-created", new {result.Reservation.Id});
+            routeModel.Id = result.Id;
+            var routeName = routeModel.Ukprn == null ? 
+                "employer-review" : 
+                "provider-review";
+
+            return RedirectToRoute(routeName, routeModel);
+        }
+
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/review", Name = "provider-review")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = "employer-review")]
+        public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
+        {
+            GetCachedReservationResult cachedReservation;
+
+            try
+            {
+                var query = new GetCachedReservationQuery
+                {
+                    Id = routeModel.Id.GetValueOrDefault()
+                };
+
+                cachedReservation = await _mediator.Send(query);
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                return View("Error");//todo: setup view correctly.
+            }
+            
+            var routeName = routeModel.Ukprn == null ? 
+                "employer-create-reservation" : 
+                "provider-create-reservation";
+
+            var viewModel = new ReviewViewModel
+            {
+                RouteName = routeName,
+                RouteModel = routeModel,
+                StartDateDescription = cachedReservation.StartDateDescription,
+                CourseDescription = cachedReservation.CourseDescription,
+                EmployerDescription = cachedReservation.EmployerDescription
+            };
+            return View(viewModel);
+        }
+
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-create-reservation")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-create-reservation")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
+        {
+            GetCachedReservationResult cachedReservationResult;
+
+            try
+            {
+                var query = new GetCachedReservationQuery
+                {
+                    Id = routeModel.Id.GetValueOrDefault()
+
+                };
+
+                cachedReservationResult = await _mediator.Send(query);
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                return View("Error");//todo: setup view correctly.
+            }
+
+            try
+            {
+                var command = new CreateReservationCommand
+                {
+                    AccountId = cachedReservationResult.AccountId,
+                    StartDate = cachedReservationResult.StartDate,
+                    Id = cachedReservationResult.Id,
+                    CourseId = cachedReservationResult.CourseId
+                };
+
+                await _mediator.Send(command);
+
+                await _mediator.Send(new DeleteCachedReservationCommand {Id = cachedReservationResult.Id});
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                return View("ApprenticeshipTraining", model);
+            }
+
+            return RedirectToRoute(routeModel.Ukprn.HasValue ? "provider-reservation-created" : "employer-reservation-created", routeModel);
         }
 
         // GET
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/create/{id}", Name = "provider-reservation-created")]
-        [Route("accounts/{employerAccountId}/reservations/create/{id}", Name = "employer-reservation-created")]
+        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-reservation-created")]
+        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
             var query = new GetReservationQuery
@@ -102,7 +194,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = queryResult.ReservationId,
                 StartDate = queryResult.StartDate,
-                ExpiryDate = queryResult.ExpiryDate
+                ExpiryDate = queryResult.ExpiryDate,
+                Course = queryResult.Course
             };
             return View(model);
         }
@@ -110,14 +203,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(uint? ukPrn)
         {
             var dates = await _startDateService.GetStartDates();
+
+            var coursesResult = await _mediator.Send(new GetCoursesQuery());
+
             return new ApprenticeshipTrainingViewModel
             {
-                RouteName = ukPrn == null ? "employer-create-reservation" : "provider-create-reservation",
-                PossibleStartDates = dates.Select(date => new StartDateViewModel
+                RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel
                 {
-                    Value = $"{date:yyyy-MM}",
-                    Label = $"{date:MMMM yyyy}"
-                }).OrderBy(model => model.Value)
+                    Id = $"{startDateModel.StartDate:yyyy-MM}",
+                    Value = JsonConvert.SerializeObject(startDateModel),
+                    Label = $"{startDateModel.StartDate:MMMM yyyy}"
+                }).OrderBy(model => model.Value),
+                Courses = coursesResult.Courses
             };
         }
     }

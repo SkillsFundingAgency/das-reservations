@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
     public interface IStartDateService
     {
-        Task<IEnumerable<DateTime>> GetStartDates();
+        Task<IEnumerable<StartDateModel>> GetStartDates();
     }
 }

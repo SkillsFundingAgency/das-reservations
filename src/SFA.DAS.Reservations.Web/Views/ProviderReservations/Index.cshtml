@@ -2,19 +2,23 @@
 @{
     ViewData["Title"] = "Reservations";
 }
-
-<h1 class="govuk-heading-xl">Get funding for non-levy employers</h1>
-<p class="govuk-body-l">Use this service to secure government funding for a non-levy employer to train an apprentice. Government funding will pay for part or all of the cost of training an apprentice.</p>
-<p class="govuk-body">Before you start you will need:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li><a href="#">permission</a> from a non-levy employer that you can secure funds for them</li>
-    <li>an estimate of which month the apprenticeship training course will start, which can be flexible up to 3 months</li>
-    <li>an idea of the <a href="#">apprenticeship training</a> the apprentice will take, which can be changed later</li>
-</ul>
-@{
-    var routeData = new Dictionary<string,string>
-    {
-        {"employerAccountId","JKXR9B"}
-    };
-}
-<a asp-route="provider-apprenticeship-training" asp-all-route-data="@routeData" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Get funding for non-levy employers</h1>
+        <p class="govuk-body">Use this service to secure government funding for a non-levy employer to train an apprentice. You can secure funding no more than 6 months in advance of the apprenticeship training start date.</p>
+        <p class="govuk-body">Your employer must give you permission to secure funding for them. To do this, the employer will need to sign in to their apprenticeship account and go to ‘training provider permissions’ on their dashboard.</p>
+        <p class="govuk-body">Before you start you will need:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>an estimate of which month the apprentice will start the apprenticeship training, which can be flexible up to 3 months</li>
+            <li>an idea of the <a href="https://findapprenticeshiptraining.sfa.bis.gov.uk/" target="_blank" class="govuk-link">apprenticeship training</a> the apprentice will take, which can be changed later</li>
+        </ul>
+        <p class="govuk-body">You will be securing funding for one apprentice at a time.</p>
+        @{
+            var routeData = new Dictionary<string, string>
+            {
+                {"employerAccountId","JKXR9B"}
+            };
+        }
+        <a asp-route="provider-apprenticeship-training" asp-all-route-data="@routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+    </div>
+</div>
