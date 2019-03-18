@@ -34,6 +34,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
+        public void Then_Sets_Description(
+            Course course)
+        {
+            var viewModel = new CourseViewModel(course);
+            viewModel.Description.Should().Be(course.CourseDescription);
+        }
+
+        [Test, AutoData]
         public void Then_Sets_Selected(
             Course course)
         {
@@ -58,5 +66,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var viewModel = new CourseViewModel(course);
             viewModel.Selected.Should().BeNull();
         }
+
+        
     }
 }

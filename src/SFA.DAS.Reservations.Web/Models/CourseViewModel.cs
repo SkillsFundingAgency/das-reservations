@@ -9,12 +9,14 @@ namespace SFA.DAS.Reservations.Web.Models
         public string Title { get; }
         public int Level { get; }
         public string Selected { get; }
+        public string Description { get; }
 
         public CourseViewModel(Course course, string courseId = null)
         {
             Id = course.Id;
             Title = course.Title;
             Level = course.Level;
+            Description = course.CourseDescription;
             Selected = Id.Equals(courseId, StringComparison.InvariantCulture)
                 ? "selected"
                 : null;
