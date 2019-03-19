@@ -55,10 +55,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
+                if (existingCommand == null)
+                {
+                    throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
+                }
+
                 var command = new CacheCreateReservationCommand
                 {
-                    AccountLegalEntityId = existingCommand?.AccountLegalEntityId ?? default(long),
-                    AccountLegalEntityName = existingCommand?.AccountLegalEntityName,
+                    AccountLegalEntityId = existingCommand.AccountLegalEntityId,
+                    AccountLegalEntityName = existingCommand.AccountLegalEntityName,
                     AccountPublicHashedId = routeModel.EmployerAccountId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),

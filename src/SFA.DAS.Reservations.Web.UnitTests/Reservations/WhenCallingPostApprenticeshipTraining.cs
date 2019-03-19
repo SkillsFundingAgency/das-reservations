@@ -59,14 +59,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task Then_Throw_Error_If_No_Reservation_Found(
+            ReservationsRouteModel routeModel,
+            StartDateModel startDateModel,
+            Course course,
+            ApprenticeshipTrainingFormModel formModel,
+            [Frozen] Mock<IMediator> mockMediator, 
+            GetCachedReservationResult cacheResult,
+            ReservationsController controller)
+        {
+            mockMediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => null);
+
+            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.CourseId = JsonConvert.SerializeObject(course);
+
+            Assert.ThrowsAsync<ArgumentException>(() => controller.PostApprenticeshipTraining(routeModel, formModel));
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Caches_Draft_Reservation(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             Course course,
             ApprenticeshipTrainingFormModel formModel,
             [Frozen] Mock<IMediator> mockMediator, 
+            GetCachedReservationResult cacheResult,
             ReservationsController controller)
         {
+            mockMediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => cacheResult);
+
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.CourseId = JsonConvert.SerializeObject(course);
 
@@ -141,7 +168,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == null &&
                     command.CourseDescription == "Unknown"
-                ), It.IsAny<CancellationToken>()));
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -173,8 +200,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Course course,
             ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult,
-            Mock<IMediator> mockMediator)
+            Mock<IMediator> mockMediator,
+            GetCachedReservationResult cacheResult)
         {
+            mockMediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => cacheResult);
+
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.CourseId = JsonConvert.SerializeObject(course);
             mockMediator
