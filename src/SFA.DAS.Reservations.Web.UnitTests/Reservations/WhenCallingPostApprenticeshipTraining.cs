@@ -129,13 +129,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
-            Course course,
-            ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult,
             Mock<IMediator> mockMediator)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            var formModel = new ApprenticeshipTrainingFormModel();
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
