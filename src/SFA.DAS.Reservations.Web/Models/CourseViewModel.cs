@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Title = course.Title;
             Level = course.Level;
             Description = course.CourseDescription;
-            Selected = Id.Equals(courseId, StringComparison.InvariantCulture)
+            Selected = Id!=null && Id.Equals(courseId, StringComparison.InvariantCulture)
                 ? "selected"
                 : null;
         }
