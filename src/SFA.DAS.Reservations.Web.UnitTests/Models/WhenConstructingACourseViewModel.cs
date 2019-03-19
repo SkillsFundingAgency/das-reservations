@@ -67,6 +67,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             viewModel.Selected.Should().BeNull();
         }
 
+        [Test]
+        public void Then_If_The_Course_Is_Null_A_New_ViewModel_Is_Returned_With_Description_Set_To_Unknown()
+        {
+            var viewModel = new CourseViewModel(null);
+            viewModel.Should().NotBeNull();
+            viewModel.Description.Should().Be("Unknown");
+        }
         
     }
 }

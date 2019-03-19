@@ -13,6 +13,13 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public CourseViewModel(Course course, string courseId = null)
         {
+            if (course == null)
+            {
+                course = new Course(null, null,0);
+                Description = course.CourseDescription;
+                return;
+            }
+
             Id = course.Id;
             Title = course.Title;
             Level = course.Level;
