@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -45,6 +46,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 throw new ValidationException(
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
+
+            var reservation = await _cacheStorageService.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString());
 
             var startDateComponents = command.StartDate.Split("-");
             var startYear = Convert.ToInt32(startDateComponents[0]);

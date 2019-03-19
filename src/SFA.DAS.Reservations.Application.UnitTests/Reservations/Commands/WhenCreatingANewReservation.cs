@@ -10,6 +10,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -22,13 +23,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCreatingANewReservation
     {
-        private Mock<IValidator<ICreateReservationCommand>> _mockValidator;
+        private Mock<IValidator<ICreateReservationCommand>> _mockCreateCommandValidator;
+        private Mock<IValidator<IReservationQuery>> _mockGetQueryValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
         private CreateReservationResponse _apiResponse;
         private Mock<IHashingService> _mockHashingService;
         private Mock<ICacheStorageService> _mockCacheService;
         private long _expectedAccountId;
+        private GetCachedReservationResult _cachedReservationResult;
 
         [SetUp]
         public void Arrange()
@@ -36,12 +39,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
+            _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
             _apiResponse = fixture.Create<CreateReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
-            _mockValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
-            _mockValidator
+            _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
+            _mockCreateCommandValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockGetQueryValidator = fixture.Freeze<Mock<IValidator<IReservationQuery>>>();
+            _mockGetQueryValidator
+                .Setup(validator => validator.ValidateAsync(It.IsAny<IReservationQuery>()))
                 .ReturnsAsync(new ValidationResult());
 
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
@@ -55,6 +64,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Returns(_expectedAccountId);
 
             _mockCacheService = fixture.Freeze<Mock<ICacheStorageService>>();
+            _mockCacheService
+                .Setup(service => service.RetrieveFromCache<GetCachedReservationResult>(It.IsAny<string>()))
+                .ReturnsAsync(_cachedReservationResult);
 
             _commandHandler = fixture.Create<CreateReservationCommandHandler>();
         }
@@ -67,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
         }
 
         [Test, AutoData]
@@ -78,7 +90,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             validationResult.AddError(propertyName);
 
-            _mockValidator
+            _mockCreateCommandValidator
                 .Setup(validator => validator.ValidateAsync(command))
                 .ReturnsAsync(validationResult);
 
@@ -86,6 +98,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             act.Should().ThrowExactly<ValidationException>()
                 .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+        }
+
+        [Test, AutoData]
+        public async Task Then_Gets_Reservation_From_The_Cache(
+            CreateReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCacheService.Verify(service => service.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString()));
+        }
+
+        [Test, AutoData]
+        public async Task Then_It_Validates_The_Cached_Reservation(
+            CreateReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
         }
 
         [Test, AutoData]
