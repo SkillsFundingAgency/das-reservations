@@ -47,7 +47,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+                StartDateModel startDateModel = null;
+                if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
+                    startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
                 Course course = null;
                 if (!string.IsNullOrWhiteSpace(formModel.CourseId))
                     course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
@@ -55,8 +57,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CacheCreateReservationCommand
                 {
                     AccountId = routeModel.EmployerAccountId,
-                    StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
-                    StartDateDescription = startDateModel.ToString(),
+                    StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
+                    StartDateDescription = startDateModel?.ToString(),
                     CourseId = course?.Id,
                     CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
                 };

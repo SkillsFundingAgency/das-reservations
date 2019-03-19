@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.Services
         private StartDateModel BuildStartDateModel(DateTime now)
         {
             var startDate = now.AddDays(1 - now.Day).Date;
-            var threeMonthsFromNow = now.AddMonths(3);
+            var threeMonthsFromNow = now.AddMonths(2);
             var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
             var expiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
 
