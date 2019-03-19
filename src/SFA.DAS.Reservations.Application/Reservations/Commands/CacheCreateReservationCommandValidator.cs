@@ -6,15 +6,15 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CacheCreateReservationCommandValidator
+    public class CacheCreateReservationCommandValidator : IValidator<CacheCreateReservationCommand>
     {
         public Task<ValidationResult> ValidateAsync(CacheCreateReservationCommand command)
         {
             var result = new ValidationResult();
 
-            if (command.AccountId == "0")
+            if (command.AccountPublicHashedId == "0")
             {
-                result.AddError(nameof(command.AccountId));
+                result.AddError(nameof(command.AccountPublicHashedId));
             }
 
             if (string.IsNullOrEmpty(command.StartDate))

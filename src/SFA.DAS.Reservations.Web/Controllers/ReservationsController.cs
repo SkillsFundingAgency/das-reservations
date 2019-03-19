@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var command = new CacheCreateReservationCommand
                 {
-                    AccountId = routeModel.EmployerAccountId,
+                    AccountPublicHashedId = routeModel.EmployerAccountId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
                     CourseId = course?.Id,

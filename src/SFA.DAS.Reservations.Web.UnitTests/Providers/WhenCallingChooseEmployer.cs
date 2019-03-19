@@ -12,7 +12,7 @@ using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Employers
+namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
     [TestFixture]
     public class WhenCallingChooseEmployer

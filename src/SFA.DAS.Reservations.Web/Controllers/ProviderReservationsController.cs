@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("confirmEmployer")]
-        public IActionResult ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
+        public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)
             {
@@ -59,6 +60,26 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
+                if (!viewModel.Confirm.Value)
+                {
+                    return RedirectToAction("ChooseEmployer", "ProviderReservations", new
+                    {
+                        UkPrn = viewModel.UkPrn
+                    });
+                }
+
+                await _mediator.Send(new CacheCreateReservationCommand
+                {
+                    AccountPublicHashedId = viewModel.AccountPublicHashedId,
+                    AccountLegalEntityId = viewModel.AccountLegalEntityId,
+                    AccountLegalEntityName = viewModel.AccountLegalEntityName
+                });
+
+                return RedirectToAction("ApprenticeshipTraining", "Reservations", new
+                {
+                    EmployerAccountId = viewModel.AccountPublicHashedId,
+                    UkPrn = viewModel.UkPrn
+                });
 
             }
             catch (ValidationException e)
@@ -70,8 +91,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("ConfirmEmployer", viewModel);
             }
-
-            return View("ConfirmEmployer", viewModel);
         }
     }
 }

@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId == routeModel.EmployerAccountId &&
+                    command.AccountPublicHashedId == routeModel.EmployerAccountId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
@@ -95,7 +95,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId == routeModel.EmployerAccountId &&
+                    command.AccountPublicHashedId == routeModel.EmployerAccountId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == null &&
