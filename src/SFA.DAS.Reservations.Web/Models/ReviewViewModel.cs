@@ -6,6 +6,6 @@
         public ReservationsRouteModel RouteModel { get; set; }
         public string StartDateDescription { get; set; }
         public string CourseDescription { get; set; }
-        public string EmployerDescription { get; set; }
+        public string AccountLegalEntityName { get; set; }
     }
 }

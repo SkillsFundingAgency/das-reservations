@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     });
                 }
 
-                await _mediator.Send(new CacheCreateReservationCommand
+                var result = await _mediator.Send(new CacheCreateReservationCommand
                 {
                     AccountPublicHashedId = viewModel.AccountPublicHashedId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
@@ -77,6 +77,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return RedirectToAction("ApprenticeshipTraining", "Reservations", new
                 {
+                    Id = result.Id,
                     EmployerAccountId = viewModel.AccountPublicHashedId,
                     UkPrn = viewModel.UkPrn
                 });

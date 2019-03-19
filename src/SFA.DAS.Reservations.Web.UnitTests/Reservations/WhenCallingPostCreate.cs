@@ -58,6 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
+            
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createReservationResult);

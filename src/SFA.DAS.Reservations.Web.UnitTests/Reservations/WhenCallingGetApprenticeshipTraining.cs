@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
    
-            await controller.ApprenticeshipTraining(employerAccountId, null);
+            await controller.ApprenticeshipTraining(employerAccountId, null, Guid.NewGuid());
 
             mockStartDateService.Verify(provider => provider.GetStartDates(), Times.Once);
         }
@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Label = startDateModel.StartDate.ToString("MMMM yyyy")
             }).OrderBy(model => model.Value);
             
-            var result = await controller.ApprenticeshipTraining(employerAccountId, null);
+            var result = await controller.ApprenticeshipTraining(employerAccountId, null, Guid.NewGuid());
 
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()

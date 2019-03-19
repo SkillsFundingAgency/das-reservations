@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.RouteModel.Should().BeEquivalentTo(routeModel);
             viewModel.StartDateDescription.Should().Be(cachedReservationResult.StartDateDescription);
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
-            viewModel.EmployerDescription.Should().Be(cachedReservationResult.EmployerDescription);
+            viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
         }
 
         [Test, MoqAutoData]
