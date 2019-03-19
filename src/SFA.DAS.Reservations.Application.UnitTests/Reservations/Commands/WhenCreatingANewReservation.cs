@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
@@ -26,6 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private CreateReservationCommandHandler _commandHandler;
         private CreateReservationResponse _apiResponse;
         private Mock<IHashingService> _mockHashingService;
+        private Mock<ICacheStorageService> _mockCacheService;
         private long _expectedAccountId;
 
         [SetUp]
@@ -51,6 +53,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockHashingService
                 .Setup(service => service.DecodeValue(It.IsAny<string>()))
                 .Returns(_expectedAccountId);
+
+            _mockCacheService = fixture.Freeze<Mock<ICacheStorageService>>();
 
             _commandHandler = fixture.Create<CreateReservationCommandHandler>();
         }
@@ -100,17 +104,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public async Task Then_Returns_Response_From_Reservation_Api(
-            CreateReservationCommand command)
-        {
-            command.StartDate = "2019-01";
-
-            var result  = await _commandHandler.Handle(command, CancellationToken.None);
-
-            result.Reservation.Id.Should().Be(_apiResponse.Id);
-        }
-
-        [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation_With_Course(
             CreateReservationCommand command)
         {
@@ -123,6 +116,29 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                     apiRequest.AccountId == _expectedAccountId &&
                     apiRequest.StartDate == "2019-Jan-01" &&
                     apiRequest.CourseId.Equals("123-1"))), Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task Then_Cache_Service_Removes_From_Cache(
+            CreateReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+            command.CourseId = "123-1";
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCacheService.Verify(service => service.DeleteFromCache(command.Id.ToString()), Times.Once);
+        }
+
+        [Test, AutoData]
+        public async Task Then_Returns_Response_From_Reservation_Api(
+            CreateReservationCommand command)
+        {
+            command.StartDate = "2019-01";
+
+            var result  = await _commandHandler.Handle(command, CancellationToken.None);
+
+            result.Reservation.Id.Should().Be(_apiResponse.Id);
         }
     }
 }

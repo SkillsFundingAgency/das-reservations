@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -20,17 +21,20 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
+        private readonly ICacheStorageService _cacheStorageService;
 
         public CreateReservationCommandHandler(
             IValidator<ICreateReservationCommand> validator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
-            IHashingService hashingService)
+            IHashingService hashingService,
+            ICacheStorageService cacheStorageService)
         {
             _validator = validator;
             _apiOptions = apiOptions;
             _apiClient = apiClient;
             _hashingService = hashingService;
+            _cacheStorageService = cacheStorageService;
         }
 
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
@@ -55,6 +59,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
+
+            await _cacheStorageService.DeleteFromCache(command.Id.ToString());
 
             return new CreateReservationResult
             {

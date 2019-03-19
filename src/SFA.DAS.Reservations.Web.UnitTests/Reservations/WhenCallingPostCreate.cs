@@ -75,29 +75,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task And_Saved_To_Db_Then_Deletes_From_Cache(
-            ReservationsRouteModel routeModel, 
-            GetCachedReservationResult cachedReservationResult,
-            CreateReservationResult createReservationResult)
-        {
-            var mockMediator = _fixture.Freeze<Mock<IMediator>>();
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cachedReservationResult);
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(createReservationResult);
-            var controller = _fixture.Create<ReservationsController>();
-            
-            await controller.Create(routeModel);
-
-            mockMediator.Verify(mediator => 
-                mediator.Send(It.Is<DeleteCachedReservationCommand>(command => 
-                    command.Id == cachedReservationResult.Id
-                ), It.IsAny<CancellationToken>()));
-        }
-
-        [Test, AutoData]
         public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(
             ReservationsRouteModel routeModel, 
             CreateReservationResult createReservationResult)
@@ -157,7 +134,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.IsNotNull(actualViewResult);
             Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
             Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("TrainingStartDate"));
-            mockMediator.Verify(mediator => mediator.Send(It.IsAny<DeleteCachedReservationCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }
