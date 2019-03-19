@@ -89,15 +89,32 @@
         window.DASFrontend.initAll();
     </script>
     <script>
-        var selectEl = document.querySelector('#course-search');
+        var idSelectField = 'course-search';
+        var selectEl = document.querySelector('#' + idSelectField);
         if (selectEl) {
             accessibleAutocomplete.enhanceSelectElement({
+                selectElement: selectEl,
                 minLength: 3,
                 autoselect: true,
                 defaultValue: '',
                 displayMenu: 'overlay',
                 placeholder: 'Start typing to search apprenticeships',
-                selectElement: selectEl
+                onConfirm: function (opt) {          
+                    var requestedOption = [].filter.call(this.selectElement.options,
+                        function (option) {
+                            return (option.textContent || option.innerText) === opt
+                        }
+                    )[0];
+                    var txtInput = document.querySelector('#' + idSelectField);
+
+                    if (requestedOption) {
+                        requestedOption.selected = true
+                    }
+
+                    if (txtInput.value.toString().length === 0) {
+                        this.selectElement.selectedIndex = 0
+                    }
+                }
             });
         }
     </script>
