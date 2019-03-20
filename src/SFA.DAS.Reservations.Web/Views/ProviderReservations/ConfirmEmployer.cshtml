@@ -5,8 +5,8 @@
     ViewBag.Title = "Confirm Employer";
 }
 
-<div class="grid-row">
-    <div class="column-two-thirds">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
         @if (!ViewData.ModelState.IsValid)
         {
@@ -45,12 +45,19 @@
         }
 
         <h1 class="govuk-heading-xl">Confirm employer</h1>
-        <div>
-        <span class="govuk-heading-l">@Model.AccountLegalEntityName</span>
-        <span class="govuk-caption-xl">Account name: @Model.AccountName</span>
-            <span class="govuk-caption-xl">Agreement ID: @Model.AccountLegalEntityPublicHashedId</span>
-        </div>
-        
+
+        <h2 class="govuk-heading-l">@Model.AccountLegalEntityName</h2>
+
+        <dl class="das-definition-list das-definition-list--inline das-definition-list--muted govuk-!-font-size-24">
+
+            <dt class="das-definition-list__title">Account name</dt>
+            <dd class="das-definition-list__definition">@Model.AccountName</dd>
+
+            <dt class="das-definition-list__title">Agreement ID</dt>
+            <dd class="das-definition-list__definition">@Model.AccountLegalEntityPublicHashedId</dd>
+
+        </dl>
+           
         <form action="@Url.Action("ConfirmEmployer")" method="POST">
 
             @Html.HiddenFor(model => model.AccountLegalEntityName)
@@ -60,12 +67,10 @@
 
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "":"govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-fieldset__heading">
-                            Is this the employer you would like to create a cohort for?
-                        </h1>
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                      Is this the employer you would like to create a cohort for?
                     </legend>
-                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Confirm"))
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("confirm-yes"))
                     {
                         <span id="confirm-error" class="govuk-error-message">
                             <span class="govuk-visually-hidden">Error:</span> Please choose an option
