@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -30,22 +29,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void Arrange()
         {
             _fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
-        }
-
-        [Test, AutoData]
-        public async Task Then_Gets_Reservation_From_Cache(
-            ReservationsRouteModel routeModel, 
-            CreateReservationResult createReservationResult)
-        {
-            var mockMediator = _fixture.Freeze<Mock<IMediator>>();
-            var controller = _fixture.Create<ReservationsController>();
-            
-            await controller.Create(routeModel);
-
-            mockMediator.Verify(mediator => 
-                mediator.Send(It.Is<GetCachedReservationQuery>(query => 
-                    query.Id == routeModel.Id
-                ), It.IsAny<CancellationToken>()));
         }
 
         [Test, AutoData]

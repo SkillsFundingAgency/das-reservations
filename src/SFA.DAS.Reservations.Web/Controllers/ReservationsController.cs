@@ -142,28 +142,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
         {
-            GetCachedReservationResult cachedReservationResult;
-
-            try
-            {
-                var query = new GetCachedReservationQuery
-                {
-                    Id = routeModel.Id.GetValueOrDefault()
-
-                };
-
-                cachedReservationResult = await _mediator.Send(query);
-            }
-            catch (ValidationException e)
-            {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
-
-                return View("Error");//todo: setup view correctly.
-            }
-
             try
             {
                 var command = new CreateReservationCommand
