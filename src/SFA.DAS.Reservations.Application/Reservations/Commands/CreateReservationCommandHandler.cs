@@ -18,20 +18,23 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
-        private readonly IValidator<CreateReservationCommand> _validator;
+        private readonly IValidator<IReservationQuery> _reservationQueryValidator;
+        private readonly IValidator<ICreateReservationCommand> _createReservationValidator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
         private readonly ICacheStorageService _cacheStorageService;
 
         public CreateReservationCommandHandler(
-            IValidator<CreateReservationCommand> validator, 
+            IValidator<IReservationQuery> reservationQueryValidator,
+            IValidator<ICreateReservationCommand> createReservationValidator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             IHashingService hashingService,
             ICacheStorageService cacheStorageService)
         {
-            _validator = validator;
+            _reservationQueryValidator = reservationQueryValidator;
+            _createReservationValidator = createReservationValidator;
             _apiOptions = apiOptions;
             _apiClient = apiClient;
             _hashingService = hashingService;
@@ -40,14 +43,21 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(command);
-            if (!validationResult.IsValid())
+            var queryValidationResult = await _reservationQueryValidator.ValidateAsync(command);
+            if (!queryValidationResult.IsValid())
             {
                 throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                    new ValidationResult("The following parameters have failed validation", queryValidationResult.ErrorList), null, null);
             }
 
             var reservation = await _cacheStorageService.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString());
+
+            var createValidationResult = await _createReservationValidator.ValidateAsync(reservation);
+            if (!createValidationResult.IsValid())
+            {
+                throw new ValidationException(
+                    new ValidationResult("The following parameters have failed validation", createValidationResult.ErrorList), null, null);
+            }
 
             var startDateComponents = reservation.StartDate.Split("-");
             var startYear = Convert.ToInt32(startDateComponents[0]);

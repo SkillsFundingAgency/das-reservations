@@ -23,8 +23,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCreatingANewReservation
     {
-        private Mock<IValidator<CreateReservationCommand>> _mockCreateCommandValidator;
-        private Mock<IValidator<IReservationQuery>> _mockGetQueryValidator;
+        private Mock<IValidator<ICreateReservationCommand>> _mockCreateCommandValidator;
+        private Mock<IValidator<IReservationQuery>> _mockReservationQueryValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
         private CreateReservationResponse _apiResponse;
@@ -46,13 +46,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _apiResponse = fixture.Create<CreateReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
-            _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
+            _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
             _mockCreateCommandValidator
-                .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
+                .Setup(validator => validator.ValidateAsync(It.IsAny<ICreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
 
-            _mockGetQueryValidator = fixture.Freeze<Mock<IValidator<IReservationQuery>>>();
-            _mockGetQueryValidator
+            _mockReservationQueryValidator = fixture.Freeze<Mock<IValidator<IReservationQuery>>>();
+            _mockReservationQueryValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<IReservationQuery>()))
                 .ReturnsAsync(new ValidationResult());
 
@@ -75,12 +75,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public async Task Then_It_Validates_The_Command(
+        public async Task Then_It_Validates_The_Id(
             CreateReservationCommand command)
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);//todo: only needs to validate the guid
+            _mockReservationQueryValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
         }
 
         [Test, AutoData]
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             validationResult.AddError(propertyName);
 
             _mockCreateCommandValidator
-                .Setup(validator => validator.ValidateAsync(command))
+                .Setup(validator => validator.ValidateAsync(_cachedReservationResult))
                 .ReturnsAsync(validationResult);
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
@@ -116,7 +116,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);//todo: needs to be validating all properties
+            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(_cachedReservationResult), Times.Once);
         }
 
         [Test, AutoData]
