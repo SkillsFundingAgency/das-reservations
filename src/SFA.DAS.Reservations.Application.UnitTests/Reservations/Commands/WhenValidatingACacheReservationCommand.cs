@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
-                AccountPublicHashedId = "0",
+                AccountId = default(long),
                 StartDate = "2018-09"
             };
 
@@ -26,8 +26,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountPublicHashedId))
-                .WhichValue.Should().Be($"{nameof(CacheCreateReservationCommand.AccountPublicHashedId)} has not been supplied");
+                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountId))
+                .WhichValue.Should().Be($"{nameof(CacheCreateReservationCommand.AccountId)} has not been supplied");
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             var command = new CacheCreateReservationCommand
             {
-                AccountPublicHashedId = "1"
+                AccountId = 1
             };
 
             var result = await validator.ValidateAsync(command);
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
-                AccountPublicHashedId = "1",
+                AccountId = 1,
                 StartDate = startDate
             };
 
@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
-                AccountPublicHashedId = "0",
+                AccountId = default(long),
                 StartDate = ""
             };
 
@@ -87,7 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(2);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountPublicHashedId))
+                .Should().ContainKey(nameof(CacheCreateReservationCommand.AccountId))
                 .And.ContainKey(nameof(CacheCreateReservationCommand.StartDate));
         }
 
@@ -97,7 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CacheCreateReservationCommand
             {
-                AccountPublicHashedId = "1",
+                AccountId = 1,
                 StartDate = "2019-07"
             };
 

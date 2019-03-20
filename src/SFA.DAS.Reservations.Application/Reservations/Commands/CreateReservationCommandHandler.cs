@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
@@ -19,23 +18,21 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         private readonly IValidator<CreateReservationCommand> _validator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
-        private readonly IHashingService _hashingService;
 
         public CreateReservationCommandHandler(
             IValidator<CreateReservationCommand> validator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
-            IApiClient apiClient,
-            IHashingService hashingService)
+            IApiClient apiClient)
         {
             _validator = validator;
             _apiOptions = apiOptions;
             _apiClient = apiClient;
-            _hashingService = hashingService;
         }
 
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
+
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(
@@ -48,10 +45,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
-                _hashingService.DecodeValue, 
-                command.HashedAccountId, 
+                command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id.Value,
+                command.Id,
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 Id = Guid.NewGuid(),
-                HashedAccountId = "0",
+                AccountId = 0,
                 StartDate = "2018-09"
             };
 
@@ -26,8 +26,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.HashedAccountId))
-                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.HashedAccountId)} has not been supplied");
+                .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
+                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
         }
 
         [TestCase("19-a")]
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 Id = Guid.NewGuid(),
-                HashedAccountId = "1",
+                AccountId = 1,
                 StartDate = startDate
             };
 
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                HashedAccountId = "0",
+                AccountId = 0,
                 StartDate = ""
             };
 
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(2);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.HashedAccountId))
+                .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
                 .And.ContainKey(nameof(CreateReservationCommand.StartDate));
         }
 
@@ -81,7 +81,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         {
             var command = new CreateReservationCommand
             {
-                HashedAccountId = "1",
+                AccountId = 1,
                 StartDate = "2019-07"
             };
 

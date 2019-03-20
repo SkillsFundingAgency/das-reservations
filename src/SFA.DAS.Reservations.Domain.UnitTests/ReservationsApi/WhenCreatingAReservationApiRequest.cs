@@ -1,7 +1,6 @@
 ﻿using System;
 using AutoFixture.NUnit3;
 using FluentAssertions;
-using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 
@@ -10,27 +9,6 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
     [TestFixture]
     public class WhenCreatingAReservationApiRequest
     {
-
-        [Test, MoqAutoData]
-        public void Then_It_Sets_And_Decodes_AccountId(
-            string url,
-            long expectedAccountId,
-            [Frozen] string hashedAccountId,
-            [Frozen] Mock<Func<string, long>> decodeFunc)
-        {
-            decodeFunc
-                .Setup(func => func(hashedAccountId))
-                .Returns(expectedAccountId);
-
-            // note: I've had to construct here as using autodata doesn't inject the mock func for some reason
-            var request = new ReservationApiRequest(url, decodeFunc.Object, hashedAccountId, DateTime.Today, Guid.NewGuid());
-            
-            var accountId = request.AccountId;
-
-            decodeFunc.Verify(func => func(hashedAccountId));
-            accountId.Should().Be(expectedAccountId);
-        }
-
         [Test, AutoData]
         public void Then_It_Sets_Id(
             [Frozen] Guid id,
@@ -40,10 +18,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         }
 
         [Test, AutoData]
-        public void Then_It_Sets_StartDate(
-            [Frozen] DateTime startDate,
-            ReservationApiRequest request)
+        public void Then_It_Sets_StartDate()
         {
+            var startDate = DateTime.Now.AddDays(-10);
+            var request = new ReservationApiRequest("test", 1, startDate, Guid.NewGuid());
+
             request.StartDate.Should().Be(startDate.ToString("yyyy-MMM-dd"));
         }
 
@@ -59,9 +38,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         public void Then_It_Sets_The_GetUrl()
         {
             var expectedId = Guid.NewGuid();
-            var decode = new Mock<Func<string, long>>();
-            decode.Setup(func => func("ABC34r")).Returns(123);
-            var request = new ReservationApiRequest("http://test/", decode.Object,"ABC34r",DateTime.Today, expectedId);
+            
+            var request = new ReservationApiRequest("http://test/", expectedId);
 
             request.GetUrl.Should().Be($"http://test/api/reservations/{expectedId}");
         }

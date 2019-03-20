@@ -23,6 +23,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         public async Task<CacheReservationResult> Handle(CacheCreateReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
+
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(

@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
     public class WhenGettingAReservationFromCache
     {
-        private const string ExpectedAccountId = "44321";
+        private const long ExpectedAccountId = 44321;
 
         private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<ICacheStorageService> _cacheService;
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
                 .ReturnsAsync(new GetCachedReservationResult
                 {
                     Id = _expectedReservationId,
-                    HashedAccountId = ExpectedAccountId,
+                    AccountId = ExpectedAccountId,
                     StartDate = _expectedStartDate
                 });
 

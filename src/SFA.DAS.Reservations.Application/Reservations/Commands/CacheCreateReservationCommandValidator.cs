@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
@@ -12,9 +10,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         {
             var result = new ValidationResult();
 
-            if (command.AccountPublicHashedId == "0")
+            if (command.AccountId == default(long))
             {
-                result.AddError(nameof(command.AccountPublicHashedId));
+                result.AddError(nameof(command.AccountId));
             }
 
             if (string.IsNullOrEmpty(command.StartDate))

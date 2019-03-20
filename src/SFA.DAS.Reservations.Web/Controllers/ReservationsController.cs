@@ -62,9 +62,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var command = new CacheCreateReservationCommand
                 {
+                    AccountId = existingCommand.AccountId,
                     AccountLegalEntityId = existingCommand.AccountLegalEntityId,
                     AccountLegalEntityName = existingCommand.AccountLegalEntityName,
-                    AccountPublicHashedId = existingCommand.AccountPublicHashedId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
                     CourseId = course?.Id,
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CreateReservationCommand
                 {
-                    HashedAccountId = cachedReservationResult.HashedAccountId,
+                    AccountId = cachedReservationResult.AccountId,
                     StartDate = cachedReservationResult.StartDate,
                     Id = cachedReservationResult.Id,
                     CourseId = cachedReservationResult.CourseId
@@ -193,6 +193,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
+            if (!routeModel.Id.HasValue)
+            {
+                throw new ArgumentException("Reservation ID must be in URL.", nameof(routeModel.Id));
+            }
+
             var query = new GetReservationQuery
             {
                 Id = routeModel.Id.Value 
