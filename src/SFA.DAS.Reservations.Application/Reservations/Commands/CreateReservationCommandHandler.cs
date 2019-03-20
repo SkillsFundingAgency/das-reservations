@@ -32,6 +32,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
+
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(
@@ -46,7 +47,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 _apiOptions.Value.Url,
                 command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id.Value,
+                command.Id,
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

@@ -193,6 +193,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
+            if (!routeModel.Id.HasValue)
+            {
+                throw new ArgumentException("Reservation ID must be in URL.", nameof(routeModel.Id));
+            }
+
             var query = new GetReservationQuery
             {
                 Id = routeModel.Id.Value 
