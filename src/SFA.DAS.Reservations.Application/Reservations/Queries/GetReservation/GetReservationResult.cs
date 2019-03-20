@@ -9,5 +9,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public Course Course { get; set; }
+        public long AccountLegalEntityId { get; set; }
+        public string AccountLegalEntityName { get; set; }
     }
 }

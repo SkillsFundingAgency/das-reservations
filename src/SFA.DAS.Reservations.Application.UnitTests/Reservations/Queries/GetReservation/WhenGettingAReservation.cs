@@ -28,6 +28,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
         private const long ExpectedAccountId = 44321;
         private const string ExpectedHashedId = "TGF45";
         private const string ExpectedBaseUrl = "https://test.local/reservation/";
+        private const long ExpectedLegalEntityId = 1002;
+        private const string ExpectedLegalEntityName = "Test Legal Entity";
         private DateTime _expectedStartDate = DateTime.Now.AddDays(-20);
         private DateTime _expectedExpiryDate = DateTime.Now.AddDays(30);
 
@@ -50,7 +52,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
                 {
                     ReservationId = _expectedReservationId,
                     StartDate = _expectedStartDate,
-                    ExpiryDate = _expectedExpiryDate
+                    ExpiryDate = _expectedExpiryDate,
+                    AccountLegalEntityId = ExpectedLegalEntityId,
+                    AccountLegalEntityName = ExpectedLegalEntityName
                 });
 
             _hashingService = new Mock<IHashingService>();
@@ -93,6 +97,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
             Assert.AreEqual(_expectedReservationId, actual.ReservationId);
             Assert.AreEqual(_expectedStartDate, actual.StartDate);
             Assert.AreEqual(_expectedExpiryDate, actual.ExpiryDate);
+            Assert.AreEqual(ExpectedLegalEntityId, actual.AccountLegalEntityId);
+            Assert.AreEqual(ExpectedLegalEntityName, actual.AccountLegalEntityName);
         }
     }
 }

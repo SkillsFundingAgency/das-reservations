@@ -9,5 +9,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public Course Course { get; set; }
+        public string AccountLegalEntityName { get; set; }
     }
 }
