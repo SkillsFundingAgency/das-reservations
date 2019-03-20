@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Reflection.Metadata.Ecma335;
 
 namespace SFA.DAS.Reservations.Domain.Courses
@@ -13,6 +14,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
 
         }
 
+        [JsonProperty("CourseId")]
         public string Id { get; }
         public string Title { get; }
         public int Level { get; }
