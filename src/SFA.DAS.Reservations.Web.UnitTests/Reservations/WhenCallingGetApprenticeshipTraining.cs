@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     {
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
-            string employerAccountId,
+            ReservationsRouteModel routeModel,
             IEnumerable<StartDateModel> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
@@ -28,14 +28,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(service => service.GetStartDates())
                 .ReturnsAsync(expectedStartDates);
    
-            await controller.ApprenticeshipTraining(employerAccountId, null, Guid.NewGuid());
+            await controller.ApprenticeshipTraining(routeModel);
 
             mockStartDateService.Verify(provider => provider.GetStartDates(), Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Dates(
-            string employerAccountId,
+            ReservationsRouteModel routeModel,
             IEnumerable<StartDateModel> expectedStartDates,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Label = startDateModel.StartDate.ToString("MMMM yyyy")
             }).OrderBy(model => model.Value);
             
-            var result = await controller.ApprenticeshipTraining(employerAccountId, null, Guid.NewGuid());
+            var result = await controller.ApprenticeshipTraining(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()

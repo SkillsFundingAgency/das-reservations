@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
-                command.AccountId, 
+                command.HashedAccountId, 
                 new DateTime(startYear, startMonth, 1),
                 command.Id.Value,
                 command.CourseId);

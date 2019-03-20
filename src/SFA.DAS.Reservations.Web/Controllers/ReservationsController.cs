@@ -29,17 +29,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _startDateService = startDateService;
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{Id}/apprenticeship-training", Name = "provider-apprenticeship-training")]
+        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = "provider-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
-        public async Task<IActionResult> ApprenticeshipTraining(string employerAccountId, uint? ukPrn, Guid id)
+        public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
             // todo: get existing training details if exist, get from mediator call
-            var viewModel = await BuildApprenticeshipTrainingViewModel(ukPrn, id);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn, routeModel.Id.GetValueOrDefault());
 
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{Id}/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
+        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
         [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     AccountLegalEntityId = existingCommand.AccountLegalEntityId,
                     AccountLegalEntityName = existingCommand.AccountLegalEntityName,
-                    AccountPublicHashedId = routeModel.EmployerAccountId,
+                    AccountPublicHashedId = existingCommand.AccountPublicHashedId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
                     CourseId = course?.Id,
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/review", Name = "provider-review")]
+        [Route("{ukPrn}/reservations/{id}/review", Name = "provider-review")]
         [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = "employer-review")]
         public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
@@ -132,7 +132,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-create-reservation")]
+        [Route("{ukPrn}/reservations/{id}/create", Name = "provider-create-reservation")]
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CreateReservationCommand
                 {
-                    AccountId = cachedReservationResult.AccountId,
+                    HashedAccountId = cachedReservationResult.HashedAccountId,
                     StartDate = cachedReservationResult.StartDate,
                     Id = cachedReservationResult.Id,
                     CourseId = cachedReservationResult.CourseId
@@ -189,7 +189,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-reservation-created")]
+        [Route("{ukPrn}/reservations/{id}/create", Name = "provider-reservation-created")]
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {

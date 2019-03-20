@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
-                    command.AccountId == cachedReservationResult.AccountId && 
+                    command.HashedAccountId == cachedReservationResult.HashedAccountId && 
                     command.StartDate == cachedReservationResult.StartDate &&
                     command.Id == cachedReservationResult.Id &&
                     command.CourseId == cachedReservationResult.CourseId

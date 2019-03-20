@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountPublicHashedId == routeModel.EmployerAccountId &&
+                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
                     command.AccountLegalEntityId.Equals(cacheResult.AccountLegalEntityId) &&
                     command.AccountLegalEntityName.Equals(cacheResult.AccountLegalEntityName) &&
-                    command.AccountPublicHashedId == routeModel.EmployerAccountId &&
+                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
@@ -153,9 +153,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel,
-            [Frozen] Mock<IMediator> mockMediator, 
+            [Frozen] Mock<IMediator> mockMediator,
+            GetCachedReservationResult cacheResult,
             ReservationsController controller)
         {
+
+            mockMediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => cacheResult);
+
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.CourseId = null;
 
@@ -163,7 +170,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountPublicHashedId == routeModel.EmployerAccountId &&
+                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == null &&

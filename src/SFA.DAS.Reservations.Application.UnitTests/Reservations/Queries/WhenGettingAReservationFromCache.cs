@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
                 .ReturnsAsync(new GetCachedReservationResult
                 {
                     Id = _expectedReservationId,
-                    AccountId = ExpectedAccountId,
+                    HashedAccountId = ExpectedAccountId,
                     StartDate = _expectedStartDate
                 });
 

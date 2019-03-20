@@ -6,6 +6,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
     public class CacheCreateReservationCommand: IRequest<CacheReservationResult>
     {
         public Guid? Id { get; set; }
+        public long AccountId { get; set; }
         public string AccountPublicHashedId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
