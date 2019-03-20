@@ -51,13 +51,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, AutoData]
         public async Task Then_Sends_Create_Command_With_Correct_Values_Set(
             ReservationsRouteModel routeModel, 
-            GetCachedReservationResult cachedReservationResult,
             CreateReservationResult createReservationResult)
         {
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cachedReservationResult);
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createReservationResult);
@@ -67,11 +63,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
-                    command.AccountId == cachedReservationResult.AccountId && 
-                    command.StartDate == cachedReservationResult.StartDate &&
-                    command.Id == cachedReservationResult.Id &&
-                    command.CourseId == cachedReservationResult.CourseId
-                        ), It.IsAny<CancellationToken>()));
+                    command.Id == routeModel.Id), It.IsAny<CancellationToken>()));
         }
 
         [Test, AutoData]
@@ -113,13 +105,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
         [Test, AutoData]
         public async Task Then_Redisplays_The_View_If_There_Is_A_Validation_Error_From_The_Command(
-            ReservationsRouteModel routeModel, 
-            GetCachedReservationResult cachedReservationResult)
+            ReservationsRouteModel routeModel)
         {
             var mockMediator = new Mock<IMediator>();
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cachedReservationResult);
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))

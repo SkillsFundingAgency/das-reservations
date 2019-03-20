@@ -168,10 +168,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CreateReservationCommand
                 {
-                    AccountId = cachedReservationResult.AccountId,
-                    StartDate = cachedReservationResult.StartDate,
-                    Id = cachedReservationResult.Id,
-                    CourseId = cachedReservationResult.CourseId
+                    Id = routeModel.Id.GetValueOrDefault()
                 };
 
                 await _mediator.Send(command);
