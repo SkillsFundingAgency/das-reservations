@@ -36,12 +36,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var apiRequest = new ReservationApiRequest(
-                _options.Url,
-                null,
-                null,
-                DateTime.MinValue, 
-                request.Id);
+            var apiRequest = new ReservationApiRequest(_options.Url,request.Id);
 
             var result = await _apiClient.Get<ReservationApiRequest, GetReservationResponse>(apiRequest);
 

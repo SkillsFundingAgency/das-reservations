@@ -10,9 +10,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         {
             var result = new ValidationResult();
 
-            if (command.HashedAccountId == "0")
+            if (command.AccountId == default(long))
             {
-                result.AddError(nameof(command.HashedAccountId));
+                result.AddError(nameof(command.AccountId));
             }
 
             if (string.IsNullOrEmpty(command.StartDate))

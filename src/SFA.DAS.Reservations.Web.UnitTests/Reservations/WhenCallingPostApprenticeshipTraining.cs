@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
+                    command.AccountId == cacheResult.AccountId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
                     command.AccountLegalEntityId.Equals(cacheResult.AccountLegalEntityId) &&
                     command.AccountLegalEntityName.Equals(cacheResult.AccountLegalEntityName) &&
-                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
+                    command.AccountId == cacheResult.AccountId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
@@ -170,7 +170,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountPublicHashedId == cacheResult.AccountPublicHashedId &&
+                    command.AccountId == cacheResult.AccountId &&
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == null &&

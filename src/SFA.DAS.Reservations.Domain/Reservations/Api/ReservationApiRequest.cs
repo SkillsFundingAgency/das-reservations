@@ -4,28 +4,29 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
     public class ReservationApiRequest : BaseApiRequest
     {
-        private readonly Func<string, long> _decodeFunc;
-        private readonly string _hashedAccountId;
-        
         public ReservationApiRequest(
             string baseUrl, 
-            Func<string, long> decodeFunc, 
-            string hashedAccountId, 
+            long accountId, 
             DateTime startDate, 
             Guid id, 
             string courseId = null) 
             : base(baseUrl)
         {
-            _decodeFunc = decodeFunc;
-            _hashedAccountId = hashedAccountId;
+            AccountId = accountId;
             Id = id;
             StartDate = startDate.ToString("yyyy-MMM-dd");
             CourseId = courseId;
         }
 
+        //Todo: This ctor will be changed when we change the BaseRequestApi logic
+        public ReservationApiRequest(string baseUrl,  Guid id) : base (baseUrl)
+        {
+            Id = id;
+        }
+
         public Guid Id { get; }
 
-        public long AccountId => _decodeFunc(_hashedAccountId);
+        public long AccountId { get; }
 
         public string StartDate { get; }
 

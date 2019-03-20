@@ -62,9 +62,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var command = new CacheCreateReservationCommand
                 {
+                    AccountId = existingCommand.AccountId,
                     AccountLegalEntityId = existingCommand.AccountLegalEntityId,
                     AccountLegalEntityName = existingCommand.AccountLegalEntityName,
-                    AccountPublicHashedId = existingCommand.AccountPublicHashedId,
                     StartDate = startDateModel.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel.ToString(),
                     CourseId = course?.Id,
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CreateReservationCommand
                 {
-                    HashedAccountId = cachedReservationResult.HashedAccountId,
+                    AccountId = cachedReservationResult.AccountId,
                     StartDate = cachedReservationResult.StartDate,
                     Id = cachedReservationResult.Id,
                     CourseId = cachedReservationResult.CourseId

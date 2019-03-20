@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             await controller.ProcessConfirmEmployer(viewModel);
 
             mockMediator.Verify(m => m.Send(It.Is<CacheCreateReservationCommand>(c =>
-                c.AccountPublicHashedId.Equals(viewModel.AccountPublicHashedId) &&
+                c.AccountId.Equals(viewModel.AccountId) &&
                 c.AccountLegalEntityId.Equals(viewModel.AccountLegalEntityId) &&
                 c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName)), It.IsAny<CancellationToken>()), Times.Once);
         }

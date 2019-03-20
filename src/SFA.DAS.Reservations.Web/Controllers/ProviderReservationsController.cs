@@ -70,7 +70,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var result = await _mediator.Send(new CacheCreateReservationCommand
                 {
                     AccountId = viewModel.AccountId,
-                    AccountPublicHashedId = viewModel.AccountPublicHashedId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
                     AccountLegalEntityName = viewModel.AccountLegalEntityName
                 });
