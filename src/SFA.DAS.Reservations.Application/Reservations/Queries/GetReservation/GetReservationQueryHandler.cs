@@ -52,7 +52,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                 StartDate = result.StartDate,
                 ExpiryDate = result.ExpiryDate,
                 Course = result.Course ?? new Course(null,null,0),
-                AccountLegalEntityId = result.AccountLegalEntityId,
                 AccountLegalEntityName = result.AccountLegalEntityName
             };
         }
