@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
+        public void And_The_Command_Is_Not_Valid_Then_Throws_ValidationException(
             CreateReservationCommand command,
             ValidationResult validationResult,
             string propertyName)
@@ -108,6 +108,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockCacheService.Verify(service => service.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString()));
+        }
+
+        [Test, AutoData]
+        public void And_No_Reservation_Found_In_Cache_Then_Throws_ValidationException(
+            CreateReservationCommand command)
+        {
+            _mockCacheService
+                .Setup(service => service.RetrieveFromCache<GetCachedReservationResult>(It.IsAny<string>()))
+                .ReturnsAsync((GetCachedReservationResult)null);
+
+            Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
+
+            act.Should().ThrowExactly<ValidationException>()
+                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(nameof(GetCachedReservationResult.Id))).Should().NotBeNullOrEmpty();
         }
 
         [Test, AutoData]
