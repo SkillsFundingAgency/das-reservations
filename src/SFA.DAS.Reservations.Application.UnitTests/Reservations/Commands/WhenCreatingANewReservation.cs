@@ -120,8 +120,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<ValidationException>()
-                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(nameof(GetCachedReservationResult.Id))).Should().NotBeNullOrEmpty();
+            act.Should().ThrowExactly<ValidationException>();
         }
 
         [Test, AutoData]
