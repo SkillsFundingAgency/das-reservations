@@ -87,24 +87,45 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_Redisplays_The_View_If_There_Is_A_Validation_Error_From_The_Command(
+        public async Task And_ValidationException_Then_Redirects_To_Apprenticeship_Training(
             ReservationsRouteModel routeModel)
         {
             var mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetCoursesResult(){Courses = new List<Course>()});
+                .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
             
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
 
             var actual = await controller.Create(routeModel);
 
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
             var actualViewResult = actual as ViewResult;
-            Assert.IsNotNull(actualViewResult);
-            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
-            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("TrainingStartDate"));
+            actualViewResult.Should().NotBeNull();
+            actualViewResult?.ViewData.ModelState.IsValid.Should().BeFalse();
+            actualViewResult?.ViewData.ModelState.Should().Contain(pair => pair.Key == "TrainingStartDate");
+            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");
+        }
+
+        [Test, AutoData]
+        public async Task And_ArgumentException_Then_Redirects_To_Apprenticeship_Training(
+            ReservationsRouteModel routeModel)
+        {
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception());
+            mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
+            
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
+
+            var actual = await controller.Create(routeModel);
+
+            actual.Should().NotBeNull();
+            var actualViewResult = actual as ViewResult;
+            actualViewResult.Should().NotBeNull();
+            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");
         }
     }
 }

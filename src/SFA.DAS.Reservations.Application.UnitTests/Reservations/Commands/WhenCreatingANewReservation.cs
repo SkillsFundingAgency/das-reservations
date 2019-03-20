@@ -111,7 +111,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public void And_No_Reservation_Found_In_Cache_Then_Throws_ValidationException(
+        public void And_No_Reservation_Found_In_Cache_Then_Throws_Exception(
             CreateReservationCommand command)
         {
             _mockCacheService
@@ -120,7 +120,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<ValidationException>();
+            act.Should().ThrowExactly<Exception>()
+                .WithMessage("No reservation was found with that Id");
         }
 
         [Test, AutoData]

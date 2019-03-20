@@ -53,8 +53,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             var reservation = await _cacheStorageService.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString());
             if (reservation == null)
             {
-                throw new ValidationException(
-                    new ValidationResult("No reservation was found with that Id"), null, null);
+                throw new Exception("No reservation was found with that Id");
             }
 
             var createValidationResult = await _createReservationValidator.ValidateAsync(reservation);

@@ -161,6 +161,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
+            catch (Exception)
+            {
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                return View("ApprenticeshipTraining", model);
+            }
 
             return RedirectToRoute(routeModel.Ukprn.HasValue ? "provider-reservation-created" : "employer-reservation-created", routeModel);
         }
