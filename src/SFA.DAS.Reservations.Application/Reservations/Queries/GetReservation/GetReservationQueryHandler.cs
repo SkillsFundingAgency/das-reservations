@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -45,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                 ReservationId = result.ReservationId,
                 StartDate = result.StartDate,
                 ExpiryDate = result.ExpiryDate,
-                Course = result.Course
+                Course = result.Course ?? new Course(null,null,0)
             };
         }
     }

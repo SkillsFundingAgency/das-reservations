@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public override string ToString()
         {
-            return $"{StartDate:dd MMMM yyyy} to {ExpiryDate:dd MMMM yyyy}";
+            return $"{StartDate:MMMM yyyy} to {ExpiryDate:MMMM yyyy}";
         }
     }
 }
