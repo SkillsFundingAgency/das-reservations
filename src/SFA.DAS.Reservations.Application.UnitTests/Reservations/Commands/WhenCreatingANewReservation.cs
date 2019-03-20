@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCreatingANewReservation
     {
-        private Mock<IValidator<ICreateReservationCommand>> _mockCreateCommandValidator;
+        private Mock<IValidator<CreateReservationCommand>> _mockCreateCommandValidator;
         private Mock<IValidator<IReservationQuery>> _mockGetQueryValidator;
         private Mock<IApiClient> _mockApiClient;
         private CreateReservationCommandHandler _commandHandler;
@@ -31,6 +31,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private Mock<IHashingService> _mockHashingService;
         private Mock<ICacheStorageService> _mockCacheService;
         private long _expectedAccountId;
+        private DateTime _expectedStartDate;
         private GetCachedReservationResult _cachedReservationResult;
 
         [SetUp]
@@ -40,10 +41,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
             _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
+            _expectedStartDate = fixture.Create<DateTime>().Date;
+            _cachedReservationResult.StartDate = $"{_expectedStartDate:yyyy-MM}";
             _apiResponse = fixture.Create<CreateReservationResponse>();
             _expectedAccountId = fixture.Create<long>();
 
-            _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
+            _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
             _mockCreateCommandValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
@@ -75,11 +78,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_It_Validates_The_Command(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);//todo: only needs to validate the guid
         }
 
         [Test, AutoData]
@@ -104,8 +105,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Gets_Reservation_From_The_Cache(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockCacheService.Verify(service => service.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString()));
@@ -115,25 +114,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_It_Validates_The_Cached_Reservation(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);
+            _mockCreateCommandValidator.Verify(validator => validator.ValidateAsync(command), Times.Once);//todo: needs to be validating all properties
         }
 
         [Test, AutoData]
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation_Without_Course(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-            command.CourseId = null;
+            _cachedReservationResult.CourseId = null;
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == "2019-Jan-01" &&
+                apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
                 apiRequest.CourseId == null)), Times.Once);
         }
 
@@ -141,14 +137,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Calls_Reservation_Api_To_Create_Reservation_With_Course(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-            command.CourseId = "123-1";
+            _cachedReservationResult.CourseId = "123-1";
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                     apiRequest.AccountId == _expectedAccountId &&
-                    apiRequest.StartDate == "2019-Jan-01" &&
+                    apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
                     apiRequest.CourseId.Equals("123-1"))), Times.Once);
         }
 
@@ -156,9 +151,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Cache_Service_Removes_From_Cache(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-            command.CourseId = "123-1";
-
             await _commandHandler.Handle(command, CancellationToken.None);
 
             _mockCacheService.Verify(service => service.DeleteFromCache(command.Id.ToString()), Times.Once);
@@ -168,8 +160,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Returns_Response_From_Reservation_Api(
             CreateReservationCommand command)
         {
-            command.StartDate = "2019-01";
-
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
             result.Reservation.Id.Should().Be(_apiResponse.Id);

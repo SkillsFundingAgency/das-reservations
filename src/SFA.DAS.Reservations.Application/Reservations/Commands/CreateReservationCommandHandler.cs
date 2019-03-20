@@ -18,14 +18,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
-        private readonly IValidator<ICreateReservationCommand> _validator;
+        private readonly IValidator<CreateReservationCommand> _validator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly IHashingService _hashingService;
         private readonly ICacheStorageService _cacheStorageService;
 
         public CreateReservationCommandHandler(
-            IValidator<ICreateReservationCommand> validator, 
+            IValidator<CreateReservationCommand> validator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             IHashingService hashingService,
@@ -49,17 +49,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             var reservation = await _cacheStorageService.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString());
 
-            var startDateComponents = command.StartDate.Split("-");
+            var startDateComponents = reservation.StartDate.Split("-");
             var startYear = Convert.ToInt32(startDateComponents[0]);
             var startMonth = Convert.ToInt32(startDateComponents[1]);
 
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 _hashingService.DecodeValue, 
-                command.AccountId, 
+                reservation.AccountId, 
                 new DateTime(startYear, startMonth, 1),
-                command.Id,
-                command.CourseId);
+                reservation.Id,
+                reservation.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
 
