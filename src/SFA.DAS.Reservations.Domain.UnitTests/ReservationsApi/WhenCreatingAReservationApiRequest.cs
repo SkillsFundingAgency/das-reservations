@@ -32,6 +32,14 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         }
 
         [Test, AutoData]
+        public void Then_It_Sets_Id(
+            [Frozen] Guid id,
+            ReservationApiRequest request)
+        {
+            request.Id.Should().Be(id);
+        }
+
+        [Test, AutoData]
         public void Then_It_Sets_StartDate(
             [Frozen] DateTime startDate,
             ReservationApiRequest request)

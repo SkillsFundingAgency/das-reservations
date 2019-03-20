@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 
         private ReservationsApiConfiguration _options;
 
-        public GetReservationQueryHandler(IValidator<GetReservationQuery> validator, IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
+        public GetReservationQueryHandler(IValidator<IReservationQuery> validator, IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
         {
             _validator = validator;
             _apiClient = apiClient;

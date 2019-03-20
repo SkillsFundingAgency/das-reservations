@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     {
         [Test, AutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
-            CreateReservationValidator validator)
+            CreateReservationCommandValidator validator)
         {
             var command = new CreateReservationCommand
             {
@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         [TestCase("-")]
         public async Task And_StartDate_Is_Not_In_The_Correct_Format_Then_Invalid(string startDate)
         {
-            var validator = new CreateReservationValidator();
+            var validator = new CreateReservationCommandValidator();
             var command = new CreateReservationCommand
             {
                 AccountId = "1",
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public async Task And_All_Fields_Invalid_Then_Returns_All_Errors(
-            CreateReservationValidator validator)
+            CreateReservationCommandValidator validator)
         {
             var command = new CreateReservationCommand
             {
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
         [Test, AutoData]
         public async Task And_All_Fields_Valid_Then_Valid(
-            CreateReservationValidator validator)
+            CreateReservationCommandValidator validator)
         {
             var command = new CreateReservationCommand
             {
