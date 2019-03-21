@@ -6,7 +6,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
 {
-    public class WhenIValidatingGetTrustedEmployersQuery
+    public class WhenValidatingGetTrustedEmployersQuery
     {
         [Test, AutoData]
         public async Task And_No_Id_Then_Invalid(

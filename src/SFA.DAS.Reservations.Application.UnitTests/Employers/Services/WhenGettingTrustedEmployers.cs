@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
         }
 
         [Test]
-        public async Task Then_Will_Not_Call_Api_If_Ukprn_Is_Not_Set()
+        public async Task Then_Ukprn_Is_Required_To_Get_Provider_Permissions()
         {
             //Act
             try
@@ -95,12 +95,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             _providerRelationsApiClient.Verify(c => c.GetAccountProviderLegalEntitiesWithPermission(
                 It.IsAny<GetAccountProviderLegalEntitiesWithPermissionRequest>(), 
                 It.IsAny<CancellationToken>()), Times.Never);
-        }
 
-        [Test]
-        public void Then_Will_Throw_Exception_If_Ukprn_Is_Not_Set()
-        {
-            //Act & Assert
             Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
         }
 
