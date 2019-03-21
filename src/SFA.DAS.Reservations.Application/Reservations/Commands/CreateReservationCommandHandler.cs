@@ -48,6 +48,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 command.AccountId, 
                 new DateTime(startYear, startMonth, 1),
                 command.Id,
+                command.AccountLegalEntityName,
                 command.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

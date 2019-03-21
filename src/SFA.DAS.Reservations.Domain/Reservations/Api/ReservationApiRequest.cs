@@ -9,11 +9,13 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             long accountId, 
             DateTime startDate, 
             Guid id, 
+            string accountLegalEntityName,
             string courseId = null) 
             : base(baseUrl)
         {
             AccountId = accountId;
             Id = id;
+            AccountLegalEntityName = accountLegalEntityName;
             StartDate = startDate.ToString("yyyy-MMM-dd");
             CourseId = courseId;
         }
@@ -34,6 +36,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 
         public override string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public override string GetUrl => $"{BaseUrl}api/reservations/{Id}";
+        public string AccountLegalEntityName { get;}
     }
 
 }

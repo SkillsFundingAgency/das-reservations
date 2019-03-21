@@ -88,6 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == command.AccountId &&
                 apiRequest.StartDate == "2019-Jan-01" &&
+                apiRequest.AccountLegalEntityName == command.AccountLegalEntityName &&
                 apiRequest.CourseId == null)), Times.Once);
         }
 
@@ -114,6 +115,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                     apiRequest.AccountId == command.AccountId &&
                     apiRequest.StartDate == "2019-Jan-01" &&
+                    apiRequest.AccountLegalEntityName == command.AccountLegalEntityName &&
                     apiRequest.CourseId.Equals("123-1"))), Times.Once);
         }
     }
