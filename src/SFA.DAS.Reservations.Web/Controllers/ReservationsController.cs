@@ -168,7 +168,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountId = cachedReservationResult.AccountId,
                     StartDate = cachedReservationResult.StartDate,
                     Id = cachedReservationResult.Id,
-                    CourseId = cachedReservationResult.CourseId
+                    CourseId = cachedReservationResult.CourseId,
+                    AccountLegalEntityName = cachedReservationResult.AccountLegalEntityName
                 };
 
                 await _mediator.Send(command);

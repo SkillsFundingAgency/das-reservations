@@ -71,7 +71,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     command.AccountId == cachedReservationResult.AccountId && 
                     command.StartDate == cachedReservationResult.StartDate &&
                     command.Id == cachedReservationResult.Id &&
-                    command.CourseId == cachedReservationResult.CourseId
+                    command.CourseId == cachedReservationResult.CourseId &&
+                    command.AccountLegalEntityName == cachedReservationResult.AccountLegalEntityName
                         ), It.IsAny<CancellationToken>()));
         }
 
