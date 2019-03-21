@@ -14,6 +14,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             {
                 result.AddError(nameof(command.AccountId));
             }
+            if (string.IsNullOrEmpty(command.AccountLegalEntityName))
+            {
+                result.AddError(nameof(command.AccountLegalEntityName));
+            }
 
             if (string.IsNullOrEmpty(command.StartDate))
             {

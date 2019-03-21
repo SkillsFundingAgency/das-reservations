@@ -18,7 +18,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 0,
-                StartDate = "2018-09"
+                StartDate = "2018-09",
+                AccountLegalEntityName = "Test Name"
             };
 
             var result = await validator.ValidateAsync(command);
@@ -44,7 +45,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 1,
-                StartDate = startDate
+                StartDate = startDate,
+                AccountLegalEntityName = "Test Name"
             };
 
             var result = await validator.ValidateAsync(command);
@@ -63,16 +65,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 AccountId = 0,
-                StartDate = ""
+                StartDate = "",
+                AccountLegalEntityName = ""
             };
 
             var result = await validator.ValidateAsync(command);
 
             result.IsValid().Should().BeFalse();
-            result.ValidationDictionary.Count.Should().Be(2);
+            result.ValidationDictionary.Count.Should().Be(3);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
-                .And.ContainKey(nameof(CreateReservationCommand.StartDate));
+                .And.ContainKey(nameof(CreateReservationCommand.StartDate))
+                .And.ContainKey(nameof(CreateReservationCommand.AccountLegalEntityName));
         }
 
         [Test, AutoData]
@@ -82,7 +86,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var command = new CreateReservationCommand
             {
                 AccountId = 1,
-                StartDate = "2019-07"
+                StartDate = "2019-07",
+                AccountLegalEntityName = "Test Name"
             };
 
             var result = await validator.ValidateAsync(command);
