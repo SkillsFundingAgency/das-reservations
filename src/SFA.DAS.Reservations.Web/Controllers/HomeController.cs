@@ -27,7 +27,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 WsFederationDefaults.AuthenticationScheme);
-          
         }
+
+        [Route("notAvailable", Name="ServiceNotAvailable")]
+        public IActionResult ServiceNotAvailable()
+        {
+            return View();
+        }
+         
     }
 }

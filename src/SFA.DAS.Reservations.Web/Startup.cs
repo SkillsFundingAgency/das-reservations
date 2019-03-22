@@ -22,6 +22,7 @@ using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Filters;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -91,6 +92,7 @@ namespace SFA.DAS.Reservations.Web
                     options =>
                     {
                         options.Filters.Add(new AuthorizeFilter());
+                        options.Filters.Add(new FeatureToggleActionFilter(_configuration));
                     })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
