@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using NLog.Web;
-using SFA.DAS.Reservations.Web.CoreFix;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -9,7 +8,6 @@ namespace SFA.DAS.Reservations.Web
     {
         public static void Main(string[] args)
         {
-            CurrentDirectoryHelpers.SetCurrentDirectory();
             CreateWebHostBuilder(args).Build().Run();
         }
 
