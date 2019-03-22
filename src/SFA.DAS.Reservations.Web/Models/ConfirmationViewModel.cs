@@ -5,9 +5,17 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmationViewModel
     {
-        public Guid ReservationId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public Course Course { get; set; }
+        public ConfirmationViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course)
+        {
+            ReservationId = reservationId;
+            StartDate = startDate;
+            ExpiryDate = expiryDate;
+            Course = course;
+        }
+
+        public Guid ReservationId { get; }
+        public DateTime StartDate { get; }
+        public DateTime ExpiryDate { get; }
+        public Course Course { get; }
     }
 }

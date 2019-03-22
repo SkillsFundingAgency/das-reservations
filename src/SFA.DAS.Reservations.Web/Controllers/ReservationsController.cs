@@ -193,12 +193,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var queryResult = await _mediator.Send(query);
 
             var model = new ConfirmationViewModel
-            {
-                ReservationId = queryResult.ReservationId,
-                StartDate = queryResult.StartDate,
-                ExpiryDate = queryResult.ExpiryDate,
-                Course = queryResult.Course
-            };
+            (
+                queryResult.ReservationId,
+                queryResult.StartDate,
+                queryResult.ExpiryDate,
+                queryResult.Course
+            );
             return View(model);
         }
 
