@@ -1,4 +1,5 @@
-﻿@if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
 {
     <div class="das-account-header das-account-header--provider">
         <div class="govuk-width-container">
@@ -12,7 +13,7 @@
                         <a href="#" class="das-user-navigation__link">Notification settings</a>
                     </li>
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a asp-route="provider-signout" class="das-user-navigation__link">Sign out</a>
+                        <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
                     </li>
                 </ul>
             </nav>

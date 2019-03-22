@@ -13,6 +13,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be("provider-review");
+            result.RouteName.Should().Be(RouteNames.ProviderReview);
         }
 
         [Test, MoqAutoData]
@@ -53,7 +54,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be("employer-review");
+            result.RouteName.Should().Be(RouteNames.EmployerReview);
         }
 
         [Test, MoqAutoData]

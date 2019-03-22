@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -62,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("provider-create-reservation");
+            ((ReviewViewModel) result.Model).RouteName.Should().Be(RouteNames.ProviderCreateReservation);
         }
 
         [Test, MoqAutoData]
@@ -74,7 +75,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.Ukprn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("employer-create-reservation");
+            ((ReviewViewModel) result.Model).RouteName.Should().Be(RouteNames.EmployerCreateReservation);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
