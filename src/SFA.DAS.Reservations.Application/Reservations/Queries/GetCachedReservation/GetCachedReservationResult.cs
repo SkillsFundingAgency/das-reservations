@@ -1,9 +1,8 @@
 ﻿using System;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 {
-    public class GetCachedReservationResult : ICreateReservationCommand
+    public class GetCachedReservationResult
     {
         public Guid Id { get; set; }
         public long AccountId { get; set; }
