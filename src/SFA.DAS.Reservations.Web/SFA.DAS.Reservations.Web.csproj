@@ -4,6 +4,13 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Pages\**" />
+    <Content Remove="Pages\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <None Remove="Pages\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="6.0.0" />
@@ -27,11 +34,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Folder Include="Pages\" />
   </ItemGroup>
 
 

@@ -171,7 +171,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);

@@ -18,6 +18,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
@@ -110,6 +111,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
             services.AddScoped(typeof(IValidator<CacheCreateReservationCommand>), typeof(CacheCreateReservationCommandValidator));
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
+            services.AddScoped(typeof(IValidator<GetCachedReservationResult>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
