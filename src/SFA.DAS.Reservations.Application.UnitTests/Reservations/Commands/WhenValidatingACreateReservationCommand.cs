@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
@@ -14,7 +13,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
             CreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
                 AccountId = 0,
@@ -27,8 +26,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(CreateReservationCommand.AccountId))
-                .WhichValue.Should().Be($"{nameof(CreateReservationCommand.AccountId)} has not been supplied");
+                .Should().ContainKey(nameof(ICreateReservationCommand.AccountId))
+                .WhichValue.Should().Be($"{nameof(ICreateReservationCommand.AccountId)} has not been supplied");
         }
 
         [TestCase("19-a")]
@@ -41,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task And_StartDate_Is_Not_In_The_Correct_Format_Then_Invalid(string startDate)
         {
             var validator = new CreateReservationCommandValidator();
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 Id = Guid.NewGuid(),
                 AccountId = 1,
@@ -62,7 +61,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task And_All_Fields_Invalid_Then_Returns_All_Errors(
             CreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 AccountId = 0,
                 StartDate = "",
@@ -83,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task And_All_Fields_Valid_Then_Valid(
             CreateReservationCommandValidator validator)
         {
-            var command = new CreateReservationCommand
+            var command = new CacheCreateReservationCommand
             {
                 AccountId = 1,
                 StartDate = "2019-07",

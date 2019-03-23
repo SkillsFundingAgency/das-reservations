@@ -62,7 +62,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("provider-create-reservation");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("provider-create-reservation");
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("provider-apprenticeship-training");
         }
 
         [Test, MoqAutoData]
@@ -74,7 +75,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.Ukprn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("employer-create-reservation");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("employer-create-reservation");
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("employer-apprenticeship-training");
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.

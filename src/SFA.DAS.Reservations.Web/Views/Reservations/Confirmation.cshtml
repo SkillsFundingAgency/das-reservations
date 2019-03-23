@@ -2,92 +2,71 @@
 @{
     ViewData["Title"] = "Reservations";
 }
-<div class="govuk-panel govuk-panel--confirmation">
-    <h1 class="govuk-panel__title">
-        Apprenticeship funds reserved
-    </h1>
-    
-    
-</div>
-<div class="govuk-summary-list">
-  
-    <dl class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Employer
-        </dt>
-        <dd class="govuk-summary-list__value">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">
+                Apprenticeship funds reserved
+            </h1>
+        </div>
+        <div class="govuk-summary-list">
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Employer
+                </dt>
+                <dd class="govuk-summary-list__value">
             @Model.AccountLegalEntityName
-        </dd>
-      
-        <dd class="govuk-summary-list__actions">
-          
-        </dd>
-      
-    </dl>
-  
-    <dl class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Apprenticeship start date
-        </dt>
-        <dd class="govuk-summary-list__value">
-            @Model.StartDate.ToString("MMMM yyyy") to @Model.ExpiryDate.ToString("MMMM yyyy")
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          
-        </dd>
+                </dd>
+            </dl>
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship start date
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.StartDate.ToString("MMMM yyyy") to @Model.ExpiryDate.ToString("MMMM yyyy")
+                </dd>
+            </dl>
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship training
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.Course.CourseDescription
+                </dd>
+            </dl>
+        </div>
 
-    </dl>
-  
-    <dl class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">
-            Apprenticeship training
-        </dt>
-        <dd class="govuk-summary-list__value">
-            
-            @Model.Course.CourseDescription
+        <h2 class="govuk-heading-l">
+            Making changes
+        </h2>
 
-        </dd>
-        <dd class="govuk-summary-list__actions">
-          
-        </dd>
+        <p>
+            You can change the apprenticeship training course when you add an apprentice.
+        </p>
 
-    </dl>
-  
+        <p>
+            You cannot change:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>
+                the employer
+            </li>
+            <li>
+                the apprenticeship start date, outside of the 3 month window you selected
+            </li>
+        </ul>
+        <p>
+            To select a different employer or apprenticeship start date, you will need to start again and secure new funding.
+        </p>
+        <h2 class="govuk-heading-l">
+            What you need to do now
+        </h2>
+        <p>
+            If the employer has not found an apprentice yet, use our <a href="#" onclick="alert('Link to recruit apprentice start page')" class="govuk-link">recruitment service</a> to find an apprentice.
+        </p>
+        <p>
+            If you know who the apprentice will be, you can add an apprentice to this funding now.
+        </p>
+    </div>
 </div>
-<h2 class="govuk-heading-l">
-    Making changes 
-</h2>
-
-<p>
-    You can change the apprenticeship training course when you add an apprentice. 
-</p>
-
-<p>
-    You cannot change: 
-</p>
-
-<ul class="govuk-list govuk-list--bullet">
-    <li>
-        the employer
-    </li>
-    <li>
-        the apprenticeship start date, outside of the 3 month window you selected
-    </li>
-</ul>
-
-<p>
-    To select a different employer or apprenticeship start date, you will need to start again and secure new funding. 
-</p>
-
-<h2 class="govuk-heading-l">
-    What you need to do now
-</h2>
-
-<p>
-    If the employer has not found an apprentice yet, use our <a href="#" onclick="alert('Link to recruit apprentice start page')">recruitment service</a> to find an apprentice.
-</p>
-
-<p>
-    If you know who the apprentice will be, you can add an apprentice to this funding now.
-</p>
-

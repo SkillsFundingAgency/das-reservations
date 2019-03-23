@@ -119,13 +119,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("Error");//todo: setup view correctly.
             }
             
-            var routeName = routeModel.Ukprn == null ? 
+            var confirmRouteName = routeModel.Ukprn == null ? 
                 "employer-create-reservation" : 
                 "provider-create-reservation";
+            var changeRouteName = routeModel.Ukprn == null ? 
+                "employer-apprenticeship-training" : 
+                "provider-apprenticeship-training";
 
             var viewModel = new ReviewViewModel
             {
-                RouteName = routeName,
+                ConfirmRouteName = confirmRouteName,
+                ChangeRouteName = changeRouteName,
                 RouteModel = routeModel,
                 StartDateDescription = cachedReservation.StartDateDescription,
                 CourseDescription = cachedReservation.CourseDescription,
@@ -140,41 +144,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
         {
-            GetCachedReservationResult cachedReservationResult;
-
-            try
-            {
-                var query = new GetCachedReservationQuery
-                {
-                    Id = routeModel.Id.GetValueOrDefault()
-                };
-
-                cachedReservationResult = await _mediator.Send(query);
-            }
-            catch (ValidationException e)
-            {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
-
-                return View("Error");//todo: setup view correctly.
-            }
-
             try
             {
                 var command = new CreateReservationCommand
                 {
-                    AccountId = cachedReservationResult.AccountId,
-                    StartDate = cachedReservationResult.StartDate,
-                    Id = cachedReservationResult.Id,
-                    CourseId = cachedReservationResult.CourseId,
-                    AccountLegalEntityName = cachedReservationResult.AccountLegalEntityName
+                    Id = routeModel.Id.GetValueOrDefault()
                 };
 
                 await _mediator.Send(command);
-
-                await _mediator.Send(new DeleteCachedReservationCommand {Id = cachedReservationResult.Id});
             }
             catch (ValidationException e)
             {
@@ -183,7 +160,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn, routeModel.Id.GetValueOrDefault());
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                return View("ApprenticeshipTraining", model);
+            }
+            catch (Exception)
+            {
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
 
@@ -228,13 +210,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = reservationId,
                 RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
-                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel
-                {
-                    Id = $"{startDateModel.StartDate:yyyy-MM}",
-                    Value = JsonConvert.SerializeObject(startDateModel),
-                    Label = $"{startDateModel.StartDate:MMMM yyyy}"
-                }).OrderBy(model => model.Value),
-                Courses = coursesResult.Courses
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
+                Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
+                CourseId = courseId,
+                TrainingStartDate = startDate
             };
         }
     }
