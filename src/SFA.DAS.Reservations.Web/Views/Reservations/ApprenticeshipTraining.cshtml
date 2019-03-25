@@ -72,7 +72,7 @@
                         @foreach (var possibleStartDate in Model.PossibleStartDates)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Id" name="trainingStartDate" type="radio" value="@possibleStartDate.Value">
+                                <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Id" name="trainingStartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked" >
                                 <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Id">
                                     @possibleStartDate.Label
                                 </label>

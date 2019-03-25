@@ -16,7 +16,7 @@
                     Employer
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    @Model.EmployerDescription
+                    @Model.AccountLegalEntityName
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link" href="">
@@ -32,7 +32,8 @@
                     @Model.StartDateDescription
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="">
+                    <a class="govuk-link" asp-route="@Model.ChangeRouteName">
+                        Change
                     </a>
                 </dd>
             </dl>
@@ -56,13 +57,14 @@
                     </details>
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a class="govuk-link" href="">
+                    <a class="govuk-link" asp-route="@Model.ChangeRouteName">
+                        Change
                     </a>
                 </dd>
             </dl>
         </div>
 
-        <form method="post" asp-route="@Model.RouteName">
+        <form method="post" asp-route="@Model.ConfirmRouteName">
             <button type="submit" draggable="false" class="govuk-button">
                 Confirm
             </button>

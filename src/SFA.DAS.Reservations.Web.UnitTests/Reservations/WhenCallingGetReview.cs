@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -51,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.RouteModel.Should().BeEquivalentTo(routeModel);
             viewModel.StartDateDescription.Should().Be(cachedReservationResult.StartDateDescription);
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
-            viewModel.EmployerDescription.Should().Be(cachedReservationResult.EmployerDescription);
+            viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
         }
 
         [Test, MoqAutoData]
@@ -62,7 +63,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("provider-create-reservation");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("provider-create-reservation");
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("provider-apprenticeship-training");
         }
 
         [Test, MoqAutoData]
@@ -74,7 +76,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.Ukprn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).RouteName.Should().Be("employer-create-reservation");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("employer-create-reservation");
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("employer-apprenticeship-training");
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.

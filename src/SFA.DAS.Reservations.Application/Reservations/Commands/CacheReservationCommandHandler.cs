@@ -11,10 +11,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CacheReservationCommandHandler : IRequestHandler<CacheCreateReservationCommand, CacheReservationResult>
     {
-        private readonly IValidator<ICreateReservationCommand> _validator;
+        private readonly IValidator<CacheCreateReservationCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
 
-        public CacheReservationCommandHandler(IValidator<ICreateReservationCommand> validator, ICacheStorageService cacheStorageService)
+        public CacheReservationCommandHandler(IValidator<CacheCreateReservationCommand> validator, ICacheStorageService cacheStorageService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
@@ -23,6 +23,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         public async Task<CacheReservationResult> Handle(CacheCreateReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
+
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(
