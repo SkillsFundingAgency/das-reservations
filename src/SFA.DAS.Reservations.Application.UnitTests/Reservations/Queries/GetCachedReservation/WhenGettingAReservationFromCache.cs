@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
@@ -14,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
 {
     public class WhenGettingAReservationFromCache
     {
-        private const string ExpectedAccountId = "44321";
+        private const long ExpectedAccountId = 44321;
 
         private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<ICacheStorageService> _cacheService;

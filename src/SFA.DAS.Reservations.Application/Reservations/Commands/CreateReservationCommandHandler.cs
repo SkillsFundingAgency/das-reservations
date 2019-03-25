@@ -4,8 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Services;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -18,32 +17,30 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
-        private readonly IValidator<IReservationQuery> _reservationQueryValidator;
-        private readonly IValidator<ICreateReservationCommand> _createReservationValidator;
+        private readonly IValidator<CreateReservationCommand> _createReservationValidator;
+        private readonly IValidator<GetCachedReservationResult> _cachedReservationValidator;
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
-        private readonly IHashingService _hashingService;
         private readonly ICacheStorageService _cacheStorageService;
 
         public CreateReservationCommandHandler(
-            IValidator<IReservationQuery> reservationQueryValidator,
-            IValidator<ICreateReservationCommand> createReservationValidator, 
+            IValidator<CreateReservationCommand> createReservationValidator,
+            IValidator<GetCachedReservationResult> cachedReservationValidator, 
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
-            IHashingService hashingService,
             ICacheStorageService cacheStorageService)
         {
-            _reservationQueryValidator = reservationQueryValidator;
             _createReservationValidator = createReservationValidator;
+            _cachedReservationValidator = cachedReservationValidator;
             _apiOptions = apiOptions;
             _apiClient = apiClient;
-            _hashingService = hashingService;
             _cacheStorageService = cacheStorageService;
         }
 
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
         {
-            var queryValidationResult = await _reservationQueryValidator.ValidateAsync(command);
+            var queryValidationResult = await _createReservationValidator.ValidateAsync(command);
+
             if (!queryValidationResult.IsValid())
             {
                 throw new ValidationException(
@@ -56,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 throw new Exception("No reservation was found with that Id");
             }
 
-            var createValidationResult = await _createReservationValidator.ValidateAsync(reservation);
+            var createValidationResult = await _cachedReservationValidator.ValidateAsync(reservation);
             if (!createValidationResult.IsValid())
             {
                 throw new ValidationException(
@@ -69,10 +66,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
-                _hashingService.DecodeValue, 
                 reservation.AccountId, 
                 new DateTime(startYear, startMonth, 1),
                 reservation.Id,
+                reservation.AccountLegalEntityName,
                 reservation.CourseId);
 
             var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);

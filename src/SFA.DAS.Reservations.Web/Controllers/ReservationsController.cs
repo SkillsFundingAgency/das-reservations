@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -29,8 +30,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _startDateService = startDateService;
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "provider-apprenticeship-training")]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "employer-apprenticeship-training")]
+        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = "provider-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-apprenticeship-training")]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult cachedReservation = null;
@@ -46,8 +47,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "provider-create-apprenticeship-training")]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training/{id?}", Name = "employer-create-apprenticeship-training")]
+        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = "provider-create-apprenticeship-training")]
+        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = "employer-create-apprenticeship-training")]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
@@ -62,9 +63,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (!string.IsNullOrWhiteSpace(formModel.CourseId))
                     course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
 
+                var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+
+                if (existingCommand == null)
+                {
+                    throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
+                }
+
                 var command = new CacheCreateReservationCommand
                 {
-                    AccountId = routeModel.EmployerAccountId,
+                    AccountId = existingCommand.AccountId,
+                    AccountLegalEntityId = existingCommand.AccountLegalEntityId,
+                    AccountLegalEntityName = existingCommand.AccountLegalEntityName,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
                     CourseId = course?.Id,
@@ -92,7 +102,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/review", Name = "provider-review")]
+        [Route("{ukPrn}/reservations/{id}/review", Name = "provider-review")]
         [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = "employer-review")]
         public async Task<IActionResult> Review(ReservationsRouteModel routeModel)
         {
@@ -131,12 +141,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RouteModel = routeModel,
                 StartDateDescription = cachedReservation.StartDateDescription,
                 CourseDescription = cachedReservation.CourseDescription,
-                EmployerDescription = cachedReservation.EmployerDescription
+                AccountLegalEntityName = cachedReservation.AccountLegalEntityName
             };
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-create-reservation")]
+        [Route("{ukPrn}/reservations/{id}/create", Name = "provider-create-reservation")]
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-create-reservation")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -161,7 +171,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
                 return View("ApprenticeshipTraining", model);
@@ -172,10 +182,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
 
-        [Route("{ukPrn}/accounts/{employerAccountId}/reservations/{id}/create", Name = "provider-reservation-created")]
+        [Route("{ukPrn}/reservations/{id}/create", Name = "provider-reservation-created")]
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = "employer-reservation-created")]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
+            if (!routeModel.Id.HasValue)
+            {
+                throw new ArgumentException("Reservation ID must be in URL.", nameof(routeModel.Id));
+            }
+
             var query = new GetReservationQuery
             {
                 Id = routeModel.Id.Value 
@@ -187,12 +202,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 ReservationId = queryResult.ReservationId,
                 StartDate = queryResult.StartDate,
                 ExpiryDate = queryResult.ExpiryDate,
-                Course = queryResult.Course
+                Course = queryResult.Course,
+                AccountLegalEntityName = queryResult.AccountLegalEntityName
             };
             return View(model);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn, string courseId = null, string startDate = null)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn,
+            string courseId = null, string startDate = null)
         {
             var dates = await _startDateService.GetStartDates();
 
@@ -200,12 +217,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return new ApprenticeshipTrainingViewModel
             {
-                RouteName = ukPrn == null ? "employer-create-apprenticeship-training" : "provider-create-apprenticeship-training",
-                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
+                RouteName = ukPrn == null
+                    ? "employer-create-apprenticeship-training"
+                    : "provider-create-apprenticeship-training",
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate))
+                    .OrderBy(model => model.Value),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 TrainingStartDate = startDate
             };
         }
+
     }
 }

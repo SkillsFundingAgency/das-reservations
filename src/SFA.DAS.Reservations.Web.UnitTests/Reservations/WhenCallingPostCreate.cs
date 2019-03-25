@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -37,6 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             CreateReservationResult createReservationResult)
         {
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(createReservationResult);

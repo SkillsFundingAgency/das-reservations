@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -46,6 +47,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.StartDate.Should().Be(mediatorResult.StartDate);
             model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
             model.Course.Should().BeEquivalentTo(mediatorResult.Course);
+            model.AccountLegalEntityName.Should().BeEquivalentTo(mediatorResult.AccountLegalEntityName);
+           
+        }
+
+        [Test, MoqAutoData]
+        public void Then_If_No_ReservationId_Given_An_Error_Is_Throw(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.Id = null;
+
+            Assert.ThrowsAsync<ArgumentException>(() => controller.Confirmation(routeModel));
         }
     }
 }

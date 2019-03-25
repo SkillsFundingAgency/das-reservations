@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
     [TestFixture]
     public class WhenCachingANewReservation
     {
-        private Mock<IValidator<ICreateReservationCommand>> _mockValidator;
+        private Mock<IValidator<CacheCreateReservationCommand>> _mockValidator;
         private Mock<ICacheStorageService> _mockCacheStorageService;
         private CacheReservationCommandHandler _commandHandler;
 
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
-            _mockValidator = fixture.Freeze<Mock<IValidator<ICreateReservationCommand>>>();
+            _mockValidator = fixture.Freeze<Mock<IValidator<CacheCreateReservationCommand>>>();
             _mockValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CacheCreateReservationCommand>()))
                 .ReturnsAsync(new ValidationResult());
