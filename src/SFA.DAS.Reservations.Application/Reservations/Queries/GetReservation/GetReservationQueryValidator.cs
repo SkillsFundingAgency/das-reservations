@@ -6,13 +6,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 {
     public class GetReservationQueryValidator : IValidator<IReservationQuery>
     {
-        public  Task<ValidationResult> ValidateAsync(IReservationQuery item)
+        public  Task<ValidationResult> ValidateAsync(IReservationQuery query)
         {
             var result = new ValidationResult();
 
-            if (item.Id == Guid.Empty)
+            if (query.Id == Guid.Empty)
             {
-                result.AddError(nameof(item.Id));
+                result.AddError(nameof(query.Id));
             }
 
             return Task.FromResult(result);

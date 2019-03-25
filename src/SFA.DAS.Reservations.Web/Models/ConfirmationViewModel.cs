@@ -38,8 +38,9 @@ namespace SFA.DAS.Reservations.Web.Models
         public Course Course { get; }
         public uint? ProviderId { get; }
         public string DashboardUrl { get;}
-        public string ApprenticeUrl { get; }
+		public string ApprenticeUrl { get; }
         public bool ShowDashboardUrl => !string.IsNullOrEmpty(DashboardUrl);
         public bool ShowApprenticeUrl => !string.IsNullOrEmpty(ApprenticeUrl);
+		public string AccountLegalEntityName { get; }
     }
 }

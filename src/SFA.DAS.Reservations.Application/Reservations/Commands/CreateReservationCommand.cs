@@ -4,7 +4,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CreateReservationCommand : IReservationQuery, IRequest<CreateReservationResult>
+    public class CreateReservationCommand : IRequest<CreateReservationResult>
     {
         public Guid Id { get; set; }
     }
