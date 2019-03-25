@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 
@@ -17,9 +18,15 @@ namespace SFA.DAS.Reservations.Web.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!_featureToggleOn)
+            if (_featureToggleOn) return;
+
+            var controllerName = context.RouteData.Values["controller"] as string ?? string.Empty;
+            var actionName = context.RouteData.Values["action"] as string ?? string.Empty;
+
+            if (!controllerName.Equals("Home", StringComparison.OrdinalIgnoreCase) ||
+                !actionName.Equals("ServiceNotAvailable", StringComparison.OrdinalIgnoreCase))
             {
-                context.Result = new RedirectToActionResult("ServiceNotAvailable", "Home", new {});
+                context.Result = new RedirectToActionResult("ServiceNotAvailable", "Home", new { });
             }
         }
 
