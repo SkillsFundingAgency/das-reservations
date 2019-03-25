@@ -48,7 +48,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                     result.AddError(nameof(command.StartDate));
                 }
             }
-            
 
             return Task.FromResult(result);
         }
