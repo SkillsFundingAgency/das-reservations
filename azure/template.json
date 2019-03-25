@@ -48,6 +48,9 @@
     },
     "certificateResourceGroup": {
       "type": "string"
+    },
+    "featureToggleOn": {
+      "type": "string"
     }
   },
   "variables": {
@@ -132,6 +135,10 @@
               {
                 "name": "WEBSITE_LOAD_CERTIFICATES",
                 "value": "[parameters('certificateThumbprintsToLoad')]"
+              },
+              {
+                "name": "FeatureToggleOn",
+                "value": "[parameters('featureToggleOn')]"
               }
             ]
           },
@@ -217,7 +224,7 @@
               },
               {
                 "name": "FeatureToggleOn",
-                "value": "False"
+                "value": "[parameters('featureToggleOn')]"
               }
             ]
           },
