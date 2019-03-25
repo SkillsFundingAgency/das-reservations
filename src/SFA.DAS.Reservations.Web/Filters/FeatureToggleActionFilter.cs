@@ -24,9 +24,9 @@ namespace SFA.DAS.Reservations.Web.Filters
             var actionName = context.RouteData.Values["action"] as string ?? string.Empty;
 
             if (!controllerName.Equals("Home", StringComparison.OrdinalIgnoreCase) ||
-                !actionName.Equals("ServiceNotAvailable", StringComparison.OrdinalIgnoreCase))
+                !actionName.Equals("FeatureNotAvailable", StringComparison.OrdinalIgnoreCase))
             {
-                context.Result = new RedirectToActionResult("ServiceNotAvailable", "Home", new { });
+                context.Result = new RedirectToActionResult("FeatureNotAvailable", "Home", new { });
             }
         }
 

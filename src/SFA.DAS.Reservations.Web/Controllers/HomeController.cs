@@ -29,8 +29,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 WsFederationDefaults.AuthenticationScheme);
         }
 
-        [Route("notAvailable", Name="ServiceNotAvailable")]
-        public IActionResult ServiceNotAvailable()
+        [Route("notAvailable", Name="FeatureNotAvailable")]
+        public IActionResult FeatureNotAvailable()
         {
             return View();
         }

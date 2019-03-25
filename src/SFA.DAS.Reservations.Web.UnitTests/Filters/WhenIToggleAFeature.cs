@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             //Assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual("Home", redirect.ControllerName);
-            Assert.AreEqual("ServiceNotAvailable", redirect.ActionName);
+            Assert.AreEqual("FeatureNotAvailable", redirect.ActionName);
 
         }
 
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             //Assign
             var routeData = new RouteData();
             routeData.Values.Add("controller", "home");
-            routeData.Values.Add("action", "servicenotavailable");
+            routeData.Values.Add("action", "featurenotavailable");
             
             
             var actionContext = new ActionContext(httpContext, routeData, actionDescriptor);
