@@ -1,241 +1,304 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "resourceEnvironmentName": {
-      "type": "string"
-    },
-    "serviceName": {
-      "type": "string"
-    },
-    "environmentName": {
-      "type": "string"
-    },
-    "sharedAppServicePlanName": {
-      "type": "string"
-    },
-    "sharedResourceGroup": {
-      "type": "string"
-    },
-    "configurationStorageConnectionString": {
-      "type": "securestring"
-    },
-    "configNames": {
-      "type": "string",
-      "defaultValue": "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2"
-    },
-    "version": {
-      "type": "string",
-      "defaultValue": "1.0"
-    },
-    "certificateThumbprintsToLoad": {
-      "type": "string"
-    },
-    "cdnUrl": {
-      "type": "string"
-    },
-    "employerCustomHostname": {
-      "type": "string"
-    },
-    "providerCustomHostname": {
-      "type": "string"
-    },
-    "employerCertificateName": {
-      "type": "string"
-    },
-    "providerCertificateName": {
-      "type": "string"
-    },
-    "certificateResourceGroup": {
-      "type": "string"
-    }
-  },
-  "variables": {
-    "deploymentUrlBase":
-      "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "resourceNamePrefix":
-      "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-    "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
-    "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]"
-  },
-  "resources": [
-    {
-      "apiVersion": "2017-05-10",
-      "name": "employer-application-insights",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-          "contentVersion": "1.0.0.0"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceEnvironmentName": {
+            "type": "string"
         },
-        "parameters": {
-          "appInsightsName": {
+        "serviceName": {
+            "type": "string"
+        },
+        "environmentName": {
+            "type": "string"
+        },
+        "configurationStorageConnectionString": {
+            "type": "securestring"
+        },
+        "configNames": {
+            "type": "string",
+            "defaultValue": "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2"
+        },
+        "version": {
+            "type": "string",
+            "defaultValue": "1.0"
+        },
+        "certificateThumbprintsToLoad": {
+            "type": "string"
+        },
+        "cdnUrl": {
+            "type": "string"
+        },
+        "employerCustomHostname": {
+            "type": "string"
+        },
+        "providerCustomHostname": {
+            "type": "string"
+        },
+        "employerCertificateName": {
+            "type": "string"
+        },
+        "providerCertificateName": {
+            "type": "string"
+        },
+        "keyVaultName": {
+            "type": "string"
+        },
+        "keyVaultResourceGroup": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
+        "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]",
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-asp')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "1"
+                    },
+                    "aspInstances": {
+                        "value": 2
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "employer-app-service-certificate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-certificate.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('employerCertificateName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[parameters('keyVaultResourceGroup')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "provider-app-service-certificate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-certificate.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('providerCertificateName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[parameters('keyVaultResourceGroup')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "employer-application-insights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('employerAppServiceName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('employerAppServiceName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "employer-app-service",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[variables('employerAppServiceName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "appServiceAppSettings": {
+                        "value": [
+                            {
+                                "name": "Environment",
+                                "value": "[parameters('environmentName')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "[parameters('version')]"
+                            },
+                            {
+                                "name": "Cdn:Url",
+                                "value": "[parameters('cdnUrl')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('employer-application-insights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "AuthType",
+                                "value": "employer"
+                            },
+                            {
+                                "name": "WEBSITE_LOAD_CERTIFICATES",
+                                "value": "[parameters('certificateThumbprintsToLoad')]"
+                            }
+                        ]
+                    },
+                    "customHostName": {
+                        "value": "[parameters('employerCustomHostname')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[reference('employer-app-service-certificate').outputs.certificateThumbprint.value]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "provider-application-insights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('providerAppServiceName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('providerAppServiceName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "provider-app-service",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[variables('providerAppServiceName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "appServiceAppSettings": {
+                        "value": [
+                            {
+                                "name": "Environment",
+                                "value": "[parameters('environmentName')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "[parameters('version')]"
+                            },
+                            {
+                                "name": "Cdn:Url",
+                                "value": "[parameters('cdnUrl')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "AuthType",
+                                "value": "provider"
+                            }
+                        ]
+                    },
+                    "customHostName": {
+                        "value": "[parameters('providerCustomHostname')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[reference('provider-app-service-certificate').outputs.certificateThumbprint.value]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "employerAppServiceName": {
+            "type": "string",
             "value": "[variables('employerAppServiceName')]"
-          },
-          "attachedService": {
-            "value": "[variables('employerAppServiceName')]"
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2017-05-10",
-      "name": "employer-app-service",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
-          "contentVersion": "1.0.0.0"
         },
-        "parameters": {
-          "appServiceName": {
-            "value": "[variables('employerAppServiceName')]"
-          },
-          "appServicePlanName": {
-            "value": "[parameters('sharedAppServicePlanName')]"
-          },
-          "appServicePlanResourceGroup": {
-            "value": "[parameters('sharedResourceGroup')]"
-          },
-          "appServiceAppSettings": {
-            "value": [
-              {
-                "name": "Environment",
-                "value": "[parameters('environmentName')]"
-              },
-              {
-                "name": "ConfigurationStorageConnectionString",
-                "value": "[parameters('configurationStorageConnectionString')]"
-              },
-              {
-                "name": "ConfigNames",
-                "value": "[parameters('configNames')]"
-              },
-              {
-                "name": "Version",
-                "value": "[parameters('version')]"
-              },
-              {
-                "name": "Cdn:Url",
-                "value": "[parameters('cdnUrl')]"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference('employer-application-insights').outputs.InstrumentationKey.value]"
-              },
-              {
-                "name": "AuthType",
-                "value": "employer"
-              },
-              {
-                "name": "WEBSITE_LOAD_CERTIFICATES",
-                "value": "[parameters('certificateThumbprintsToLoad')]"
-              }
-            ]
-          },
-          "customHostName": {
-            "value": "[parameters('employerCustomHostname')]"
-          },
-          "certificateThumbprint": {
-            "value":
-              "[reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('employerCertificateName')), '2016-03-01').Thumbprint]"
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2017-05-10",
-      "name": "provider-application-insights",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "appInsightsName": {
+        "providerAppServiceName": {
+            "type": "string",
             "value": "[variables('providerAppServiceName')]"
-          },
-          "attachedService": {
-            "value": "[variables('providerAppServiceName')]"
-          }
         }
-      }
-    },
-    {
-      "apiVersion": "2017-05-10",
-      "name": "provider-app-service",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "appServiceName": {
-            "value": "[variables('providerAppServiceName')]"
-          },
-          "appServicePlanName": {
-            "value": "[parameters('sharedAppServicePlanName')]"
-          },
-          "appServicePlanResourceGroup": {
-            "value": "[parameters('sharedResourceGroup')]"
-          },
-          "appServiceAppSettings": {
-            "value": [
-              {
-                "name": "Environment",
-                "value": "[parameters('environmentName')]"
-              },
-              {
-                "name": "ConfigurationStorageConnectionString",
-                "value": "[parameters('configurationStorageConnectionString')]"
-              },
-              {
-                "name": "ConfigNames",
-                "value": "[parameters('configNames')]"
-              },
-              {
-                "name": "Version",
-                "value": "[parameters('version')]"
-              },
-              {
-                "name": "Cdn:Url",
-                "value": "[parameters('cdnUrl')]"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
-              },
-              {
-                "name": "AuthType",
-                "value": "provider"
-              }
-            ]
-          },
-          "customHostName": {
-            "value": "[parameters('providerCustomHostname')]"
-          },
-          "certificateThumbprint": {
-            "value":
-              "[reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('providerCertificateName')), '2016-03-01').Thumbprint]"
-          }
-        }
-      }
     }
-  ],
-  "outputs": {
-    "employerAppServiceName": {
-      "type": "string",
-      "value": "[variables('employerAppServiceName')]"
-    },
-    "providerAppServiceName": {
-      "type": "string",
-      "value": "[variables('providerAppServiceName')]"
-    }
-  }
 }
