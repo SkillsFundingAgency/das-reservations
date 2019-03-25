@@ -13,6 +13,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         private readonly DateTime _expectedExpiryDate = new DateTime(2018, 12, 20);
         private readonly Course _expectedCourse = new Course("1", "Title", 0);
         private const uint ExpectedProviderId = 4354351;
+        private const string ExpectedHashedLegalEntityAccountId = "TGF45";
 
         [Test]
         public void Then_The_Model_Is_Constructed()
@@ -23,6 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 _expectedStartDate,
                 _expectedExpiryDate,
                 _expectedCourse,
+                ExpectedHashedLegalEntityAccountId,
                 ExpectedProviderId);
 
             //Assert
@@ -48,7 +50,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 _expectedStartDate,
                 _expectedExpiryDate,
                 _expectedCourse,
+                ExpectedHashedLegalEntityAccountId,
                 ExpectedProviderId,
+                "",
                 expectedDashboardUrl);
 
             //Act
@@ -66,11 +70,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 _expectedStartDate,
                 _expectedExpiryDate,
                 _expectedCourse,
+                ExpectedHashedLegalEntityAccountId,
                 ExpectedProviderId,
+                "",
                 "","https://apprentice");
 
             //Act
-            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId=YZWX27&courseCode={_expectedCourse.Id}&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}", actual.ApprenticeUrl);
+            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}&courseCode={_expectedCourse.Id}", actual.ApprenticeUrl);
             Assert.IsTrue(actual.ShowApprenticeUrl);
         }
 
@@ -82,11 +88,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 _expectedStartDate,
                 _expectedExpiryDate,
                 null,
+                ExpectedHashedLegalEntityAccountId,
                 ExpectedProviderId,
+                "",
                 "", "https://apprentice");
 
             //Act
-            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId=YZWX27&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}", actual.ApprenticeUrl);
+            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}", actual.ApprenticeUrl);
             Assert.IsTrue(actual.ShowApprenticeUrl);
         }
     }

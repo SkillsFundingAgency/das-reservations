@@ -7,27 +7,25 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmationViewModel
     {
-        public ConfirmationViewModel(Guid reservationId,
-            DateTime startDate, DateTime expiryDate, Course course, uint? providerId = null, string dashboardUrl = "", string apprenticeUrl = "")
+        public ConfirmationViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string hashedAccountLegalEntityId, uint? providerId = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
         {
             ReservationId = reservationId;
             StartDate = startDate;
             ExpiryDate = expiryDate;
             Course = course;
+            HashedAccountLegalEntityId = hashedAccountLegalEntityId;
             ProviderId = providerId;
+            AccountLegalEntityName = accountLegalEntityName;
+
             if (!string.IsNullOrEmpty(apprenticeUrl))
             {
+                apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={hashedAccountLegalEntityId}&startMonthYear={StartDate.Month}{StartDate.Year}";
                 if (course != null)
                 {
-                    apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId=YZWX27&courseCode={course.Id}&startMonthYear={StartDate.Month}{StartDate.Year}";
-                }
-                else
-                {
-                    apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId=YZWX27&startMonthYear={StartDate.Month}{StartDate.Year}";
+                    apprenticeUrl += $"&courseCode={course.Id}";
                 }
             }
             
-
             DashboardUrl = dashboardUrl;
             ApprenticeUrl = apprenticeUrl;
         }
@@ -36,6 +34,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public DateTime StartDate { get; }
         public DateTime ExpiryDate { get; }
         public Course Course { get; }
+        public string HashedAccountLegalEntityId { get; }
         public uint? ProviderId { get; }
         public string DashboardUrl { get;}
 		public string ApprenticeUrl { get; }
