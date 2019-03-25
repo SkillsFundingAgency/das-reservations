@@ -126,7 +126,10 @@
                         "value": "[parameters('keyVaultResourceGroup')]"
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "employer-app-service-certificate"
+            ]
         },
         {
             "apiVersion": "2017-05-10",
