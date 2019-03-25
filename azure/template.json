@@ -11,6 +11,10 @@
         "environmentName": {
             "type": "string"
         },
+        "appServiceAllowedIPs": {
+            "type": "array",
+            "defaultValue": []
+        },
         "configurationStorageConnectionString": {
             "type": "securestring"
         },
@@ -205,6 +209,9 @@
                     },
                     "certificateThumbprint": {
                         "value": "[reference('employer-app-service-certificate').outputs.certificateThumbprint.value]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
             }
@@ -286,6 +293,9 @@
                     },
                     "certificateThumbprint": {
                         "value": "[reference('provider-app-service-certificate').outputs.certificateThumbprint.value]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
             }
