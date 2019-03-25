@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found
             }
             
-            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn, cachedReservation?.CourseId, cachedReservation?.StartDate);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn, cachedReservation?.CourseId, cachedReservation?.StartDate);
 
             return View(viewModel);
         }
@@ -80,12 +80,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
             }
 
             routeModel.Id = result.Id;
-            var routeName = routeModel.Ukprn == null ? 
+            var routeName = routeModel.UkPrn == null ? 
                 RouteNames.EmployerReview :
                 RouteNames.ProviderReview;
 
@@ -117,11 +117,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("Error");//todo: setup view correctly.
             }
             
-            var confirmRouteName = routeModel.Ukprn == null ? 
+            var confirmRouteName = routeModel.UkPrn == null ? 
                 RouteNames.EmployerCreateReservation : 
                 RouteNames.ProviderCreateReservation;
 
-            var changeRouteName = routeModel.Ukprn == null ? 
+            var changeRouteName = routeModel.UkPrn == null ? 
                 RouteNames.EmployerApprenticeshipTraining : 
                 RouteNames.ProviderApprenticeshipTraining;
 
@@ -159,16 +159,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
             }
             catch (Exception)
             {
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.Ukprn);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
             }
 
-            return RedirectToRoute(routeModel.Ukprn.HasValue ? RouteNames.ProviderReservationCreated : RouteNames.EmployerReservationCreated, routeModel);
+            return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderReservationCreated : RouteNames.EmployerReservationCreated, routeModel);
         }
 
         // GET
@@ -188,7 +188,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 queryResult.ReservationId,
                 queryResult.StartDate,
                 queryResult.ExpiryDate,
-                queryResult.Course
+                queryResult.Course,
+                routeModel.UkPrn
             );
             return View(model);
         }

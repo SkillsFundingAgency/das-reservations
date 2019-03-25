@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.CourseId = JsonConvert.SerializeObject(course);
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
 
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             

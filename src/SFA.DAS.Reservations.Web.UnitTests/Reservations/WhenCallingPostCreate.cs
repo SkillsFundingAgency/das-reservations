@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel, 
             CreateReservationResult createReservationResult)
         {
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))

@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
         {
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
             ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerCreateReservation);
