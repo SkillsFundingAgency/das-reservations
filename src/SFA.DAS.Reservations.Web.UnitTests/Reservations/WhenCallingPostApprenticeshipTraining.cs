@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
 
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             
@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
             routeModel.Ukprn = null;
 
             var result = await controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => null);
 
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
 
             Assert.ThrowsAsync<ArgumentException>(() => controller.PostApprenticeshipTraining(routeModel, formModel));
         }
@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => cacheResult);
 
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
 
             await controller.PostApprenticeshipTraining(routeModel, formModel);
 
@@ -129,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => cacheResult);
 
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
 
             await controller.PostApprenticeshipTraining(routeModel, formModel);
 
@@ -165,7 +165,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => cacheResult);
 
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = null;
+            formModel.SelectedCourse = null;
 
             await controller.PostApprenticeshipTraining(routeModel, formModel);
 
@@ -190,7 +190,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cacheReservationResult);
@@ -217,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => cacheResult);
 
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.CourseId = JsonConvert.SerializeObject(course);
+            formModel.SelectedCourse = JsonConvert.SerializeObject(course);
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
