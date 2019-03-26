@@ -13,7 +13,12 @@ namespace SFA.DAS.Reservations.Web.Filters
         {
             var featureConfig = configuration["FeatureToggleOn"];
 
-            _featureToggleOn = bool.Parse(featureConfig);
+            if (!bool.TryParse(featureConfig, out var isFeatureEnabled))
+            {
+                isFeatureEnabled = true;
+            }
+
+            _featureToggleOn = isFeatureEnabled;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
