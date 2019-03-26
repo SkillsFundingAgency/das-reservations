@@ -107,6 +107,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == course.Id &&
+                    command.AccountLegalEntityPublicHashedId == cacheResult.AccountLegalEntityPublicHashedId &&
                     command.CourseDescription == $"{course.Title} - Level: {course.Level}"
                     ), It.IsAny<CancellationToken>()));
         }

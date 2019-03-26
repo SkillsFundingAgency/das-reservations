@@ -7,19 +7,19 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmationViewModel
     {
-        public ConfirmationViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string hashedAccountLegalEntityId, uint? providerId = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
+        public ConfirmationViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string accountLegalEntityPublicHashedId, uint? providerId = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
         {
             ReservationId = reservationId;
             StartDate = startDate;
             ExpiryDate = expiryDate;
             Course = course;
-            HashedAccountLegalEntityId = hashedAccountLegalEntityId;
+            AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
             ProviderId = providerId;
             AccountLegalEntityName = accountLegalEntityName;
 
             if (!string.IsNullOrEmpty(apprenticeUrl))
             {
-                apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={hashedAccountLegalEntityId}&startMonthYear={StartDate.Month}{StartDate.Year}";
+                apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={StartDate.Month}{StartDate.Year}";
                 if (course != null)
                 {
                     apprenticeUrl += $"&courseCode={course.Id}";
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public DateTime StartDate { get; }
         public DateTime ExpiryDate { get; }
         public Course Course { get; }
-        public string HashedAccountLegalEntityId { get; }
+        public string AccountLegalEntityPublicHashedId { get; }
         public uint? ProviderId { get; }
         public string DashboardUrl { get;}
 		public string ApprenticeUrl { get; }

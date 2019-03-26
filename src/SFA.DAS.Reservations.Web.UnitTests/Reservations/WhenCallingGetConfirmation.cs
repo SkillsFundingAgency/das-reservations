@@ -48,6 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
             model.Course.Should().BeEquivalentTo(mediatorResult.Course);
             model.AccountLegalEntityName.Should().BeEquivalentTo(mediatorResult.AccountLegalEntityName);
+            model.AccountLegalEntityPublicHashedId.Should().BeEquivalentTo(routeModel.AccountLegalEntityPublicHashedId);
            
         }
 

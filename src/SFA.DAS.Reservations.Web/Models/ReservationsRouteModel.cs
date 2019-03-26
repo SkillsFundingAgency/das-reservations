@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public uint? UkPrn { get; set; }
         public string EmployerAccountId { get; set; }
         public Guid? Id { get; set; }
+        public string AccountLegalEntityPublicHashedId { get; set; }
     }
 }

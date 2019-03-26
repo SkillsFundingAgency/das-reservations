@@ -77,6 +77,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountLegalEntityName = existingCommand.AccountLegalEntityName,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
+                    AccountLegalEntityPublicHashedId = existingCommand.AccountLegalEntityPublicHashedId,
                     CourseId = course?.Id,
                     CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
                 };
@@ -142,7 +143,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RouteModel = routeModel,
                 StartDateDescription = cachedReservation.StartDateDescription,
                 CourseDescription = cachedReservation.CourseDescription,
-                AccountLegalEntityName = cachedReservation.AccountLegalEntityName
+                AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
+                AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId
             };
             return View(viewModel);
         }
@@ -160,7 +162,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Id = routeModel.Id.GetValueOrDefault()
                 };
 
-                await _mediator.Send(command);
+                var result = await _mediator.Send(command);
+                routeModel.AccountLegalEntityPublicHashedId = result.Reservation.AccountLegalEntityPublicHashedId;
             }
             catch (ValidationException e)
             {
@@ -183,7 +186,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
 
-        [Route("{ukPrn}/reservations/{id}/create", Name = RouteNames.ProviderReservationCreated)]
+        [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCreated)]
         [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = RouteNames.EmployerReservationCreated)]
         public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
         {
@@ -204,8 +207,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 queryResult.StartDate,
                 queryResult.ExpiryDate,
                 queryResult.Course,
+                routeModel.AccountLegalEntityPublicHashedId,
 				routeModel.UkPrn,
-				queryResult.AccountLegalEntityName
+                queryResult.AccountLegalEntityName
             );
             return View(model);
         }
