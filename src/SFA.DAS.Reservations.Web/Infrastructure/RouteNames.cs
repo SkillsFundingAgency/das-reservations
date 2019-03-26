@@ -20,6 +20,6 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
         public const string EmployerReview = "employer-review";
         public const string EmployerCreateReservation = "employer-create-reservation";
         public const string EmployerReservationCreated = "employer-reservation-created";
-        public const string EmployerSignOut = "provider-signout";
+        public const string EmployerSignOut = "employer-signout";
     }
 }
