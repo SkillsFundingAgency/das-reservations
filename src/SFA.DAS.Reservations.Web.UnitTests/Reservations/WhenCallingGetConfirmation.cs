@@ -5,9 +5,11 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -32,12 +34,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
             ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
                 .ReturnsAsync(mediatorResult);
-
+            
             var result = await controller.Confirmation(routeModel);
 
             var model = result.Should().BeOfType<ViewResult>()
@@ -49,7 +52,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.Course.Should().BeEquivalentTo(mediatorResult.Course);
             model.AccountLegalEntityName.Should().BeEquivalentTo(mediatorResult.AccountLegalEntityName);
             model.AccountLegalEntityPublicHashedId.Should().BeEquivalentTo(routeModel.AccountLegalEntityPublicHashedId);
-           
+            model.ApprenticeUrl.Should().NotBeEmpty();
+            model.DashboardUrl.Should().NotBeEmpty();
         }
 
         [Test, MoqAutoData]

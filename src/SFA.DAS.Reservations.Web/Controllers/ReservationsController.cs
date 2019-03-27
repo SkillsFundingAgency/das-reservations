@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
@@ -12,6 +13,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -23,11 +25,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
+        private readonly ReservationsWebConfiguration _configuration;
 
-        public ReservationsController(IMediator mediator, IStartDateService startDateService)
+        public ReservationsController(IMediator mediator, IStartDateService startDateService, IOptions<ReservationsWebConfiguration> configuration)
         {
             _mediator = mediator;
             _startDateService = startDateService;
+            _configuration = configuration.Value;
         }
 
         [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
@@ -209,9 +213,42 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 queryResult.Course,
                 routeModel.AccountLegalEntityPublicHashedId,
 				routeModel.UkPrn,
-                queryResult.AccountLegalEntityName
+                queryResult.AccountLegalEntityName,
+                _configuration.DashboardUrl, 
+                _configuration.ApprenticeUrl
             );
             return View(model);
+        }
+
+        [HttpPost]
+        [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCompleted)]
+        public async Task<IActionResult> Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        {
+            
+            if (!ModelState.IsValid)
+            {
+                var confirmationModel = new ConfirmationViewModel
+                (
+                    model.ReservationId,
+                    model.StartDate,
+                    model.ExpiryDate,
+                    new Course(model.CourseId, model.CourseTitle, model.Level),
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    routeModel.UkPrn,
+                    model.AccountLegalEntityName,
+                    _configuration.DashboardUrl,
+                    _configuration.ApprenticeUrl
+                );
+                
+                return View("Confirmation", confirmationModel);
+            }
+
+            if (model.AddApprentice.HasValue && model.AddApprentice.Value)
+            {
+                return Redirect(model.ApprenticeUrl);
+            }
+
+            return Redirect(model.DashboardUrl);
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(long? ukPrn,
@@ -230,6 +267,5 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 TrainingStartDate = startDate
             };
         }
-
     }
 }

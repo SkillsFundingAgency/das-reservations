@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SFA.DAS.Reservations.Web.Infrastructure
+﻿namespace SFA.DAS.Reservations.Web.Infrastructure
 {
     public static class RouteNames
     {
@@ -13,7 +8,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
         public const string ProviderCreateReservation = "provider-create-reservation";
         public const string ProviderReservationCreated = "provider-reservation-created";
         public const string ProviderSignOut = "provider-signout";
-
+        public const string ProviderReservationCompleted = "provider-reservation-completed";
 
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
