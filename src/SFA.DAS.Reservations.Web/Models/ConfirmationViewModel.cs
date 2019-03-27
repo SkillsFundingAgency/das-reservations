@@ -1,7 +1,5 @@
 ﻿using System;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Courses;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -19,7 +17,7 @@ namespace SFA.DAS.Reservations.Web.Models
 
             if (!string.IsNullOrEmpty(apprenticeUrl))
             {
-                apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={StartDate.Month}{StartDate.Year}";
+                apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={StartDate.ToString("MMyyyy")}";
                 if (course != null)
                 {
                     apprenticeUrl += $"&courseCode={course.Id}";

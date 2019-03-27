@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
     {
 
         private readonly Guid _expectedReservationId = Guid.NewGuid();
-        private readonly DateTime _expectedStartDate = new DateTime(2018, 10, 20);
+        private readonly DateTime _expectedStartDate = new DateTime(2018, 9, 20);
         private readonly DateTime _expectedExpiryDate = new DateTime(2018, 12, 20);
         private readonly Course _expectedCourse = new Course("1", "Title", 0);
         private const uint ExpectedProviderId = 4354351;
@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 "","https://apprentice");
 
             //Act
-            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}&courseCode={_expectedCourse.Id}", actual.ApprenticeUrl);
+            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.ToString("MMyyyy")}&courseCode={_expectedCourse.Id}", actual.ApprenticeUrl);
             Assert.IsTrue(actual.ShowApprenticeUrl);
         }
 
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 "", "https://apprentice");
 
             //Act
-            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.Month}{_expectedStartDate.Year}", actual.ApprenticeUrl);
+            Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.ToString("MMyyyy")}", actual.ApprenticeUrl);
             Assert.IsTrue(actual.ShowApprenticeUrl);
         }
     }
