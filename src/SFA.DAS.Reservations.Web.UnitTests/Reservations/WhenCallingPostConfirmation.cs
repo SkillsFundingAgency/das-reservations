@@ -36,9 +36,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
         [TestCase(true)]
         [TestCase(false)]
-        [AutoData]
-        public async Task Then_The_Request_Is_Redirected_Based_On_The_Selection(bool selection, ConfirmationRedirectViewModel model, ReservationsRouteModel routeModel)
+        public async Task Then_The_Request_Is_Redirected_Based_On_The_Selection(bool selection)
         {
+            var model = _fixture.Create<ConfirmationRedirectViewModel>();
+            var routeModel = _fixture.Create<ReservationsRouteModel>();
             model.AddApprentice = selection;
             var controller = _fixture.Create<ReservationsController>();
 
