@@ -29,6 +29,7 @@ using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Stubs;
 using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
@@ -102,6 +103,7 @@ namespace SFA.DAS.Reservations.Web
                     options =>
                     {
                         options.Filters.Add(new AuthorizeFilter());
+                        options.Filters.Add(new FeatureToggleActionFilter(_configuration));
                     })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()

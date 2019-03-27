@@ -58,15 +58,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             CacheReservationResult result;
 
+            StartDateModel startDateModel = null;
+            if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
+                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+            Course course = null;
+            if (!string.IsNullOrWhiteSpace(formModel.SelectedCourse))
+                course = JsonConvert.DeserializeObject<Course>(formModel.SelectedCourse);
+
             try
             {
-                StartDateModel startDateModel = null;
-                if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
-                    startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
-                Course course = null;
-                if (!string.IsNullOrWhiteSpace(formModel.CourseId))
-                    course = JsonConvert.DeserializeObject<Course>(formModel.CourseId);
-
                 var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
                 if (existingCommand == null)
@@ -76,6 +76,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var command = new CacheCreateReservationCommand
                 {
+                    Id = existingCommand.Id,
                     AccountId = existingCommand.AccountId,
                     AccountLegalEntityId = existingCommand.AccountLegalEntityId,
                     AccountLegalEntityName = existingCommand.AccountLegalEntityName,
@@ -95,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn, course?.Id);
                 return View("ApprenticeshipTraining", model);
             }
 

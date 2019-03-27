@@ -68,7 +68,7 @@
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "":"govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                      Is this the employer you would like to create a cohort for?
+                        Are you sure you want to secure funds for this employer?
                     </legend>
                     @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("confirm-yes"))
                     {
@@ -92,7 +92,7 @@
                     </div>
                 </fieldset>
             </div>
-            <button type="submit" class="govuk-button">Continue</button>
+            <button type="submit" class="govuk-button">Save and continue</button>
         </form>
     </div>
 </div>
