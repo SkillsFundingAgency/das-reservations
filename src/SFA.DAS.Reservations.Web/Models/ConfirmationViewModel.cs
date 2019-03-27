@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.Models
             ProviderId = providerId;
             AccountLegalEntityName = accountLegalEntityName;
 
-            if (!string.IsNullOrEmpty(apprenticeUrl))
+            if (!string.IsNullOrWhiteSpace(apprenticeUrl))
             {
                 apprenticeUrl = $"{apprenticeUrl}/{providerId}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={StartDate.ToString("MMyyyy")}";
                 if (course != null)
@@ -36,8 +36,8 @@ namespace SFA.DAS.Reservations.Web.Models
         public uint? ProviderId { get; }
         public string DashboardUrl { get;}
 		public string ApprenticeUrl { get; }
-        public bool ShowDashboardUrl => !string.IsNullOrEmpty(DashboardUrl);
-        public bool ShowApprenticeUrl => !string.IsNullOrEmpty(ApprenticeUrl);
+        public bool ShowDashboardUrl => !string.IsNullOrWhiteSpace(DashboardUrl);
+        public bool ShowApprenticeUrl => !string.IsNullOrWhiteSpace(ApprenticeUrl);
 		public string AccountLegalEntityName { get; }
     }
 }

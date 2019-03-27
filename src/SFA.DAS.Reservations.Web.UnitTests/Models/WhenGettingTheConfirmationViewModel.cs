@@ -39,6 +39,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test]
+        public void Then_The_Model_Is_Constructed_With_White_Space()
+        {
+            //Act
+            var actual = new ConfirmationViewModel(
+                _expectedReservationId,
+                _expectedStartDate,
+                _expectedExpiryDate,
+                _expectedCourse,
+                ExpectedHashedLegalEntityAccountId,
+                ExpectedProviderId," "," ");
+
+            //Assert
+            Assert.AreEqual(_expectedReservationId, actual.ReservationId);
+            Assert.AreEqual(_expectedStartDate, actual.StartDate);
+            Assert.AreEqual(_expectedExpiryDate, actual.ExpiryDate);
+            Assert.AreEqual(_expectedCourse, actual.Course);
+            Assert.IsFalse(actual.ShowDashboardUrl);
+            Assert.IsFalse(actual.ShowApprenticeUrl);
+            Assert.AreEqual(" ", actual.DashboardUrl);
+            Assert.AreEqual("", actual.ApprenticeUrl);
+        }
+
+        [Test]
         public void Then_If_The_DashboardUrl_Is_Available_The_Url_Is_Created_If_Supplied()
         {
             //Arrange
