@@ -26,13 +26,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> ViewCourses()
+        [Route("SelectCourse")]
+        public async Task<IActionResult> SelectCourse()
         {
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
             var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
 
-            var viewModel = new EmployerCoursesViewModel
+            var viewModel = new EmployerSelectCourseViewModel
             {
                 Courses = courseViewModels
             };

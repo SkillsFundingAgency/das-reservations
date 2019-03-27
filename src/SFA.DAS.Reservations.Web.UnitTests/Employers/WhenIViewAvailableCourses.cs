@@ -33,8 +33,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedCourseViewModels = courses.Select(c => new CourseViewModel(c)).ToArray();
 
             //Act
-            var result = await controller.ViewCourses() as ViewResult;
-            var viewModel = result?.Model as EmployerCoursesViewModel;
+            var result = await controller.SelectCourse() as ViewResult;
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
 
             //Assert
             Assert.IsNotNull(viewModel);
