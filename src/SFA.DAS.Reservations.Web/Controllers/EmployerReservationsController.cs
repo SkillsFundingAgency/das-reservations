@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -14,20 +17,33 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class EmployerReservationsController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly IHashingService _hashingService;
 
-        public EmployerReservationsController(IMediator mediator)
+        public EmployerReservationsController(IMediator mediator, IHashingService hashingService)
         {
             _mediator = mediator;
+            _hashingService = hashingService;
         }
 
         // GET
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string employerAccountId)
         {
-            return View();
+            var accountId = _hashingService.DecodeValue(employerAccountId);
+
+            var response = await _mediator.Send(new CacheCreateReservationCommand
+            {
+                AccountId = accountId,
+                AccountLegalEntityId = 1,
+                AccountLegalEntityName = "Test Corp"
+            });
+
+            var viewModel = new ReservationViewModel{ Id = response.Id};
+
+            return View(viewModel);
         }
 
-        [Route("SelectCourse")]
-        public async Task<IActionResult> SelectCourse()
+        [Route("{reservationId}/SelectCourse")]
+        public async Task<IActionResult> SelectCourse(Guid reservationId)
         {
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
@@ -35,6 +51,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var viewModel = new EmployerSelectCourseViewModel
             {
+                ReservationId = reservationId,
                 Courses = courseViewModels
             };
 
