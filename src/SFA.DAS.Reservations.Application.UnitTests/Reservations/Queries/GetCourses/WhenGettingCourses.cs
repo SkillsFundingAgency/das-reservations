@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
 
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
-                    x.Get<CoursesApiRequest, GetCoursesResponse>(
+                    x.Get<GetCoursesResponse>(
                         It.Is<CoursesApiRequest>(c =>
                             c.GetUrl.Equals(
                                 $"{ExpectedBaseUrl}api/courses"))))

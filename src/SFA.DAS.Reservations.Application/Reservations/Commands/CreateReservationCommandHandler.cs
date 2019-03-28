@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 reservation.AccountLegalEntityName,
                 reservation.CourseId);
 
-            var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
+            var response = await _apiClient.Create<CreateReservationResponse>(apiRequest);
 
             await _cacheStorageService.DeleteFromCache(command.Id.ToString());
 

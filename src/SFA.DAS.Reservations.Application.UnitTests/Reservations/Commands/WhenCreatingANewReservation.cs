@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
             _mockApiClient
-                .Setup(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
+                .Setup(client => client.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(_apiResponse);
 
             _mockCacheService = fixture.Freeze<Mock<ICacheStorageService>>();
@@ -138,7 +138,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
+            _mockApiClient.Verify(client => client.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                 apiRequest.AccountId == _expectedAccountId &&
                 apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
                 apiRequest.CourseId == null)), Times.Once);
@@ -152,7 +152,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockApiClient.Verify(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
+            _mockApiClient.Verify(client => client.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
                     apiRequest.AccountId == _expectedAccountId &&
                     apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
                     apiRequest.AccountLegalEntityName == _expectedLegalEntityName &&

@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses
         {
             var apiRequest = new CoursesApiRequest(_options.Url);
 
-            var result = await _apiClient.Get<CoursesApiRequest, GetCoursesResponse>(apiRequest);
+            var result = await _apiClient.Get<GetCoursesResponse>(apiRequest);
 
             return new GetCoursesResult
             {
