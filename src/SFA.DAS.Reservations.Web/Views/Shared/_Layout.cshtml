@@ -54,7 +54,7 @@
         <partial name="_Navigation" />
     </header>
 
-    
+
 
     <div class="govuk-width-container">
         <main class="govuk-main-wrapper " id="main-content" role="main">
@@ -82,9 +82,10 @@
         </div>
     </footer>
 
-    <script src="js/all.js"></script>
-    <script src="js/das-all.js"></script>
+    <script src="libs/govuk-frontend/all.js"></script>
     <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script>
+    <script src="js/das-all.js"></script>
+
     <script>
         window.GOVUKFrontend.initAll();
         window.DASFrontend.initAll();
@@ -95,24 +96,26 @@
         if (selectEl) {
             accessibleAutocomplete.enhanceSelectElement({
                 selectElement: selectEl,
-                minLength: 3,
+                textElement: document.querySelector('#' + idSelectField),
                 autoselect: true,
+                minLength: 3,
                 defaultValue: '',
                 displayMenu: 'overlay',
                 placeholder: 'Start typing to search apprenticeships',
-                onConfirm: function (opt) {          
+                onConfirm: function (opt) {
+
+                    var txtInput = document.querySelector('#' + idSelectField);
+                    var searchString = opt || txtInput.value;
+
                     var requestedOption = [].filter.call(this.selectElement.options,
                         function (option) {
-                            return (option.textContent || option.innerText) === opt
+                            return (option.textContent || option.innerText) === searchString
                         }
                     )[0];
-                    var txtInput = document.querySelector('#' + idSelectField);
 
                     if (requestedOption) {
                         requestedOption.selected = true
-                    }
-
-                    if (txtInput.value.toString().length === 0) {
+                    } else {
                         this.selectElement.selectedIndex = 0
                     }
                 }
