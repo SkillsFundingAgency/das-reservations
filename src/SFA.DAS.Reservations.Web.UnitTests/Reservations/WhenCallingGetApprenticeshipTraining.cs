@@ -69,6 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.Courses.Should().BeEquivalentTo(mappedCourses);
             viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
             viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
+            viewModel.IsProvider.Should().BeTrue();
         }
 
         [Test, MoqAutoData]
@@ -94,5 +95,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockMediator.Verify(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()), Times.Never);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Then_IsProvider_Is_False(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.Ukprn = null;
+
+            var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
+
+            ((ApprenticeshipTrainingViewModel) result.Model).IsProvider.Should().BeFalse();
+        }
+
+        /*[Test, MoqAutoData]
+        public async Task And_Employer_Then_EmployersChosenCourse_Is_Serialised_Course(
+            ReservationsRouteModel routeModel,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.Ukprn = null;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            var expectedEmployersChosenCourse = new CourseViewModel(cachedReservationResult.CourseId, cachedReservationResult.CourseDescription);
+
+            var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
+
+            ((ApprenticeshipTrainingViewModel) result.Model).EmployersChosenCourse.Should().Be();
+        }*/
     }
 }

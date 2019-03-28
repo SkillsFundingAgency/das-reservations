@@ -46,11 +46,16 @@
                     </div>
                 </div>
             }
-
-            <div class="govuk-form-group">
-                <partial name="_CourseSearch" />             
-            </div>
-
+            @if (Model.IsProvider)
+            {
+                <div class="govuk-form-group">
+                    <partial name="_CourseSearch"/>
+                </div>
+            }
+            else
+            {
+                @*todo: hiddens for SelectedCourse*@
+            }
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

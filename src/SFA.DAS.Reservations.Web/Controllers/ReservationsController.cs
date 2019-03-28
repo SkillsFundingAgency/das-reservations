@@ -182,6 +182,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (Exception ex)
             {
+                // todo: log this ex
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
             }
@@ -265,7 +266,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
-                TrainingStartDate = startDate
+                TrainingStartDate = startDate,
+                IsProvider = ukPrn != null
             };
         }
     }
