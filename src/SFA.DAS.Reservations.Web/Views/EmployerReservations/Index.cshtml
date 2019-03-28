@@ -14,5 +14,14 @@
 </ul>
 @*<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@
 
-<a asp-route="employer-apprenticeship-training"  role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+@{
+    var parms = new Dictionary<string, string>
+    {
+        { "id", Model.Id.ToString() },
+        { "EmployerAccountId", ViewContext.RouteData.Values["EmployerAccountId"].ToString() }
+    };
+}
+
+
+<a asp-route="employer_select_course" asp-all-route-data="parms"   role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
 
