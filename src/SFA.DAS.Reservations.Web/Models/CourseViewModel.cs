@@ -28,5 +28,11 @@ namespace SFA.DAS.Reservations.Web.Models
                 ? "selected"
                 : null;
         }
+
+        public CourseViewModel(string courseId, string courseDescription)
+        {
+            Id = courseId;
+            Description = courseDescription;
+        }
     }
 }
