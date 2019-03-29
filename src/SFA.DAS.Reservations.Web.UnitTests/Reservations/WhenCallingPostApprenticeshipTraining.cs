@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Throw_Error_If_No_Reservation_Found(
+        public void Then_Throw_Error_If_No_Reservation_Found(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             Course course,
@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourse = JsonConvert.SerializeObject(course);
 
-            Assert.ThrowsAsync<ArgumentException>(() => controller.PostApprenticeshipTraining(routeModel, formModel));
+            Assert.ThrowsAsync<ArgumentException>(async () => await controller.PostApprenticeshipTraining(routeModel, formModel));
         }
 
         [Test, MoqAutoData]
