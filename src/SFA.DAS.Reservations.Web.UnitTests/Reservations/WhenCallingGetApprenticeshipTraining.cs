@@ -102,7 +102,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
 
             var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
 
@@ -117,7 +117,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
             cachedReservationResult.CourseId = getCoursesResult.Courses.First().Id;
             cachedReservationResult.CourseDescription = getCoursesResult.Courses.First().CourseDescription;
             //cachedReservationResult
