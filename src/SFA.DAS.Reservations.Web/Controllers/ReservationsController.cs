@@ -134,7 +134,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
            
             var viewModel = new ReviewViewModel(routeModel,cachedReservation.StartDateDescription, cachedReservation.CourseDescription, cachedReservation.AccountLegalEntityName, cachedReservation.AccountLegalEntityPublicHashedId);
-            return View(viewModel);
+            return View(viewModel.ViewName,viewModel);
         }
 
         [Route("{ukPrn}/reservations/{id}/create", Name = RouteNames.ProviderCreateReservation)]

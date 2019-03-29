@@ -1,0 +1,78 @@
+﻿@model ReviewViewModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Check your information</h1>
+
+        <p>
+            You are securing funding for part, or all of the training costs for the following apprenticeship.  <br />
+            This will be paid directly to the training provider you choose.
+        </p>
+
+        <div class="govuk-summary-list">
+          
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Employer
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.AccountLegalEntityName
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="">
+                    </a>
+                </dd>
+            </dl>
+          
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship training start date
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.StartDateDescription
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" asp-route="@Model.ChangeRouteName">
+                        Change
+                    </a>
+                </dd>
+            </dl>
+          
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship training
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.CourseDescription
+                    <br />
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Can I change the course?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            You can change the course when you add an apprentice's details.
+                        </div>
+                    </details>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" asp-route="@Model.ChangeRouteName">
+                        Change
+                    </a>
+                </dd>
+            </dl>
+        </div>
+        <p>
+            Remember you may need to pay towards the cost of training your apprentice
+        </p>
+
+        <form method="post" asp-route="@Model.ConfirmRouteName">
+            <button type="submit" draggable="false" class="govuk-button">
+                Confirm and secure funding
+            </button>
+        </form>
+    </div>
+</div>
