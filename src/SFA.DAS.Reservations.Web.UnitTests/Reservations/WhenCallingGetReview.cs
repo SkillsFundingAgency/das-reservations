@@ -6,11 +6,14 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -53,6 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.StartDateDescription.Should().Be(cachedReservationResult.StartDateDescription);
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
             viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
+            viewModel.AccountLegalEntityPublicHashedId.Should().Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
         }
 
         [Test, MoqAutoData]
@@ -63,8 +67,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("provider-create-reservation");
-            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("provider-apprenticeship-training");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.ProviderCreateReservation);
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
         }
 
         [Test, MoqAutoData]
@@ -73,11 +77,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
         {
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be("employer-create-reservation");
-            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be("employer-apprenticeship-training");
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerCreateReservation);
+            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
@@ -89,7 +93,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Id|The Id field is not valid." }), null, null));
-            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>());
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
             
             var result = await controller.Review(routeModel);
             

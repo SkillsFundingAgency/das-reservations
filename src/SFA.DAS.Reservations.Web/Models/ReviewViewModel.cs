@@ -8,5 +8,6 @@
         public string StartDateDescription { get; set; }
         public string CourseDescription { get; set; }
         public string AccountLegalEntityName { get; set; }
+        public string AccountLegalEntityPublicHashedId { get; set; }
     }
 }
