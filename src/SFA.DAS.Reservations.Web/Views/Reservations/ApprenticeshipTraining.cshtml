@@ -54,7 +54,7 @@
             }
             else
             {
-                @*todo: hiddens for SelectedCourse*@
+                <input id="selected-course" type="hidden" value="@Model.EmployersChosenCourse"/>
             }
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">

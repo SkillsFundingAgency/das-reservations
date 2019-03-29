@@ -260,6 +260,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
+            CourseViewModel employerChosenCourse = null;
+            if (ukPrn == null && courseId != null)
+            {
+                var selectedCourse = coursesResult.Courses.SingleOrDefault(course => course.Id == courseId);
+                employerChosenCourse = new CourseViewModel(selectedCourse?.Id, selectedCourse?.CourseDescription);
+            }
+
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = ukPrn == null ? RouteNames.EmployerCreateApprenticeshipTraining : RouteNames.ProviderCreateApprenticeshipTraining,
@@ -267,7 +274,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 TrainingStartDate = startDate,
-                IsProvider = ukPrn != null
+                IsProvider = ukPrn != null,
+                EmployersChosenCourse = JsonConvert.SerializeObject(employerChosenCourse)
             };
         }
     }
