@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -65,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("{id}/SelectCourse")]
-        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourse)
+        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
             var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
 
@@ -74,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
             }
 
-            if (string.IsNullOrEmpty(selectedCourse))
+            if (string.IsNullOrEmpty(selectedCourseId))
             {
                 return RedirectToRoute("employer-apprenticeship-training", new
                 {
@@ -82,8 +80,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     EmployerAccountId = routeModel.EmployerAccountId,
                 });
             }
-
-            var course = JsonConvert.DeserializeObject<Course>(selectedCourse);
+         
+            var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+            var selectedCourse = getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(selectedCourseId));
+            var course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(selectedCourseId));
 
             try
             {
@@ -93,8 +93,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountId = cachedReservation.AccountId,
                     AccountLegalEntityId = cachedReservation.AccountLegalEntityId,
                     AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
-                    CourseId = course?.Id,
-                    CourseDescription = course?.CourseDescription,
+                    CourseId = course.Id,
+                    CourseDescription = course.CourseDescription,
                     IgnoreStartDate = true
                 });
 

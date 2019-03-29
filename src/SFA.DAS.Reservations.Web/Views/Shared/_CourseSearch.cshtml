@@ -1,12 +1,11 @@
-@using Newtonsoft.Json
 @model SelectCourseViewModel
 
 
-<select id="course-search" name="SelectedCourse" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
+<select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
 
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
-        <option value="@JsonConvert.SerializeObject(course)" selected="@course.Selected">@course.Description</option>
+        <option value="@course.Id" selected="@course.Selected">@course.Description</option>
     }
 </select>
