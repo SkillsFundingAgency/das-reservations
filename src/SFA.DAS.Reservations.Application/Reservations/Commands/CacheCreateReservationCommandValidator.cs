@@ -17,9 +17,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             if (string.IsNullOrEmpty(command.StartDate))
             {
-                if (command.Id.HasValue)
+                if (command.Id.HasValue && !command.IgnoreStartDate)
                 {
-                    result.AddError(nameof(command.StartDate));
+                   result.AddError(nameof(command.StartDate));
                 }
             }
             else

@@ -34,8 +34,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _configuration = configuration.Value;
         }
 
-        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
+        [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult cachedReservation = null;
@@ -51,8 +51,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name =  RouteNames.ProviderCreateApprenticeshipTraining)]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = RouteNames.EmployerCreateApprenticeshipTraining)]
+        [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name =  RouteNames.ProviderCreateApprenticeshipTraining)]
+        [Route("accounts/{employerAccountId}/reservations/{Id}/apprenticeship-training", Name = RouteNames.EmployerCreateApprenticeshipTraining)]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {

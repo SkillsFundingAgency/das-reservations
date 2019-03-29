@@ -1,4 +1,5 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@model ReservationViewModel
+@using SFA.DAS.Reservations.Web.Infrastructure
 @{
     ViewData["Title"] = "Reservations";
 }
@@ -12,5 +13,14 @@
     <li>what level the course is likely to be</li>
 </ul>
 
-<a asp-route="@RouteNames.EmployerApprenticeshipTraining" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+@{
+    var routeData = new Dictionary<string, string>
+    {
+        { "id", Model.Id.ToString() },
+        { "EmployerAccountId", ViewContext.RouteData.Values["EmployerAccountId"].ToString() }
+    };
+}
+
+
+<a asp-route="@RouteNames.EmployerApprenticeshipTraining" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
 

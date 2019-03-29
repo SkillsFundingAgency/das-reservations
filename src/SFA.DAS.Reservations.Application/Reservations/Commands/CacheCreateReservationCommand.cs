@@ -14,5 +14,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         public string StartDateDescription { get; set; }
         public string CourseId { get; set; }
         public string CourseDescription { get; set; }
+
+        //TODO: Remove this once we work out how to handle the issue
+        // with different work flow steps between employer and provider 
+        public bool IgnoreStartDate { get; set; }
     }
 }
