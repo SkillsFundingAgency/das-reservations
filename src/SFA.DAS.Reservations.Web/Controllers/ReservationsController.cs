@@ -132,25 +132,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("Error");//todo: setup view correctly.
             }
-            
-            var confirmRouteName = routeModel.UkPrn == null ? 
-                RouteNames.EmployerCreateReservation : 
-                RouteNames.ProviderCreateReservation;
-
-            var changeRouteName = routeModel.UkPrn == null ? 
-                RouteNames.EmployerApprenticeshipTraining : 
-                RouteNames.ProviderApprenticeshipTraining;
-
-            var viewModel = new ReviewViewModel
-            {
-                ConfirmRouteName = confirmRouteName,
-                ChangeRouteName = changeRouteName,
-                RouteModel = routeModel,
-                StartDateDescription = cachedReservation.StartDateDescription,
-                CourseDescription = cachedReservation.CourseDescription,
-                AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId
-            };
+           
+            var viewModel = new ReviewViewModel(routeModel,cachedReservation.StartDateDescription, cachedReservation.CourseDescription, cachedReservation.AccountLegalEntityName, cachedReservation.AccountLegalEntityPublicHashedId);
             return View(viewModel);
         }
 
