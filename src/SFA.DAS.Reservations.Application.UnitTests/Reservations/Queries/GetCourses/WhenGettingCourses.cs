@@ -87,7 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
         }
 
         [Test]
-        public async Task Then_The_Courses_Are_Retreieved_From_Cache()
+        public async Task Then_The_Courses_Are_Retrieved_From_Cache()
         {
             //Arrange
             _cacheService.Setup(s => s.RetrieveFromCache<GetCoursesResult>(It.IsAny<string>()))
@@ -100,14 +100,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
             _cacheService.Verify(s => s.RetrieveFromCache<GetCoursesResult>(nameof(GetCoursesQueryHandler)), 
                 Times.Once);
 
-            _apiClient.Verify(c => c.Get<CoursesApiRequest, GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
+            _apiClient.Verify(c => c.Get<GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
                 Times.Never);
             
             actual.Courses.Should().BeEquivalentTo(_expectedCacheCourses);
         }
 
         [Test]
-        public async Task Then_The_Courses_Are_Retreieved_From_Api_If_Cache_Is_Empty()
+        public async Task Then_The_Courses_Are_Retrieved_From_Api_If_Cache_Is_Empty()
         {
             //Act
             var actual = await _handler.Handle(new GetCoursesQuery(), new CancellationToken());
@@ -116,7 +116,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
             _cacheService.Verify(s => s.RetrieveFromCache<GetCoursesResult>(nameof(GetCoursesQueryHandler)), 
                 Times.Once);
             
-            _apiClient.Verify(c => c.Get<CoursesApiRequest, GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
+            _apiClient.Verify(c => c.Get<GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
                 Times.Once);
            
             actual.Courses.Should().BeEquivalentTo(_expectedApiCourses);
