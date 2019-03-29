@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 
             return new GetReservationResult
             {
-                ReservationId = result.ReservationId,
+                ReservationId = result.Id,
                 StartDate = result.StartDate,
                 ExpiryDate = result.ExpiryDate,
                 Course = result.Course ?? new Course(null,null,0),

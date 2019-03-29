@@ -71,7 +71,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     AccountId = viewModel.AccountId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
-                    AccountLegalEntityName = viewModel.AccountLegalEntityName
+                    AccountLegalEntityName = viewModel.AccountLegalEntityName,
+                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId
                 });
 
                 return RedirectToAction("ApprenticeshipTraining", "Reservations", new

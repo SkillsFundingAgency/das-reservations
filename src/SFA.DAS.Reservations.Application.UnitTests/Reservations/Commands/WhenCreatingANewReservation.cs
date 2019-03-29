@@ -175,6 +175,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             var result  = await _commandHandler.Handle(command, CancellationToken.None);
 
             result.Reservation.Id.Should().Be(_apiResponse.Id);
+            result.Reservation.AccountLegalEntityPublicHashedId.Should()
+                .Be(_cachedReservationResult.AccountLegalEntityPublicHashedId);
         }
     }
 }
