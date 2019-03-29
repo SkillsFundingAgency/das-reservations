@@ -65,9 +65,14 @@
                 </dd>
             </dl>
         </div>
-        <p>
-            Remember you may need to pay towards the cost of training your apprentice
-        </p>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive"></span>
+                Remember you may need to pay towards the cost of training your apprentice.
+            </strong>
+        </div>
 
         <form method="post" asp-route="@Model.ConfirmRouteName">
             <button type="submit" draggable="false" class="govuk-button">
