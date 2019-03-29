@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn);
                 return View("ApprenticeshipTraining", model);
@@ -206,7 +206,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCompleted)]
-        public async Task<IActionResult> Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        public IActionResult Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
         {
             
             if (!ModelState.IsValid)
