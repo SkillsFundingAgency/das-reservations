@@ -261,10 +261,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
             CourseViewModel employerChosenCourse = null;
-            if (ukPrn == null && courseId != null)
+            if (ukPrn == null)
             {
-                var selectedCourse = coursesResult.Courses.SingleOrDefault(course => course.Id == courseId);
-                employerChosenCourse = new CourseViewModel(selectedCourse?.Id, selectedCourse?.CourseDescription);
+                if (string.IsNullOrWhiteSpace(courseId))
+                {
+                    employerChosenCourse = new CourseViewModel((string)null, "Unknown");   
+                }
+                else
+                {
+                    var selectedCourse = coursesResult.Courses.SingleOrDefault(course => course.Id == courseId);
+                    employerChosenCourse = new CourseViewModel(selectedCourse?.Id, selectedCourse?.CourseDescription);
+                }
             }
 
             return new ApprenticeshipTrainingViewModel
