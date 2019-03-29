@@ -57,9 +57,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
             StartDateModel startDateModel = null;
             if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
                 startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+
             Course course = null;
-            if (!string.IsNullOrWhiteSpace(formModel.SelectedCourse))
-                course = JsonConvert.DeserializeObject<Course>(formModel.SelectedCourse);
+
+            if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
+            {
+
+                var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+
+                var selectedCourse =
+                    getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
+
+                course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
+            }
 
             try
             {
@@ -79,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
                     CourseId = course?.Id,
-                    CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
+                    CourseDescription = course == null? "Unknown" : course.CourseDescription
                 };
 
                 result = await _mediator.Send(command);
