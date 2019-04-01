@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
@@ -32,11 +33,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                     new ValidationResult("The following parameters have failed validation", queryValidationResult.ErrorList), null, null);
             }
 
-            /*var startDateComponents = command.StartDate.Split("-");
-            var startYear = Convert.ToInt32(startDateComponents[0]);
-            var startMonth = Convert.ToInt32(startDateComponents[1]);*/
+            var cachedReservation = await _cacheStorageService.RetrieveFromCache<CachedReservation>(command.Id.ToString());
 
-            await Task.CompletedTask;
+            if (cachedReservation == null)
+            {
+                throw new Exception("No reservation was found with that Id");
+            }
+
+            cachedReservation.StartDate = command.StartDate;
+            
+            await _cacheStorageService.SaveToCache(command.Id.ToString(), cachedReservation, 1);
             return Unit.Value;
         }
     }
