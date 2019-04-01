@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId
                 });
 
-                return RedirectToAction("ApprenticeshipTraining", "Reservations", new
+                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
                 {
                     Id = result.Id,
                     EmployerAccountId = viewModel.AccountPublicHashedId,

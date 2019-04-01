@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
@@ -67,11 +68,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
    
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
-            var redirectResult = result as RedirectToActionResult;
+            var redirectResult = result as RedirectToRouteResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.AreEqual("Reservations",redirectResult.ControllerName);
-            Assert.AreEqual("ApprenticeshipTraining",redirectResult.ActionName);
+            Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, redirectResult.RouteName);
             Assert.AreEqual(viewModel.UkPrn,redirectResult.RouteValues["UkPrn"]);
             Assert.AreEqual(viewModel.AccountPublicHashedId,redirectResult.RouteValues["EmployerAccountId"]);
         }
