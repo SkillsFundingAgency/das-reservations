@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
     {
         public Guid Id { get; set; }
         public string StartDate { get; set; }
+        public string StartDateDescription { get; set; }
     }
 }

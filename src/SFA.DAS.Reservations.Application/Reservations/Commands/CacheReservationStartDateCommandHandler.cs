@@ -41,6 +41,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             }
 
             cachedReservation.StartDate = command.StartDate;
+            cachedReservation.StartDateDescription = command.StartDateDescription;
             
             await _cacheStorageService.SaveToCache(command.Id.ToString(), cachedReservation, 1);
             return Unit.Value;
