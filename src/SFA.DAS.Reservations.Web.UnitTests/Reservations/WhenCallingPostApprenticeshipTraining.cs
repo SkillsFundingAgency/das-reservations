@@ -9,6 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -17,7 +18,9 @@ using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -39,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
 
             _mediator = new Mock<IMediator>();
-            _controller = new ReservationsController(_mediator.Object, Mock.Of<IStartDateService>());
+            _controller = new ReservationsController(_mediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
@@ -73,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be("provider-review");
+            result.RouteName.Should().Be(RouteNames.ProviderReview);
         }
 
         [Test, MoqAutoData]
@@ -84,12 +87,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
-            routeModel.Ukprn = null;
+            routeModel.UkPrn = null;
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
             
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be("employer-review");
+            result.RouteName.Should().Be(RouteNames.EmployerReview);
         }
 
         [Test, MoqAutoData]
@@ -126,7 +129,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
                     command.StartDateDescription == startDateModel.ToString() &&
                     command.CourseId == _course.Id &&
-                    command.CourseDescription == _course.CourseDescription
+                    command.CourseDescription == _course.CourseDescription &&
+                    command.AccountLegalEntityPublicHashedId == _cachedReservationResult.AccountLegalEntityPublicHashedId
                     ), It.IsAny<CancellationToken>()));
         }
 

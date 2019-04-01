@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
                                 $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))
                 .ReturnsAsync(new GetReservationResponse
                 {
-                    ReservationId = _expectedReservationId,
+                    Id = _expectedReservationId,
                     StartDate = _expectedStartDate,
                     ExpiryDate = _expectedExpiryDate,
                     AccountLegalEntityName = ExpectedLegalEntityName

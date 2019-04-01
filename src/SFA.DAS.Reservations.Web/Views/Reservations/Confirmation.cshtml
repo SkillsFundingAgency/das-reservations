@@ -1,9 +1,47 @@
-﻿@model ConfirmationViewModel
+﻿@using System.Text
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using SFA.DAS.Reservations.Web.Infrastructure
+@model ConfirmationViewModel
 @{
     ViewData["Title"] = "Reservations";
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
+                </h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        @{
+                            var errorStringBuilder = new StringBuilder();
+                            var errorCount = ViewData.ModelState.ErrorCount;
+                            var loopCount = 1;
+                            foreach (var error in ViewData.ModelState)
+                            {
+                                if (error.Value.ValidationState == ModelValidationState.Invalid)
+                                {
+                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
+                                    if (loopCount == errorCount - 1)
+                                    {
+                                        errorStringBuilder.Append(" and ");
+                                    }
+                                    else if (loopCount != errorCount)
+                                    {
+                                        errorStringBuilder.Append(", ");
+                                    }
+
+                                    loopCount++;
+                                }
+                            }
+                        }
+                        @Html.Raw(errorStringBuilder.ToString())
+                    </ul>
+                </div>
+            </div>
+        }
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">
                 Apprenticeship funds reserved
@@ -15,7 +53,7 @@
                     Employer
                 </dt>
                 <dd class="govuk-summary-list__value">
-            @Model.AccountLegalEntityName
+                    @Model.AccountLegalEntityName
                 </dd>
             </dl>
             <dl class="govuk-summary-list__row">
@@ -68,5 +106,59 @@
         <p>
             If you know who the apprentice will be, you can add an apprentice to this funding now.
         </p>
+
+
+
+        @if (Model.ShowApprenticeUrl && Model.ShowDashboardUrl)
+        {
+
+            <form method="post" asp-route="@RouteNames.ProviderReservationCreated">
+
+                <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
+                <input type="hidden" name="ApprenticeUrl" value="@Model.ApprenticeUrl" />
+                <input type="hidden" name="DashboardUrl" value="@Model.DashboardUrl" />
+                <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
+                <input type="hidden" name="StartDate" value="@Model.StartDate" />
+                <input type="hidden" name="Level" value="@Model.Course.Level" />
+                <input type="hidden" name="CourseId" value="@Model.Course.Id" />
+                <input type="hidden" name="CourseTitle" value="@Model.Course.Title" />
+                <input type="hidden" name="ExpiryDate" value="@Model.ExpiryDate" />
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Do you want to add an apprentice now?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("AddApprentice"))
+                        {
+                        <span id="confirm-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["AddApprentice"].Errors.First().ErrorMessage
+                        </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="AddApprentice" name="AddApprentice" type="radio" value="True">
+                                <label class="govuk-label govuk-radios__label" for="confirm-yes">
+                                    Yes
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="AddApprentice-no" name="AddApprentice" type="radio" value="False">
+                                <label class="govuk-label govuk-radios__label" for="confirm-no">
+                                    No, not right now
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <p>
+
+                    <button type="submit" draggable="false" class="govuk-button">
+                        Confirm
+                    </button>
+
+                </p>
+            </form>
+        }
     </div>
 </div>
