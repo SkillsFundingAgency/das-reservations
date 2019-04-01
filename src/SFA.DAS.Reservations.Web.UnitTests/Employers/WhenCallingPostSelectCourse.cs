@@ -86,23 +86,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public void Then_Throw_Error_If_No_Reservation_Found(ReservationsRouteModel routeModel)
         {
+            //Assign
+            var selectedCourse = _course.Id;
+
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => null);
-            
-            var selectedCourse = JsonConvert.SerializeObject(_course);
 
+            //Act + Assert
             Assert.ThrowsAsync<ArgumentException>(() => _controller.PostSelectCourse(routeModel, selectedCourse));
         }
 
         [Test, MoqAutoData]
         public async Task Then_Gets_Employer_Information_From_Cache([Frozen]ReservationsRouteModel routeModel)
         {
+            //Assign
             var selectedCourse = _course.Id;
 
+            //Act
             await _controller.PostSelectCourse(routeModel, selectedCourse);
 
+            //Assert
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<GetCachedReservationQuery>(q => q.Id.Equals(routeModel.Id)),
                 It.IsAny<CancellationToken>()), Times.Once);
@@ -120,8 +125,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData] 
         public async Task And_No_Course_Then_Doesnt_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
         {
+            //Act
             await _controller.PostSelectCourse(routeModel, null);
 
+            //Assert
             _mediator.Verify(mediator => 
                 mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()), 
                 Times.Never);
@@ -130,10 +137,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task Then_Adds_Guid_To_RouteModel(ReservationsRouteModel routeModel)
         {
+            //Assign
             var selectedCourse = _course.Id;
             
+            //Act
             var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as RedirectToRouteResult;
 
+            //Assert
             Assert.IsNotNull(result);
 
             result.RouteValues.Should().ContainKey("Id")
@@ -143,15 +153,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(ReservationsRouteModel routeModel)
         {
+            //Assign
             var selectedCourse = _course.Id;
             
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
-          
-            var controller = new EmployerReservationsController(_mediator.Object, _hashingService.Object);
             
-            var result = await controller.PostSelectCourse(routeModel, selectedCourse);
-            
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse);
+
+            //Assert
             Assert.IsNotNull(result);
             var actualViewResult = result as ViewResult;
             Assert.IsNotNull(actualViewResult);

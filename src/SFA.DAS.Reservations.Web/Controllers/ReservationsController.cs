@@ -66,7 +66,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
             {
-
                 var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
 
                 var selectedCourse =
