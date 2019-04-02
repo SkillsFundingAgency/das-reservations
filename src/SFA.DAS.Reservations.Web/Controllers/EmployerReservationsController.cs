@@ -65,15 +65,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("{id}/SelectCourse")]
-        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourse)
+        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
-            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
 
             if (cachedReservation == null)
             {
                 throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
             }
-
 
             if (string.IsNullOrEmpty(selectedCourseId))
             {
@@ -84,7 +83,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 });
             }
 
-            var course = JsonConvert.DeserializeObject<Course>(selectedCourse);
+            var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+            var selectedCourse = getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(selectedCourseId));
+            var course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(selectedCourseId));
 
             try
             {
@@ -94,8 +95,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountId = cachedReservation.AccountId,
                     AccountLegalEntityId = cachedReservation.AccountLegalEntityId,
                     AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
-                    CourseId = course?.Id,
-                    CourseDescription = course?.CourseDescription,
+                    CourseId = course.Id,
+                    CourseDescription = course.CourseDescription,
                     IgnoreStartDate = true
                 });
 
@@ -124,6 +125,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("SelectCourse", viewModel);
             }
+
         }
     }
 }

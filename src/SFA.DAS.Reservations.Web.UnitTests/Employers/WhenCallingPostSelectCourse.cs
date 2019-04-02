@@ -102,33 +102,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Gets_Employer_Information_From_Cache(
-            [Frozen]ReservationsRouteModel routeModel,
-            CourseViewModel course,
-            [Frozen] Mock<IMediator> mockMediator,
-            GetCachedReservationResult cacheResult,
-            EmployerReservationsController controller)
+        public async Task Then_Gets_Employer_Information_From_Cache([Frozen]ReservationsRouteModel routeModel)
         {
-            mockMediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetCachedReservationQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => cacheResult);
-           
-            var selectedCourse = JsonConvert.SerializeObject(course);
+            //Assign
+            var selectedCourse = _course.Id;
 
-            await controller.PostSelectCourse(routeModel, selectedCourse);
+            //Act
+            await _controller.PostSelectCourse(routeModel, selectedCourse);
 
-            mockMediator.Verify(mediator => mediator.Send(
+            //Assert
+            _mediator.Verify(mediator => mediator.Send(
                 It.Is<GetCachedReservationQuery>(q => q.Id.Equals(routeModel.Id)),
                 It.IsAny<CancellationToken>()), Times.Once);
 
-            mockMediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId == cacheResult.AccountId &&
-                    command.AccountLegalEntityId.Equals(cacheResult.AccountLegalEntityId) &&
-                    command.AccountLegalEntityName.Equals(cacheResult.AccountLegalEntityName) &&
-                    command.CourseId == course.Id &&
-                    command.CourseDescription == course.Description
+            _mediator.Verify(mediator =>
+                mediator.Send(It.Is<CacheCreateReservationCommand>(command =>
+                    command.AccountId == _cachedReservationResult.AccountId &&
+                    command.AccountLegalEntityId.Equals(_cachedReservationResult.AccountLegalEntityId) &&
+                    command.AccountLegalEntityName.Equals(_cachedReservationResult.AccountLegalEntityName) &&
+                    command.CourseId == _course.Id &&
+                    command.CourseDescription == _course.CourseDescription
                 ), It.IsAny<CancellationToken>()));
         }
 
@@ -151,55 +144,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Adds_Guid_To_RouteModel(
-            ReservationsRouteModel routeModel,
-            CourseViewModel course,
-            CacheReservationResult cacheReservationResult,
-            [Frozen] Mock<IMediator> mockMediator, 
-            EmployerReservationsController controller)
+        public async Task Then_Adds_Guid_To_RouteModel(ReservationsRouteModel routeModel)
         {
-            var selectedCourse = JsonConvert.SerializeObject(course);
+            //Assign
+            var selectedCourse = _course.Id;
 
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cacheReservationResult);
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as RedirectToRouteResult;
 
-            var result = await controller.PostSelectCourse(routeModel, selectedCourse) as RedirectToRouteResult;
-
+            //Assert
             Assert.IsNotNull(result);
 
             result.RouteValues.Should().ContainKey("Id")
-                .WhichValue.Should().Be(cacheReservationResult.Id);
+                .WhichValue.Should().Be(_cachedReservationResult.Id);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
-        public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
-            ReservationsRouteModel routeModel,
-            CourseViewModel course,
-            GetCoursesResult coursesResult,
-            Mock<IMediator> mockMediator,
-            Mock<IHashingService> mockHashingService,
-            GetCachedReservationResult cacheResult)
+        public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(ReservationsRouteModel routeModel)
         {
-            mockMediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetCachedReservationQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => cacheResult);
-            
-            var selectedCourse = JsonConvert.SerializeObject(course);
-            
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
+            //Assign
+            var selectedCourse = _course.Id;
+
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
-            
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(coursesResult);
-            
-            var controller = new EmployerReservationsController(mockMediator.Object, mockHashingService.Object);
-            
-            var result = await controller.PostSelectCourse(routeModel, selectedCourse);
-            
+
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse);
+
+            //Assert
             Assert.IsNotNull(result);
             var actualViewResult = result as ViewResult;
             Assert.IsNotNull(actualViewResult);
