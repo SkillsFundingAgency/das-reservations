@@ -1,11 +1,10 @@
 ﻿using System;
-using MediatR;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
-    public class CacheCreateReservationCommand: IRequest<CacheReservationResult>
+    public class CachedReservation
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
@@ -14,9 +13,5 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
         public string StartDateDescription { get; set; }
         public string CourseId { get; set; }
         public string CourseDescription { get; set; }
-
-        //TODO: Remove this once we work out how to handle the issue
-        // with different work flow steps between employer and provider 
-        public bool IgnoreStartDate { get; set; }
     }
 }

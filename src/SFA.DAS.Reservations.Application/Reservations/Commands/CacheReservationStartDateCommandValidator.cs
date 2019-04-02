@@ -4,23 +4,24 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
-    public class CacheCreateReservationCommandValidator : IValidator<CacheCreateReservationCommand>
+    public class CacheReservationStartDateCommandValidator : IValidator<CacheReservationStartDateCommand>
     {
-        public Task<ValidationResult> ValidateAsync(CacheCreateReservationCommand command)
+        public Task<ValidationResult> ValidateAsync(CacheReservationStartDateCommand command)
         {
             var result = new ValidationResult();
 
-            if (command.AccountId == default(long))
+            // id
+
+            if (command.Id == Guid.Empty)
             {
-                result.AddError(nameof(command.AccountId));
+                result.AddError(nameof(command.Id));
             }
+
+            // start date
 
             if (string.IsNullOrEmpty(command.StartDate))
             {
-                if (command.Id.HasValue && !command.IgnoreStartDate)
-                {
-                   result.AddError(nameof(command.StartDate));
-                }
+                result.AddError(nameof(command.StartDate));
             }
             else
             {

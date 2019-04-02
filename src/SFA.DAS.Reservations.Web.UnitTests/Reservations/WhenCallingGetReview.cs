@@ -68,7 +68,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.Review(routeModel) as ViewResult;
 
             ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.ProviderCreateReservation);
-            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
         }
 
         [Test, MoqAutoData]
@@ -81,7 +82,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.Review(routeModel) as ViewResult;
 
             ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerCreateReservation);
-            ((ReviewViewModel) result.Model).ChangeRouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
+            ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.EmployerSelectCourse);
+            ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.

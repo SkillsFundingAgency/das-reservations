@@ -16,5 +16,7 @@
         public const string EmployerCreateReservation = "employer-create-reservation";
         public const string EmployerReservationCreated = "employer-reservation-created";
         public const string EmployerSignOut = "employer-signout";
+        public const string EmployerSelectCourse = "employer-select-course";
+
     }
 }

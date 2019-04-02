@@ -34,8 +34,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _configuration = configuration.Value;
         }
 
-        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
+        [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
             GetCachedReservationResult cachedReservation = null;
@@ -51,8 +51,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [Route("{ukPrn}/reservations/{Id}/apprenticeship-training", Name =  RouteNames.ProviderCreateApprenticeshipTraining)]
-        [Route("accounts/{employerAccountId}/reservations/apprenticeship-training", Name = RouteNames.EmployerCreateApprenticeshipTraining)]
+        [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name = RouteNames.ProviderCreateApprenticeshipTraining)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerCreateApprenticeshipTraining)]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
@@ -61,9 +61,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             StartDateModel startDateModel = null;
             if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
                 startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+
             Course course = null;
-            if (!string.IsNullOrWhiteSpace(formModel.SelectedCourse))
-                course = JsonConvert.DeserializeObject<Course>(formModel.SelectedCourse);
+
+            if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
+            {
+                var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+
+                var selectedCourse =
+                    getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
+
+                course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
+            }
 
             try
             {
@@ -84,7 +93,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     StartDateDescription = startDateModel?.ToString(),
                     AccountLegalEntityPublicHashedId = existingCommand.AccountLegalEntityPublicHashedId,
                     CourseId = course?.Id,
-                    CourseDescription = course == null? "Unknown" : $"{course.Title} - Level: {course.Level}"
+                    CourseDescription = course == null? "Unknown" : course.CourseDescription
                 };
 
                 result = await _mediator.Send(command);
@@ -137,14 +146,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RouteNames.EmployerCreateReservation : 
                 RouteNames.ProviderCreateReservation;
 
-            var changeRouteName = routeModel.UkPrn == null ? 
+            var changeCourseRouteName = routeModel.UkPrn == null ? 
+                RouteNames.EmployerSelectCourse : 
+                RouteNames.ProviderApprenticeshipTraining;
+
+            var changeStartDateRouteName = routeModel.UkPrn == null ? 
                 RouteNames.EmployerApprenticeshipTraining : 
                 RouteNames.ProviderApprenticeshipTraining;
 
             var viewModel = new ReviewViewModel
             {
                 ConfirmRouteName = confirmRouteName,
-                ChangeRouteName = changeRouteName,
+                ChangeCourseRouteName = changeCourseRouteName,
+                ChangeStartDateRouteName = changeStartDateRouteName,
                 RouteModel = routeModel,
                 StartDateDescription = cachedReservation.StartDateDescription,
                 CourseDescription = cachedReservation.CourseDescription,
