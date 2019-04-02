@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer
 {
     public class CacheReservationEmployerCommand : IRequest<Unit>
     {

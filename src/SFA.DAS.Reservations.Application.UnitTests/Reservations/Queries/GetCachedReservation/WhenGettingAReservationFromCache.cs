@@ -11,7 +11,7 @@ using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCachedReservation
 {
     public class WhenGettingAReservationFromCache
     {
