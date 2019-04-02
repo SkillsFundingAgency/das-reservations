@@ -108,6 +108,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
 
         [Test]
         public async Task Then_The_Courses_Are_Retrieved_From_Api_If_Cache_Is_Empty()
+
         {
             //Act
             var actual = await _handler.Handle(new GetCoursesQuery(), new CancellationToken());
@@ -117,6 +118,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCou
                 Times.Once);
             
             _apiClient.Verify(c => c.Get<GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
+
                 Times.Once);
            
             actual.Courses.Should().BeEquivalentTo(_expectedApiCourses);

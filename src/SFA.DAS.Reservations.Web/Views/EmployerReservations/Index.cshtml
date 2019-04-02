@@ -1,5 +1,6 @@
-﻿@model ReservationViewModel
+@model ReservationViewModel
 @using SFA.DAS.Reservations.Web.Infrastructure
+
 @{
     ViewData["Title"] = "Reservations";
 }
@@ -21,6 +22,5 @@
     };
 }
 
-
-<a asp-route="@RouteNames.EmployerApprenticeshipTraining" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+<a asp-route="employer_select_course" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
 

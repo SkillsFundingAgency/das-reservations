@@ -74,7 +74,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
             }
 
-            if (string.IsNullOrEmpty(selectedCourse))
+
+            if (string.IsNullOrEmpty(selectedCourseId))
             {
                 return RedirectToRoute("employer-apprenticeship-training", new
                 {

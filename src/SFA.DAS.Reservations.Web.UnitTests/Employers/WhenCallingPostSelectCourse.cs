@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
@@ -23,34 +25,61 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
     public class WhenCallingPostSelectCourse
     {
-        [Test, MoqAutoData]
-        public async Task Then_Caches_Draft_Reservation(
-            ReservationsRouteModel routeModel,
-            CourseViewModel course,
-            [Frozen] Mock<IMediator> mockMediator, 
-            GetCachedReservationResult cacheResult,
-            EmployerReservationsController controller)
-        {
-            //Assign
-            var selectedCourse = JsonConvert.SerializeObject(course);
+        private Course _course;
+        private GetCachedReservationResult _cachedReservationResult;
+        private Mock<IMediator> _mediator;
+        private Mock<IHashingService> _hashingService;
+        private EmployerReservationsController _controller;
 
-            mockMediator.Setup(mediator => mediator.Send(
+        [SetUp]
+        public void Arrange()
+        {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+
+            _course = fixture.Create<Course>();
+            _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
+            _hashingService = new Mock<IHashingService>();
+
+            _mediator = new Mock<IMediator>();
+            _controller = new EmployerReservationsController(_mediator.Object,_hashingService.Object);
+
+            _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => cacheResult);
+                .ReturnsAsync(() => _cachedReservationResult);
+
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<CacheCreateReservationCommand>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new CacheReservationResult{Id = _cachedReservationResult.Id});
+
+            _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult
+                {
+                    Courses = new List<Course>
+                    {
+                        _course
+                    }
+                });
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
+        {
+            //Assign
+            var selectedCourse = _course.Id;
 
             //Act
-            await controller.PostSelectCourse(routeModel, selectedCourse);
-
+            await _controller.PostSelectCourse(routeModel, selectedCourse);
 
             //Assert
-            mockMediator.Verify(mediator => 
+            _mediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId.Equals(cacheResult.AccountId) &&
-                    command.AccountLegalEntityId.Equals(cacheResult.AccountLegalEntityId) &&
-                    command.AccountLegalEntityName.Equals(cacheResult.AccountLegalEntityName) &&
-                    command.CourseId.Equals(course.Id) &&
-                    command.CourseDescription.Equals(course.Description)
+                    command.AccountId.Equals(_cachedReservationResult.AccountId) &&
+                    command.AccountLegalEntityId.Equals(_cachedReservationResult.AccountLegalEntityId) &&
+                    command.AccountLegalEntityName.Equals(_cachedReservationResult.AccountLegalEntityName) &&
+                    command.CourseId.Equals(_course.Id) &&
+                    command.CourseDescription.Equals(_course.CourseDescription)
                     ), It.IsAny<CancellationToken>()));
         }
 

@@ -40,7 +40,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                    c.AccountId.Equals(expectedEmployerAccountId) &&
                    c.AccountLegalEntityId != default(long) &&
                    !string.IsNullOrEmpty(c.AccountLegalEntityName)), It.IsAny<CancellationToken>()));
-                
         }
 
         [Test, MoqAutoData]

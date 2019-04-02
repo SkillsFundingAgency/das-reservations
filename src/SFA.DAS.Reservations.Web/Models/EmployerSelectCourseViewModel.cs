@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -7,6 +6,6 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public Guid ReservationId { get; set; }
         public string RouteName { get; set; }
-       
+
     }
 }
