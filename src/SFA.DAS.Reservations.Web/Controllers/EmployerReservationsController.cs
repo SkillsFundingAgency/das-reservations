@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/SelectCourse",Name = "employer_select_course")]
+        [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(Guid id)
         {
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (string.IsNullOrEmpty(selectedCourseId))
             {
-                return RedirectToRoute("employer-apprenticeship-training", new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
                 {
                     Id = cachedReservation.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
@@ -98,7 +98,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     IgnoreStartDate = true
                 });
 
-                return RedirectToRoute("employer-apprenticeship-training", new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
                 {
                     Id = result.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
