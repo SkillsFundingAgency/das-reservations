@@ -125,32 +125,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Gets_Employer_Information_From_Cache(
-            ReservationsRouteModel routeModel,
-            StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel)
-        {
-            var expectedId = Guid.NewGuid();
-            routeModel.Id = expectedId;
-            
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.SelectedCourseId = _course.Id;
-
-            await _controller.PostApprenticeshipTraining(routeModel, formModel);
-
-            _mediator.Verify(mediator => mediator.Send(
-                It.Is<CacheReservationCourseCommand>( c => 
-                    c.CourseId.Equals(_course.Id)),
-                It.IsAny<CancellationToken>()));
-
-            _mediator.Verify(mediator => mediator.Send(
-                It.Is<CacheReservationStartDateCommand>(c =>
-                    c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                    c.StartDateDescription.Equals(startDateModel.ToString())),
-                It.IsAny<CancellationToken>()));
-        }
-
-        [Test, MoqAutoData]
         public async Task And_No_Course_Then_Caches_Draft_Reservation(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
