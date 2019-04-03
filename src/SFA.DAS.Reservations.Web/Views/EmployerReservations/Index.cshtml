@@ -1,17 +1,20 @@
 ﻿@{
     ViewData["Title"] = "Reservations";
 }
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Get funding for taking on an apprentice</h1>
+        <p class="govuk-body">Use this service to secure government funding for training an apprentice. Government funding will pay for part, or all of the cost of training an apprentice. You can secure funding no more than 6 months in advance of the date the apprentice starts their off-the-job training.</p>
+        <p class="govuk-body">Before you start you will need:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>an estimate of which month the apprentice will start their apprenticeship training, which can be flexible up to 3 months</li>
+            <li>an idea of the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank">apprenticeship training</a> the apprentice will take (optional)</li>
+        </ul>
+        <p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
 
-<h1 class="govuk-heading-xl">Get funding for taking on an apprentice</h1>
-<p class="govuk-body">Use this service to secure government funding for training an apprentice. Government funding will pay for part, or all of the cost of training an apprentice. You can secure funding no more than 6 months in advance of the date the apprentice starts their off-the-job training.</p>
-<p class="govuk-body">Before you start you will need:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li>an estimate of which month the apprentice will start their apprenticeship training, which can be flexible up to 3 months</li>
-    <li>an idea of the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank">apprenticeship training</a> the apprentice will take (optional)</li>
-</ul>
-<p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
+        @*<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@
 
-@*<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@
+        <a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
 
-<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
-
+    </div>
+</div>
