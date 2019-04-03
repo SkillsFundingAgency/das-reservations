@@ -102,23 +102,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public void Then_Throw_Error_If_No_Reservation_Found(
-            ReservationsRouteModel routeModel,
-            StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel)
-        {
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetCachedReservationQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => null);
-
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.SelectedCourseId = _course.Id;
-
-            Assert.ThrowsAsync<ArgumentException>(() => _controller.PostApprenticeshipTraining(routeModel, formModel));
-        }
-
-        [Test, MoqAutoData]
         public async Task Then_Caches_Draft_Reservation(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,

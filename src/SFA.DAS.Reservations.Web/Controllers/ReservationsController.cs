@@ -77,16 +77,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
-
-                if (existingCommand == null)
-                {
-                    throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
-                }
-
                 var courseCommand = new CacheReservationCourseCommand
                 {
-                    Id = existingCommand.Id,
+                    Id = routeModel.Id,
                     CourseId = course?.Id
                 };
 
@@ -94,7 +87,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var startDateCommand = new CacheReservationStartDateCommand
                 {
-                    Id = existingCommand.Id,
+                    Id = routeModel.Id.Value,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
                 };
