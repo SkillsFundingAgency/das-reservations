@@ -29,9 +29,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("chooseEmployer", Name = RouteNames.ProviderChooseEmployer)]
-        public async Task<IActionResult> ChooseEmployer(uint ukPrn)
+        public async Task<IActionResult> ChooseEmployer(ReservationsRouteModel routeModel)
         {
-            var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = ukPrn});
+            if (!routeModel.UkPrn.HasValue)
+            {
+                throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
+            }
+
+            var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
 
             var viewModel = new ChooseEmployerViewModel
             {

@@ -44,10 +44,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 throw new CachedReservationNotFoundException(command.Id);
             }
 
-            var course = await _courseService.GetCourse(command.CourseId);
+            if (string.IsNullOrEmpty(command.CourseId))
+            {
+                cachedReservation.CourseId = null;
+                cachedReservation.CourseDescription = null;
+            }
+            else
+            {
+                var course = await _courseService.GetCourse(command.CourseId);
 
-            cachedReservation.CourseId = course.Id;
-            cachedReservation.CourseDescription = course.CourseDescription;
+                cachedReservation.CourseId = course.Id;
+                cachedReservation.CourseDescription = course.CourseDescription;
+            }
 
             await _cacheStorageService.SaveToCache(cachedReservation.Id.ToString(), cachedReservation, 1);
 

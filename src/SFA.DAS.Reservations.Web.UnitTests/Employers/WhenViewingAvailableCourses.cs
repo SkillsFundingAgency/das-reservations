@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
     {
         [Test, MoqAutoData]
         public async Task Then_Gets_Cached_Reservation(
-            Guid reservationId,
+            ReservationsRouteModel routeModel,
             GetCoursesResult coursesResult,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -30,14 +29,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(coursesResult);
 
-            await controller.SelectCourse(reservationId);
+            await controller.SelectCourse(routeModel);
 
-            mockMediator.Verify(mediator => mediator.Send(It.Is<GetCachedReservationQuery>(query => query.Id == reservationId), CancellationToken.None), Times.Once);
+            mockMediator.Verify(mediator => mediator.Send(It.Is<GetCachedReservationQuery>(query => query.Id == routeModel.Id.Value), CancellationToken.None), Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task And_No_Cached_Reservation_Then_Redirects_Start_Again(
-            Guid reservationId,
+            ReservationsRouteModel routeModel,
             GetCoursesResult coursesResult,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -49,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetCachedReservationResult)null);
 
-            var result = await controller.SelectCourse(reservationId) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             result.Should().NotBeNull();
             result?.ViewName.Should().Be("Index");
         }
@@ -58,7 +57,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_All_Available_Courses_Are_Viewable(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            EmployerReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             //Assign
             mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedCourseViewModels = courses.Select(c => new CourseViewModel(c)).ToArray();
 
             //Act
-            var result = await controller.SelectCourse(Guid.NewGuid()) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
 
             //Assert
@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task And_Previously_Selected_Course_Then_Sets_Selected_Course(
-            Guid reservationId,
+            ReservationsRouteModel routeModel,
             GetCoursesResult coursesResult,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
 
-            var result = await controller.SelectCourse(reservationId) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             result.Should().NotBeNull();
             var viewModel = result.Model as EmployerSelectCourseViewModel;
             viewModel.Courses.Single(model => model.Selected == "selected").Id
@@ -105,10 +105,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_ReservationId_Will_Be_In_View_Model(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            EmployerReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             //Assign
-            var expectedReservationId = Guid.NewGuid();
+         
             mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
                 {
@@ -116,12 +117,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //Act
-            var result = await controller.SelectCourse(expectedReservationId) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
 
             //Assert
             Assert.IsNotNull(viewModel);
-            Assert.AreEqual(expectedReservationId, viewModel.ReservationId);
+            Assert.AreEqual(routeModel.Id, viewModel.ReservationId);
         }
     }
 }

@@ -9,7 +9,7 @@
         <h1 class="govuk-heading-xl">Apprenticeship training</h1>
 
 
-        <form method="post" asp-route="@Model.RouteName">
+        <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
 
             @if (!ViewData.ModelState.IsValid)
             {
