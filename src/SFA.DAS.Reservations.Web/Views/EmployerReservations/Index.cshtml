@@ -1,25 +1,30 @@
 ﻿@model ReservationViewModel
 
-@{
+
+﻿@{
     ViewData["Title"] = "Reservations";
 }
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Get funding for taking on an apprentice</h1>
+        <p class="govuk-body">Use this service to secure government funding for training an apprentice. Government funding will pay for part, or all of the cost of training an apprentice. You can secure funding no more than 6 months in advance of the date the apprentice starts their off-the-job training.</p>
+        <p class="govuk-body">Before you start you will need:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>an estimate of which month the apprentice will start their apprenticeship training, which can be flexible up to 3 months</li>
+            <li>an idea of the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" class="govuk-link">apprenticeship training</a> the apprentice will take (optional)</li>
+        </ul>
+        <p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
 
-<h1 class="govuk-heading-xl">Reserve funding for apprenticeship training</h1>
-<p class="govuk-body-l">Check if apprenticeship funding is available for the date you want your apprentice to start and reserve this now to guarantee the funding will be available when you need it.</p>
-<p class="govuk-body">You will need:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li>a rough idea of when you expect the apprenticeship training to start</li>
-    <li>what course it is likely to be</li>
-    <li>what level the course is likely to be</li>
-</ul>
+        @*<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@
 
-@{
+
+  @{
     var routeData = new Dictionary<string, string>
     {
         { "id", Model.Id.ToString() },
         { "EmployerAccountId", ViewContext.RouteData.Values["EmployerAccountId"].ToString() }
     };
-}
-
-<a asp-route="employer-select-course" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
-
+  }
+      <a asp-route="employer-select-course" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+    </div>
+</div>
