@@ -206,6 +206,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Id = routeModel.Id.Value 
             };
             var queryResult = await _mediator.Send(query);
+            //todo: null check on result
 
             var model = new ConfirmationViewModel
             (
@@ -259,20 +260,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
-            CourseViewModel employerChosenCourse = null;
-            if (!isProvider)
-            {
-                if (string.IsNullOrWhiteSpace(courseId))
-                {
-                    employerChosenCourse = new CourseViewModel((string)null, "Unknown");   
-                }
-                else
-                {
-                    var selectedCourse = coursesResult.Courses.SingleOrDefault(course => course.Id == courseId);
-                    employerChosenCourse = new CourseViewModel(selectedCourse?.Id, selectedCourse?.CourseDescription);
-                }
-            }
-
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
@@ -280,8 +267,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 TrainingStartDate = startDate,
-                IsProvider = isProvider,
-                EmployersChosenCourse = JsonConvert.SerializeObject(employerChosenCourse)
+                IsProvider = isProvider
             };
         }
     }

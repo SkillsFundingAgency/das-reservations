@@ -7,9 +7,7 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -107,56 +105,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
 
             ((ApprenticeshipTrainingViewModel) result.Model).IsProvider.Should().BeFalse();
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Employer_Then_EmployersChosenCourse_Is_Serialised_CourseViewModel(
-            ReservationsRouteModel routeModel,
-            GetCoursesResult getCoursesResult,
-            GetCachedReservationResult cachedReservationResult,
-            [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
-        {
-            routeModel.UkPrn = null;
-            cachedReservationResult.CourseId = getCoursesResult.Courses.First().Id;
-            cachedReservationResult.CourseDescription = getCoursesResult.Courses.First().CourseDescription;
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getCoursesResult);
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cachedReservationResult);
-            var expectedEmployersChosenCourse = new CourseViewModel(cachedReservationResult.CourseId, cachedReservationResult.CourseDescription);
-            var expectedEmployersChosenCourseJson = JsonConvert.SerializeObject(expectedEmployersChosenCourse);
-
-            var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
-
-            ((ApprenticeshipTrainingViewModel) result.Model).EmployersChosenCourse.Should().Be(expectedEmployersChosenCourseJson);
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Employer_Not_Selected_A_Course_Then_EmployersChosenCourse_Is_Serialised_Empty_Course(
-            ReservationsRouteModel routeModel,
-            GetCoursesResult getCoursesResult,
-            GetCachedReservationResult cachedReservationResult,
-            [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
-        {
-            routeModel.UkPrn = null;
-            cachedReservationResult.CourseId = null;
-            cachedReservationResult.CourseDescription = "Unknown";
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getCoursesResult);
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(cachedReservationResult);
-            var expectedEmployersChosenCourse = new CourseViewModel(cachedReservationResult.CourseId, cachedReservationResult.CourseDescription);
-            var expectedEmployersChosenCourseJson = JsonConvert.SerializeObject(expectedEmployersChosenCourse);
-
-            var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
-
-            ((ApprenticeshipTrainingViewModel) result.Model).EmployersChosenCourse.Should().Be(expectedEmployersChosenCourseJson);
         }
     }
 }
