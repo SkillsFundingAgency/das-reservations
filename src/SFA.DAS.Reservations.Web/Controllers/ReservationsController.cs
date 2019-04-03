@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -57,8 +58,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
-            CacheReservationResult result;
-
             StartDateModel startDateModel = null;
             if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
                 startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
@@ -163,6 +162,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
                 AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId
             };
+
             return View(viewModel);
         }
 
@@ -235,9 +235,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCompleted)]
-        public async Task<IActionResult> Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        public IActionResult Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
         {
-            
             if (!ModelState.IsValid)
             {
                 var confirmationModel = new ConfirmationViewModel

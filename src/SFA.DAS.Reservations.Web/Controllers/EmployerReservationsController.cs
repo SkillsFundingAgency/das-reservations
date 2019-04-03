@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -109,6 +109,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+
+                if (getCoursesResponse?.Courses == null)
+                {
+                    return View("Error");//todo: setup view correctly.
+                }
 
                 var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
 

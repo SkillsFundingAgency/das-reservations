@@ -5,7 +5,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 {
     public class CacheReservationCourseCommand: IRequest<Unit>
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
        
         public string CourseId { get; set; }
     }

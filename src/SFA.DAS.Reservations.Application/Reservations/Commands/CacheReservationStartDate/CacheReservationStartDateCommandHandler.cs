@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -37,7 +38,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (cachedReservation == null)
             {
-                throw new Exception("No reservation was found with that Id");
+                throw new CachedReservationNotFoundException(command.Id);
             }
 
             cachedReservation.StartDate = command.StartDate;

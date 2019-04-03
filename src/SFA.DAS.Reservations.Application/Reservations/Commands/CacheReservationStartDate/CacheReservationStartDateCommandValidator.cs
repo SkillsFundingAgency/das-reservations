@@ -10,14 +10,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         {
             var result = new ValidationResult();
 
-            // id
-
             if (command.Id == Guid.Empty)
             {
                 result.AddError(nameof(command.Id));
             }
-
-            // start date
 
             if (string.IsNullOrEmpty(command.StartDate))
             {
