@@ -22,7 +22,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_All_Available_Courses_Are_Viewable(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            EmployerReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             //Assign
             mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedCourseViewModels = courses.Select(c => new CourseViewModel(c)).ToArray();
 
             //Act
-            var result = await controller.SelectCourse(Guid.NewGuid()) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
 
             //Assert
@@ -46,10 +47,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_ReservationId_Will_Be_In_View_Model(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            EmployerReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             //Assign
-            var expectedReservationId = Guid.NewGuid();
+         
             mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
                 {
@@ -57,12 +59,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //Act
-            var result = await controller.SelectCourse(expectedReservationId) as ViewResult;
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
 
             //Assert
             Assert.IsNotNull(viewModel);
-            Assert.AreEqual(expectedReservationId, viewModel.ReservationId);
+            Assert.AreEqual(routeModel.Id, viewModel.ReservationId);
         }
     }
 }

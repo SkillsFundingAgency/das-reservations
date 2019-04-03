@@ -173,6 +173,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, AutoData]
+        public async Task Then_Caches_Course_Choice_If_Not_Selected(
+            CacheReservationCourseCommand command, 
+            CachedReservation cachedReservation)
+        {
+            //Assign
+            command.CourseId = null;
+            
+            _mockCacheStorageService.Setup(s => s.RetrieveFromCache<CachedReservation>(It.IsAny<string>()))
+                .ReturnsAsync(cachedReservation);
+
+            //Act
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            //Assert
+            _mockCourseService.Verify(s => s.GetCourse(It.IsAny<string>()), Times.Never);
+            _mockCacheStorageService.Verify(service => service.SaveToCache(
+                It.IsAny<string>(), 
+                It.Is<CachedReservation>(c => c.CourseId == null && c.CourseDescription == null), 
+                1));
+        }
+
+        [Test, AutoData]
         public void Then_Throws_Exception_If_Reservation_Not_Found_In_Cache(CacheReservationCourseCommand command)
         {
             //Assign

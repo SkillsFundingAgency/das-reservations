@@ -23,11 +23,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 result.AddError(nameof(command.Id), $"{nameof( CacheReservationCourseCommand.Id)} has not been supplied");
             }
 
-            if (string.IsNullOrEmpty(command.CourseId))
-            {
-                result.AddError(nameof(command.CourseId), $"{nameof( CacheReservationCourseCommand.CourseId)} has not been supplied");
-            }
-            else if(!await _courseService.CourseExists(command.CourseId))
+            if(!string.IsNullOrEmpty(command.CourseId) && !await _courseService.CourseExists(command.CourseId))
             {
                 result.AddError(nameof(command.CourseId), $"{nameof(CacheReservationCourseCommand.CourseId)} is invalid");
             }

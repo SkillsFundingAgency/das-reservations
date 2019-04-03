@@ -11,9 +11,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -78,42 +76,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     command.CourseId.Equals(_course.Id)), It.IsAny<CancellationToken>()));
         }
 
-        [Test, MoqAutoData]
-        public void Then_Throw_Error_If_No_Reservation_Found(ReservationsRouteModel routeModel)
-        {
-            //Assign
-            var selectedCourse = _course.Id;
-
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetCachedReservationQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => null);
-
-            //Act + Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _controller.PostSelectCourse(routeModel, selectedCourse));
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_Gets_Employer_Information_From_Cache([Frozen]ReservationsRouteModel routeModel)
-        {
-            //Assign
-            var selectedCourse = _course.Id;
-
-            //Act
-            await _controller.PostSelectCourse(routeModel, selectedCourse);
-
-            //Assert
-            _mediator.Verify(mediator => mediator.Send(
-                It.Is<GetCachedReservationQuery>(q => q.Id.Equals(routeModel.Id)),
-                It.IsAny<CancellationToken>()), Times.Once);
-
-            _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheReservationCourseCommand>(command => 
-                    command.CourseId == _course.Id), It.IsAny<CancellationToken>()));
-        }
-
         [Test, MoqAutoData] 
-        public async Task And_No_Course_Then_Doesnt_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
+        public async Task And_No_Course_Then_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
         {
             //Act
             await _controller.PostSelectCourse(routeModel, null);
@@ -121,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             _mediator.Verify(mediator => 
                 mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()), 
-                Times.Never);
+                Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -137,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(result);
 
             result.RouteValues.Should().ContainKey("Id")
-                .WhichValue.Should().Be(_cachedReservationResult.Id);
+                .WhichValue.Should().Be(routeModel.Id);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
