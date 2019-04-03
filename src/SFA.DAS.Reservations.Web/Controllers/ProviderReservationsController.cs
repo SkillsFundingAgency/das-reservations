@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!viewModel.Confirm.HasValue)
             {
-                ModelState.AddModelError("confirm-yes", "You must pick an option");
+                ModelState.AddModelError("confirm-yes", "Select whether to secure funds for this employer or not");
                 return View("ConfirmEmployer", viewModel);
             }
 

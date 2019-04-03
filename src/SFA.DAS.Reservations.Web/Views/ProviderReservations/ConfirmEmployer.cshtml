@@ -24,7 +24,7 @@
                             {
                                 if (error.Value.ValidationState == ModelValidationState.Invalid)
                                 {
-                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose an option</a></li>");
+                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Select whether to secure funds for this employer or not</a></li>");
                                     if (loopCount == errorCount - 1)
                                     {
                                         errorStringBuilder.Append(" and ");
@@ -72,9 +72,9 @@
                     </legend>
                     @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("confirm-yes"))
                     {
-                        <span id="confirm-error" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> Please choose an option
-                        </span>
+                    <span id="confirm-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> Select whether to secure funds for this employer or not
+                    </span>
                     }
                     <div class="govuk-radios">
                         <div class="govuk-radios__item">
