@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         {
             var result = new ValidationResult();
 
-            if (!command.Id.HasValue || command.Id == Guid.Empty)
+            if (command.Id == Guid.Empty)
             {
                 result.AddError(nameof(command.Id), $"{nameof( CacheReservationCourseCommand.Id)} has not been supplied");
             }

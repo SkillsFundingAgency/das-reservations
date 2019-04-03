@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Courses.Api;
@@ -136,17 +137,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         }
 
         [Test]
-        public async Task Then_Returns_Null_If_Course_Does_Not_Exist()
+        public void Then_Throws_Exception_If_Course_Does_Not_Exist()
         {
             //Assign
             _cacheService.Setup(s => s.RetrieveFromCache<IDictionary<string, Course>>(It.IsAny<string>()))
                 .ReturnsAsync(_expectedCacheCourses);
 
-            //Act
-            var course = await _service.GetCourse("20");
-
-            //Assert
-            Assert.IsNull(course);
+            //Act + Assert
+            Assert.ThrowsAsync<CourseNotFoundException>(() => _service.GetCourse("20"));
         }
 
         [Test]

@@ -4,11 +4,11 @@ namespace SFA.DAS.Reservations.Application.Exceptions
 {
     public class CachedReservationNotFoundException : Exception
     {
-        private readonly Guid _reservationId;
+        public Guid ReservationId { get; }
 
         public CachedReservationNotFoundException(Guid reservationId)
         {
-            _reservationId = reservationId;
+            ReservationId = reservationId;
         }
     }
 }

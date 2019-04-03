@@ -17,7 +17,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         private readonly ICacheStorageService _cacheStorageService;
         private readonly ICourseService _courseService;
 
-        public CacheReservationCourseCommandHandler(IValidator<CacheReservationCourseCommand> validator, ICacheStorageService cacheStorageService, ICourseService courseService)
+        public CacheReservationCourseCommandHandler(
+            IValidator<CacheReservationCourseCommand> validator, 
+            ICacheStorageService cacheStorageService, 
+            ICourseService courseService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
@@ -38,7 +41,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (cachedReservation == null)
             {
-                throw new CachedReservationNotFoundException(command.Id.GetValueOrDefault());
+                throw new CachedReservationNotFoundException(command.Id);
             }
 
             var course = await _courseService.GetCourse(command.CourseId);

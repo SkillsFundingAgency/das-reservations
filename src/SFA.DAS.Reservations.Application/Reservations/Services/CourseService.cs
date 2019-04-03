@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -34,7 +35,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
         {
             var coursesLookUp = await GetCachedLookup();
 
-            return coursesLookUp.TryGetValue(id, out var course) ? course : null;
+            if (!coursesLookUp.TryGetValue(id, out var course))
+            {
+                throw new CourseNotFoundException(id);
+            }
+
+            return course;
         }
 
         public async Task<bool> CourseExists(string id)

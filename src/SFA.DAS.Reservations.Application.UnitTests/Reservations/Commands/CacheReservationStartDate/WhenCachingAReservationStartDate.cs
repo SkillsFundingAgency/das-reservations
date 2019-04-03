@@ -9,7 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.UnitTests.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
@@ -17,7 +17,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CacheReservationStartDate
 {
     [TestFixture]
     public class WhenCachingAReservationStartDate
@@ -109,8 +109,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<Exception>()
-                .Which.Message.Should().Be("No reservation was found with that Id");
+            act.Should().ThrowExactly<CachedReservationNotFoundException>()
+                .Which.ReservationId.Equals(command.Id);
+              
         }
     }
 }
