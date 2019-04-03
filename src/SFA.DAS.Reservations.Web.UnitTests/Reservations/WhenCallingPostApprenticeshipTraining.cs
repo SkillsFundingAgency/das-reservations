@@ -14,6 +14,8 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -50,9 +52,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => _cachedReservationResult);
 
             _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<CacheCreateReservationCommand>(),
+                    It.IsAny<CacheReservationCourseCommand>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new CacheReservationResult{Id = _cachedReservationResult.Id});
+                .ReturnsAsync(Unit.Value);
+
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<CacheReservationStartDateCommand>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Value);
 
             _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
@@ -124,16 +131,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
 
-            _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId == _cachedReservationResult.AccountId &&
-                    command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
-                    command.StartDateDescription == startDateModel.ToString() &&
-                    command.CourseId == _course.Id &&
-                    command.AccountLegalEntityPublicHashedId == _cachedReservationResult.AccountLegalEntityPublicHashedId &&
-                    command.CourseDescription == _course.CourseDescription &&
-                    command.AccountLegalEntityPublicHashedId == _cachedReservationResult.AccountLegalEntityPublicHashedId
-                    ), It.IsAny<CancellationToken>()));
+            _mediator.Verify(mediator => mediator.Send(
+                    It.Is<CacheReservationCourseCommand>( c => 
+                        c.CourseId.Equals(_course.Id)),
+                    It.IsAny<CancellationToken>()));
+
+            _mediator.Verify(mediator => mediator.Send(
+                    It.Is<CacheReservationStartDateCommand>(c =>
+                        c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
+                        c.StartDateDescription.Equals(startDateModel.ToString())),
+                    It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData]
@@ -150,20 +157,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
 
-            _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountLegalEntityId.Equals(_cachedReservationResult.AccountLegalEntityId) &&
-                    command.AccountLegalEntityName.Equals(_cachedReservationResult.AccountLegalEntityName) &&
-                    command.AccountId == _cachedReservationResult.AccountId &&
-                    command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
-                    command.StartDateDescription == startDateModel.ToString() &&
-                    command.CourseId == _course.Id &&
-                    command.CourseDescription == _course.CourseDescription
-                ), It.IsAny<CancellationToken>()));
+            _mediator.Verify(mediator => mediator.Send(
+                It.Is<CacheReservationCourseCommand>( c => 
+                    c.CourseId.Equals(_course.Id)),
+                It.IsAny<CancellationToken>()));
 
             _mediator.Verify(mediator => mediator.Send(
-                It.Is<GetCachedReservationQuery>(q => q.Id.Equals(expectedId)),
-                It.IsAny<CancellationToken>()), Times.Once);
+                It.Is<CacheReservationStartDateCommand>(c =>
+                    c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
+                    c.StartDateDescription.Equals(startDateModel.ToString())),
+                It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData]
@@ -177,14 +180,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
 
-            _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId == _cachedReservationResult.AccountId &&
-                    command.StartDate == startDateModel.StartDate.ToString("yyyy-MM") &&
-                    command.StartDateDescription == startDateModel.ToString() &&
-                    command.CourseId == null &&
-                    command.CourseDescription == "Unknown"
-                ), It.IsAny<CancellationToken>()), Times.Once);
+            _mediator.Verify(mediator => mediator.Send(
+                It.Is<CacheReservationCourseCommand>( c => 
+                    c.CourseId == null),
+                It.IsAny<CancellationToken>()));
+
+            _mediator.Verify(mediator => mediator.Send(
+                It.Is<CacheReservationStartDateCommand>(c =>
+                    c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
+                    c.StartDateDescription.Equals(startDateModel.ToString())),
+                It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData]
@@ -199,11 +204,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
 
             result.RouteValues.Should().ContainKey("Id")
-                .WhichValue.Should().Be(_cachedReservationResult.Id);
+                .WhichValue.Should().Be(routeModel.Id);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
-        public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
+        public async Task And_Start_Date_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel,
@@ -212,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
             
-            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
            
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -224,43 +229,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("TrainingStartDate"));
         }
 
-        [Test, MoqAutoData]
-        public async Task Then_Gets_Course_Details_From_Service(
+        [Test, AutoData] //note cannot use moqautodata to construct controller here due to modelmetadata usage.
+        public async Task And_Course_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel)
+            ApprenticeshipTrainingFormModel formModel,
+            GetCoursesResult coursesResult)
         {
-            //Assign
-            formModel.SelectedCourseId = _course.Id;
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-
-            //Act
-            await _controller.PostApprenticeshipTraining(routeModel, formModel);
-
-            //Assert
-            _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.CourseId == _course.Id &&
-                    command.CourseDescription == _course.CourseDescription
-                ), It.IsAny<CancellationToken>()), Times.Once);
-            
-        }
-
-        [Test, MoqAutoData]
-        public void Then_If_Course_Details_Not_Found_Will_Throw_Exception(
-            ReservationsRouteModel routeModel,
-            StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel)
-        {
-            //Assign
-            _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
-
             formModel.SelectedCourseId = _course.Id;
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
 
-            //Act + Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _controller.PostApprenticeshipTraining(routeModel, formModel));
+            _mediator.Setup(mediator =>
+                    mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(
+                    new ValidationResult("Failed",
+                        new List<string> {"CourseId|The CourseId field is invalid."}), null, null));
+
+            var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
+
+            Assert.IsNotNull(result);
+            var actualViewResult = result as ViewResult;
+            Assert.IsNotNull(actualViewResult);
+            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
+            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("CourseId"));
         }
     }
 }

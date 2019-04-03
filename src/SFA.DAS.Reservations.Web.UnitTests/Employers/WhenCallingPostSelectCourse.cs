@@ -10,9 +10,9 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -49,9 +49,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(() => _cachedReservationResult);
 
             _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<CacheCreateReservationCommand>(),
+                    It.IsAny<CacheReservationCourseCommand>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new CacheReservationResult{Id = _cachedReservationResult.Id});
+                .ReturnsAsync(Unit.Value);
 
             _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
@@ -74,13 +74,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             //Assert
             _mediator.Verify(mediator => 
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command => 
-                    command.AccountId.Equals(_cachedReservationResult.AccountId) &&
-                    command.AccountLegalEntityId.Equals(_cachedReservationResult.AccountLegalEntityId) &&
-                    command.AccountLegalEntityName.Equals(_cachedReservationResult.AccountLegalEntityName) &&
-                    command.CourseId.Equals(_course.Id) &&
-                    command.CourseDescription.Equals(_course.CourseDescription)
-                    ), It.IsAny<CancellationToken>()));
+                mediator.Send(It.Is<CacheReservationCourseCommand>(command => 
+                    command.CourseId.Equals(_course.Id)), It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData]
@@ -116,13 +111,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 It.IsAny<CancellationToken>()), Times.Once);
 
             _mediator.Verify(mediator =>
-                mediator.Send(It.Is<CacheCreateReservationCommand>(command =>
-                    command.AccountId == _cachedReservationResult.AccountId &&
-                    command.AccountLegalEntityId.Equals(_cachedReservationResult.AccountLegalEntityId) &&
-                    command.AccountLegalEntityName.Equals(_cachedReservationResult.AccountLegalEntityName) &&
-                    command.CourseId == _course.Id &&
-                    command.CourseDescription == _course.CourseDescription
-                ), It.IsAny<CancellationToken>()));
+                mediator.Send(It.Is<CacheReservationCourseCommand>(command => 
+                    command.CourseId == _course.Id), It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData] public async Task And_No_Course_Then_Doesnt_Caches_Draft_Reservation(
@@ -139,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             await controller.PostSelectCourse(routeModel, null);
 
             mockMediator.Verify(mediator => 
-                mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()), 
+                mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()), 
                 Times.Never);
         }
 
@@ -165,7 +155,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assign
             var selectedCourse = _course.Id;
 
-            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheCreateReservationCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
 
             //Act

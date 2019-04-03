@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -56,8 +58,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
-            CacheReservationResult result;
-
             StartDateModel startDateModel = null;
             if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
                 startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
@@ -83,20 +83,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
                 }
 
-                var command = new CacheCreateReservationCommand
+                var courseCommand = new CacheReservationCourseCommand
                 {
                     Id = existingCommand.Id,
-                    AccountId = existingCommand.AccountId,
-                    AccountLegalEntityId = existingCommand.AccountLegalEntityId,
-                    AccountLegalEntityName = existingCommand.AccountLegalEntityName,
-                    StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
-                    StartDateDescription = startDateModel?.ToString(),
-                    AccountLegalEntityPublicHashedId = existingCommand.AccountLegalEntityPublicHashedId,
-                    CourseId = course?.Id,
-                    CourseDescription = course == null? "Unknown" : course.CourseDescription
+                    CourseId = course?.Id
                 };
 
-                result = await _mediator.Send(command);
+                await _mediator.Send(courseCommand);
+
+                var startDateCommand = new CacheReservationStartDateCommand
+                {
+                    Id = existingCommand.Id,
+                    StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
+                    StartDateDescription = startDateModel?.ToString(),
+                };
+
+                await _mediator.Send(startDateCommand);
             }
             catch (ValidationException e)
             {
@@ -109,7 +111,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("ApprenticeshipTraining", model);
             }
 
-            routeModel.Id = result.Id;
+            routeModel.Id = routeModel.Id.GetValueOrDefault();
             var routeName = routeModel.UkPrn == null ? 
                 RouteNames.EmployerReview :
                 RouteNames.ProviderReview;
@@ -217,7 +219,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCompleted)]
         public IActionResult Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
         {
-            
             if (!ModelState.IsValid)
             {
                 var confirmationModel = new ConfirmationViewModel

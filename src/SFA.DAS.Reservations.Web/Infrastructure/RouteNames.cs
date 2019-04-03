@@ -9,6 +9,9 @@
         public const string ProviderReservationCreated = "provider-reservation-created";
         public const string ProviderSignOut = "provider-signout";
         public const string ProviderReservationCompleted = "provider-reservation-completed";
+        public const string ProviderChooseEmployer = "provider-choose-employer";
+
+        
 
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
@@ -16,5 +19,7 @@
         public const string EmployerCreateReservation = "employer-create-reservation";
         public const string EmployerReservationCreated = "employer-reservation-created";
         public const string EmployerSignOut = "employer-signout";
+        public const string EmployerSelectCourse = "employer-select-course";
+
     }
 }
