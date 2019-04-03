@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate
 {
     public class CacheReservationStartDateCommandValidator : IValidator<CacheReservationStartDateCommand>
     {

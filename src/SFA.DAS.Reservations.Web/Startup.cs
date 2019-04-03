@@ -17,6 +17,9 @@ using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -111,7 +114,9 @@ namespace SFA.DAS.Reservations.Web
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
-            services.AddScoped(typeof(IValidator<CacheCreateReservationCommand>), typeof(CacheCreateReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<CacheReservationCourseCommand>), typeof(CacheReservationCourseCommandValidator));
+            services.AddScoped(typeof(IValidator<CacheReservationStartDateCommand>), typeof(CacheReservationStartDateCommandValidator));
+            services.AddScoped(typeof(IValidator<CacheReservationEmployerCommand>), typeof(CacheReservationEmployerCommandValidator));
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddScoped(typeof(IValidator<GetCachedReservationResult>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
@@ -124,6 +129,7 @@ namespace SFA.DAS.Reservations.Web
                 reservationsWebConfig.EmployerAccountHashLength, 
                 reservationsWebConfig.EmployerAccountHashAlphabet));
             services.AddTransient<IStartDateService, StartDateService>();
+            services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);

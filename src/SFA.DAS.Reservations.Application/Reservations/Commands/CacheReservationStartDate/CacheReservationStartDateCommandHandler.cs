@@ -8,7 +8,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate
 {
     public class CacheReservationStartDateCommandHandler : IRequestHandler<CacheReservationStartDateCommand>
     {

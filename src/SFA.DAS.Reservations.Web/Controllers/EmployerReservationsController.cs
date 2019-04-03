@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -32,14 +34,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var accountId = _hashingService.DecodeValue(employerAccountId);
 
-            var response = await _mediator.Send(new CacheCreateReservationCommand
+            var reservationId = Guid.NewGuid();
+
+            await _mediator.Send(new CacheReservationEmployerCommand
             {
+                Id = reservationId,
                 AccountId = accountId,
                 AccountLegalEntityId = 1,
+                AccountLegalEntityPublicHashedId = "111ABC",
                 AccountLegalEntityName = "Test Corp"
             });
 
-            var viewModel = new ReservationViewModel{ Id = response.Id};
+            var viewModel = new ReservationViewModel{ Id = reservationId};
 
             return View(viewModel);
         }
@@ -80,27 +86,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     EmployerAccountId = routeModel.EmployerAccountId,
                 });
             }
-         
-            var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
-            var selectedCourse = getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(selectedCourseId));
-            var course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(selectedCourseId));
 
             try
             {
-                var result = await _mediator.Send(new CacheCreateReservationCommand
+                await _mediator.Send(new CacheReservationCourseCommand
                 {
                     Id = cachedReservation.Id,
-                    AccountId = cachedReservation.AccountId,
-                    AccountLegalEntityId = cachedReservation.AccountLegalEntityId,
-                    AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
-                    CourseId = course.Id,
-                    CourseDescription = course.CourseDescription,
-                    IgnoreStartDate = true
+                    CourseId = selectedCourseId
                 });
 
                 return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
                 {
-                    Id = result.Id,
+                    Id = cachedReservation.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
                 });
             }

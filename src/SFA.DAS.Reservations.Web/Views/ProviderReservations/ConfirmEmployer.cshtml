@@ -61,6 +61,7 @@
         <form action="@Url.Action("ConfirmEmployer")" method="POST">
 
             @Html.HiddenFor(model => model.AccountLegalEntityName)
+            @Html.HiddenFor(model => model.AccountLegalEntityId)
             @Html.HiddenFor(model => model.AccountLegalEntityPublicHashedId)
             @Html.HiddenFor(model => model.AccountName)
             @Html.HiddenFor(model => model.AccountId)

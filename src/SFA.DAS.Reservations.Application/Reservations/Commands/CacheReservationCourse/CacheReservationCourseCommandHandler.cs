@@ -11,7 +11,7 @@ using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse
 {
-    public class CacheReservationCourseCommandHandler : IRequestHandler<CacheReservationCourseCommand, CacheReservationResult>
+    public class CacheReservationCourseCommandHandler : IRequestHandler<CacheReservationCourseCommand, Unit>
     {
         private readonly IValidator<CacheReservationCourseCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             _courseService = courseService;
         }
 
-        public async Task<CacheReservationResult> Handle(CacheReservationCourseCommand command, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CacheReservationCourseCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
 
@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             await _cacheStorageService.SaveToCache(cachedReservation.Id.ToString(), cachedReservation, 1);
 
-            return new CacheReservationResult { Id = command.Id.GetValueOrDefault() };
+            return Unit.Value;
         }
     }
 }

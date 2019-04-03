@@ -3,7 +3,7 @@ using MediatR;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse
 {
-    public class CacheReservationCourseCommand: IRequest<CacheReservationResult>
+    public class CacheReservationCourseCommand: IRequest<Unit>
     {
         public Guid? Id { get; set; }
        
