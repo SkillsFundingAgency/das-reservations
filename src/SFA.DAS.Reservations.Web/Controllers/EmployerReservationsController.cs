@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -54,9 +53,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(Guid id)
         {
+            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = id});
+            if (cachedReservation == null)
+            {
+                return View("Index");
+            }
+
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
-            var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
+            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
 
             var viewModel = new EmployerSelectCourseViewModel
             {
@@ -80,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (string.IsNullOrEmpty(selectedCourseId))
             {
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
                 {
                     Id = cachedReservation.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
@@ -95,7 +100,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     CourseId = selectedCourseId
                 });
 
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
                 {
                     Id = cachedReservation.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
