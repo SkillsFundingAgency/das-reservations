@@ -17,8 +17,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses
         public async Task<GetCoursesResult> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
         {
             var courses = await _service.GetCourses();
-
-            var result = await _apiClient.Get<CoursesApiRequest, GetCoursesResponse>(apiRequest);
+            
             return new GetCoursesResult {Courses = courses};
         }
     }
