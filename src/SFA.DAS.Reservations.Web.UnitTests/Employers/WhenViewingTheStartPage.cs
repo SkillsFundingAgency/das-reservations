@@ -7,6 +7,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -16,20 +17,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_Reservation_Cache_WIll_Be_Created(
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IHashingService> mockHashingService,
-            EmployerReservationsController controller)
+            EmployerReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             //Assign
-            var hashedAccountId = "ABC123";
-            var expectedEmployerAccountId = 123;
+            const int expectedEmployerAccountId = 123;
             
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Value);
 
-            mockHashingService.Setup(s => s.DecodeValue(hashedAccountId))
+            mockHashingService.Setup(s => s.DecodeValue(routeModel.EmployerAccountId))
                 .Returns(expectedEmployerAccountId);   
             
             //Act
-            await controller.Index(hashedAccountId);
+            await controller.Index(routeModel);
             
             //Assert
             mockMediator.Verify(m => m.Send(It.Is<CacheReservationEmployerCommand>( c =>

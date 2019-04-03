@@ -41,26 +41,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                 .WhichValue.Should().Be($"{nameof( CacheReservationCourseCommand.Id)} has not been supplied");
         }
 
-        [Test]
-        public async Task Then_If_CourseId_Is_Empty_Then_Fail()
-        {
-            var command = new  CacheReservationCourseCommand
-            {
-                Id = Guid.NewGuid(),
-                CourseId = ""
-            };
-
-            var result = await _validator.ValidateAsync(command);
-
-            result.IsValid().Should().BeFalse();
-            result.ValidationDictionary.Count.Should().Be(1);
-            result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.CourseId))
-                .WhichValue.Should().Be($"{nameof( CacheReservationCourseCommand.CourseId)} has not been supplied");
-
-            _courseService.Verify(s => s.CourseExists(It.IsAny<string>()), Times.Never);
-        }
-
         
         [Test]
         public async Task Then_If_CourseId_Is_Invalid_Then_Fail()
@@ -85,7 +65,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test]
         public async Task And_All_Fields_Invalid_Then_Returns_All_Errors()
         {
-            var command = new  CacheReservationCourseCommand();
+            _courseService.Setup(s => s.CourseExists(It.IsAny<string>())).ReturnsAsync(false);
+
+            var command = new  CacheReservationCourseCommand{ CourseId = "INVALID" };
 
             var result = await _validator.ValidateAsync(command);
 
