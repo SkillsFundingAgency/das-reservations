@@ -6,12 +6,12 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Employers.Services;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
+namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
 {
     public class WhenCheckingCachedReservationAccessForProvider
     {

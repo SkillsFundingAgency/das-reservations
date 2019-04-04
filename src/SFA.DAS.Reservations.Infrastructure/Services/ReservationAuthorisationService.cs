@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Remotion.Linq.Clauses;
-using SFA.DAS.Reservations.Application.Employers.Services;
-using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Services
+namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class ReservationAuthorisationService : IReservationAuthorisationService
     {
