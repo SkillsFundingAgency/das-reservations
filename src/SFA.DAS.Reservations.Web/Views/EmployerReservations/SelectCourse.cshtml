@@ -7,7 +7,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <form method="post" asp-route="@Model.RouteName">
+        <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
 
             @if (!ViewData.ModelState.IsValid)
             {
