@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web.UnitTests", "SFA.DAS.Reservations.Web.UnitTests\SFA.DAS.Reservations.Web.UnitTests.csproj", "{DD46209A-CA75-4223-B61B-F7D355DD010C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Domain", "SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj", "{945C9EDA-02A4-4652-9BDD-4535714FE430}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Domain", "SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj", "{945C9EDA-02A4-4652-9BDD-4535714FE430}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Domain.UnitTests", "SFA.DAS.Reservations.Domain.UnitTests\SFA.DAS.Reservations.Domain.UnitTests.csproj", "{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Domain.UnitTests", "SFA.DAS.Reservations.Domain.UnitTests\SFA.DAS.Reservations.Domain.UnitTests.csproj", "{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,6 +10,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -82,6 +83,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/SelectCourse")]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
+
             if (!routeModel.Id.HasValue)
             {
                 throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));

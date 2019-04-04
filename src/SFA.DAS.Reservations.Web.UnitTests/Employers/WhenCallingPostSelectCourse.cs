@@ -10,6 +10,7 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -79,10 +80,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData] 
         public async Task And_No_Course_Then_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
         {
-            //Act
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => _cachedReservationResult);
+
             await _controller.PostSelectCourse(routeModel, null);
 
-            //Assert
             _mediator.Verify(mediator => 
                 mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()), 
                 Times.Once);
@@ -93,7 +97,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Assign
             var selectedCourse = _course.Id;
-            
+
             //Act
             var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as RedirectToRouteResult;
 
@@ -109,10 +113,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Assign
             var selectedCourse = _course.Id;
-            
+
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
-            
+
             //Act
             var result = await _controller.PostSelectCourse(routeModel, selectedCourse);
 

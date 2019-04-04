@@ -114,7 +114,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
-            Assert.ThrowsAsync<ArgumentException>(() => _controller.PostApprenticeshipTraining(routeModel, formModel));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _controller.PostApprenticeshipTraining(routeModel, formModel));
+
         }
 
         [Test, MoqAutoData]
