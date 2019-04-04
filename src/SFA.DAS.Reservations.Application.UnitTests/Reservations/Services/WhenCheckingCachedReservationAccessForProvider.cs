@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             var providerUkPrn = reservation.UkPrn;
 
             //Act + Assert
-            var exception = Assert.Throws<ArgumentException>(() => service.ProviderReservationAccessAllowed(providerUkPrn, null));
+            var exception = Assert.Throws<ArgumentException>(() => service.ProviderReservationAccessAllowed(providerUkPrn, (CachedReservation) null));
             exception.ParamName.Should().Be("reservation");
         }
 
