@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
             routeModel.UkPrn = null;
 
@@ -105,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel)
         {
 
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -129,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel)
         {
             routeModel.UkPrn = null;
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -152,7 +152,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -175,7 +175,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
@@ -191,7 +191,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
             
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()))
@@ -213,7 +213,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             _mediator.Setup(mediator =>

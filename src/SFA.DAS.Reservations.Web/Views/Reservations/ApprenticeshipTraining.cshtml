@@ -20,11 +20,21 @@
                             var errorStringBuilder = new StringBuilder();
                             var errorCount = ViewData.ModelState.ErrorCount;
                             var loopCount = 1;
+
+
+                            var firstStartDate = Model.PossibleStartDates.FirstOrDefault().Id;
                             foreach (var error in ViewData.ModelState)
                             {
                                 if (error.Value.ValidationState == ModelValidationState.Invalid)
                                 {
-                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose a date</a></li>");
+                                    var errorKey = $"{error.Key}";
+                                    if (error.Key.Equals("StartDate"))
+                                    {
+                                        errorKey = $"{error.Key}-{firstStartDate}";
+                                    }
+
+                                    errorStringBuilder.Append($"<li><a href=\"#{errorKey}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
+                                    
                                     if (loopCount == errorCount - 1)
                                     {
                                         errorStringBuilder.Append(" and ");
@@ -37,7 +47,7 @@
                                     loopCount++;
                                 }
                             }
-                        }
+                            }
                         @Html.Raw(errorStringBuilder.ToString())
                     </ul>
                 </div>
@@ -86,8 +96,8 @@
                     </span>
                     @if (ViewData.ModelState.ContainsKey("StartDate"))
                     {
-                        <span id="startDate" class="govuk-error-message">
-                            Select a start date
+                        <span id="StartDate" class="govuk-error-message">
+                            @ViewData.ModelState["StartDate"].Errors.First().ErrorMessage
                         </span>
                     }
 
@@ -95,7 +105,7 @@
                         @foreach (var possibleStartDate in Model.PossibleStartDates)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Id" name="trainingStartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked">
+                                <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked">
                                 <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Id">
                                     @possibleStartDate.Label
                                 </label>

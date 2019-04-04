@@ -59,8 +59,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             StartDateModel startDateModel = null;
-            if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
-                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+
+            if (!ModelState.IsValid)
+            {
+                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
+                return View("ApprenticeshipTraining", model);
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(formModel.StartDate))
+                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
 
             try
             {
