@@ -6,9 +6,14 @@ namespace SFA.DAS.Reservations.Domain.Courses
 {
     public class Course
     {
+        public Course()
+        {
+            Title = SetDefaultTitleIfEmpty("");
+        }
+
         public Course(string id, string title, int level)
         {
-            Title = string.IsNullOrEmpty(title) ? "Unknown" : title;
+            Title = SetDefaultTitleIfEmpty(title);
             Id = id;
             Level = level;
 
@@ -16,9 +21,17 @@ namespace SFA.DAS.Reservations.Domain.Courses
 
         [JsonProperty("CourseId")]
         public string Id { get; }
+
         public string Title { get; }
+
         public int Level { get; }
+
         public string CourseDescription => Title.Equals("UNKNOWN",StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title} - Level {Level}";
+
+        private static string SetDefaultTitleIfEmpty(string title)
+        {
+            return string.IsNullOrEmpty(title) ? "Unknown" : title;
+        }
     }
 }
 

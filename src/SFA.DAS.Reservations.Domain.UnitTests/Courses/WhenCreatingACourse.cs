@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Courses;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
 {
@@ -51,6 +48,19 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
 
             //Assert
             Assert.AreEqual("Some title - Level 1", actualApprenticeship.CourseDescription);
+        }
+
+        [Test]
+        public void Then_The_Empty_Constructor_Sets_The_Title_To_Unknown()
+        {
+            //Arrange
+            var expectedString = "Unknown";
+
+            //Act
+            var course = new Course();
+
+            //Assert
+            Assert.AreEqual(expectedString, course.CourseDescription);
         }
 
     }
