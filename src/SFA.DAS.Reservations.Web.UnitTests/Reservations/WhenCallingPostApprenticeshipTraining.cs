@@ -32,14 +32,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         private GetCachedReservationResult _cachedReservationResult;
         private Mock<IMediator> _mediator;
         private ReservationsController _controller;
+        private IFixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
             _course = new Course("1-4-5","test",1);
-            _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
+            _cachedReservationResult = _fixture.Create<GetCachedReservationResult>();
 
             _mediator = new Mock<IMediator>();
             _controller = new ReservationsController(
@@ -65,6 +66,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         _course
                     }
                 });
+        }
+
+        [Test, AutoData]
+        public async Task Then_The_Model_Is_Validated_And_Confirmation_Returned(ApprenticeshipTrainingFormModel model, ReservationsRouteModel routeModel)
+        {
+            _controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            var actual = await _controller.PostApprenticeshipTraining(routeModel, model);
+
+            var actualModel = actual as ViewResult;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual("ApprenticeshipTraining", actualModel.ViewName);
         }
 
         [Test, MoqAutoData]
