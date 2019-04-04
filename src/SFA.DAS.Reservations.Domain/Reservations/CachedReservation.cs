@@ -13,5 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public string StartDateDescription { get; set; }
         public string CourseId { get; set; }
         public string CourseDescription { get; set; }
+        public uint UkPrn { get; set; }
     }
 }
