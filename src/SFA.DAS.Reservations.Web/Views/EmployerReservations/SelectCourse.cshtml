@@ -8,6 +8,8 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
+        <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take? (optional)</h1>
+
         <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
 
             @if (!ViewData.ModelState.IsValid)
@@ -47,13 +49,12 @@
             }
 
             <div class="govuk-form-group">
-                <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take? (optional)</h1>
                 <label class="govuk-label" for="course-search">
                     Search for a course
                 </label>
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
                     This information can be changed later. If you want to find the correct training,
-                    you can check <a class="govuk-link" target="_blank"  href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/">Find apprenticeship training</a> or ask your training provider.
+                    you can check <a class="govuk-link" target="_blank" href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/">Find apprenticeship training</a> or ask your training provider.
                 </span>
                 <partial name="_CourseSearch" />
             </div>
