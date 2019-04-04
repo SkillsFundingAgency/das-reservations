@@ -36,13 +36,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             {
                 Assert.AreEqual(ViewNames.EmployerReview, actual.ViewName);
                 Assert.AreEqual(RouteNames.EmployerCreateReservation, actual.ConfirmRouteName);
-                Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.ChangeRouteName);
+                Assert.AreEqual(RouteNames.EmployerSelectCourse, actual.ChangeCourseRouteName);
+                Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.ChangeStartDateRouteName);
             }
             else
             {
                 Assert.AreEqual(ViewNames.ProviderReview, actual.ViewName);
                 Assert.AreEqual(RouteNames.ProviderCreateReservation, actual.ConfirmRouteName);
-                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeRouteName);
+                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeCourseRouteName);
+                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeStartDateRouteName);
             }
             Assert.AreEqual(StartDateDescription, actual.StartDateDescription);
         }

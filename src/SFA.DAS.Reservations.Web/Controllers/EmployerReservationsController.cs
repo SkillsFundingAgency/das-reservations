@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -54,14 +55,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {
-            if (!routeModel.Id.HasValue)
+            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+            if (cachedReservation == null)
             {
-                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
+                return View("Index");
             }
 
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
-            var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
+            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
 
             var viewModel = new EmployerSelectCourseViewModel
             {
@@ -84,11 +86,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
 
-            if (!routeModel.Id.HasValue)
-            {
-                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
-            }
-
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand
@@ -97,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     CourseId = selectedCourseId
                 });
 
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
                 {
                     Id = routeModel.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,

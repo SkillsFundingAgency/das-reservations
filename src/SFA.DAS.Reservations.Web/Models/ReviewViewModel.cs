@@ -10,7 +10,11 @@ namespace SFA.DAS.Reservations.Web.Models
                 RouteNames.EmployerCreateReservation :
                 RouteNames.ProviderCreateReservation;
 
-            ChangeRouteName = IsEmployerRoute(routeModel) ?
+            ChangeCourseRouteName = IsEmployerRoute(routeModel) ?
+                RouteNames.EmployerSelectCourse :
+                RouteNames.ProviderApprenticeshipTraining;
+
+            ChangeStartDateRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerApprenticeshipTraining :
                 RouteNames.ProviderApprenticeshipTraining;
 
@@ -23,12 +27,11 @@ namespace SFA.DAS.Reservations.Web.Models
             CourseDescription = courseDescription;
             AccountLegalEntityName = accountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
-
-            
         }
 
+        public string ChangeCourseRouteName { get; }
+        public string ChangeStartDateRouteName { get; }
         public string ConfirmRouteName { get; }
-        public string ChangeRouteName { get; }
         public ReservationsRouteModel RouteModel { get;  }
         public string StartDateDescription { get;  }
         public string CourseDescription { get;  }

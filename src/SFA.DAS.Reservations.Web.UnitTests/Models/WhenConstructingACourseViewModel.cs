@@ -83,6 +83,5 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             viewModel.Description.Should().Be("Unknown");
             viewModel.Selected.Should().BeNull();
         }
-        
     }
 }
