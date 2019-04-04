@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using FluentAssertions;
@@ -9,6 +10,7 @@ using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
+using StructureMap.Pipeline;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 {
@@ -37,26 +39,26 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         }
 
         [Test]
-        public void Then_Provider_Has_Access_If_Allowed()
+        public async Task Then_Provider_Has_Access_If_Allowed()
         {
            //Arrange
             var providerUkPrn = _reservation.UkPrn;
 
             //Act
-            var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
+            var result = await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
 
             //Assert
             Assert.IsTrue(result);
         }
 
         [Test]
-        public void Then_Denies_Access_If_UkPrn_Doesnt_Matches()
+        public async Task Then_Denies_Access_If_UkPrn_Doesnt_Matches()
         {
             //Arrange
             var providerUkPrn = _reservation.UkPrn + 10;
 
             //Act
-            var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
+            var result = await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
 
             //Assert
             Assert.IsFalse(result);
@@ -66,7 +68,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public void Then_Exception_Thrown_If_UkPrn_Default_Value()
         {
             //Act + Assert
-            var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(default(uint), _reservation));
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await _service.ProviderReservationAccessAllowed(default(uint), _reservation));
             exception.ParamName.Should().Be("ukPrn");
         }
 
@@ -74,7 +76,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public void Then_Exception_Thrown_If_Reservation_Is_Null()
         {
             //Act + Assert
-            var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(10, (GetReservationResponse) null));
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await _service.ProviderReservationAccessAllowed(10, (GetReservationResponse) null));
             exception.ParamName.Should().Be("reservation");
         }
 
@@ -86,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             _reservation.UkPrn = default(uint);
 
             //Act + Assert
-            var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation));
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation));
             exception.ParamName.Should().Be("reservation");
         }
 
@@ -98,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             _reservation.AccountLegalEntityId = _employer.AccountLegalEntityId + 1;
 
             //Act + Assert
-            Assert.Throws<UnauthorizedAccessException>(() => _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation));
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async() => await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation));
         }
     }
 }
