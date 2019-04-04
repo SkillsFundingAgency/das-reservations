@@ -5,6 +5,7 @@ using MediatR;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -46,8 +47,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (string.IsNullOrEmpty(command.CourseId))
             {
-                cachedReservation.CourseId = null;
-                cachedReservation.CourseDescription = null;
+                var course = new Course(null,null,0);
+                cachedReservation.CourseId = course.Id;
+                cachedReservation.CourseDescription = course.CourseDescription;
             }
             else
             {

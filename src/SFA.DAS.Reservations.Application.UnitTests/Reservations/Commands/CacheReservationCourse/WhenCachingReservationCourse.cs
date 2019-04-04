@@ -167,8 +167,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             //Assert
             _mockCacheStorageService.Verify(service => service.SaveToCache(
                 It.IsAny<string>(), 
-                It.Is<CachedReservation>(c => c.CourseId.Equals(_expectedCourse.Id) &&
-                    c.CourseDescription.Equals(_expectedCourse.CourseDescription)), 
+                It.Is<CachedReservation>(c => c.CourseId.Equals(_expectedCourse.Id) 
+                        && c.CourseDescription.Equals(_expectedCourse.CourseDescription)), 
                 1));
         }
 
@@ -190,7 +190,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             _mockCourseService.Verify(s => s.GetCourse(It.IsAny<string>()), Times.Never);
             _mockCacheStorageService.Verify(service => service.SaveToCache(
                 It.IsAny<string>(), 
-                It.Is<CachedReservation>(c => c.CourseId == null && c.CourseDescription == null), 
+                It.Is<CachedReservation>(c => c.CourseId == null && c.CourseDescription == "Unknown"), 
                 1));
         }
 
