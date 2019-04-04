@@ -126,32 +126,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("Error");//todo: setup view correctly.
             }
+           
+            var viewModel = new ReviewViewModel(
+                routeModel,
+                cachedReservation.StartDateDescription, 
+                cachedReservation.CourseDescription, 
+                cachedReservation.AccountLegalEntityName, 
+                cachedReservation.AccountLegalEntityPublicHashedId);
             
-            var confirmRouteName = routeModel.UkPrn == null ? 
-                RouteNames.EmployerCreateReservation : 
-                RouteNames.ProviderCreateReservation;
-
-            var changeCourseRouteName = routeModel.UkPrn == null ? 
-                RouteNames.EmployerSelectCourse : 
-                RouteNames.ProviderApprenticeshipTraining;
-
-            var changeStartDateRouteName = routeModel.UkPrn == null ? 
-                RouteNames.EmployerApprenticeshipTraining : 
-                RouteNames.ProviderApprenticeshipTraining;
-
-            var viewModel = new ReviewViewModel
-            {
-                ConfirmRouteName = confirmRouteName,
-                ChangeCourseRouteName = changeCourseRouteName,
-                ChangeStartDateRouteName = changeStartDateRouteName,
-                RouteModel = routeModel,
-                StartDateDescription = cachedReservation.StartDateDescription,
-                CourseDescription = cachedReservation.CourseDescription,
-                AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId
-            };
-
-            return View(viewModel);
+            return View(viewModel.ViewName, viewModel);
         }
 
         [Route("{ukPrn}/reservations/{id}/create", Name = RouteNames.ProviderCreateReservation)]
@@ -180,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // todo: log this ex
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
@@ -253,8 +236,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Redirect(model.DashboardUrl);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,
-            string courseId = null, string startDate = null)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
+            bool isProvider, string courseId = null, string startDate = null)
         {
             var dates = await _startDateService.GetStartDates();
 

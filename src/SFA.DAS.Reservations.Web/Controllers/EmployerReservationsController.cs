@@ -11,6 +11,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmp
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -84,6 +85,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/SelectCourse")]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
+
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand

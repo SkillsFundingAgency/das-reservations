@@ -104,6 +104,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
+
             formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 

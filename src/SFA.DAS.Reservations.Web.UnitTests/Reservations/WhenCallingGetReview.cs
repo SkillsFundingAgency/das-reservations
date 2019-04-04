@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_Has_Ukprn_Then_Uses_Provider_Route(
+        public async Task And_Has_Ukprn_Then_Uses_Provider_Route_And_View(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
@@ -70,10 +70,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.ProviderCreateReservation);
             ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
             ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            result.ViewName.Should().Be(ViewNames.ProviderReview);
         }
 
         [Test, MoqAutoData]
-        public async Task And_No_Ukprn_Then_Uses_Employer_Route(
+        public async Task And_No_Ukprn_Then_Uses_Employer_Route_And_View(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
@@ -84,6 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerCreateReservation);
             ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.EmployerSelectCourse);
             ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
+            result.ViewName.Should().Be(ViewNames.EmployerReview);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
