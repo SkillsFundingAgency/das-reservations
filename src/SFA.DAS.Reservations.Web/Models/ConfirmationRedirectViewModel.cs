@@ -5,7 +5,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmationRedirectViewModel
     {
-        [Required(ErrorMessage = "You must select an option")]
+        [Required(ErrorMessage = "Select whether to add an apprentice now or later")]
         public bool? AddApprentice { get; set; }
         public string DashboardUrl { get; set; }
         public string ApprenticeUrl { get; set; }
