@@ -6,11 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Courses
 {
     public class Course
     {
-        public Course()
-        {
-            Title = SetDefaultTitleIfEmpty("");
-        }
-
         public Course(string id, string title, int level)
         {
             Title = SetDefaultTitleIfEmpty(title);

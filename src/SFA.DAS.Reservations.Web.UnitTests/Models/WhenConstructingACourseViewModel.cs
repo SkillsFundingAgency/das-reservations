@@ -41,10 +41,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             viewModel.Description.Should().Be(course.CourseDescription);
         }
 
-        [Test, AutoData]
-        public void Then_Sets_Selected(
-            Course course)
+        [Test]
+        public void Then_Sets_Selected()
         {
+            var course = new Course("12","Test",1);
             var courseId = course.Id;
             var viewModel = new CourseViewModel(course, courseId);
             viewModel.Selected.Should().Be("selected");

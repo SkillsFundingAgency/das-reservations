@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-            _course = fixture.Create<Course>();
+            _course = new Course("1-4-5","test",1);
             _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
 
             _mediator = new Mock<IMediator>();

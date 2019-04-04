@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var expectedString = "Unknown";
 
             //Act
-            var course = new Course();
+            var course = new Course(null, null, 0);
 
             //Assert
             Assert.AreEqual(expectedString, course.CourseDescription);
