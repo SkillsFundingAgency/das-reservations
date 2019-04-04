@@ -1,5 +1,6 @@
 ﻿@using System.Text
 @using Microsoft.AspNetCore.Mvc.ModelBinding
+@using SFA.DAS.Reservations.Web.Infrastructure
 @model EmployerSelectCourseViewModel
 @{
     ViewData["Title"] = "Reservations - Select Course";
@@ -62,7 +63,7 @@
             </button>
             <div class="govuk-form-group">
                 <span class="govuk-hint govuk-!-margin-top-4">
-                    <a asp-route="employer-skip-select-course" >
+                    <a asp-route="@RouteNames.EmployerSkipSelectCourse" >
                         I don't know this yet
                     </a>
                 </span>
