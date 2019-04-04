@@ -19,33 +19,33 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         [Test, MoqAutoData]
         public async Task Then_It_Calls_ProviderPermissions_Service_To_Get_Employers(
-            uint ukPrn,
             IEnumerable<Employer> expectedEmployers,
             [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller)
+            ProviderReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = expectedEmployers});
    
-            await controller.ChooseEmployer(ukPrn);
+            await controller.ChooseEmployer(routeModel);
 
             mockMediator.Verify(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(),  It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Trusted_Employers(
-            uint ukPrn,
             IEnumerable<Employer> expectedEmployers,
             [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller)
+            ProviderReservationsController controller,
+            ReservationsRouteModel routeModel)
         {
             mockMediator
                 .Setup(service => service.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = expectedEmployers});
 
            
-            var result =   await controller.ChooseEmployer(ukPrn);
+            var result =   await controller.ChooseEmployer(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ChooseEmployerViewModel>()

@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 
             var apiRequest = new ReservationApiRequest(_options.Url,request.Id);
 
-            var result = await _apiClient.Get<ReservationApiRequest, GetReservationResponse>(apiRequest);
+            var result = await _apiClient.Get<GetReservationResponse>(apiRequest);
 
             return new GetReservationResult
             {

@@ -81,45 +81,16 @@
             </div>
         </div>
     </footer>
-
+    <script src="libs/jquery/jquery.min.js"></script>
     <script src="libs/govuk-frontend/all.js"></script>
     <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script>
     <script src="js/das-all.js"></script>
-
+    <script src="/js/app.js" no-cdn></script>
     <script>
         window.GOVUKFrontend.initAll();
         window.DASFrontend.initAll();
     </script>
-    <script>
-        var idSelectField = 'course-search';
-        var selectEl = document.querySelector('#' + idSelectField);
-        if (selectEl) {
-            accessibleAutocomplete.enhanceSelectElement({
-                selectElement: selectEl,
-                minLength: 3,
-                defaultValue: '',
-                displayMenu: 'overlay',
-                placeholder: 'Start typing to search apprenticeships',
-                onConfirm: function (opt) {
 
-                    var txtInput = document.querySelector('#' + idSelectField);
-                    var searchString = opt || txtInput.value;
-
-                    var requestedOption = [].filter.call(this.selectElement.options,
-                        function (option) {
-                            return (option.textContent || option.innerText) === searchString
-                        }
-                    )[0];
-
-                    if (requestedOption) {
-                        requestedOption.selected = true
-                    } else {
-                        this.selectElement.selectedIndex = 0
-                    }
-                }
-            });
-        }
-    </script>
 
 </body>
 

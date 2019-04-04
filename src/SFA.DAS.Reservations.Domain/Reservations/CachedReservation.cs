@@ -1,11 +1,10 @@
 ﻿using System;
-using MediatR;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
-    public class CacheCreateReservationCommand: IRequest<CacheReservationResult>
+    public class CachedReservation
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }

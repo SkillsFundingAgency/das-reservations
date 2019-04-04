@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Api
@@ -20,7 +19,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _apiOptions = apiOptions;
         }
 
-        public async Task<TResponse> Get<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
+        public async Task<TResponse> Get<TResponse>(IGetApiRequest request) 
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
@@ -35,7 +34,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             }
         }
 
-        public async Task<TResponse> Create<TRequest, TResponse>(TRequest request) where TRequest : BaseApiRequest
+        public async Task<TResponse> Create<TResponse>(IPostApiRequest request)
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
