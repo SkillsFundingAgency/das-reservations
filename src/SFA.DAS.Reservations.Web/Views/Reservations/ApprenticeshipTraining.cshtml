@@ -6,9 +6,14 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Apprenticeship training</h1>
-
-
+        @if (Model.IsProvider)
+        {
+            <h1 class="govuk-heading-xl">Apprenticeship training</h1>
+        }
+        else
+        {
+            <h1 class="govuk-heading-xl">When will the apprentice start their off-the-job training?</h1>
+        }
         <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
 
             @if (!ViewData.ModelState.IsValid)
@@ -61,11 +66,14 @@
             }
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        <h2 class="govuk-fieldset__heading">
-                            When will the apprenticeship training start?
-                        </h2>
-                    </legend>
+                    @if (Model.IsProvider)
+                    {
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">
+                                When will the apprenticeship training start?
+                            </h2>
+                        </legend>
+                    }
                     <span id="choose-start-date-hint" class="govuk-hint">
                         The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
                     </span>
