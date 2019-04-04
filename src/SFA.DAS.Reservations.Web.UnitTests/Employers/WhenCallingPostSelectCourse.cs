@@ -80,14 +80,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData] 
         public async Task And_No_Course_Then_Caches_Draft_Reservation(ReservationsRouteModel routeModel)
         {
-            mockMediator.Setup(mediator => mediator.Send(
+            _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => cacheResult);
+                .ReturnsAsync(() => _cachedReservationResult);
 
-            await controller.PostSelectCourse(routeModel, null);
+            await _controller.PostSelectCourse(routeModel, null);
 
-            mockMediator.Verify(mediator => 
+            _mediator.Verify(mediator => 
                 mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()), 
                 Times.Once);
         }
