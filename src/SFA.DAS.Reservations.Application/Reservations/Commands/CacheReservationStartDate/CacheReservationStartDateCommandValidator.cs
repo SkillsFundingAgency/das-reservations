@@ -2,25 +2,22 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate
 {
-    public class CacheCreateReservationCommandValidator : IValidator<CacheCreateReservationCommand>
+    public class CacheReservationStartDateCommandValidator : IValidator<CacheReservationStartDateCommand>
     {
-        public Task<ValidationResult> ValidateAsync(CacheCreateReservationCommand command)
+        public Task<ValidationResult> ValidateAsync(CacheReservationStartDateCommand command)
         {
             var result = new ValidationResult();
 
-            if (command.AccountId == default(long))
+            if (command.Id == Guid.Empty)
             {
-                result.AddError(nameof(command.AccountId));
+                result.AddError(nameof(command.Id));
             }
 
             if (string.IsNullOrEmpty(command.StartDate))
             {
-                if (command.Id.HasValue)
-                {
-                    result.AddError(nameof(command.StartDate));
-                }
+                result.AddError(nameof(command.StartDate));
             }
             else
             {

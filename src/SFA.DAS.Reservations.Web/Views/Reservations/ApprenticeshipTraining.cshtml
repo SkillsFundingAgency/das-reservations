@@ -6,60 +6,83 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Apprenticeship training</h1>
 
 
-        <form method="post" asp-route="@Model.RouteName">
-
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-                    <h2 class="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div class="govuk-error-summary__body">
-                        <ul class="govuk-list govuk-error-summary__list">
-                            @{
-                                var errorStringBuilder = new StringBuilder();
-                                var errorCount = ViewData.ModelState.ErrorCount;
-                                var loopCount = 1;
-                                foreach (var error in ViewData.ModelState)
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
+                </h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        @{
+                            var errorStringBuilder = new StringBuilder();
+                            var errorCount = ViewData.ModelState.ErrorCount;
+                            var loopCount = 1;
+                            foreach (var error in ViewData.ModelState)
+                            {
+                                if (error.Value.ValidationState == ModelValidationState.Invalid)
                                 {
-                                    if (error.Value.ValidationState == ModelValidationState.Invalid)
+                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose a date</a></li>");
+                                    if (loopCount == errorCount - 1)
                                     {
-                                        errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Please choose a date</a></li>");
-                                        if (loopCount == errorCount - 1)
-                                        {
-                                            errorStringBuilder.Append(" and ");
-                                        }
-                                        else if (loopCount != errorCount)
-                                        {
-                                            errorStringBuilder.Append(", ");
-                                        }
-
-                                        loopCount++;
+                                        errorStringBuilder.Append(" and ");
                                     }
+                                    else if (loopCount != errorCount)
+                                    {
+                                        errorStringBuilder.Append(", ");
+                                    }
+
+                                    loopCount++;
                                 }
                             }
-                            @Html.Raw(errorStringBuilder.ToString())
-                        </ul>
-                    </div>
+                        }
+                        @Html.Raw(errorStringBuilder.ToString())
+                    </ul>
                 </div>
-            }
-
-            <div class="govuk-form-group">
-                <partial name="_CourseSearch" />             
             </div>
+        }
 
+        @if (Model.IsProvider)
+        {
+            <h1 class="govuk-heading-xl">Apprenticeship training</h1>
+        }
+        else
+        {
+            <h1 class="govuk-heading-xl">When will the apprentice start their off-the-job training?</h1>
+        }
+
+        <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
+            @if (Model.IsProvider)
+            {
+            <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take? (optional)</h2>
+            <div class="govuk-form-group">
+
+                <label class="govuk-label" for="course-search">
+                    Search for a course
+                </label>
+                <partial name="_CourseSearch" />
+                <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
+                    This information can be changed later.
+                </span>
+            </div>
+            }
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        <h2 class="govuk-fieldset__heading">
-                            When will the apprenticeship training start?
-                        </h2>
-                    </legend>
+                    @if (Model.IsProvider)
+                    {
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">
+                                When will the apprenticeship training start?
+                            </h2>
+                        </legend>
+                        <span id="choose-start-date-hint" class="govuk-hint">
+                            The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
+                        </span>
+                    }
                     <span id="choose-start-date-hint" class="govuk-hint">
-                        The apprenticeship training can start anytime in the month you choose or the following 2 months. For example if you select January, the apprenticeship training can start anytime from January to March.
+                        The apprentice can start their off-the-job training anytime in the month you choose, or the following 2 months. For example if you select January, the apprentice can start their off-the-job training anytime from January to March.
                     </span>
                     @if (ViewData.ModelState.ContainsKey("StartDate"))
                     {
@@ -72,7 +95,7 @@
                         @foreach (var possibleStartDate in Model.PossibleStartDates)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Id" name="trainingStartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked" >
+                                <input class="govuk-radios__input" id="training-start-date-@possibleStartDate.Id" name="trainingStartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked">
                                 <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Id">
                                     @possibleStartDate.Label
                                 </label>
@@ -87,9 +110,18 @@
                         I want a later start date
                     </span>
                 </summary>
-                <div class="govuk-details__text">
-                    You can secure funding no more than 6 months in advance of the apprenticeship training start date. If you want to secure funding for a later date, come back later.
-                </div>
+                @if (Model.IsProvider)
+                {
+                    <div class="govuk-details__text">
+                        You can secure funding no more than 6 months in advance of the apprenticeship training start date. If you want to secure funding for a later date, come back later.
+                    </div>
+                }
+                else
+                {
+                    <div class="govuk-details__text">
+                        You are securing funding for a non-levy employer to take on an apprentice. This will be paid directly to the training provider, who the employer will confirm at a later date.
+                    </div>
+                }
             </details>
             <button type="submit" class="govuk-button">
                 Save and continue

@@ -1,18 +1,19 @@
 ﻿using System;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class ReservationApiRequest : BaseApiRequest
+    public class ReservationApiRequest : IGetApiRequest, IPostApiRequest
     {
         public ReservationApiRequest(
-            string baseUrl, 
+            string baseUrl,
             long accountId, 
             DateTime startDate, 
             Guid id, 
             string accountLegalEntityName,
             string courseId = null) 
-            : base(baseUrl)
         {
+            BaseUrl = baseUrl;
             AccountId = accountId;
             Id = id;
             AccountLegalEntityName = accountLegalEntityName;
@@ -20,9 +21,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             CourseId = courseId;
         }
 
-        //Todo: This ctor will be changed when we change the BaseRequestApi logic
-        public ReservationApiRequest(string baseUrl,  Guid id) : base (baseUrl)
+        public ReservationApiRequest(string baseUrl, Guid id)
         {
+            BaseUrl = baseUrl;
             Id = id;
         }
 
@@ -33,9 +34,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string StartDate { get; }
 
         public string CourseId { get; }
-
-        public override string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
-        public override string GetUrl => $"{BaseUrl}api/reservations/{Id}";
+        public string BaseUrl { get; }
+        public string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
+        public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
         public string AccountLegalEntityName { get;}
     }
 

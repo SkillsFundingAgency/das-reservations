@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -27,10 +28,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("chooseEmployer", Name = "provider_choose_employer")]
-        public async Task<IActionResult> ChooseEmployer(uint ukPrn)
+        [Route("chooseEmployer", Name = RouteNames.ProviderChooseEmployer)]
+        public async Task<IActionResult> ChooseEmployer(ReservationsRouteModel routeModel)
         {
-            var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = ukPrn});
+            if (!routeModel.UkPrn.HasValue)
+            {
+                throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
+            }
+
+            var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
 
             var viewModel = new ChooseEmployerViewModel
             {
@@ -67,17 +73,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     });
                 }
 
-                var result = await _mediator.Send(new CacheCreateReservationCommand
+                var reservationId = Guid.NewGuid();
+
+                await _mediator.Send(new CacheReservationEmployerCommand
                 {
+                    Id = reservationId,
                     AccountId = viewModel.AccountId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
                     AccountLegalEntityName = viewModel.AccountLegalEntityName,
                     AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId
                 });
 
-                return RedirectToAction("ApprenticeshipTraining", "Reservations", new
+                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
                 {
-                    Id = result.Id,
+                    Id = reservationId,
                     EmployerAccountId = viewModel.AccountPublicHashedId,
                     UkPrn = viewModel.UkPrn
                 });

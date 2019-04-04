@@ -1,14 +1,16 @@
-﻿using SFA.DAS.Reservations.Domain.Reservations;
+﻿using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Domain.Courses.Api
 {
-    public class CoursesApiRequest : BaseApiRequest
+    public class CoursesApiRequest : IGetApiRequest
     {
-        public override string CreateUrl { get; }
-        public override string GetUrl => $"{BaseUrl}api/courses";
-
-        public CoursesApiRequest(string baseUrl) : base(baseUrl)
+        public CoursesApiRequest(string baseUrl)
         {
+            BaseUrl = baseUrl;
         }
+        public string BaseUrl { get; }
+        public string GetUrl => $"{BaseUrl}api/courses";
+
+        
     }
 }

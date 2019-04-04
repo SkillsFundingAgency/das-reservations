@@ -8,10 +8,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -69,6 +67,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.Courses.Should().BeEquivalentTo(mappedCourses);
             viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
             viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
+            viewModel.IsProvider.Should().BeTrue();
         }
 
         [Test, MoqAutoData]
@@ -93,6 +92,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             await controller.ApprenticeshipTraining(routeModel);
 
             mockMediator.Verify(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Then_IsProvider_Is_False(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+
+            var result = await controller.ApprenticeshipTraining(routeModel) as ViewResult;
+
+            ((ApprenticeshipTrainingViewModel) result.Model).IsProvider.Should().BeFalse();
         }
     }
 }

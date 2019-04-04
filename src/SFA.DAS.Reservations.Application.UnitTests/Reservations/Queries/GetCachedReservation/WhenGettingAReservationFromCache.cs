@@ -3,44 +3,44 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCachedReservation
 {
     public class WhenGettingAReservationFromCache
     {
-        private const long ExpectedAccountId = 44321;
-
+        private CachedReservation _cachedReservation;
         private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<ICacheStorageService> _cacheService;
         private GetCachedReservationQueryHandler _handler;
-        private readonly Guid _expectedReservationId = Guid.NewGuid();
-        private readonly string _expectedStartDate = DateTime.Now.AddDays(-20).ToString();
 
         [SetUp]
         public void Arrange()
         {
-            _validator = new Mock<IValidator<IReservationQuery>>();
-            _validator.Setup(x => x.ValidateAsync(It.Is<GetCachedReservationQuery>(c =>
-                    c.Id.Equals(_expectedReservationId))))
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            _cachedReservation = fixture.Create<CachedReservation>();
+
+            _validator = fixture.Freeze<Mock<IValidator<IReservationQuery>>>();
+            _validator
+                .Setup(x => x.ValidateAsync(It.Is<GetCachedReservationQuery>(c =>
+                    c.Id.Equals(_cachedReservation.Id))))
                 .ReturnsAsync(new ValidationResult());
            
-            _cacheService = new Mock<ICacheStorageService>();
-            _cacheService.Setup(x => x.RetrieveFromCache<GetCachedReservationResult>(_expectedReservationId.ToString()))
-                .ReturnsAsync(new GetCachedReservationResult
-                {
-                    Id = _expectedReservationId,
-                    AccountId = ExpectedAccountId,
-                    StartDate = _expectedStartDate
-                });
+            _cacheService = fixture.Freeze<Mock<ICacheStorageService>>();
+            _cacheService
+                .Setup(x => x.RetrieveFromCache<CachedReservation>(_cachedReservation.Id.ToString()))
+                .ReturnsAsync(_cachedReservation);
 
-            _handler = new GetCachedReservationQueryHandler(_validator.Object, _cacheService.Object);
+            _handler = fixture.Create<GetCachedReservationQueryHandler>();
         }
 
         [Test]
@@ -64,15 +64,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries
             //Arrange
             var command = new GetCachedReservationQuery
             {
-                Id = _expectedReservationId
+                Id = _cachedReservation.Id
             };
 
             //Act
             var actual = await _handler.Handle(command, new CancellationToken());
 
             //Assert
-            Assert.AreEqual(_expectedReservationId, actual.Id);
-            Assert.AreEqual(_expectedStartDate, actual.StartDate);
+            Assert.AreEqual(_cachedReservation.Id, actual.Id);
+            Assert.AreEqual(_cachedReservation.StartDate, actual.StartDate);
         }
     }
 }
