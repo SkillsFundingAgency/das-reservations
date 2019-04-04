@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -32,9 +30,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Index(string employerAccountId)
+        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
-            var accountId = _hashingService.DecodeValue(employerAccountId);
+            var accountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
 
             var reservationId = Guid.NewGuid();
 
@@ -54,52 +52,54 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
-        public async Task<IActionResult> SelectCourse(Guid id)
+        public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {
+            if (!routeModel.Id.HasValue)
+            {
+                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
+            }
+
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
             var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
 
             var viewModel = new EmployerSelectCourseViewModel
             {
-                ReservationId = id,
+                ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels
             };
 
             return View(viewModel);
         }
 
+        [HttpGet]
+        [Route("{id}/SkipCourseSelection",Name = RouteNames.EmployerSkipSelectCourse)]
+        public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
+        {
+            return await PostSelectCourse(routeModel, null);
+        }
+
         [HttpPost]
         [Route("{id}/SelectCourse")]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
-            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
 
-            if (cachedReservation == null)
+            if (!routeModel.Id.HasValue)
             {
-                throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
-            }
-
-            if (string.IsNullOrEmpty(selectedCourseId))
-            {
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
-                {
-                    Id = cachedReservation.Id,
-                    EmployerAccountId = routeModel.EmployerAccountId,
-                });
+                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
             }
 
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand
                 {
-                    Id = cachedReservation.Id,
+                    Id = routeModel.Id.Value,
                     CourseId = selectedCourseId
                 });
 
                 return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
                 {
-                    Id = cachedReservation.Id,
+                    Id = routeModel.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
                 });
             }
@@ -114,7 +114,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (getCoursesResponse?.Courses == null)
                 {
-                    return View("Error");//todo: setup view correctly.
+                    return View("Error"); //todo: setup view correctly.
                 }
 
                 var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
@@ -127,7 +127,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("SelectCourse", viewModel);
             }
-
+            catch (CachedReservationNotFoundException)
+            {
+                throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
+            }
         }
     }
 }
