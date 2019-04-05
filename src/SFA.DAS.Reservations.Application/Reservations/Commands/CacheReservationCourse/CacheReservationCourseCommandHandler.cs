@@ -15,15 +15,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationCourseCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
+        private readonly ICachedReservationRespository _cachedReservationRespository;
         private readonly ICourseService _courseService;
 
         public CacheReservationCourseCommandHandler(
             IValidator<CacheReservationCourseCommand> validator, 
             ICacheStorageService cacheStorageService, 
+            ICachedReservationRespository cachedReservationRespository,
             ICourseService courseService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
+            _cachedReservationRespository = cachedReservationRespository;
             _courseService = courseService;
         }
 
