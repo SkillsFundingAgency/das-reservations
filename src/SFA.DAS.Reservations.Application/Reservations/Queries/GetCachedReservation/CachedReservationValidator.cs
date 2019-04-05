@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 {
-    public class CachedReservationValidator : IValidator<GetCachedReservationResult>
+    public class CachedReservationValidator : IValidator<CachedReservation>
     {
-        public Task<ValidationResult> ValidateAsync(GetCachedReservationResult reservation)
+        public Task<ValidationResult> ValidateAsync(CachedReservation reservation)
         {
             var result = new ValidationResult();
 

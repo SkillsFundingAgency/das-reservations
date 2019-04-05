@@ -25,10 +25,12 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Filters;
@@ -117,7 +119,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CacheReservationStartDateCommand>), typeof(CacheReservationStartDateCommandValidator));
             services.AddScoped(typeof(IValidator<CacheReservationEmployerCommand>), typeof(CacheReservationEmployerCommandValidator));
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
-            services.AddScoped(typeof(IValidator<GetCachedReservationResult>), typeof(CachedReservationValidator));
+            services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
@@ -130,6 +132,8 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
+            services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
+            services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 

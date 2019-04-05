@@ -85,7 +85,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var courseCommand = new CacheReservationCourseCommand
                 {
                     Id = existingCommand.Id,
-                    CourseId = course?.Id
+                    CourseId = course?.Id,
+                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
                 };
 
                 await _mediator.Send(courseCommand);
@@ -95,6 +96,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Id = existingCommand.Id,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
+                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
                 };
 
                 await _mediator.Send(startDateCommand);
@@ -175,7 +177,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var command = new CreateReservationCommand
                 {
-                    Id = routeModel.Id.GetValueOrDefault()
+                    Id = routeModel.Id.GetValueOrDefault(),
+                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
                 };
 
                 var result = await _mediator.Send(command);
