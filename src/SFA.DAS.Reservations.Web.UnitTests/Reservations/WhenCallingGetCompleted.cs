@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
@@ -43,9 +44,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var result = await controller.Completed(routeModel);
 
-            var model = result.Should().BeOfType<ViewResult>()
-                .Which.Model.Should().BeOfType<CompletedViewModel>().Subject;
+            var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+            var model = viewResult.Model.Should().BeOfType<CompletedViewModel>().Subject;
 
+            viewResult.ViewName.Should().Be(ViewNames.ProviderCompleted);
+        
             model.ReservationId.Should().Be(mediatorResult.ReservationId);
             model.StartDate.Should().Be(mediatorResult.StartDate);
             model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
@@ -54,6 +57,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.AccountLegalEntityPublicHashedId.Should().BeEquivalentTo(routeModel.AccountLegalEntityPublicHashedId);
             model.ApprenticeUrl.Should().NotBeEmpty();
             model.DashboardUrl.Should().NotBeEmpty();
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_UkPrn_Then_It_Uses_Employer_View(
+            ReservationsRouteModel routeModel,
+            GetReservationResult mediatorResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
+                .ReturnsAsync(mediatorResult);
+            
+            var result = await controller.Completed(routeModel);
+
+            var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+            viewResult.ViewName.Should().Be(ViewNames.EmployerCompleted);
         }
 
         [Test, MoqAutoData]

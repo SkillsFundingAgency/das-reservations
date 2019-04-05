@@ -211,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _configuration.DashboardUrl, 
                 _configuration.ApprenticeUrl
             );
-            return View(model);
+            return View(model.ViewName, model);
         }
 
         [HttpPost]
