@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Application.Exceptions
+namespace SFA.DAS.Reservations.Infrastructure.Exceptions
 {
     public class CachedReservationNotFoundException : Exception
     {

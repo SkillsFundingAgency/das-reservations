@@ -9,12 +9,12 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.UnitTests.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CacheReservationStartDate

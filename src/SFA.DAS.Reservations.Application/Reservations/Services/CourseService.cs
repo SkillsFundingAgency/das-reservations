@@ -8,6 +8,7 @@ using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Services
 {

@@ -9,7 +9,6 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -17,6 +16,7 @@ using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CacheReservationCourse
