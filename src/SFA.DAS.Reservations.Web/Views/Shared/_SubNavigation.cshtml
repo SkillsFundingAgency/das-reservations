@@ -31,6 +31,36 @@ else
         <div class="govuk-width-container">
             <ul class="das-navigation__list ">
                 <li class="das-navigation__list-item">
+                    <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--current">Home</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Finance</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Recruitment</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="apprentices" asp-external-action="home" asp-external-subdomain="test-empc" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="teams" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your team</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="agreements" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your organisations and agreements</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="schemes" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--last">PAYE schemes</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+}
+else
+{
+    <nav class="das-navigation">
+        <div class="govuk-width-container">
+            <ul class="das-navigation__list ">
+                <li class="das-navigation__list-item">
                     <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Home</a>
                 </li>
                 <li class="das-navigation__list-item">
