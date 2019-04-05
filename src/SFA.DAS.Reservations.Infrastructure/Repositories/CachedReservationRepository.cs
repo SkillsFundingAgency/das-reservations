@@ -2,10 +2,6 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
-<<<<<<< Updated upstream
-=======
-using SFA.DAS.Reservations.Domain.Reservations.Api;
->>>>>>> Stashed changes
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 
 namespace SFA.DAS.Reservations.Infrastructure.Repositories
