@@ -184,7 +184,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         // GET
 
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderCompleted)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/completed", Name = RouteNames.EmployerCompleted)]//todo: needs /{accountLegalEntityPublicHashedId}??
+        [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerCompleted)]
         public async Task<IActionResult> Completed(ReservationsRouteModel routeModel)
         {
             if (!routeModel.Id.HasValue)

@@ -1,6 +1,8 @@
 ﻿using System;
+using AutoFixture.NUnit3;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
@@ -119,6 +121,23 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             //Act
             Assert.AreEqual($"https://apprentice/{ExpectedProviderId}/unapproved/add-apprentice?reservationId={_expectedReservationId}&employerAccountLegalEntityPublicHashedId={ExpectedHashedLegalEntityAccountId}&startMonthYear={_expectedStartDate.ToString("MMyyyy")}", actual.ApprenticeUrl);
             Assert.IsTrue(actual.ShowApprenticeUrl);
+        }
+
+        [Test, AutoData]
+        public void And_Ukprn_Is_Null_Then_ViewName_Is_EmployerCompleted(
+            ReservationsRouteModel routeModel,
+            Course course)
+        {
+            routeModel.UkPrn = null;
+            var viewModel = new CompletedViewModel(Guid.NewGuid(), DateTime.Today, DateTime.Today, course, "234");
+            Assert.AreEqual(ViewNames.EmployerCompleted, viewModel.ViewName);
+        }
+
+        [Test, AutoData]
+        public void And_Ukprn_Not_Null_Then_ViewName_Is_ProviderCompleted(
+            CompletedViewModel viewModel)
+        {
+            Assert.AreEqual(ViewNames.ProviderCompleted, viewModel.ViewName);
         }
     }
 }
