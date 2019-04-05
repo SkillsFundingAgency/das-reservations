@@ -40,7 +40,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var cachedReservation = await _cacheStorageService.RetrieveFromCache<CachedReservation>(command.Id.ToString());
+            CachedReservation cachedReservation;
+
+            if (command.UkPrn == default(uint))
+            {
+                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+            }
+            else
+            {
+                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+            }
 
             if (cachedReservation == null)
             {

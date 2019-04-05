@@ -46,7 +46,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             _mockCacheRepository.Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
                 .ReturnsAsync(_cachedReservation);
 
-            _commandHandler = fixture.Create<CacheReservationStartDateCommandHandler>();
+            _commandHandler = new CacheReservationStartDateCommandHandler(
+                _mockValidator.Object,
+                _mockCacheStorageService.Object,
+                _mockCacheRepository.Object);
         }
 
         [Test, AutoData]

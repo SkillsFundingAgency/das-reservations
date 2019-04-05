@@ -15,13 +15,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationStartDateCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
+        private readonly ICachedReservationRespository _cachedReservationRespository;
 
         public CacheReservationStartDateCommandHandler(
-            IValidator<CacheReservationStartDateCommand> validator, 
-            ICacheStorageService cacheStorageService)
+            IValidator<CacheReservationStartDateCommand> validator,
+            ICacheStorageService cacheStorageService, 
+            ICachedReservationRespository cachedReservationRespository)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
+            _cachedReservationRespository = cachedReservationRespository;
         }
 
         public async Task<Unit> Handle(CacheReservationStartDateCommand command, CancellationToken cancellationToken)
@@ -34,7 +37,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     new ValidationResult("The following parameters have failed validation", queryValidationResult.ErrorList), null, null);
             }
 
-            var cachedReservation = await _cacheStorageService.RetrieveFromCache<CachedReservation>(command.Id.ToString());
+            CachedReservation cachedReservation;
+
+            if (command.UkPrn == default(uint))
+            {
+                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+            }
+            else
+            {
+                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+            }
 
             if (cachedReservation == null)
             {

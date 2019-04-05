@@ -7,6 +7,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
@@ -15,6 +16,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
@@ -34,6 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         private CachedReservation _cachedReservation;
         private long _expectedAccountId = 12;
         private string _expectedLegalEntityName = "Test Entity";
+        private IOptions<ReservationsApiConfiguration> _options;
 
         [SetUp]
         public void Arrange()
@@ -59,6 +62,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
                 .Setup(validator => validator.ValidateAsync(It.IsAny<CachedReservation>()))
                 .ReturnsAsync(new ValidationResult());
 
+            _options = fixture.Freeze<IOptions<ReservationsApiConfiguration>>();
+
             _mockApiClient = fixture.Freeze<Mock<IApiClient>>();
             _mockApiClient
                 .Setup(client => client.Create<ReservationApiRequest, CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
@@ -70,7 +75,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
             _mockCacheRepository.Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
                 .ReturnsAsync(_cachedReservation);
 
-            _commandHandler = fixture.Create<CreateReservationCommandHandler>();
+            _commandHandler = new CreateReservationCommandHandler(
+                _mockCreateCommandValidator.Object,
+                _mockCachedReservationValidator.Object,
+                _options,
+                _mockApiClient.Object,
+                _mockCacheService.Object,
+                _mockCacheRepository.Object);
         }
 
         [Test, AutoData]
@@ -101,8 +112,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         }
 
         [Test, AutoData]
-        public async Task Then_Gets_Provider_Reservation_From_The_Cache(
-            CreateReservationCommand command)
+        public async Task Then_Gets_Provider_Reservation_From_The_Cache(CreateReservationCommand command)
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
@@ -114,6 +124,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
         public async Task Then_Gets_Employer_Reservation_From_The_Cache(CreateReservationCommand command)
         {
             command.UkPrn = default(uint);
+
+            _mockCacheRepository.Setup(r => r.GetEmployerReservation(It.IsAny<Guid>()))
+                .ReturnsAsync(_cachedReservation);
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
