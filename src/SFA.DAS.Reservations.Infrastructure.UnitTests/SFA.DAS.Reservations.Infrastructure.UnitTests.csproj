@@ -4,6 +4,9 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AutoFixture" Version="4.8.0" />
+    <PackageReference Include="AutoFixture.AutoMoq" Version="4.8.0" />
+    <PackageReference Include="AutoFixture.NUnit3" Version="4.8.0" />
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Moq" Version="4.10.0" />
@@ -13,16 +16,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="AutoFixture">
-      <HintPath>..\..\..\..\..\..\..\Users\robinoconnor\.nuget\packages\autofixture\4.8.0\lib\netstandard2.0\AutoFixture.dll</HintPath>
-    </Reference>
-    <Reference Include="AutoFixture.AutoMoq">
-      <HintPath>..\..\..\..\..\..\..\Users\robinoconnor\.nuget\packages\autofixture.automoq\4.8.0\lib\netstandard1.5\AutoFixture.AutoMoq.dll</HintPath>
-    </Reference>
-    <Reference Include="AutoFixture.NUnit3">
-      <HintPath>..\..\..\..\..\..\..\Users\robinoconnor\.nuget\packages\autofixture.nunit3\4.8.0\lib\netstandard1.5\AutoFixture.NUnit3.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
