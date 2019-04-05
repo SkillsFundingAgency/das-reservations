@@ -7,10 +7,10 @@
             <nav class="das-user-navigation" id="user-nav">
                 <ul class="das-user-navigation__list" role="menu">
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a href="#" class="das-user-navigation__link">Provider account</a>
+                        <a asp-external-controller="Account" class="das-user-navigation__link">Provider account</a>
                     </li>
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a href="#" class="das-user-navigation__link">Notification settings</a>
+                        <a asp-external-controller="NotificationSettings" class="das-user-navigation__link">Notification settings</a>
                     </li>
                     <li role="menuitem" class="das-user-navigation__list-item">
                         <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
