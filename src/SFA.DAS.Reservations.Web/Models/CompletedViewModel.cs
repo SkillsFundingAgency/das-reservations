@@ -3,9 +3,9 @@ using SFA.DAS.Reservations.Domain.Courses;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class ConfirmationViewModel
+    public class CompletedViewModel
     {
-        public ConfirmationViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string accountLegalEntityPublicHashedId, uint? providerId = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
+        public CompletedViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string accountLegalEntityPublicHashedId, uint? providerId = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
         {
             ReservationId = reservationId;
             StartDate = startDate;

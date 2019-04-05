@@ -5,7 +5,7 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
 {
-    public class WhenGettingTheConfirmationViewModel
+    public class WhenConstructingACompletedViewModel
     {
 
         private readonly Guid _expectedReservationId = Guid.NewGuid();
@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_The_Model_Is_Constructed()
         {
             //Act
-            var actual = new ConfirmationViewModel(
+            var actual = new CompletedViewModel(
                 _expectedReservationId,
                 _expectedStartDate,
                 _expectedExpiryDate,
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_The_Model_Is_Constructed_With_White_Space()
         {
             //Act
-            var actual = new ConfirmationViewModel(
+            var actual = new CompletedViewModel(
                 _expectedReservationId,
                 _expectedStartDate,
                 _expectedExpiryDate,
@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var expectedDashboardUrl = "https://test.local";
 
             //Act
-            var actual = new ConfirmationViewModel(
+            var actual = new CompletedViewModel(
                 _expectedReservationId,
                 _expectedStartDate,
                 _expectedExpiryDate,
@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
 
             //Act
-            var actual = new ConfirmationViewModel(
+            var actual = new CompletedViewModel(
                 _expectedReservationId,
                 _expectedStartDate,
                 _expectedExpiryDate,
@@ -106,7 +106,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void Then_The_ApprenticeUrl_Is_Built_With_No_Course_Supplied()
         {
-            var actual = new ConfirmationViewModel(
+            var actual = new CompletedViewModel(
                 _expectedReservationId,
                 _expectedStartDate,
                 _expectedExpiryDate,

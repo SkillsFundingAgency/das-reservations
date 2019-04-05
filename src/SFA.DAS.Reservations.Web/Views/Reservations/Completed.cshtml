@@ -1,7 +1,7 @@
 ﻿@using System.Text
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @using SFA.DAS.Reservations.Web.Infrastructure
-@model ConfirmationViewModel
+@model CompletedViewModel
 @{
     ViewData["Title"] = "Reservations";
 }
@@ -112,7 +112,7 @@
         @if (Model.ShowApprenticeUrl && Model.ShowDashboardUrl)
         {
 
-            <form method="post" asp-route="@RouteNames.ProviderReservationCreated">
+            <form method="post" asp-route="@RouteNames.ProviderCompleted">
 
                 <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
                 <input type="hidden" name="ApprenticeUrl" value="@Model.ApprenticeUrl" />

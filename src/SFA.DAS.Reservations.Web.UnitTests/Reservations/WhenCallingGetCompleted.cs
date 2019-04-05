@@ -16,7 +16,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
     [TestFixture]
-    public class WhenCallingGetConfirmation
+    public class WhenCallingGetCompleted
     {
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Mediator_To_Get_Reservation(
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            await controller.Confirmation(routeModel);
+            await controller.Completed(routeModel);
 
             mockMediator.Verify(mediator => mediator.Send(It.Is<GetReservationQuery>(query => query.Id == routeModel.Id), CancellationToken.None));
         }
@@ -41,10 +41,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
                 .ReturnsAsync(mediatorResult);
             
-            var result = await controller.Confirmation(routeModel);
+            var result = await controller.Completed(routeModel);
 
             var model = result.Should().BeOfType<ViewResult>()
-                .Which.Model.Should().BeOfType<ConfirmationViewModel>().Subject;
+                .Which.Model.Should().BeOfType<CompletedViewModel>().Subject;
 
             model.ReservationId.Should().Be(mediatorResult.ReservationId);
             model.StartDate.Should().Be(mediatorResult.StartDate);
@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             routeModel.Id = null;
 
-            Assert.ThrowsAsync<ArgumentException>(() => controller.Confirmation(routeModel));
+            Assert.ThrowsAsync<ArgumentException>(() => controller.Completed(routeModel));
         }
     }
 }

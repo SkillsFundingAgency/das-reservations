@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("chooseEmployer", Name = RouteNames.ProviderChooseEmployer)]
+        [Route("choose-employer", Name = RouteNames.ProviderChooseEmployer)]
         public async Task<IActionResult> ChooseEmployer(ReservationsRouteModel routeModel)
         {
             if (!routeModel.UkPrn.HasValue)
@@ -47,14 +47,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirmEmployer")]
+        [Route("confirm-employer")]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
         }
 
         [HttpPost]
-        [Route("confirmEmployer")]
+        [Route("confirm-employer")]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)

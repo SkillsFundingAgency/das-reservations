@@ -8,7 +8,7 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
-    public class WhenCallingPostConfirmation
+    public class WhenCallingPostCompleted
     {
         private IFixture _fixture;
 
@@ -24,11 +24,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var controller = _fixture.Create<ReservationsController>();
             controller.ModelState.AddModelError("AddApprentice", "AddApprentice");
 
-            var actual = controller.Completed(routeModel, model);
+            var actual = controller.PostCompleted(routeModel, model);
 
             var actualModel = actual as ViewResult;
             Assert.IsNotNull(actualModel);
-            Assert.AreEqual("Confirmation",actualModel.ViewName);
+            Assert.AreEqual("Completed",actualModel.ViewName);
         }
 
         [TestCase(true)]
@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.AddApprentice = selection;
             var controller = _fixture.Create<ReservationsController>();
 
-            var actual = controller.Completed(routeModel, model);
+            var actual = controller.PostCompleted(routeModel, model);
 
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);
