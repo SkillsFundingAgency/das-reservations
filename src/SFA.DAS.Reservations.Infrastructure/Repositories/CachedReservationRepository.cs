@@ -2,6 +2,10 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+<<<<<<< Updated upstream
+=======
+using SFA.DAS.Reservations.Domain.Reservations.Api;
+>>>>>>> Stashed changes
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 
 namespace SFA.DAS.Reservations.Infrastructure.Repositories
@@ -18,9 +22,31 @@ namespace SFA.DAS.Reservations.Infrastructure.Repositories
             _authorisationService = authorisationService;
         }
 
-        public Task<CachedReservation> GetProviderReservation(Guid id, uint ukPrn)
+        public async Task<CachedReservation> GetProviderReservation(Guid id, uint ukPrn)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(id.ToString()) || id == Guid.Empty)
+            {
+                throw new ArgumentException("GUID is not set",nameof(id));
+            }
+
+            if (ukPrn == default(uint))
+            {
+                throw new ArgumentException("ukPrn is not set", nameof(ukPrn));
+            }
+
+            var cachedReservation = await _cacheStorage.RetrieveFromCache<CachedReservation>(id.ToString());
+
+            if (cachedReservation == null)
+            {
+                throw new CachedReservationNotFoundException(id);
+            }
+
+            if (!_authorisationService.ProviderReservationAccessAllowed(ukPrn, cachedReservation))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return cachedReservation;
         }
 
         public async Task<CachedReservation> GetEmployerReservation(Guid id)
