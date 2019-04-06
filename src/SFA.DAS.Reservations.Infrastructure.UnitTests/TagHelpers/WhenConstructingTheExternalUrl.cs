@@ -93,5 +93,20 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             Assert.IsNotNull(actual);
             Assert.AreEqual($"https://{subDomain}.test.local/{controller}", actual);
         }
+
+        [Test]
+        public void Then_The_Folder_Is_Included_In_The_Url()
+        {
+            //Arrange
+            var controller = "test-controller";
+            var subDomain = "testDomain";
+            var folder = "test-folder";
+
+            //Act
+            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain, folder:folder);
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual($"https://{subDomain}.test.local/{folder}/{controller}", actual);
+        }
     }
 }
