@@ -14,10 +14,10 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
-        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "")
+        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "", string folder="")
         {
             var urlString = new StringBuilder();
-            urlString.Append(FormatBaseUrl(_options.DashboardUrl, subDomain));
+            urlString.Append(FormatBaseUrl(_options.DashboardUrl, subDomain, folder));
 
             if (!string.IsNullOrEmpty(id))
             {
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return urlString.ToString().TrimEnd('/');
         }
 
-        private static string FormatBaseUrl(string url, string subDomain = "")
+        private static string FormatBaseUrl(string url, string subDomain = "", string folder = "")
         {
             var returnUrl = url.EndsWith("/")
                 ? url
@@ -46,6 +46,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             if (!string.IsNullOrEmpty(subDomain))
             {
                 returnUrl = returnUrl.Replace("https://", $"https://{subDomain}.");
+            }
+
+            if (!string.IsNullOrEmpty(folder))
+            {
+                returnUrl += $"{folder}/";
             }
 
             return returnUrl;
