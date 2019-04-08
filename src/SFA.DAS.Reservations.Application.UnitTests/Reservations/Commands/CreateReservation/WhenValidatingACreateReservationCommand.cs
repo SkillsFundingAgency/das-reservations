@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CreateReservation
 {
     [TestFixture]
     public class WhenValidatingACreateReservationCommand

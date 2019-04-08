@@ -20,7 +20,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CreateReservation
 {
     [TestFixture]
     public class WhenCreatingANewReservation
