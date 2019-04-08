@@ -1,8 +1,7 @@
 ﻿using System;
 using MediatR;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation
 {
     public class CreateReservationCommand : IRequest<CreateReservationResult>
     {
