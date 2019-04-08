@@ -183,7 +183,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
-                return View("ApprenticeshipTraining", model);
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
             return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderCompleted : RouteNames.EmployerCompleted, routeModel);
