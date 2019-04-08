@@ -9,9 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -19,7 +17,7 @@ using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CreateReservation
 {
     [TestFixture]
     public class WhenCreatingANewReservation
