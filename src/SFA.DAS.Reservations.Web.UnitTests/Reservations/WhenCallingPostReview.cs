@@ -119,7 +119,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task And_CachedReservationNotFoundException_Then_Redirects_To_Choose_Employer_Account(
+        public async Task And_CachedReservationNotFoundException_And_Has_Ukprn_Then_Redirects_To_ProviderIndex(
             ReservationsRouteModel routeModel)
         {
             var mockMediator = new Mock<IMediator>();
@@ -133,9 +133,30 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var actual = await controller.PostReview(routeModel);
 
             actual.Should().NotBeNull();
-            var actualViewResult = actual as ViewResult;
-            actualViewResult.Should().NotBeNull();
-            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");//todo: not this view!!! should go to beginning of caching.
+            var redirectToRouteResult = actual as RedirectToRouteResult;
+            redirectToRouteResult.Should().NotBeNull();
+            redirectToRouteResult?.RouteName.Should().Be(RouteNames.ProviderIndex);
+        }
+
+        [Test, AutoData]
+        public async Task And_CachedReservationNotFoundException_And_No_Ukprn_Then_Redirects_To_EmployerIndex(
+            ReservationsRouteModel routeModel)
+        {
+            routeModel.UkPrn = null;
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new CachedReservationNotFoundException(routeModel.Id.Value));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
+            
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<ILogger<ReservationsController>>());
+
+            var actual = await controller.PostReview(routeModel);
+
+            actual.Should().NotBeNull();
+            var redirectToRouteResult = actual as RedirectToRouteResult;
+            redirectToRouteResult.Should().NotBeNull();
+            redirectToRouteResult?.RouteName.Should().Be(RouteNames.EmployerIndex);
         }
     }
 }
