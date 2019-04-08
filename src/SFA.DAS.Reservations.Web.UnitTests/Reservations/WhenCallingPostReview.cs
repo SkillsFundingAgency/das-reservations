@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
@@ -117,12 +118,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task And_ArgumentException_Then_Redirects_To_Apprenticeship_Training(
+        public async Task And_CachedReservationNotFoundException_Then_Redirects_To_Choose_Employer_Account(
             ReservationsRouteModel routeModel)
         {
             var mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new CachedReservationNotFoundException(routeModel.Id.Value));
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
             
@@ -133,7 +134,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actual.Should().NotBeNull();
             var actualViewResult = actual as ViewResult;
             actualViewResult.Should().NotBeNull();
-            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");
+            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");//todo: not this view!!! should go to beginning of caching.
         }
     }
 }

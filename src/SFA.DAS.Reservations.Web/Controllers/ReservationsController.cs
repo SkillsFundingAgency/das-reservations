@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -171,7 +172,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception)
+            catch (CachedReservationNotFoundException e)
             {
                 // todo: log this ex
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
