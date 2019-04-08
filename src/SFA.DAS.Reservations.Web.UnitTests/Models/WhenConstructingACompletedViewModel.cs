@@ -124,10 +124,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test]
-        public void Then_If_The_EmployerRecruitUrl_Is_Available_The_Url_Is_Created_If_Supplied()
+        public void Then_If_The_EmployerDashboardUrl_Is_Available_The_Url_Is_Created_If_Supplied()
         {
             //Arrange
-            var expectedEmployerRecruitUrl = "https://test.local";
+            var expectedEmployerDashboardUrl = "https://test.local";
 
             //Act
             var actual = new CompletedViewModel(
@@ -137,50 +137,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 _expectedCourse,
                 ExpectedHashedLegalEntityAccountId,
                 ExpectedProviderId, 
-                employerRecruitUrl:expectedEmployerRecruitUrl);
+                employerDashboardUrl:expectedEmployerDashboardUrl);
 
             //Act
-            Assert.AreEqual(expectedEmployerRecruitUrl, actual.EmployerRecruitUrl);
-        }
-
-        [Test]
-        public void Then_If_The_EmployerFATUrl_Is_Available_The_Url_Is_Created_If_Supplied()
-        {
-            //Arrange
-            var expectedEmployerFATUrl = "https://test.local";
-
-            //Act
-            var actual = new CompletedViewModel(
-                _expectedReservationId,
-                _expectedStartDate,
-                _expectedExpiryDate,
-                _expectedCourse,
-                ExpectedHashedLegalEntityAccountId,
-                ExpectedProviderId, 
-                employerFATUrl:expectedEmployerFATUrl);
-
-            //Act
-            Assert.AreEqual(expectedEmployerFATUrl, actual.EmployerFATUrl);
-        }
-
-        [Test]
-        public void Then_If_The_EmployerMAUrl_Is_Available_The_Url_Is_Created_If_Supplied()
-        {
-            //Arrange
-            var expectedEmployerMAUrl = "https://test.local";
-
-            //Act
-            var actual = new CompletedViewModel(
-                _expectedReservationId,
-                _expectedStartDate,
-                _expectedExpiryDate,
-                _expectedCourse,
-                ExpectedHashedLegalEntityAccountId,
-                ExpectedProviderId, 
-                employerMAUrl:expectedEmployerMAUrl);
-
-            //Act
-            Assert.AreEqual(expectedEmployerMAUrl, actual.EmployerMAUrl);
+            Assert.AreEqual(expectedEmployerDashboardUrl, actual.EmployerDashboardUrl);
         }
 
         [Test, AutoData]
