@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -27,12 +28,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
+        private readonly ILogger<ReservationsController> _logger;
         private readonly ReservationsWebConfiguration _configuration;
 
-        public ReservationsController(IMediator mediator, IStartDateService startDateService, IOptions<ReservationsWebConfiguration> configuration)
+        public ReservationsController(
+            IMediator mediator, 
+            IStartDateService startDateService, 
+            IOptions<ReservationsWebConfiguration> configuration,
+            ILogger<ReservationsController> logger)
         {
             _mediator = mediator;
             _startDateService = startDateService;
+            _logger = logger;
             _configuration = configuration.Value;
         }
 

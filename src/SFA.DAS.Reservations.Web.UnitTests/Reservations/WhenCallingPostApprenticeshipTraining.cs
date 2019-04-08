@@ -9,6 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -46,7 +47,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _controller = new ReservationsController(
                 _mediator.Object, 
                 Mock.Of<IStartDateService>(), 
-                Mock.Of<IOptions<ReservationsWebConfiguration>>());
+                Mock.Of<IOptions<ReservationsWebConfiguration>>(),
+                Mock.Of<ILogger<ReservationsController>>());
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<CacheReservationCourseCommand>(),
