@@ -209,7 +209,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 				routeModel.UkPrn,
                 queryResult.AccountLegalEntityName,
                 _configuration.DashboardUrl, 
-                _configuration.ApprenticeUrl
+                _configuration.ApprenticeUrl,
+                _configuration.EmployerDashboardUrl
             );
             return View(model.ViewName, model);
         }
@@ -231,7 +232,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     routeModel.UkPrn,
                     model.AccountLegalEntityName,
                     _configuration.DashboardUrl,
-                    _configuration.ApprenticeUrl
+                    _configuration.ApprenticeUrl,
+                    _configuration.EmployerDashboardUrl
                 );
                 
                 return View(viewModel.ViewName, viewModel);

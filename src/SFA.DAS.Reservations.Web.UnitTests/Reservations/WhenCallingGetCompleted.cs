@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
+            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockConfig,
             ReservationsController controller)
         {
             mockMediator
@@ -55,8 +55,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.Course.Should().BeEquivalentTo(mediatorResult.Course);
             model.AccountLegalEntityName.Should().BeEquivalentTo(mediatorResult.AccountLegalEntityName);
             model.AccountLegalEntityPublicHashedId.Should().BeEquivalentTo(routeModel.AccountLegalEntityPublicHashedId);
-            model.ApprenticeUrl.Should().NotBeEmpty();
-            model.DashboardUrl.Should().NotBeEmpty();
+            model.ApprenticeUrl.Should().StartWith(mockConfig.Object.Value.ApprenticeUrl);
+            model.DashboardUrl.Should().Be(mockConfig.Object.Value.DashboardUrl);
+            model.EmployerDashboardUrl.Should().Be(mockConfig.Object.Value.EmployerDashboardUrl);
         }
 
         [Test, MoqAutoData]
