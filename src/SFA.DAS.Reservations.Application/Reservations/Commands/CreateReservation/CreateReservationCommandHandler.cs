@@ -12,7 +12,7 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {

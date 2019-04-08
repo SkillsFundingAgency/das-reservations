@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation
 {
     public class CreateReservationCommandValidator : IValidator<CreateReservationCommand>
     {
