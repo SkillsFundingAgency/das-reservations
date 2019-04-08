@@ -200,9 +200,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (CachedReservationNotFoundException e)
+            catch (CachedReservationNotFoundException ex)
             {
-                // todo: log this ex
+                _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return View("ApprenticeshipTraining", model);
             }
