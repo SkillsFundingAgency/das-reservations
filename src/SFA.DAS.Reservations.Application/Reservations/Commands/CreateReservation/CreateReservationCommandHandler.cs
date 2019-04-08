@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -50,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             var reservation = await _cacheStorageService.RetrieveFromCache<GetCachedReservationResult>(command.Id.ToString());
             if (reservation == null)
             {
-                throw new Exception("No reservation was found with that Id");
+                throw new CachedReservationNotFoundException(command.Id);
             }
 
             var createValidationResult = await _cachedReservationValidator.ValidateAsync(reservation);

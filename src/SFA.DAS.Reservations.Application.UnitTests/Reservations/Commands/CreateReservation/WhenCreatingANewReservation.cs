@@ -9,6 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
@@ -116,8 +117,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<Exception>()
-                .WithMessage("No reservation was found with that Id");
+            act.Should().ThrowExactly<CachedReservationNotFoundException>()
+                .WithMessage($"No reservation was found with id [{command.Id}].");
         }
 
         [Test, AutoData]
