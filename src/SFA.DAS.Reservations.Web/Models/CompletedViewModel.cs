@@ -6,7 +6,19 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class CompletedViewModel
     {
-        public CompletedViewModel(Guid reservationId, DateTime startDate, DateTime expiryDate, Course course, string accountLegalEntityPublicHashedId, uint? ukPrn = null,string accountLegalEntityName = "", string dashboardUrl = "", string apprenticeUrl = "")
+        public CompletedViewModel(
+            Guid reservationId, 
+            DateTime startDate, 
+            DateTime expiryDate, 
+            Course course, 
+            string accountLegalEntityPublicHashedId, 
+            uint? ukPrn = null,
+            string accountLegalEntityName = "", 
+            string dashboardUrl = "", 
+            string apprenticeUrl = "",
+            string employerRecruitUrl = "",
+            string employerFATUrl = "",
+            string employerMAUrl = "")
         {
             ReservationId = reservationId;
             StartDate = startDate;
@@ -27,6 +39,9 @@ namespace SFA.DAS.Reservations.Web.Models
             
             DashboardUrl = dashboardUrl;
             ApprenticeUrl = apprenticeUrl;
+            EmployerRecruitUrl = employerRecruitUrl;
+            EmployerFATUrl = employerFATUrl;
+            EmployerMAUrl = employerMAUrl;
 
             ViewName = ukPrn == null ? ViewNames.EmployerCompleted : ViewNames.ProviderCompleted;
         }
@@ -43,5 +58,8 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool ShowApprenticeUrl => !string.IsNullOrWhiteSpace(ApprenticeUrl);
 		public string AccountLegalEntityName { get; }
         public string ViewName { get; }
+        public string EmployerRecruitUrl { get; }
+        public string EmployerFATUrl { get; }
+        public string EmployerMAUrl { get; }
     }
 }
