@@ -36,10 +36,12 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
         private static Task PopulateProviderClaims(SecurityTokenValidatedContext ctx)
         {
-            var providerId = ctx.Principal.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn))
-                .Value;
-            ctx.HttpContext.Items.Add(ProviderClaims.ProviderUkprn,providerId);
-            ctx.Principal.Identities.First().AddClaim(new Claim(ProviderClaims.ProviderUkprn,providerId));
+            var providerId = ctx.Principal.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
+            var displayName = ctx.Principal.Claims.First(c => c.Type.Equals(ProviderClaims.DisplayName)).Value;
+            ctx.HttpContext.Items.Add(ClaimsIdentity.DefaultNameClaimType,providerId);
+            ctx.HttpContext.Items.Add(ProviderClaims.DisplayName,displayName);
+            ctx.Principal.Identities.First().AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, providerId));
+            ctx.Principal.Identities.First().AddClaim(new Claim(ProviderClaims.DisplayName, displayName));
             return Task.CompletedTask;
         }
     }
