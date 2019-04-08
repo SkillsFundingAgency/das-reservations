@@ -6,7 +6,7 @@
         <div class="govuk-width-container">
             <ul class="das-navigation__list ">
                 <li class="das-navigation__list-item">
-                    <a asp-external-controller="Account" class="das-navigation__link das-navigation__link--current">Home</a>
+                    <a asp-external-controller="Account" class="das-navigation__link">Home</a>
                 </li>
                 <li class="das-navigation__list-item">
                     <a asp-external-action="Cohorts" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Your cohorts</a>
@@ -31,7 +31,7 @@ else
         <div class="govuk-width-container">
             <ul class="das-navigation__list ">
                 <li class="das-navigation__list-item">
-                    <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--current">Home</a>
+                    <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Home</a>
                 </li>
                 <li class="das-navigation__list-item">
                     <a asp-external-controller="balance"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Finance</a>
