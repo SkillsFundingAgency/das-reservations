@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -138,18 +139,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         public void And_No_Reservation_Found_In_Cache_Then_Throws_Exception(
             CreateReservationCommand command)
         {
-            var expectedException = new CachedReservationNotFoundException(command.Id);
+            _mockCacheService
+                .Setup(service => service.RetrieveFromCache<GetCachedReservationResult>(It.IsAny<string>()))
+                .ReturnsAsync((GetCachedReservationResult)null);
 
-            _mockCacheRepository.Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
-                .ThrowsAsync(expectedException);
+            Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
-            var exception = Assert.ThrowsAsync<CachedReservationNotFoundException>(() =>
-                _commandHandler.Handle(command, CancellationToken.None));
-
-            Assert.AreEqual(expectedException, exception);
-
-            _mockApiClient.Verify(api => 
-                api.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()), Times.Never);
+            act.Should().ThrowExactly<CachedReservationNotFoundException>()
+                .WithMessage($"No reservation was found with id [{command.Id}].");
         }
 
         [Test, AutoData]
