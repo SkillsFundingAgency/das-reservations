@@ -3,11 +3,11 @@
 {
     <div class="das-account-header das-account-header--provider">
         <div class="govuk-width-container">
-            <p class="das-account-header__title">Your provider account</p>
+            <p class="das-account-header__title">Your training provider account</p>
             <nav class="das-user-navigation" id="user-nav">
                 <ul class="das-user-navigation__list" role="menu">
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a asp-external-controller="Account" class="das-user-navigation__link">Provider account</a>
+                        <a asp-external-controller="" class="das-user-navigation__link">@Context.User.Identity.Name</a>
                     </li>
                     <li role="menuitem" class="das-user-navigation__list-item">
                         <a asp-external-controller="NotificationSettings" class="das-user-navigation__link">Notification settings</a>
