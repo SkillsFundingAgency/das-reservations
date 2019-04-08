@@ -221,7 +221,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var confirmationModel = new CompletedViewModel
+                var viewModel = new CompletedViewModel
                 (
                     model.ReservationId,
                     model.StartDate,
@@ -234,7 +234,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     _configuration.ApprenticeUrl
                 );
                 
-                return View("Completed", confirmationModel);
+                return View(viewModel.ViewName, viewModel);
             }
 
             if (model.AddApprentice.HasValue && model.AddApprentice.Value)

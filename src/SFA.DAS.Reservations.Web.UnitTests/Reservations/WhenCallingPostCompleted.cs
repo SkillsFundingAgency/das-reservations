@@ -4,6 +4,7 @@ using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
@@ -19,7 +20,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public void Then_The_Model_Is_Validated_And_Confirmation_Returned(ConfirmationRedirectViewModel model, ReservationsRouteModel routeModel)
+        public void And_Has_Ukprn_And_ValidationError_Then_Return_Provider_Completed_View(
+            ConfirmationRedirectViewModel model, 
+            ReservationsRouteModel routeModel)
         {
             var controller = _fixture.Create<ReservationsController>();
             controller.ModelState.AddModelError("AddApprentice", "AddApprentice");
@@ -28,7 +31,23 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var actualModel = actual as ViewResult;
             Assert.IsNotNull(actualModel);
-            Assert.AreEqual("Completed",actualModel.ViewName);
+            Assert.AreEqual(ViewNames.ProviderCompleted, actualModel.ViewName);
+        }
+
+        [Test, AutoData]
+        public void And_No_Ukprn_And_ValidationError_Then_Return_Employer_Completed_View(
+            ConfirmationRedirectViewModel model, 
+            ReservationsRouteModel routeModel)
+        {
+            routeModel.UkPrn = null;
+            var controller = _fixture.Create<ReservationsController>();
+            controller.ModelState.AddModelError("AddApprentice", "AddApprentice");
+
+            var actual = controller.PostCompleted(routeModel, model);
+
+            var actualModel = actual as ViewResult;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual(ViewNames.EmployerCompleted, actualModel.ViewName);
         }
 
         [TestCase(true)]
