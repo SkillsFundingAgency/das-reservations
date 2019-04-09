@@ -7,8 +7,8 @@ namespace SFA.DAS.Reservations.Web.Models
         public ReviewViewModel(ReservationsRouteModel routeModel,string startDateDescription, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
         {
             ConfirmRouteName = IsEmployerRoute(routeModel) ?
-                RouteNames.EmployerCreateReservation :
-                RouteNames.ProviderCreateReservation;
+                RouteNames.EmployerPostReview :
+                RouteNames.ProviderPostReview;
 
             ChangeCourseRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerSelectCourse :
