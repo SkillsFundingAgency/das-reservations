@@ -21,6 +21,8 @@
         public const string EmployerSignOut = "employer-signout";
         public const string EmployerSelectCourse = "employer-select-course";
         public const string EmployerSkipSelectCourse = "employer-skip-select-course";
-
+        public const string EmployerIndex = "employer-index";
+        public const string EmployerChangePassword = "employer-change-password";
+        public const string EmployerChangeEmail = "employer-change-email";
     }
 }
