@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
+        [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {
             var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
@@ -74,14 +74,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/SkipCourseSelection",Name = RouteNames.EmployerSkipSelectCourse)]
+        [Route("{id}/skip-course-selection",Name = RouteNames.EmployerSkipSelectCourse)]
         public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
         {
             return await PostSelectCourse(routeModel, null);
         }
 
         [HttpPost]
-        [Route("{id}/SelectCourse")]
+        [Route("{id}/select-course")]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
 

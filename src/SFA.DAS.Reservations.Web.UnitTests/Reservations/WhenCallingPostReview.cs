@@ -26,7 +26,7 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
     [TestFixture]
-    public class WhenCallingPostCreate
+    public class WhenCallingPostReview
     {
         private IFixture _fixture;
 
@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
             
-            await controller.Create(routeModel);
+            await controller.PostReview(routeModel);
 
             mockMediator.Verify(mediator => 
                 mediator.Send(It.Is<CreateReservationCommand>(command => 
@@ -67,10 +67,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
-            var result = await controller.Create(routeModel) as RedirectToRouteResult;
+            var result = await controller.PostReview(routeModel) as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be(RouteNames.EmployerReservationCreated);
+            result.RouteName.Should().Be(RouteNames.EmployerCompleted);
             result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
         }
 
@@ -85,10 +85,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationResult);
             var controller = _fixture.Create<ReservationsController>();
 
-            var result = await controller.Create(routeModel) as RedirectToRouteResult;
+            var result = await controller.PostReview(routeModel) as RedirectToRouteResult;
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
-            result.RouteName.Should().Be(RouteNames.ProviderReservationCreated);
+            result.RouteName.Should().Be(RouteNames.ProviderCompleted);
             result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
             result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId").WhichValue.Should().Be(createReservationResult.Reservation.AccountLegalEntityPublicHashedId);
         }
@@ -105,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
-            var actual = await controller.Create(routeModel);
+            var actual = await controller.PostReview(routeModel);
 
             actual.Should().NotBeNull();
             var actualViewResult = actual as ViewResult;
@@ -127,7 +127,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
-            var actual = await controller.Create(routeModel);
+            var actual = await controller.PostReview(routeModel);
 
             actual.Should().NotBeNull();
             var actualViewResult = actual as ViewResult;

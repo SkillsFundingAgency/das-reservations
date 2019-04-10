@@ -59,8 +59,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             StartDateModel startDateModel = null;
-            if (!string.IsNullOrWhiteSpace(formModel.TrainingStartDate))
-                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.TrainingStartDate);
+
+            if (!ModelState.IsValid)
+            {
+                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
+                return View("ApprenticeshipTraining", model);
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(formModel.StartDate))
+                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
 
             try
             {
@@ -137,11 +145,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel.ViewName, viewModel);
         }
 
-        [Route("{ukPrn}/reservations/{id}/create", Name = RouteNames.ProviderCreateReservation)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = RouteNames.EmployerCreateReservation)]
+        [Route("{ukPrn}/reservations/{id}/review", Name = RouteNames.ProviderPostReview)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = RouteNames.EmployerPostReview)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> PostReview(ReservationsRouteModel routeModel)
         {
             try
             {
@@ -170,14 +178,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("ApprenticeshipTraining", model);
             }
 
-            return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderReservationCreated : RouteNames.EmployerReservationCreated, routeModel);
+            return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderCompleted : RouteNames.EmployerCompleted, routeModel);
         }
 
         // GET
 
-        [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCreated)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/create", Name = RouteNames.EmployerReservationCreated)]
-        public async Task<IActionResult> Confirmation(ReservationsRouteModel routeModel)
+        [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderCompleted)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerCompleted)]
+        public async Task<IActionResult> Completed(ReservationsRouteModel routeModel)
         {
             if (!routeModel.Id.HasValue)
             {
@@ -191,7 +199,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var queryResult = await _mediator.Send(query);
             //todo: null check on result
 
-            var model = new ConfirmationViewModel
+            var model = new CompletedViewModel
             (
                 queryResult.ReservationId,
                 queryResult.StartDate,
@@ -201,18 +209,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
 				routeModel.UkPrn,
                 queryResult.AccountLegalEntityName,
                 _configuration.DashboardUrl, 
-                _configuration.ApprenticeUrl
+                _configuration.ApprenticeUrl,
+                _configuration.EmployerDashboardUrl
             );
-            return View(model);
+            return View(model.ViewName, model);
         }
 
         [HttpPost]
-        [Route("{ukPrn}/reservations/{id}/create/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderReservationCompleted)]
-        public IActionResult Completed(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerPostCompleted)]
+        public IActionResult PostCompleted(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var confirmationModel = new ConfirmationViewModel
+                var viewModel = new CompletedViewModel
                 (
                     model.ReservationId,
                     model.StartDate,
@@ -222,10 +232,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     routeModel.UkPrn,
                     model.AccountLegalEntityName,
                     _configuration.DashboardUrl,
-                    _configuration.ApprenticeUrl
+                    _configuration.ApprenticeUrl,
+                    _configuration.EmployerDashboardUrl
                 );
                 
-                return View("Confirmation", confirmationModel);
+                return View(viewModel.ViewName, viewModel);
             }
 
             if (model.AddApprentice.HasValue && model.AddApprentice.Value)

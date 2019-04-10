@@ -67,7 +67,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.ProviderCreateReservation);
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.ProviderPostReview);
             ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
             ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
             result.ViewName.Should().Be(ViewNames.ProviderReview);
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             var result = await controller.Review(routeModel) as ViewResult;
 
-            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerCreateReservation);
+            ((ReviewViewModel) result.Model).ConfirmRouteName.Should().Be(RouteNames.EmployerPostReview);
             ((ReviewViewModel) result.Model).ChangeCourseRouteName.Should().Be(RouteNames.EmployerSelectCourse);
             ((ReviewViewModel) result.Model).ChangeStartDateRouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
             result.ViewName.Should().Be(ViewNames.EmployerReview);

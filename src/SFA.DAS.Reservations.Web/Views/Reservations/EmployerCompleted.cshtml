@@ -1,0 +1,95 @@
+﻿@using System.Text
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using SFA.DAS.Reservations.Web.Infrastructure
+@model CompletedViewModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">
+                Funding secured for this apprenticeship
+            </h1>
+        </div>
+        <div class="govuk-summary-list">
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Employer
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.AccountLegalEntityName
+                </dd>
+            </dl>
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship start date
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.StartDate.ToString("MMMM yyyy") to @Model.ExpiryDate.ToString("MMMM yyyy")
+                </dd>
+            </dl>
+            <dl class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Apprenticeship training
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @Model.Course.CourseDescription
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Can I change the course?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            You can change the course when you add an apprentice's details.
+                        </div>
+                    </details>
+                </dd>
+            </dl>
+        </div>
+
+        <h2 class="govuk-heading-l">
+            Making changes
+        </h2>
+
+        <p>
+            You can add or change the apprenticeship training when you add an apprentice's details.
+        </p>
+
+        <p>
+            You cannot change:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>
+                the off-the-job training start date, outside of the 3 month window you selected
+            </li>
+        </ul>
+        <p>
+            To select a different apprenticeship start date, you will need to start again and secure new funding.
+        </p>
+        <h2 class="govuk-heading-l">
+            What you need to do now
+        </h2>
+        <p>
+            If you know who your apprentice and training provider will be, you can add the apprentice's details.
+        </p>
+        <p>
+            If you do not know who the apprentice or training provider will be, you will need to:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>
+                Find an apprentice. You can use our <a href="https://recruit.manage-apprenticeships.service.gov.uk" target="_blank" rel="noopener">recruitment service</a> to find and apprentice.
+            </li>
+            <li>
+                Find a training provider. Use the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" rel="noopener">find apprenticeship training</a> service to find a training provider who offers the course you would like to take.
+            </li>
+        </ul>
+        <p>
+            <a href="@Model.EmployerDashboardUrl" role="button" draggable="false" class="govuk-button">
+                Return to your account
+            </a>
+        </p>
+    </div>
+</div>
