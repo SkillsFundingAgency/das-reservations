@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 
             return accounts
                 .Select(acc =>
-                    new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName/*, LegalEntityResources = acc.LegalEntities*/ });
+                    new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName, LegalEntityResources = acc.LegalEntities });
         }
 
         private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
