@@ -6,5 +6,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
     public class GetCachedReservationQuery : IReservationQuery, IRequest<GetCachedReservationResult>
     {
         public Guid Id { get; set; }
+        public uint UkPrn { get; set; }
     }
 }
