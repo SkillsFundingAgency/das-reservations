@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Infrastructure", "SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj", "{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Models", "SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj", "{C61C9E16-B344-4FC7-98C4-B16436855B18}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{429FE184-B674-47C2-971C-87AFC7411D47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Infrastructure.UnitTests", "SFA.DAS.Reservations.Infrastructure.UnitTests\SFA.DAS.Reservations.Infrastructure.UnitTests.csproj", "{DDDA5440-96C8-452D-A4FD-FF09581E2738}"
@@ -37,10 +35,6 @@ Global
 		{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EE1BABA-7E0A-447B-AD0F-43B385F22CB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C61C9E16-B344-4FC7-98C4-B16436855B18}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDDA5440-96C8-452D-A4FD-FF09581E2738}.Release|Any CPU.ActiveCfg = Release|Any CPU
