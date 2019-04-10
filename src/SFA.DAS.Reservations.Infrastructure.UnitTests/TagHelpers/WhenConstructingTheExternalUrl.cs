@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
@@ -8,15 +9,18 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 {
     public class WhenConstructingTheExternalUrl
     {
-        private Mock<IOptions<ReservationsWebConfiguration>> _config;
+        private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfig;
         private ProviderExternalUrlHelper _helper;
+        private Mock<IConfiguration> _config;
 
         [SetUp]
         public void Arrange()
         {
-            _config = new Mock<IOptions<ReservationsWebConfiguration>>();
-            _config.Setup(x => x.Value.DashboardUrl).Returns("https://test.local");
-            _helper = new ProviderExternalUrlHelper(_config.Object);
+            _reservationsConfig = new Mock<IOptions<ReservationsWebConfiguration>>();
+            _reservationsConfig.Setup(x => x.Value.DashboardUrl).Returns("https://test.local");
+            _config = new Mock<IConfiguration>();
+            _config.Setup(x => x["AuthType"]).Returns("provider");
+            _helper = new ProviderExternalUrlHelper(_reservationsConfig.Object, _config.Object);
         }
 
         [TestCase("https://test.local")]
@@ -92,6 +96,28 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             //Assert
             Assert.IsNotNull(actual);
             Assert.AreEqual($"https://{subDomain}.test.local/{controller}", actual);
+        }
+
+        [Test]
+        public void Then_The_Folder_Is_Included_In_The_Url_And_Correct_Base_Url_Based_On_Auth_Type()
+        {
+            //Arrange
+            var controller = "test-controller";
+            var subDomain = "testDomain";
+            var folder = "test-folder";
+            _reservationsConfig = new Mock<IOptions<ReservationsWebConfiguration>>();
+            _reservationsConfig.Setup(x => x.Value.DashboardUrl).Returns("https://test.local/account");
+            _reservationsConfig.Setup(x => x.Value.EmployerDashboardUrl).Returns("https://test.local.dashboard/");
+            _config = new Mock<IConfiguration>();
+            _config.Setup(x => x["AuthType"]).Returns("employer");
+            _helper = new ProviderExternalUrlHelper(_reservationsConfig.Object, _config.Object);
+
+            //Act
+            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain, folder:folder);
+
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual($"https://{subDomain}.test.local.dashboard/{folder}/{controller}", actual);
         }
     }
 }

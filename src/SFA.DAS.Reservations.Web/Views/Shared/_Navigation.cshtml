@@ -24,11 +24,24 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
 {
     <div class="das-account-header das-account-header--employer">
         <div class="govuk-width-container">
+            
             <p class="das-account-header__title">Your employer account</p>
             <nav class="das-user-navigation" id="user-nav">
                 <ul class="das-user-navigation__list" role="menu">
+                    <li><a asp-external-controller="Service" asp-external-action="help" class="menu-main">Help</a></li>
+                    <li class="has-sub-menu open">
+                        <a href="/" role="menuitem" class="menu-main">Settings</a>
+                        <ul role="menu" id="settings-menu" class="" aria-hidden="false">
+                            <li><a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service" role="menuitem" class="sub-menu-item">Your accounts</a></li>
+                            <li><a asp-external-controller="rename" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="menuitem" class="sub-menu-item">Rename account</a></li>
+                            <li><a asp-identity-server-chg-pwd="true" asp-identity-server-chg-email="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="sub-menu-item">Change your password</a></li>
+                            <li><a asp-identity-server-chg-email="true" asp-identity-server-chg-pwd="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]"  class="sub-menu-item">Change your email address</a></li>
+                            <li><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="notifications" role="menuitem"  class="sub-menu-item">Notification settings</a></li>
+
+                        </ul>
+                    </li>
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a href="#" class="das-user-navigation__link">Sign out</a>
+                        <a asp-route="@RouteNames.EmployerSignOut" class="das-user-navigation__link">Sign out</a>
                     </li>
                 </ul>
             </nav>
