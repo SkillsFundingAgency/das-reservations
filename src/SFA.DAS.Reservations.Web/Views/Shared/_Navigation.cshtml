@@ -32,11 +32,11 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
                     <li class="has-sub-menu open">
                         <a href="/" role="menuitem" class="menu-main">Settings</a>
                         <ul role="menu" id="settings-menu" class="" aria-hidden="false">
-                            <li><a asp-external-controller="Service" asp-external-action="accounts" role="menuitem" class="sub-menu-item">Your accounts</a></li>
-                            <li><a asp-external-controller="Service" asp-external-action="rename" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="menuitem" class="sub-menu-item">Rename account</a></li>
-                            <li><a href="#" class="sub-menu-item">Change your password</a></li>
-                            <li><a href="#" class="sub-menu-item">Change your email address</a></li>
-                            <li><a asp-external-controller="settings" asp-external-action="notifications" role="menuitem"  class="sub-menu-item">Notification settings</a></li>
+                            <li><a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service" role="menuitem" class="sub-menu-item">Your accounts</a></li>
+                            <li><a asp-external-controller="rename" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="menuitem" class="sub-menu-item">Rename account</a></li>
+                            <li><a asp-identity-server-chg-pwd="true" asp-identity-server-chg-email="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="sub-menu-item">Change your password</a></li>
+                            <li><a asp-identity-server-chg-email="true" asp-identity-server-chg-pwd="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]"  class="sub-menu-item">Change your email address</a></li>
+                            <li><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="notifications" role="menuitem"  class="sub-menu-item">Notification settings</a></li>
 
                         </ul>
                     </li>
