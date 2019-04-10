@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         public void Then_It_Sets_StartDate()
         {
             var startDate = DateTime.Now.AddDays(-10);
-            var request = new ReservationApiRequest("test", 1, startDate, Guid.NewGuid(), "Test Name");
+            var request = new ReservationApiRequest("test", 1, 2, startDate, Guid.NewGuid(),1, "Test Name");
 
             request.StartDate.Should().Be(startDate.ToString("yyyy-MMM-dd"));
         }

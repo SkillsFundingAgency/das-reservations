@@ -34,12 +34,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             }
 
             return ukPrn == reservation.UkPrn;
-
         }
 
         public async Task<bool> ProviderReservationAccessAllowed(uint ukPrn, GetReservationResponse reservation)
         {
-            if (reservation == null || reservation.UkPrn == default(uint))
+            if (reservation == null || reservation.ProviderId == default(uint))
             {
                 throw new ArgumentException("GetReservationResponse is null", nameof(reservation));
             }
@@ -49,21 +48,19 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                 throw new ArgumentException("ukPrn is not set", nameof(ukPrn));
             }
 
-            if (ukPrn != reservation.UkPrn)
+            if (ukPrn != reservation.ProviderId)
             {
                 return false;
             }
 
             var trustedList = await _providerPermissionsService.GetTrustedEmployers(ukPrn);
 
-            if (trustedList.Any(e => e.AccountLegalEntityId == reservation.AccountLegalEntityId))
-            {
-                return true;
-            }
-            else
+            if (trustedList.All(e => e.AccountLegalEntityId != reservation.AccountLegalEntityId))
             {
                 throw new UnauthorizedAccessException();
             }
+
+            return true;
         }
     }
 }

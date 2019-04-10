@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -81,8 +80,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 cachedReservation.AccountId, 
+                cachedReservation.UkPrn,
                 new DateTime(startYear, startMonth, 1),
                 cachedReservation.Id,
+                cachedReservation.AccountLegalEntityId,
                 cachedReservation.AccountLegalEntityName,
                 cachedReservation.CourseId);
 

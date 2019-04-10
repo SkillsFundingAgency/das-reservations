@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public async Task Then_Provider_Has_Access_If_Allowed()
         {
            //Arrange
-            var providerUkPrn = _reservation.UkPrn;
+            var providerUkPrn = _reservation.ProviderId;
 
             //Act
             var result = await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public async Task Then_Denies_Access_If_UkPrn_Doesnt_Matches()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn + 10;
+            var providerUkPrn = _reservation.ProviderId + 10;
 
             //Act
             var result = await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
@@ -83,8 +83,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Exception_Thrown_If_Reservation_UkPrn_Not_Set()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn;
-            _reservation.UkPrn = default(uint);
+            var providerUkPrn = _reservation.ProviderId;
+            _reservation.ProviderId = default(uint);
 
             //Act + Assert
             var exception = Assert.ThrowsAsync<ArgumentException>(async () => await _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation));
@@ -95,7 +95,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Exception_Thrown_If_Provider_Does_Not_Have_Access_To_Employer()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn;
+            var providerUkPrn = _reservation.ProviderId;
             _reservation.AccountLegalEntityId = _employer.AccountLegalEntityId + 1;
 
             //Act + Assert
