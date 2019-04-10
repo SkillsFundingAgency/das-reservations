@@ -216,7 +216,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var query = new GetReservationQuery
             {
-                Id = routeModel.Id.Value 
+                Id = routeModel.Id.Value,
+                UkPrn = routeModel.UkPrn.GetValueOrDefault()
             };
             var queryResult = await _mediator.Send(query);
 
