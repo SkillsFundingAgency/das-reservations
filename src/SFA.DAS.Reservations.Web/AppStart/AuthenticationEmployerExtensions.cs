@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -62,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             var userId = ctx.Principal.Claims
                 .First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))
                 .Value;
-            var associatedAccountsClaim = await accountsSvc.GetClaim(userId);
+            var associatedAccountsClaim = await accountsSvc.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier);
             ctx.Principal.Identities.First().AddClaim(associatedAccountsClaim);
         }
 

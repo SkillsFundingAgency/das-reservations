@@ -4,13 +4,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using SFA.DAS.EAS.Account.Api.Client;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Models.Authentication;
-using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.EAS.Account.Api.Client;
+using SFA.DAS.Reservations.Domain.Authentication;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Web.Services
+namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class EmployerAccountService : IEmployerAccountService
     {
@@ -27,12 +26,7 @@ namespace SFA.DAS.Reservations.Web.Services
 
             return accounts
                 .Select(acc =>
-                    new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName });
-        }
-
-        public EmployerIdentifier GetCurrentEmployerAccountId(HttpContext context)
-        {
-            return (EmployerIdentifier)context.Items[ContextItemKeys.EmployerIdentifier];
+                    new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName/*, LegalEntityResources = acc.LegalEntities*/ });
         }
 
         private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
@@ -70,15 +64,14 @@ namespace SFA.DAS.Reservations.Web.Services
             return employerIdentifiers.Except(identifiersToRemove);
         }
 
-        public async Task<Claim> GetClaim(string userId)
+        public async Task<Claim> GetClaim(string userId, string claimType)
         {
             var accounts = await GetEmployerIdentifiersAsync(userId);
 
             accounts = await GetUserRoles(accounts, userId);
 
             var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
-            var associatedAccountsClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, accountsAsJson,
-                JsonClaimValueTypes.Json);
+            var associatedAccountsClaim = new Claim(claimType, accountsAsJson, JsonClaimValueTypes.Json);
             return associatedAccountsClaim;
         }
     }

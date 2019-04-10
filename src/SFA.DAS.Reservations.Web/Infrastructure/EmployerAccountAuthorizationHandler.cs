@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Models.Authentication;
+using SFA.DAS.Reservations.Domain.Authentication;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
