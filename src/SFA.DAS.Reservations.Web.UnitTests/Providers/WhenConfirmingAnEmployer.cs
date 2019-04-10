@@ -31,7 +31,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 c.AccountId.Equals(viewModel.AccountId) &&
                 c.AccountLegalEntityId.Equals(viewModel.AccountLegalEntityId) &&
                 c.AccountLegalEntityPublicHashedId.Equals(viewModel.AccountLegalEntityPublicHashedId) &&
-                c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName)), It.IsAny<CancellationToken>()), Times.Once);
+                c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName) &&
+                c.UkPrn.Equals(viewModel.UkPrn)), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]

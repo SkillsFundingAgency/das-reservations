@@ -18,9 +18,14 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 
         public bool ProviderReservationAccessAllowed(uint ukPrn, CachedReservation reservation)
         {
-            if (reservation == null || reservation.UkPrn == default(uint))
+            if (reservation == null)
             {
-                throw new ArgumentException("CachedReservation is null",nameof(reservation));
+                throw new ArgumentException("CachedReservation is null", nameof(reservation));
+            }
+
+            if (reservation.UkPrn == default(uint))
+            {
+                throw new ArgumentException("CachedReservation UkPrn is null", nameof(reservation));
             }
 
             if (ukPrn == default(uint))
