@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
 
             var apiRequest = new ReservationApiRequest(_options.Url,request.Id);
 
-            var result = await _apiClient.Get<ReservationApiRequest, GetReservationResponse>(apiRequest);
+            var result = await _apiClient.Get<GetReservationResponse>(apiRequest);
             
             if (request.UkPrn != default(uint) && !await _reservationAuthorisationService.ProviderReservationAccessAllowed(request.UkPrn, result))
             {

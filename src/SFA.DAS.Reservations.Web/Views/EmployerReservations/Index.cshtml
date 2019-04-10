@@ -1,4 +1,5 @@
-﻿@model ReservationViewModel
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model ReservationViewModel
 
 
 ﻿@{
@@ -15,9 +16,6 @@
         </ul>
         <p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
 
-        @*<a asp-route="employer-apprenticeship-training" role="button" draggable="false" class="govuk-button govuk-button--start">Start</a>*@
-
-
   @{
     var routeData = new Dictionary<string, string>
     {
@@ -25,6 +23,8 @@
         { "EmployerAccountId", ViewContext.RouteData.Values["EmployerAccountId"].ToString() }
     };
   }
-      <a asp-route="employer-select-course" asp-all-route-data="routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+
+      <a asp-route="@RouteNames.EmployerSelectCourse" asp-all-route-data="@routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+
     </div>
 </div>

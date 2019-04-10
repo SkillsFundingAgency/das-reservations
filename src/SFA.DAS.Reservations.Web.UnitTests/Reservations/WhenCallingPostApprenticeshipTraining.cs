@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,17 +31,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         private GetCachedReservationResult _cachedReservationResult;
         private Mock<IMediator> _mediator;
         private ReservationsController _controller;
+        private IFixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-            _course = fixture.Create<Course>();
-            _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
+            _course = new Course("1-4-5","test",1);
+            _cachedReservationResult = _fixture.Create<GetCachedReservationResult>();
 
             _mediator = new Mock<IMediator>();
-            _controller = new ReservationsController(_mediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            _controller = new ReservationsController(
+                _mediator.Object, 
+                Mock.Of<IStartDateService>(), 
+                Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
@@ -69,13 +72,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 });
         }
 
+        [Test, AutoData]
+        public async Task Then_The_Model_Is_Validated_And_Confirmation_Returned(ApprenticeshipTrainingFormModel model, ReservationsRouteModel routeModel)
+        {
+            _controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            var actual = await _controller.PostApprenticeshipTraining(routeModel, model);
+
+            var actualModel = actual as ViewResult;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual("ApprenticeshipTraining", actualModel.ViewName);
+        }
+
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_Redirects_To_Provider_Route(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
@@ -90,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
             routeModel.UkPrn = null;
 
@@ -101,29 +116,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public void Then_Throw_Error_If_No_Reservation_Found(
+        public async Task And_Has_Ukprn_Then_Caches_Course_And_StartDate(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetCachedReservationQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => null);
 
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
-            formModel.SelectedCourseId = _course.Id;
-
-            Assert.ThrowsAsync<ArgumentException>(() => _controller.PostApprenticeshipTraining(routeModel, formModel));
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_Caches_Draft_Reservation(
-            ReservationsRouteModel routeModel,
-            StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel)
-        {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -137,35 +136,32 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _mediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationStartDateCommand>(c =>
                         c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                        c.StartDateDescription.Equals(startDateModel.ToString())),
+                        c.StartDateDescription.Equals(startDateModel.ToString()) &&
+                        c.UkPrn.Equals(routeModel.UkPrn)),
                     It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Gets_Employer_Information_From_Cache(
+        public async Task And_No_Ukprn_Then_Caches_StartDate_Only(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            var expectedId = Guid.NewGuid();
-            routeModel.Id = expectedId;
-            
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            routeModel.UkPrn = null;
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationCourseCommand>( c => 
-                    c.CourseId.Equals(_course.Id) &&
-                    c.UkPrn.Equals(routeModel.UkPrn)),
-                It.IsAny<CancellationToken>()));
+                    c.CourseId.Equals(_course.Id)),
+                It.IsAny<CancellationToken>()), Times.Never);
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationStartDateCommand>(c =>
                     c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                    c.StartDateDescription.Equals(startDateModel.ToString())&&
-                    c.UkPrn.Equals(routeModel.UkPrn)),
+                    c.StartDateDescription.Equals(startDateModel.ToString())),
                 It.IsAny<CancellationToken>()));
         }
 
@@ -175,7 +171,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = null;
 
             await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -199,7 +195,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             StartDateModel startDateModel,
             ApprenticeshipTrainingFormModel formModel)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
@@ -215,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
             
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()))
@@ -237,7 +233,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel,
             GetCoursesResult coursesResult)
         {
-            formModel.TrainingStartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
 
             _mediator.Setup(mediator =>

@@ -1,0 +1,57 @@
+﻿
+@using SFA.DAS.Reservations.Web.Infrastructure
+@if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+{
+    <nav class="das-navigation">
+        <div class="govuk-width-container">
+            <ul class="das-navigation__list ">
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="Account" class="das-navigation__link">Home</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-action="Cohorts" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Your cohorts</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-action="manage/all" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage your apprentices</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a class="das-navigation__link" asp-external-controller="" asp-external-subdomain="recruit" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]">Recruit apprentices</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="Agreements" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Organisations and agreements</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+}
+
+else
+{
+    <nav class="das-navigation">
+        <div class="govuk-width-container">
+            <ul class="das-navigation__list ">
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="teams"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Home</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="balance"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Finance</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Recruitment</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="apprentices" asp-external-action="home" asp-external-folder="commitments" asp-external-subdomain="test-empc" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="teams" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your team</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="agreements" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your organisations and agreements</a>
+                </li>
+                <li class="das-navigation__list-item">
+                    <a asp-external-controller="schemes" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--last">PAYE schemes</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+}

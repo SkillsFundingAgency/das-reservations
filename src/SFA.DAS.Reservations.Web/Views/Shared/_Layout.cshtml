@@ -33,8 +33,7 @@
         <div class="govuk-header__container govuk-width-container">
 
             <div class="govuk-header__logo">
-                <a href="/" class="govuk-header__link govuk-header__link--homepage">
-                    @*TODO:Redirect to correct page - external url helper*@
+                <a asp-external-controller="" class="govuk-header__link govuk-header__link--homepage">
                     <span class="govuk-header__logotype">
 
                         <svg role="presentation" focusable="false" class="govuk-header__logotype-crown" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 132 97" height="32" width="36">
@@ -48,13 +47,20 @@
                 </a>
             </div>
             <div class="govuk-header__content">
-                <a href="#" class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>@*TODO:Change based on provider account?*@
+                @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    <a href="#" class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
+                }
+                else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    <a asp-external-controller="" class="govuk-header__link govuk-header__link--service-name">Apprenticeships</a>
+                }
             </div>
         </div>
         <partial name="_Navigation" />
     </header>
-
-
+    
+    <partial name="_SubNavigation"/>
 
     <div class="govuk-width-container">
         <main class="govuk-main-wrapper " id="main-content" role="main">

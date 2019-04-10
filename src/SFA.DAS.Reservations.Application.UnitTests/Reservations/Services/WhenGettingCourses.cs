@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
-                    x.Get<CoursesApiRequest, GetCoursesResponse>(
+                    x.Get<GetCoursesResponse>(
                         It.Is<CoursesApiRequest>(c =>
                             c.GetUrl.Equals(
                                 $"{ExpectedBaseUrl}api/courses"))))
@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             _cacheService.Verify(s => s.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)), 
                 Times.Once);
 
-            _apiClient.Verify(c => c.Get<CoursesApiRequest, GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
+            _apiClient.Verify(c => c.Get<GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
                 Times.Never);
             
             courses.Should().BeEquivalentTo(_expectedCacheCourses.Values);
@@ -117,7 +117,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             _cacheService.Verify(s => s.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)), 
                 Times.Once);
             
-            _apiClient.Verify(c => c.Get<CoursesApiRequest, GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
+            _apiClient.Verify(c => c.Get<GetCoursesResponse>(It.IsAny<CoursesApiRequest>()), 
                 Times.Once);
            
             courses.Should().BeEquivalentTo(_expectedApiCourses);

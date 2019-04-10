@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("chooseEmployer", Name = RouteNames.ProviderChooseEmployer)]
+        [Route("choose-employer", Name = RouteNames.ProviderChooseEmployer)]
         public async Task<IActionResult> ChooseEmployer(ReservationsRouteModel routeModel)
         {
             if (!routeModel.UkPrn.HasValue)
@@ -47,19 +47,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirmEmployer")]
+        [Route("confirm-employer")]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
         }
 
         [HttpPost]
-        [Route("confirmEmployer")]
+        [Route("confirm-employer")]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)
             {
-                ModelState.AddModelError("confirm-yes", "You must pick an option");
+                ModelState.AddModelError("confirm-yes", "Select whether to secure funds for this employer or not");
                 return View("ConfirmEmployer", viewModel);
             }
 
@@ -85,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     UkPrn = viewModel.UkPrn
                 });
 
-                return RedirectToAction("ApprenticeshipTraining", "Reservations", new
+                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
                 {
                     Id = reservationId,
                     EmployerAccountId = viewModel.AccountPublicHashedId,

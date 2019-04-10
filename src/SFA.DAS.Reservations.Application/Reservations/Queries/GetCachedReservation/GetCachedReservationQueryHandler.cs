@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
@@ -29,9 +30,20 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var reservation = await _cacheService.RetrieveFromCache<GetCachedReservationResult>(request.Id.ToString());
+            var cachedReservation = await _cacheService.RetrieveFromCache<CachedReservation>(request.Id.ToString());
 
-            return reservation;
+            return new GetCachedReservationResult
+            {
+                Id = cachedReservation.Id,
+                AccountId = cachedReservation.AccountId,
+                AccountLegalEntityId = cachedReservation.AccountLegalEntityId,
+                AccountLegalEntityName = cachedReservation.AccountLegalEntityName,
+                AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId,
+                CourseId = cachedReservation.CourseId,
+                CourseDescription = cachedReservation.CourseDescription,
+                StartDate = cachedReservation.StartDate,
+                StartDateDescription = cachedReservation.StartDateDescription
+            };
         }
     }
 }

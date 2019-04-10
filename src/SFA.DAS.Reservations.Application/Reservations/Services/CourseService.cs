@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
         {
             var apiRequest = new CoursesApiRequest(_options.Url);
 
-            var result = await _apiClient.Get<CoursesApiRequest, GetCoursesResponse>(apiRequest);
+            var result = await _apiClient.Get<GetCoursesResponse>(apiRequest);
 
             var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
 

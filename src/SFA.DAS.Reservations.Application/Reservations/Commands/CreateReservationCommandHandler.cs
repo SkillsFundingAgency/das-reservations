@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
                 cachedReservation.AccountLegalEntityName,
                 cachedReservation.CourseId);
 
-            var response = await _apiClient.Create<ReservationApiRequest, CreateReservationResponse>(apiRequest);
+            var response = await _apiClient.Create<CreateReservationResponse>(apiRequest);
 
             var accountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId;
 

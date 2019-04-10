@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
 
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
-                    x.Get<ReservationApiRequest, GetReservationResponse>(
+                    x.Get<GetReservationResponse>(
                         It.Is<ReservationApiRequest>(c =>
                             c.GetUrl.Equals(
                                 $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))

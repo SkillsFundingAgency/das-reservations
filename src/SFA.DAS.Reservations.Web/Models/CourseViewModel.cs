@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             if (course == null)
             {
-                course = new Course(null, null,0);
+                course = new Course(null,null,0);
                 Description = course.CourseDescription;
                 return;
             }

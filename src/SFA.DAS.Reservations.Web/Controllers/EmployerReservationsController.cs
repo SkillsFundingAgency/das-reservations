@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -50,17 +52,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/SelectCourse",Name = RouteNames.EmployerSelectCourse)]
+        [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {
-            if (!routeModel.Id.HasValue)
+            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+            if (cachedReservation == null)
             {
-                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
+                return View("Index");
             }
 
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
-            var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
+            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
 
             var viewModel = new EmployerSelectCourseViewModel
             {
@@ -72,20 +75,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/SkipCourseSelection",Name = RouteNames.EmployerSkipSelectCourse)]
+        [Route("{id}/skip-course-selection",Name = RouteNames.EmployerSkipSelectCourse)]
         public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
         {
             return await PostSelectCourse(routeModel, null);
         }
 
         [HttpPost]
-        [Route("{id}/SelectCourse")]
+        [Route("{id}/select-course")]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
-            if (!routeModel.Id.HasValue)
-            {
-                throw new ArgumentException("Reservation Id must be set", nameof(routeModel.Id));
-            }
 
             try
             {
@@ -95,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     CourseId = selectedCourseId
                 });
 
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new
+                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
                 {
                     Id = routeModel.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
