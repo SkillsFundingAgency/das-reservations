@@ -52,6 +52,31 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
+        [Route("{id}/select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
+        public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
+        {
+            var user = User;//.Claims - can get required stuff from here. wrap into different service for testing?
+            await Task.CompletedTask;
+            return RedirectToRoute(RouteNames.EmployerConfirmLegalEntity, routeModel);
+        }
+
+        [HttpGet]
+        [Route("{id}/confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
+        public async Task<IActionResult> ConfirmLegalEntity(ReservationsRouteModel routeModel)
+        {
+            await Task.CompletedTask;
+            return await PostConfirmLegalEntity(routeModel);
+        }
+
+        [HttpPost]
+        [Route("{id}/confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
+        public async Task<IActionResult> PostConfirmLegalEntity(ReservationsRouteModel routeModel)
+        {
+            await Task.CompletedTask;
+            return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
+        }
+
+        [HttpGet]
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {

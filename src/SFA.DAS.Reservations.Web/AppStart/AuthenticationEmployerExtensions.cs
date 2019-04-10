@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Infrastructure;
-using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
