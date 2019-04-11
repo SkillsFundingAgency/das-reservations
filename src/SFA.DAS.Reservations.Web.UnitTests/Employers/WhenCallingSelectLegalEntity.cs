@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             await controller.SelectLegalEntity(routeModel);
 
-            mockMediator.Verify(mediator => mediator.Send(It.Is<GetLegalEntitiesQuery>(query => query.UserId == routeModel.EmployerAccountId), It.IsAny<CancellationToken>()), Times.Once);
+            mockMediator.Verify(mediator => mediator.Send(It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId), It.IsAny<CancellationToken>()), Times.Once);
         }
         // todo: get legal entity details and add them to the view model
     }

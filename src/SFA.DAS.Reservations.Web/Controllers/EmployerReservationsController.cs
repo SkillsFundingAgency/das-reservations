@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
-            await _mediator.Send(new GetLegalEntitiesQuery {UserId = routeModel.EmployerAccountId});
+            await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
             
             return RedirectToRoute(RouteNames.EmployerConfirmLegalEntity, routeModel);
         }
