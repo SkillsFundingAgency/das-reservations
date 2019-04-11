@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -55,8 +55,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
-            var user = User;//.Claims - can get required stuff from here. wrap into different service for testing?
-            await Task.CompletedTask;
+            await _mediator.Send(new GetLegalEntitiesQuery {UserId = routeModel.EmployerAccountId});
+            
             return RedirectToRoute(RouteNames.EmployerConfirmLegalEntity, routeModel);
         }
 
