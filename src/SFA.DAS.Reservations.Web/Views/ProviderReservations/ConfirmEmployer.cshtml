@@ -5,6 +5,15 @@
     ViewBag.Title = "Confirm Employer";
 }
 
+@{
+    var routeData = new Dictionary<string, string>
+    {
+        {"employerAccountId","JKXR9B"}
+    };
+}
+
+<a asp-route="provider-choose-employer" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
