@@ -40,8 +40,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             result.Should().BeEquivalentTo(accountDetailViewModels.Select(model => new EmployerIdentifier
             {
                 AccountId = model.HashedAccountId,
-                EmployerName = model.DasAccountName,
-                LegalEntityResources = model.LegalEntities
+                EmployerName = model.DasAccountName
             }));
         }
     }
