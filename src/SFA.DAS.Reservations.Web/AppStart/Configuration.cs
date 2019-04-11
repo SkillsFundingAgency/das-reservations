@@ -3,10 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EAS.Account.Api.Client;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
-using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.Configuration.AccountApiConfiguration;
+using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -42,6 +42,10 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
             services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
+
+            services.AddSingleton<IAuthorizationHandler, HasProviderOrEmployerAccountAuthorisationHandler>();
+            services.AddSingleton<IProviderAuthorisationHandler, ProviderAuthorizationHandler>();
+            services.AddSingleton<IEmployerAccountAuthorisationHandler, EmployerAccountAuthorizationHandler>();
         }
     }
 }

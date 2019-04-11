@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
+﻿namespace SFA.DAS.Reservations.Infrastructure.Configuration
 {
     public class ProviderIdamsConfiguration
     {

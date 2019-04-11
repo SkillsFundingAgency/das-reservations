@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Configuration
 {

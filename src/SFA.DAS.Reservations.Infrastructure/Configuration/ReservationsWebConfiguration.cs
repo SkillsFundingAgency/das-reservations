@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
+namespace SFA.DAS.Reservations.Infrastructure.Configuration
 {
     public class ReservationsWebConfiguration
     {
@@ -9,7 +9,12 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration.Configuration
         public string EmployerAccountHashAlphabet { get; set; }
         public double SessionTimeoutHours { get; set; }
         public DateTime? CurrentDateTime { get; set; }
-        public string RedisCacheConnectionString { get; set; }
+
+        public string RedisCacheConnectionString
+        {
+            get; set;
+
+        }
         public virtual string ApprenticeUrl { get; set; }
         public virtual string DashboardUrl { get; set; }
         public virtual string EmployerDashboardUrl { get; set; }

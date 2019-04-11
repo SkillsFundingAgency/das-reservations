@@ -35,6 +35,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireAssertion(context => context.User.HasClaim(c =>
                             c.Type.Equals(ProviderClaims.ProviderUkprn) ||
                             c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)));
+                        policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
                     });
             });
         }
