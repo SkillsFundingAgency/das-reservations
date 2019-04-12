@@ -17,14 +17,37 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
     public class WhenGettingLegalEntities
     {
         [Test, MoqAutoData]
-        public async Task Then_Gets_Legal_Entities_For_Account(
+        public async Task And_No_Cache_Then_Gets_Legal_Entities_For_Account(
             GetLegalEntitiesQuery query,
             [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
+            [Frozen] Mock<ICacheStorageService> mockCacheService,
             GetLegalEntitiesQueryHandler handler)
         {
+            mockCacheService
+                .Setup(service => service.RetrieveFromCache<IEnumerable<LegalEntityViewModel>>(query.AccountId))
+                .ReturnsAsync((IEnumerable<LegalEntityViewModel>)null);
+
             await handler.Handle(query, CancellationToken.None);
 
             mockAccountApiClient.Verify(client => client.GetLegalEntitiesConnectedToAccount(query.AccountId), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Is_Cache_Then_Gets_Legal_Entities_From_Cache(
+            GetLegalEntitiesQuery query,
+            IEnumerable<LegalEntityViewModel> cachedLegalEntities,
+            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
+            [Frozen] Mock<ICacheStorageService> mockCacheService,
+            GetLegalEntitiesQueryHandler handler)
+        {
+            mockCacheService
+                .Setup(service => service.RetrieveFromCache<IEnumerable<LegalEntityViewModel>>(query.AccountId))
+                .ReturnsAsync(cachedLegalEntities);
+
+            await handler.Handle(query, CancellationToken.None);
+
+            mockAccountApiClient.Verify(client => client.GetLegalEntitiesConnectedToAccount(query.AccountId), Times.Never);
+            mockAccountApiClient.Verify(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()), Times.Never);
         }
 
         [Test, MoqAutoData]
@@ -32,8 +55,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQuery query,
             List<ResourceViewModel> resourceViewModels,
             [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
+            [Frozen] Mock<ICacheStorageService> mockCacheService,
             GetLegalEntitiesQueryHandler handler)
         {
+            mockCacheService
+                .Setup(service => service.RetrieveFromCache<IEnumerable<LegalEntityViewModel>>(query.AccountId))
+                .ReturnsAsync((IEnumerable<LegalEntityViewModel>)null);
+
             mockAccountApiClient
                 .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
                 .ReturnsAsync(resourceViewModels);
@@ -53,6 +81,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             [Frozen] Mock<ICacheStorageService> mockCacheService,
             GetLegalEntitiesQueryHandler handler)
         {
+            mockCacheService
+                .Setup(service => service.RetrieveFromCache<IEnumerable<LegalEntityViewModel>>(query.AccountId))
+                .ReturnsAsync((IEnumerable<LegalEntityViewModel>)null);
+
             mockAccountApiClient
                 .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
                 .ReturnsAsync(resourceViewModels);
@@ -71,8 +103,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             List<ResourceViewModel> resourceViewModels,
             LegalEntityViewModel legalEntityViewModel,
             [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
+            [Frozen] Mock<ICacheStorageService> mockCacheService,
             GetLegalEntitiesQueryHandler handler)
         {
+            mockCacheService
+                .Setup(service => service.RetrieveFromCache<IEnumerable<LegalEntityViewModel>>(query.AccountId))
+                .ReturnsAsync((IEnumerable<LegalEntityViewModel>)null);
+
             mockAccountApiClient
                 .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
                 .ReturnsAsync(resourceViewModels);
@@ -85,7 +122,5 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             result.LegalEntityViewModels.Count().Should().Be(resourceViewModels.Count);
             result.LegalEntityViewModels.First().Should().BeEquivalentTo(legalEntityViewModel);
         }
-
-        //todo: get and store in cache based on account id
     }
 }
