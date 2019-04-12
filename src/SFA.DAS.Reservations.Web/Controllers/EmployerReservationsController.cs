@@ -15,7 +15,6 @@ using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
-using LegalEntityViewModel = SFA.DAS.EAS.Account.Api.Types.LegalEntityViewModel;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -54,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
+        [Route("select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
             var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
@@ -63,15 +62,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
-        public async Task<IActionResult> ConfirmLegalEntity(ReservationsRouteModel routeModel)
+        [Route("confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
+        public async Task<IActionResult> ConfirmLegalEntity(ReservationsRouteModel routeModel, string legalEntity)
         {
             await Task.CompletedTask;
             return await PostConfirmLegalEntity(routeModel);
         }
 
         [HttpPost]
-        [Route("{id}/confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
+        [Route("confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
         public async Task<IActionResult> PostConfirmLegalEntity(ReservationsRouteModel routeModel)
         {
             await Task.CompletedTask;

@@ -46,15 +46,50 @@
 
         <h1 class="govuk-heading-xl">Choose organisation</h1>
 
-        <form method="post" asp-route="@RouteNames.EmployerSelectCourse" class="validate-auto-complete">
-
-
-            <div class="govuk-form-group">
+        <form method="get" asp-route="@RouteNames.EmployerConfirmLegalEntity" class="validate-auto-complete">
+            <div class="govuk-form-group" @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")>
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
                     Which organisation is named on the contract with the training provider for the apprentices you'd like to add?
                 </span>
+                <fieldset class="govuk-fieldset">
+                    
+                    @if (ViewData.ModelState.ContainsKey("LegalEntity"))
+                    {
+                        <span id="legal-entity-error" class="govuk-error-message">
+                            @ViewData.ModelState["LegalEntity"].Errors.First().ErrorMessage
+                        </span>
+                    }
+
+                    <div class="govuk-radios">
+                        @foreach (var legalEntity in Model.LegalEntities)
+                        {
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId" name="legalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
+                                <label class="govuk-label govuk-radios__label" for="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId">
+                                    @legalEntity.Name
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
             </div>
-            <details>What is a contract for services?</details>
+
+            <details class="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        What is a contract for services?
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    A contract for services is a formal agreement between a buyer and a supplier.
+                </div>
+                <div class="govuk-details__text">
+                    In this case, the contract is between the organisation that's buying apprenticeship training for their apprentices and the training provider that's training the apprentices.
+                </div>
+                <div class="govuk-details__text">
+                    If you're and employer-provider, for example, you won't need a contract for services as your organisation is both the buyer and the supplier.
+                </div>
+            </details>
             <button type="submit" class="govuk-button">
                 Save and continue
             </button>

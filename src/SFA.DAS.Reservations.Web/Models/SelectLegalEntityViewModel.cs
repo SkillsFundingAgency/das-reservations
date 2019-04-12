@@ -22,10 +22,11 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public LegalEntityViewModel(api.LegalEntityViewModel apiModel)
         {
-            AccountLegalEntityId = apiModel.AccountLegalEntityId;
             Name = apiModel.Name;
+            AccountLegalEntityPublicHashedId = apiModel.AccountLegalEntityPublicHashedId;
         }
+
         public string Name { get; }
-        public long AccountLegalEntityId { get; }
+        public string AccountLegalEntityPublicHashedId { get; }
     }
 }
