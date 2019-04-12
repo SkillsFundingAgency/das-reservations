@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using LegalEntityViewModel = SFA.DAS.EAS.Account.Api.Types.LegalEntityViewModel;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -55,9 +57,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
-            await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
-            
-            return RedirectToRoute(RouteNames.EmployerConfirmLegalEntity, routeModel);
+            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
+            var viewModel = new SelectLegalEntityViewModel(routeModel, response.LegalEntityViewModels);
+            return View(viewModel);
         }
 
         [HttpGet]

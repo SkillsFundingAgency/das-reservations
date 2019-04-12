@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.EAS.Account.Api.Client;
+using SFA.DAS.EAS.Account.Api.Types;
 
 namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 {
@@ -16,9 +18,19 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 
         public async Task<GetLegalEntitiesResponse> Handle(GetLegalEntitiesQuery request, CancellationToken cancellationToken)
         {
-            await _accountApiClient.GetLegalEntitiesConnectedToAccount(request.AccountId);
+            var legalEntityResources = await _accountApiClient.GetLegalEntitiesConnectedToAccount(request.AccountId);
+
+            var legalEntities = new List<LegalEntityViewModel>();
+            foreach (var legalEntityResource in legalEntityResources)
+            {
+                var legalEntity = await _accountApiClient.GetResource<LegalEntityViewModel>(legalEntityResource.Href);
+                legalEntities.Add(legalEntity);
+            }
             
-            return null;
+            return new GetLegalEntitiesResponse
+            {
+                LegalEntityViewModels = legalEntities
+            };
         }
     }
 }
