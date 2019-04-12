@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalEntities
 {
@@ -44,6 +45,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
         }
 
         [Test, MoqAutoData]
+        public async Task Then_Caches_Legal_Entities_Details(
+            GetLegalEntitiesQuery query,
+            List<ResourceViewModel> resourceViewModels,
+            LegalEntityViewModel legalEntityViewModel,
+            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
+            [Frozen] Mock<ICacheStorageService> mockCacheService,
+            GetLegalEntitiesQueryHandler handler)
+        {
+            mockAccountApiClient
+                .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
+                .ReturnsAsync(resourceViewModels);
+            mockAccountApiClient
+                .Setup(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()))
+                .ReturnsAsync(legalEntityViewModel);
+            
+            await handler.Handle(query, CancellationToken.None);
+
+            mockCacheService.Verify(service => service.SaveToCache(query.AccountId, It.IsAny<IEnumerable<LegalEntityViewModel>>(), 1), Times.Once);
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Returns_Legal_Entities(
             GetLegalEntitiesQuery query,
             List<ResourceViewModel> resourceViewModels,
@@ -63,5 +85,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             result.LegalEntityViewModels.Count().Should().Be(resourceViewModels.Count);
             result.LegalEntityViewModels.First().Should().BeEquivalentTo(legalEntityViewModel);
         }
+
+        //todo: get and store in cache based on account id
     }
 }
