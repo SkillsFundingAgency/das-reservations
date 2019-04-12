@@ -23,6 +23,5 @@
         public const string EmployerSelectCourse = "employer-select-course";
         public const string EmployerSkipSelectCourse = "employer-skip-select-course";
         public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
-        public const string EmployerConfirmLegalEntity = "employer-confirm-legal-entity";
     }
 }

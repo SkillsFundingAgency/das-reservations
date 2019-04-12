@@ -46,7 +46,7 @@
 
         <h1 class="govuk-heading-xl">Choose organisation</h1>
 
-        <form method="get" asp-route="@RouteNames.EmployerConfirmLegalEntity" class="validate-auto-complete">
+        <form method="post" asp-route="@RouteNames.EmployerSelectLegalEntity" class="validate-auto-complete">
             <div class="govuk-form-group" @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")>
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
                     Which organisation is named on the contract with the training provider for the apprentices you'd like to add?

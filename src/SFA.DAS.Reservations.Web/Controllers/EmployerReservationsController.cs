@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,18 +60,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [HttpGet]
-        [Route("confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
-        public async Task<IActionResult> ConfirmLegalEntity(ReservationsRouteModel routeModel, string legalEntity)
-        {
-            await Task.CompletedTask;
-            return await PostConfirmLegalEntity(routeModel);
-        }
-
         [HttpPost]
-        [Route("confirm-legal-entity", Name = RouteNames.EmployerConfirmLegalEntity)]
-        public async Task<IActionResult> PostConfirmLegalEntity(ReservationsRouteModel routeModel)
+        [Route("confirm-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
+        public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
         {
+            await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
             await Task.CompletedTask;
             return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
         }

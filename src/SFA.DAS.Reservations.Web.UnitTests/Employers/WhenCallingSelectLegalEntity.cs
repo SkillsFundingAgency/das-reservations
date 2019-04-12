@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -10,7 +9,6 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
-using api = SFA.DAS.EAS.Account.Api.Types;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -25,7 +23,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             await controller.SelectLegalEntity(routeModel);
 
-            mockMediator.Verify(mediator => mediator.Send(It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId), It.IsAny<CancellationToken>()), Times.Once);
+            mockMediator.Verify(mediator => mediator.Send(
+                It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId), 
+                It.IsAny<CancellationToken>()), 
+                Times.Once);
         }
 
         [Test, MoqAutoData]
