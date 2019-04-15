@@ -70,8 +70,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return await SelectLegalEntity(routeModel);
             }
 
-            await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
-            await Task.CompletedTask;
+            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
+            var selectedAccountLegalEntity = response.LegalEntityViewModels.Single(model =>
+                model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+
+            await _mediator.Send(new CacheReservationEmployerCommand
+            {
+                Id = Guid.NewGuid(),
+                AccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId),
+                AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = selectedAccountLegalEntity.Name,
+                AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
+            });
+            
             return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
         }
 
