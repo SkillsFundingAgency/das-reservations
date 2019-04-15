@@ -59,9 +59,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
 
         private async Task<IDictionary<string, Course>> CacheCoursesFromApi()
         {
-            var apiRequest = new CoursesApiRequest(_options.Url);
+            var apiRequest = new GetCoursesApiRequest(_options.Url);
 
-            var result = await _apiClient.Get<GetCoursesResponse>(apiRequest);
+            var result = await _apiClient.Get<GetCoursesApiResponse>(apiRequest);
 
             var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
 
