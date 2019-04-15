@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -57,13 +58,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
             var viewModel = new SelectLegalEntityViewModel(routeModel, response.LegalEntityViewModels);
-            return View(viewModel);
+            return View("SelectLegalEntity", viewModel);
         }
 
         [HttpPost]
-        [Route("confirm-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
+        [Route("select-legal-entity", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return await SelectLegalEntity(routeModel);
+            }
+
             await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
             await Task.CompletedTask;
             return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
