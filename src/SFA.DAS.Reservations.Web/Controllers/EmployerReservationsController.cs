@@ -32,24 +32,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
+        public IActionResult Index()
         {
-            var accountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
-
-            var reservationId = Guid.NewGuid();
-
-            await _mediator.Send(new CacheReservationEmployerCommand
-            {
-                Id = reservationId,
-                AccountId = accountId,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityPublicHashedId = "111ABC",
-                AccountLegalEntityName = "Test Corp"
-            });
-
-            var viewModel = new ReservationViewModel{ Id = reservationId};
-
-            return View(viewModel);
+            return View();
         }
 
         [HttpGet]
@@ -73,15 +58,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
             var selectedAccountLegalEntity = response.LegalEntityViewModels.Single(model =>
                 model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+            var reservationId = Guid.NewGuid();
 
             await _mediator.Send(new CacheReservationEmployerCommand
             {
-                Id = Guid.NewGuid(),
+                Id = reservationId,
                 AccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId),
                 AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = selectedAccountLegalEntity.Name,
                 AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
             });
+
+            routeModel.Id = reservationId;
             
             return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
         }

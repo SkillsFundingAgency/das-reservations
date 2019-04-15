@@ -1,6 +1,4 @@
 ﻿@using SFA.DAS.Reservations.Web.Infrastructure
-@model ReservationViewModel
-
 
 ﻿@{
     ViewData["Title"] = "Reservations";
@@ -15,16 +13,8 @@
             <li>an idea of the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" class="govuk-link">apprenticeship training</a> the apprentice will take (optional)</li>
         </ul>
         <p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
-
-  @{
-    var routeData = new Dictionary<string, string>
-    {
-        { "id", Model.Id.ToString() },
-        { "EmployerAccountId", ViewContext.RouteData.Values["EmployerAccountId"].ToString() }
-    };
-  }
-
-      <a asp-route="@RouteNames.EmployerSelectLegalEntity" asp-all-route-data="@routeData" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
+        
+        <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
 
     </div>
 </div>
