@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
             var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
-            var viewModel = new SelectLegalEntityViewModel(routeModel, response.LegalEntityViewModels);
+            var viewModel = new SelectLegalEntityViewModel(routeModel, response.AccountLegalEntities);
             return View("SelectLegalEntity", viewModel);
         }
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
-            var selectedAccountLegalEntity = response.LegalEntityViewModels.Single(model =>
+            var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
                 model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
             var reservationId = Guid.NewGuid();
 

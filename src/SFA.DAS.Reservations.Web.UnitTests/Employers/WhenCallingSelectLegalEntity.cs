@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var viewModel = result?.Model.Should().BeOfType<SelectLegalEntityViewModel>().Subject;
             viewModel.Should().NotBeNull();
             viewModel?.RouteModel.Should().BeEquivalentTo(routeModel);
-            viewModel?.LegalEntities.Should().BeEquivalentTo(getLegalEntitiesResponse.LegalEntityViewModels, options => options.ExcludingMissingMembers());
+            viewModel?.LegalEntities.Should().BeEquivalentTo(getLegalEntitiesResponse.AccountLegalEntities, options => options.ExcludingMissingMembers());
         }
     }
 }

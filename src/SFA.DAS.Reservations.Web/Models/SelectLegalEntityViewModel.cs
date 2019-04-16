@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using api = SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Reservations.Domain.Employers;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -8,10 +8,10 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public SelectLegalEntityViewModel(
             ReservationsRouteModel routeModel,
-            IEnumerable<api.LegalEntityViewModel> apiLegalEntities)
+            IEnumerable<AccountLegalEntity> accountLegalEntities)
         {
             RouteModel = routeModel;
-            LegalEntities = apiLegalEntities?.Select(apiModel => new LegalEntityViewModel(apiModel));
+            LegalEntities = accountLegalEntities?.Select(apiModel => new LegalEntityViewModel(apiModel));
         }
 
         public IEnumerable<LegalEntityViewModel> LegalEntities { get; }
@@ -20,10 +20,10 @@ namespace SFA.DAS.Reservations.Web.Models
 
     public class LegalEntityViewModel
     {
-        public LegalEntityViewModel(api.LegalEntityViewModel apiModel)
+        public LegalEntityViewModel(AccountLegalEntity accountLegalEntity)
         {
-            Name = apiModel.Name;
-            AccountLegalEntityPublicHashedId = apiModel.AccountLegalEntityPublicHashedId;
+            Name = accountLegalEntity.Name;
+            AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId;
         }
 
         public string Name { get; }

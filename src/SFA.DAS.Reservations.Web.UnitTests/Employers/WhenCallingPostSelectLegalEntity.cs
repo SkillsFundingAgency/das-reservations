@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IHashingService> mockHashingService,
             EmployerReservationsController controller)
         {
-            var firstLegalEntity = getLegalEntitiesResponse.LegalEntityViewModels.First();
+            var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IHashingService> mockHashingService,
             EmployerReservationsController controller)
         {
-            var firstLegalEntity = getLegalEntitiesResponse.LegalEntityViewModels.First();
+            var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(

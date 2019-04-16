@@ -2,8 +2,8 @@
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Models;
-using api = SFA.DAS.EAS.Account.Api.Types;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
 {
@@ -13,9 +13,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_RouteModel(
             ReservationsRouteModel routeModel,
-            List<api.LegalEntityViewModel> apiLegalEntities)
+            List<AccountLegalEntity> accountLegalEntities)
         {
-            var viewModel = new SelectLegalEntityViewModel(routeModel, apiLegalEntities);
+            var viewModel = new SelectLegalEntityViewModel(routeModel, accountLegalEntities);
 
             viewModel.RouteModel.Should().Be(routeModel);
         }
@@ -23,17 +23,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_LegalEntities(
             ReservationsRouteModel routeModel,
-            List<api.LegalEntityViewModel> apiLegalEntities)
+            List<AccountLegalEntity> accountLegalEntities)
         {
-            var viewModel = new SelectLegalEntityViewModel(routeModel, apiLegalEntities);
+            var viewModel = new SelectLegalEntityViewModel(routeModel, accountLegalEntities);
 
-            viewModel.LegalEntities.Should().BeEquivalentTo(apiLegalEntities, option => option.ExcludingMissingMembers());
+            viewModel.LegalEntities.Should().BeEquivalentTo(accountLegalEntities, option => option.ExcludingMissingMembers());
         }
         
         [Test, AutoData]
         public void And_Api_LegalEntities_Null_Then_Sets_LegalEntities_Null(
-            ReservationsRouteModel routeModel,
-            List<api.LegalEntityViewModel> apiLegalEntities)
+            ReservationsRouteModel routeModel)
         {
             var viewModel = new SelectLegalEntityViewModel(routeModel, null);
 
