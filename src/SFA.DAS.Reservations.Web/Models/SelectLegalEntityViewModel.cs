@@ -16,7 +16,6 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public IEnumerable<LegalEntityViewModel> LegalEntities { get; }
         public ReservationsRouteModel RouteModel { get; }
-        public string LegalEntity { get; set; }
     }
 
     public class LegalEntityViewModel
