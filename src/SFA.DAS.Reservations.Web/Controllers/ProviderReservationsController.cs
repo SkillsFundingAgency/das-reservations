@@ -12,7 +12,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Route("{ukPrn}/reservations")]
+    [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;
@@ -47,14 +47,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
         }
 
         [HttpPost]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)

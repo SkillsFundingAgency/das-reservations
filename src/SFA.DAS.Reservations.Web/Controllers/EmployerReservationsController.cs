@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -19,7 +18,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
-    [Route("accounts/{employerAccountId}/reservations")]
+    [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
     public class EmployerReservationsController : Controller
     {
         private readonly IMediator _mediator;
@@ -105,7 +104,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/select-course")]
+        [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
 

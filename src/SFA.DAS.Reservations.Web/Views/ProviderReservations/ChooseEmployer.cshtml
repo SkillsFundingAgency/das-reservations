@@ -1,4 +1,5 @@
-﻿@model ChooseEmployerViewModel
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model ChooseEmployerViewModel
 
 
 @{
@@ -42,7 +43,7 @@
                     <td class="govuk-table__cell">@employer.AccountName</td>
                     <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric">
-                        <a class="govuk-link" href="@Url.Action("ConfirmEmployer", viewModel)">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                        <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderConfirmEmployer, viewModel)">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
                     </td>
                 </tr>
             }
