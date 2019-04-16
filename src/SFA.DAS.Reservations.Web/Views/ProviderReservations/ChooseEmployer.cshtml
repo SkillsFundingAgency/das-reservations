@@ -1,50 +1,54 @@
 ﻿@model ChooseEmployerViewModel
 
-<a href="@Url.Action("Index",new {UkPrn = ViewContext.RouteData.Values["ukPrn"]})" class="govuk-back-link">Back</a>
-
 
 @{
     ViewBag.Title = "Choose Employer";
+    var routeData = new Dictionary<string, string>
+    {
+        {"UkPrn",ViewContext.RouteData.Values["ukPrn"].ToString()}
+    };
 }
 
+<a asp-action="Index" asp-controller="ProviderReservations" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
 
 
-<div class="govuk-grid-row">
 
-    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-two-thirds">
 
-        <h1 class="govuk-heading-xl">Choose an employer</h1>
-        <p>This is the employer you are securing funds on behalf of.</p>
+            <h1 class="govuk-heading-xl">Choose an employer</h1>
+            <p>This is the employer you are securing funds on behalf of.</p>
 
-        <p>@Model.Employers.Count() result@(Model.Employers.Count() != 1 ? "s" : null) found.</p>
-        <table class="govuk-table">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th class="govuk-table__header" scope="col">Employer</th>
-                    <th class="govuk-table__header" scope="col">Account name</th>
-                    <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
-                    <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @foreach (var employer in Model.Employers)
-                {
-                    var viewModel = new ConfirmEmployerViewModel
-                    {
-                        AccountId = employer.AccountId,
-                        AccountPublicHashedId = employer.AccountPublicHashedId,
-                        AccountName = employer.AccountName,
-                        AccountLegalEntityId = employer.AccountLegalEntityId,
-                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
-                        AccountLegalEntityName = employer.AccountLegalEntityName
-                    };
-
+            <p>@Model.Employers.Count() result@(Model.Employers.Count() != 1 ? "s" : null) found.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
-                        <td class="govuk-table__cell">@employer.AccountName</td>
-                        <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">
-                            <a class="govuk-link" href="@Url.Action("ConfirmEmployer", new
+                        <th class="govuk-table__header" scope="col">Employer</th>
+                        <th class="govuk-table__header" scope="col">Account name</th>
+                        <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
+                        <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var employer in Model.Employers)
+                    {
+                        var viewModel = new ConfirmEmployerViewModel
+                        {
+                            AccountId = employer.AccountId,
+                            AccountPublicHashedId = employer.AccountPublicHashedId,
+                            AccountName = employer.AccountName,
+                            AccountLegalEntityId = employer.AccountLegalEntityId,
+                            AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                            AccountLegalEntityName = employer.AccountLegalEntityName
+                        };
+
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
+                            <td class="govuk-table__cell">@employer.AccountName</td>
+                            <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">
+                                <a class="govuk-link" href="@Url.Action("ConfirmEmployer", new
                                                     {
                                                         UkPrn = ViewContext.RouteData.Values["ukPrn"],
                                                         AccountId = employer.AccountId,
@@ -57,10 +61,10 @@
                                                 </td>
                                             </tr>
                                         }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-
+</main>
 
