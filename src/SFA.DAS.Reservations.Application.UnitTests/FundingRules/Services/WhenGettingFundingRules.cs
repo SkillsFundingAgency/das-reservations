@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
                                 $"{ExpectedBaseUrl}api/rules"))))
                 .ReturnsAsync(new GetFundingRulesApiResponse
                 {
-                    CourseRules = _expectedResevationRules,
+                    Rules = _expectedResevationRules,
                     GlobalRules = _expectedGlobalRules
                 });
 
@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedResevationRules, result.CourseRules);
+            Assert.AreEqual(_expectedResevationRules, result.Rules);
             Assert.AreEqual(_expectedGlobalRules, result.GlobalRules);
         }
 

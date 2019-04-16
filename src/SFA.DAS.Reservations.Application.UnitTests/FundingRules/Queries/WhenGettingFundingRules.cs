@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         {
             _expectedFundingRules = new GetFundingRulesApiResponse
             {
-                CourseRules = new List<ReservationRule>(),
+                Rules = new List<ReservationRule>(),
                 GlobalRules = new List<GlobalRule>()
             };
             

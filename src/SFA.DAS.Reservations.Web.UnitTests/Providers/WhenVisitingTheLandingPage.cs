@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     FundingRules = new GetFundingRulesApiResponse
                     {
-                        CourseRules = new List<ReservationRule>(),
+                        Rules = new List<ReservationRule>(),
                         GlobalRules = new List<GlobalRule>()
                     }
                 });
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     FundingRules = new GetFundingRulesApiResponse
                     {
-                        CourseRules = new List<ReservationRule>(),
+                        Rules = new List<ReservationRule>(),
                         GlobalRules = new List<GlobalRule>
                         {
                             new GlobalRule()

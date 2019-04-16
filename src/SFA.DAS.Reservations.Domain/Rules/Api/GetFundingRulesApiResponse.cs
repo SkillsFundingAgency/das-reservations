@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Domain.Rules.Api
 {
     public class GetFundingRulesApiResponse
     {
-        public IEnumerable<ReservationRule> CourseRules { get; set; }
+        public IEnumerable<ReservationRule> Rules { get; set; }
         public IEnumerable<GlobalRule> GlobalRules { get; set; }
     }
 }
