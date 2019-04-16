@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -22,9 +26,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var response = await _mediator.Send(new GetFundingRulesQuery());
+
+            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            {
+                return View( "fundingStopped");
+            }
+
+            return View("index");
         }
 
         [HttpGet]

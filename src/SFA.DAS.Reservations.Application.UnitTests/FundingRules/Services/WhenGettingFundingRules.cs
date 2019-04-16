@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 {
     public class WhenGettingFundingRules
     {
-        private IRulesService _service;
+        private IFundingRulesService _service;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
             _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
 
-            _service = new RulesService(_apiClient.Object, _options.Object);
+            _service = new FundingFundingRulesService(_apiClient.Object, _options.Object);
         }
 
         [Test]

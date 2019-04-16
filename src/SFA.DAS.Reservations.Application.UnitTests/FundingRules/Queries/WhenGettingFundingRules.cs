@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
     public class WhenGettingFundingRules
     {
         private GetFundingRulesQueryHandler _handler;
-        private Mock<IRulesService> _service;
+        private Mock<IFundingRulesService> _service;
         private GetFundingRulesApiResponse _expectedFundingRules;
 
         [SetUp]
@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>()
             };
             
-            _service = new Mock<IRulesService>();
+            _service = new Mock<IFundingRulesService>();
             _service.Setup(s => s.GetFundingRules()).ReturnsAsync(_expectedFundingRules);
 
             _handler = new GetFundingRulesQueryHandler(_service.Object);

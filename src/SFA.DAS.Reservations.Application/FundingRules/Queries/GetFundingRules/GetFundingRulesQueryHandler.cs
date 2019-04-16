@@ -7,9 +7,9 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 {
     public class GetFundingRulesQueryHandler : IRequestHandler<GetFundingRulesQuery, GetFundingRulesResult>
     {
-        private readonly IRulesService _service;
+        private readonly IFundingRulesService _service;
 
-        public GetFundingRulesQueryHandler(IRulesService service)
+        public GetFundingRulesQueryHandler(IFundingRulesService service)
         {
             _service = service;
         }
