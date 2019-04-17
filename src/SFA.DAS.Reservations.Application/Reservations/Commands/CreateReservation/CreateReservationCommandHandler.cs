@@ -11,6 +11,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation

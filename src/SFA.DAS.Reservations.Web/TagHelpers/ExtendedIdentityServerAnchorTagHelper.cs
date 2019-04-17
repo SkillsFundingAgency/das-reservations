@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Web.TagHelpers
 {

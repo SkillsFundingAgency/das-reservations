@@ -10,8 +10,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -139,9 +139,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         public void And_No_Reservation_Found_In_Cache_Then_Throws_Exception(
             CreateReservationCommand command)
         {
-            _mockCacheService
-                .Setup(service => service.RetrieveFromCache<GetCachedReservationResult>(It.IsAny<string>()))
-                .ReturnsAsync((GetCachedReservationResult)null);
+            _mockCacheRepository
+                .Setup(service => service.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
+                .ReturnsAsync((CachedReservation)null);
+            _mockCacheRepository
+                .Setup(service => service.GetEmployerReservation(It.IsAny<Guid>()))
+                .ReturnsAsync((CachedReservation)null);
 
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
