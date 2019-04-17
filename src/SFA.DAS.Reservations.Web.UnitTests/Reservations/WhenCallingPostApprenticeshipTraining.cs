@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationSta
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -47,6 +46,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 _mediator.Object, 
                 Mock.Of<IStartDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>());
+
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetCachedReservationQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => _cachedReservationResult);
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<CacheReservationCourseCommand>(),
@@ -125,13 +129,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationCourseCommand>( c => 
-                        c.CourseId.Equals(_course.Id)),
+                        c.CourseId.Equals(_course.Id) &&
+                        c.UkPrn.Equals(routeModel.UkPrn)),
                     It.IsAny<CancellationToken>()));
 
             _mediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationStartDateCommand>(c =>
                         c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                        c.StartDateDescription.Equals(startDateModel.ToString())),
+                        c.StartDateDescription.Equals(startDateModel.ToString()) &&
+                        c.UkPrn.Equals(routeModel.UkPrn)),
                     It.IsAny<CancellationToken>()));
         }
 
@@ -178,7 +184,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationStartDateCommand>(c =>
                     c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                    c.StartDateDescription.Equals(startDateModel.ToString())),
+                    c.StartDateDescription.Equals(startDateModel.ToString()) &&
+                    c.UkPrn.Equals(routeModel.UkPrn)),
                 It.IsAny<CancellationToken>()));
         }
 

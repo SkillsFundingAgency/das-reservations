@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
     {
         private CachedReservation _cachedReservation;
         private Mock<IValidator<IReservationQuery>> _validator;
-        private Mock<ICacheStorageService> _cacheService;
+        private Mock<ICachedReservationRespository> _cacheReservationRepository;
         private GetCachedReservationQueryHandler _handler;
 
         [SetUp]
@@ -35,9 +35,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
                     c.Id.Equals(_cachedReservation.Id))))
                 .ReturnsAsync(new ValidationResult());
            
-            _cacheService = fixture.Freeze<Mock<ICacheStorageService>>();
-            _cacheService
-                .Setup(x => x.RetrieveFromCache<CachedReservation>(_cachedReservation.Id.ToString()))
+            _cacheReservationRepository = fixture.Freeze<Mock<ICachedReservationRespository>>();
+            
+            _cacheReservationRepository
+                .Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
                 .ReturnsAsync(_cachedReservation);
 
             _handler = fixture.Create<GetCachedReservationQueryHandler>();
@@ -59,9 +60,34 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
         }
 
         [Test]
-        public async Task Then_The_Reservation_Is_Returned_By_Id()
+        public async Task Then_The_Provider_Reservation_Is_Returned_By_Id()
         {
             //Arrange
+            var command = new GetCachedReservationQuery
+            {
+                Id = _cachedReservation.Id,
+                UkPrn = 12
+            };
+
+            //Act
+            var actual = await _handler.Handle(command, new CancellationToken());
+
+            //Assert
+            Assert.AreEqual(_cachedReservation.Id, actual.Id);
+            Assert.AreEqual(_cachedReservation.StartDate, actual.StartDate);
+
+            _cacheReservationRepository.Verify(r => r.GetProviderReservation(command.Id, command.UkPrn), Times.Once);
+            _cacheReservationRepository.Verify(r => r.GetEmployerReservation(It.IsAny<Guid>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Then_The_Employer_Reservation_Is_Returned_By_Id()
+        {
+            //Arrange
+            _cacheReservationRepository
+                .Setup(r => r.GetEmployerReservation(It.IsAny<Guid>()))
+                .ReturnsAsync(_cachedReservation);
+
             var command = new GetCachedReservationQuery
             {
                 Id = _cachedReservation.Id
@@ -73,6 +99,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             //Assert
             Assert.AreEqual(_cachedReservation.Id, actual.Id);
             Assert.AreEqual(_cachedReservation.StartDate, actual.StartDate);
+
+            _cacheReservationRepository.Verify(r => r.GetEmployerReservation(command.Id), Times.Once);
+            _cacheReservationRepository.Verify(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()), Times.Never);
         }
     }
 }

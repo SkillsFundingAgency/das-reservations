@@ -6,9 +6,9 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 

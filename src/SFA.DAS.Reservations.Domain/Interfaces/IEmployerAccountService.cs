@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using SFA.DAS.Reservations.Models.Authentication;
+using SFA.DAS.Reservations.Domain.Authentication;
 
-namespace SFA.DAS.Reservations.Web.Services
+namespace SFA.DAS.Reservations.Domain.Interfaces
 {
     public interface IEmployerAccountService
     {
         Task<IEnumerable<EmployerIdentifier>> GetEmployerIdentifiersAsync(string userId);
-        EmployerIdentifier GetCurrentEmployerAccountId(HttpContext routeData);
         Task<IEnumerable<EmployerIdentifier>> GetUserRoles(IEnumerable<EmployerIdentifier> values, string userId);
-        Task<Claim> GetClaim(string userId);
+        Task<Claim> GetClaim(string userId, string claimType);
     }
 }

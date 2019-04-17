@@ -104,7 +104,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     c.AccountId.Equals(command.AccountId) &&
                     c.AccountLegalEntityId.Equals(command.AccountLegalEntityId) &&
                     c.AccountLegalEntityName.Equals(command.AccountLegalEntityName) &&
-                    c.AccountLegalEntityPublicHashedId.Equals(command.AccountLegalEntityPublicHashedId)), 
+                    c.AccountLegalEntityPublicHashedId.Equals(command.AccountLegalEntityPublicHashedId) &&
+                    c.UkPrn.Equals(command.UkPrn)), 
                 1));
         }
     }

@@ -2,12 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse
@@ -16,15 +16,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationCourseCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
+        private readonly ICachedReservationRespository _cachedReservationRespository;
         private readonly ICourseService _courseService;
 
         public CacheReservationCourseCommandHandler(
             IValidator<CacheReservationCourseCommand> validator, 
             ICacheStorageService cacheStorageService, 
+            ICachedReservationRespository cachedReservationRespository,
             ICourseService courseService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
+            _cachedReservationRespository = cachedReservationRespository;
             _courseService = courseService;
         }
 
@@ -38,7 +41,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var cachedReservation = await _cacheStorageService.RetrieveFromCache<CachedReservation>(command.Id.ToString());
+            CachedReservation cachedReservation;
+
+            if (command.UkPrn == default(uint))
+            {
+                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+            }
+            else
+            {
+                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+            }
 
             if (cachedReservation == null)
             {
