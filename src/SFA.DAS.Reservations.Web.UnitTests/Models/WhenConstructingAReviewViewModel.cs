@@ -38,6 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.EmployerPostReview, actual.ConfirmRouteName);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, actual.ChangeCourseRouteName);
                 Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.ChangeStartDateRouteName);
+                Assert.AreEqual(string.Empty, actual.BackLink);
             }
             else
             {
@@ -45,6 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.ProviderPostReview, actual.ConfirmRouteName);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeCourseRouteName);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeStartDateRouteName);
+                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.BackLink);
             }
             Assert.AreEqual(StartDateDescription, actual.StartDateDescription);
         }

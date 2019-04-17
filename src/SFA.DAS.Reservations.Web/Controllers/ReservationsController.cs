@@ -283,7 +283,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 TrainingStartDate = startDate,
-                IsProvider = isProvider
+                IsProvider = isProvider,
+                BackLink = isProvider ? RouteNames.ProviderChooseEmployer :""
             };
         }
     }

@@ -22,6 +22,9 @@ namespace SFA.DAS.Reservations.Web.Models
                 ViewNames.EmployerReview :
                 ViewNames.ProviderReview;
 
+            BackLink = IsEmployerRoute(routeModel) ? 
+                RouteNames.ProviderApprenticeshipTraining : string.Empty;
+
             RouteModel = routeModel;
             StartDateDescription = startDateDescription;
             CourseDescription = courseDescription;
@@ -38,6 +41,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityName { get;  }
         public string AccountLegalEntityPublicHashedId { get;  }
         public string ViewName { get; }
+        public string BackLink { get;}
 
         private bool IsEmployerRoute(ReservationsRouteModel routeModel) => routeModel.UkPrn == null;
         

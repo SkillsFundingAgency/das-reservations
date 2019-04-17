@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -68,6 +69,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
             viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
             viewModel.IsProvider.Should().BeTrue();
+            viewModel.RouteName.Should().Be(RouteNames.ProviderCreateApprenticeshipTraining);
+            viewModel.BackLink.Should().Be(RouteNames.ProviderChooseEmployer);
         }
 
         [Test, MoqAutoData]
