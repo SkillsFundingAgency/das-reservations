@@ -10,9 +10,8 @@
         public const string ProviderSignOut = "provider-signout";
         public const string ProviderPostCompleted = "provider-reservation-completed";
         public const string ProviderChooseEmployer = "provider-choose-employer";
-
+        public const string ProviderConfirmEmployer = "provider-confirm-employer";
         
-
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";

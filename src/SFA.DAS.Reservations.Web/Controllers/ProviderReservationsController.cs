@@ -47,14 +47,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name=RouteNames.ProviderConfirmEmployer)]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
         }
 
         [HttpPost]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)

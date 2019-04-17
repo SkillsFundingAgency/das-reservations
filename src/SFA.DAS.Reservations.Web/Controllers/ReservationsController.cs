@@ -284,7 +284,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CourseId = courseId,
                 TrainingStartDate = startDate,
                 IsProvider = isProvider,
-                BackLink = isProvider ? RouteNames.ProviderChooseEmployer :""
+                BackLink = isProvider ? RouteNames.ProviderConfirmEmployer : ""
             };
         }
     }

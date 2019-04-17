@@ -35,6 +35,7 @@
                     {
                         var viewModel = new ConfirmEmployerViewModel
                         {
+                            UkPrn = Convert.ToUInt32(ViewContext.RouteData.Values["ukPrn"]),
                             AccountId = employer.AccountId,
                             AccountPublicHashedId = employer.AccountPublicHashedId,
                             AccountName = employer.AccountName,
@@ -48,19 +49,10 @@
                             <td class="govuk-table__cell">@employer.AccountName</td>
                             <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">
-                                <a class="govuk-link" href="@Url.Action("ConfirmEmployer", new
-                                                    {
-                                                        UkPrn = ViewContext.RouteData.Values["ukPrn"],
-                                                        AccountId = employer.AccountId,
-                                                        AccountPublicHashedId = employer.AccountPublicHashedId,
-                                                        AccountName = employer.AccountName,
-                                                        AccountLegalEntityId = employer.AccountLegalEntityId,
-                                                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
-                                                        AccountLegalEntityName = employer.AccountLegalEntityName
-                                                    })">Select<span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
-                                                </td>
-                                            </tr>
-                                        }
+                                <a class="govuk-link" href="@Url.Action("ConfirmEmployer", viewModel)">Select<span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                            </td>
+                        </tr>
+                     }
                 </tbody>
             </table>
         </div>

@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
             viewModel.IsProvider.Should().BeTrue();
             viewModel.RouteName.Should().Be(RouteNames.ProviderCreateApprenticeshipTraining);
-            viewModel.BackLink.Should().Be(RouteNames.ProviderChooseEmployer);
+            viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
         }
 
         [Test, MoqAutoData]

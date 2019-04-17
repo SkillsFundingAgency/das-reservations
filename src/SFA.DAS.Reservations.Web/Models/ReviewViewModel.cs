@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.Models
                 ViewNames.ProviderReview;
 
             BackLink = IsEmployerRoute(routeModel) ? 
-                RouteNames.ProviderApprenticeshipTraining : string.Empty;
+                 string.Empty : RouteNames.ProviderApprenticeshipTraining;
 
             RouteModel = routeModel;
             StartDateDescription = startDateDescription;
