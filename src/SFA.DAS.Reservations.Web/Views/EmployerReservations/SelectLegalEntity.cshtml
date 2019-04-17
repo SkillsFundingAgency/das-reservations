@@ -25,7 +25,7 @@
                             {
                                 if (error.Value.ValidationState == ModelValidationState.Invalid)
                                 {
-                                    errorStringBuilder.Append($"<li><a href=\"#legal-entity-{accountLegalEntityPublicHashedId}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
+                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}-{accountLegalEntityPublicHashedId}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
                                     if (loopCount == errorCount - 1)
                                     {
                                         errorStringBuilder.Append(" and ");
@@ -65,8 +65,8 @@
                         @foreach (var legalEntity in Model.LegalEntities)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId" name="legalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
-                                <label class="govuk-label govuk-radios__label" for="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId">
+                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
+                                <label class="govuk-label govuk-radios__label" for="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId">
                                     @legalEntity.Name
                                 </label>
                             </div>
