@@ -9,12 +9,12 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.UnitTests.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CacheReservationStartDate
@@ -24,8 +24,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
     {
         private Mock<IValidator<CacheReservationStartDateCommand>> _mockValidator;
         private Mock<ICacheStorageService> _mockCacheStorageService;
+        private Mock<ICachedReservationRespository> _mockCacheRepository;
         private CacheReservationStartDateCommandHandler _commandHandler;
         private CachedReservation _cachedReservation;
+        
 
         [SetUp]
         public void Arrange()
@@ -40,11 +42,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                 .ReturnsAsync(new ValidationResult());
 
             _mockCacheStorageService = fixture.Freeze<Mock<ICacheStorageService>>();
-            _mockCacheStorageService
-                .Setup(service => service.RetrieveFromCache<CachedReservation>(It.IsAny<string>()))
+            _mockCacheRepository = fixture.Freeze<Mock<ICachedReservationRespository>>();
+            _mockCacheRepository.Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
                 .ReturnsAsync(_cachedReservation);
 
-            _commandHandler = fixture.Create<CacheReservationStartDateCommandHandler>();
+            _commandHandler = new CacheReservationStartDateCommandHandler(
+                _mockValidator.Object,
+                _mockCacheStorageService.Object,
+                _mockCacheRepository.Object);
         }
 
         [Test, AutoData]
@@ -82,9 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var originalCommand = command.Clone();
 
             await _commandHandler.Handle(command, CancellationToken.None);
-
-            _mockCacheStorageService.Verify(service => service.RetrieveFromCache<CachedReservation>(originalCommand.Id.ToString()));
-
+            
             _mockCacheStorageService.Verify(service => service.SaveToCache(originalCommand.Id.ToString(), It.Is<CachedReservation>(reservation => 
                 reservation.Id == originalCommand.Id && 
                 reservation.StartDate == originalCommand.StartDate &&
@@ -98,20 +101,38 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, AutoData]
+        public async Task Then_Gets_Provider_Cached_Reservation(CacheReservationStartDateCommand command)
+        {
+            await _commandHandler.Handle(command, CancellationToken.None);
+            
+            _mockCacheRepository.Verify(service => service.GetProviderReservation(command.Id, command.UkPrn), Times.Once);
+            _mockCacheRepository.Verify(service => service.GetEmployerReservation(It.IsAny<Guid>()), Times.Never);
+        }
+
+        [Test, AutoData]
+        public async Task Then_Gets_Employer_Cached_Reservation(CacheReservationStartDateCommand command)
+        {
+            command.UkPrn = default(uint);
+
+            await _commandHandler.Handle(command, CancellationToken.None);
+
+            _mockCacheRepository.Verify(service => service.GetEmployerReservation(command.Id), Times.Once);
+            _mockCacheRepository.Verify(service => service.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()), Times.Never);
+        }
+
+        [Test, AutoData]
         public void And_CachedReservation_Not_Found_Then_It_Throws_Exception(
             CacheReservationStartDateCommand command)
         {
-            var originalCommand = command.Clone();
+            var expectedException = new CachedReservationNotFoundException(command.Id);
 
-            _mockCacheStorageService
-                .Setup(service => service.RetrieveFromCache<CachedReservation>(originalCommand.Id.ToString()))
-                .ReturnsAsync((CachedReservation)null);
+            _mockCacheRepository.Setup(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()))
+                .ThrowsAsync(expectedException);
 
-            Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
+            var exception = Assert.ThrowsAsync<CachedReservationNotFoundException>(() =>
+                _commandHandler.Handle(command, CancellationToken.None));
 
-            act.Should().ThrowExactly<CachedReservationNotFoundException>()
-                .Which.ReservationId.Equals(command.Id);
-              
+            Assert.AreEqual(expectedException, exception);
         }
     }
 }

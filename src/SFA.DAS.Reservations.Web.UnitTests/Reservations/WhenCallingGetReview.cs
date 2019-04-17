@@ -11,7 +11,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;

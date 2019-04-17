@@ -81,7 +81,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountId = viewModel.AccountId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
                     AccountLegalEntityName = viewModel.AccountLegalEntityName,
-                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId
+                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
+                    UkPrn = viewModel.UkPrn
                 });
 
                 return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 

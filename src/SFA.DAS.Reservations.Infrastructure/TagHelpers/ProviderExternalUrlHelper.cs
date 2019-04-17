@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 {

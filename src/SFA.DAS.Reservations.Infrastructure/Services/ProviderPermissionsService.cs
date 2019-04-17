@@ -6,9 +6,9 @@ using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Types.Dtos;
 using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Employers;
-using StructureMap.Query;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Application.Employers.Services
+namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class ProviderPermissionsService : IProviderPermissionsService
     {

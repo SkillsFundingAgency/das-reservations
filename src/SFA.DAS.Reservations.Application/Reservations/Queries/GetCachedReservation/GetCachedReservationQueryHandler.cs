@@ -12,12 +12,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
     public class GetCachedReservationQueryHandler : IRequestHandler<GetCachedReservationQuery, GetCachedReservationResult>
     {
         private readonly IValidator<IReservationQuery> _validator;
-        private readonly ICacheStorageService _cacheService;
+        private readonly ICachedReservationRespository _cachedReservationRepository;
 
-        public GetCachedReservationQueryHandler(IValidator<IReservationQuery> validator, ICacheStorageService cacheService)
+        public GetCachedReservationQueryHandler(IValidator<IReservationQuery> validator, ICachedReservationRespository cachedReservationRepository)
         {
             _validator = validator;
-            _cacheService = cacheService;
+            _cachedReservationRepository = cachedReservationRepository;
         }
 
         public async Task<GetCachedReservationResult> Handle(GetCachedReservationQuery request, CancellationToken cancellationToken)
@@ -30,7 +30,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var cachedReservation = await _cacheService.RetrieveFromCache<CachedReservation>(request.Id.ToString());
+            CachedReservation cachedReservation;
+
+            if (request.UkPrn != default(uint))
+            {
+                cachedReservation =
+                    await _cachedReservationRepository.GetProviderReservation(request.Id, request.UkPrn);
+            }
+            else
+            {
+                cachedReservation =
+                    await _cachedReservationRepository.GetEmployerReservation(request.Id);
+            }
 
             return new GetCachedReservationResult
             {

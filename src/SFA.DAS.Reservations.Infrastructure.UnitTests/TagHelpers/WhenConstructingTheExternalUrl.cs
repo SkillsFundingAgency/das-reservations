@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers

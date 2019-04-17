@@ -7,13 +7,16 @@
   <ItemGroup>
     <PackageReference Include="Hashids.net" Version="1.2.2" />
     <PackageReference Include="MediatR" Version="6.0.0" />
-    <PackageReference Include="SFA.DAS.ProviderRelationships.Api.Client" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Employers\Services\" />
   </ItemGroup>
 
 </Project>
