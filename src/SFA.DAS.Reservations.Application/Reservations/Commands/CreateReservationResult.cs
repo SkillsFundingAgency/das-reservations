@@ -1,4 +1,4 @@
-﻿using SFA.DAS.Reservations.Models;
+﻿using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands
 {
