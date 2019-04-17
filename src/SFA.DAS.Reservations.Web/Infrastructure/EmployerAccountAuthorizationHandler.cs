@@ -36,8 +36,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (employerAccountClaim == null || !employerAccounts.ContainsKey(accountIdFromUrl))
                 return false;
 
-            mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
-
+            if (!mvcContext.HttpContext.Items.ContainsKey(ContextItemKeys.EmployerIdentifier))
+            {
+                mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
+            }
+            
             return true;
         }
     }
