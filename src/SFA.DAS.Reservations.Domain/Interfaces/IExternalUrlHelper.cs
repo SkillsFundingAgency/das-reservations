@@ -2,6 +2,6 @@
 {
     public interface IExternalUrlHelper
     {
-        string GenerateUrl(string id = "", string controller = "", string action = "", string subDomain = "");
+        string GenerateUrl(string id = "", string controller = "", string action = "", string subDomain = "", string folder = "");
     }
 }

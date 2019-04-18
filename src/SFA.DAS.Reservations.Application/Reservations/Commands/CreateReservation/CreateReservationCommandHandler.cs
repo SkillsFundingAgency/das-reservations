@@ -4,15 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation
 {
     public class CreateReservationCommandHandler : IRequestHandler<CreateReservationCommand, CreateReservationResult>
     {
@@ -62,7 +64,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands
 
             if (cachedReservation == null)
             {
-                throw new Exception("No reservation was found with that Id");
+                throw new CachedReservationNotFoundException(command.Id);
             }
 
             var createValidationResult = await _cachedReservationValidator.ValidateAsync(cachedReservation);
