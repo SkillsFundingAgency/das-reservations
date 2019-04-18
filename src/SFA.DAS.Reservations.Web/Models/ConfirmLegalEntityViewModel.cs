@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmLegalEntityViewModel
     {
-        [Required(ErrorMessage = "Todo: need this error message for model validation")]
+        [Required(ErrorMessage = "Select an organisation")]
         public string LegalEntity { get; set; }
     }
 }
