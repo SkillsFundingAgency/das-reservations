@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Reservations.Models.Authentication
+﻿namespace SFA.DAS.Reservations.Domain.Authentication
 {
     public class EmployerIdentifier
     {

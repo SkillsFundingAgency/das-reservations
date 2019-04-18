@@ -12,7 +12,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Route("{ukPrn}/reservations")]
+    [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;

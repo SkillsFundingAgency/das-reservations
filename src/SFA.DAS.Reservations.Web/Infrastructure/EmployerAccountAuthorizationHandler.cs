@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Models.Authentication;
+using SFA.DAS.Reservations.Domain.Authentication;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
@@ -36,8 +36,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (employerAccountClaim == null || !employerAccounts.ContainsKey(accountIdFromUrl))
                 return false;
 
-            mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
-
+            if (!mvcContext.HttpContext.Items.ContainsKey(ContextItemKeys.EmployerIdentifier))
+            {
+                mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
+            }
+            
             return true;
         }
     }

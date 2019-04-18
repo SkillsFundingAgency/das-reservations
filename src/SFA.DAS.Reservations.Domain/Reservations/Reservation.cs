@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Models
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation
     {

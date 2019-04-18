@@ -9,12 +9,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="microsoft.extensions.options" Version="2.2.0" />
     <PackageReference Include="SFA.DAS.ProviderRelationships.Api.Client" Version="2.0.1" />
+    <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
-    <ProjectReference Include="..\SFA.DAS.Reservations.Models\SFA.DAS.Reservations.Models.csproj" />
   </ItemGroup>
 
 </Project>
