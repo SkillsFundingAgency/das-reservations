@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
@@ -136,8 +137,10 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
+            services.AddTransient<IFundingRulesService, FundingFundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
+
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
