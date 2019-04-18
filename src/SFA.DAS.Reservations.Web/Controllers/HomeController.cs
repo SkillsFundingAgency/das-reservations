@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -16,10 +17,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [Route("{ukprn}/signout",Name = RouteNames.ProviderSignOut)]
-        [Route("accounts/{employerAccountId}/signout", Name=RouteNames.EmployerSignOut)]
-        public IActionResult SignOut(string ukprn="", string employerAccountId="")
+        [Route("accounts/{employerAccountId}/signout", Name = RouteNames.EmployerSignOut)]
+        public IActionResult SignOut(string ukprn)
         {
-            _logger.LogDebug($"User signed out {ukprn}{employerAccountId}");
+            _logger.LogDebug($"User signed out {ukprn}");
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
@@ -29,12 +30,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 WsFederationDefaults.AuthenticationScheme);
         }
-
+        
         [Route("notAvailable", Name="FeatureNotAvailable")]
         public IActionResult FeatureNotAvailable()
         {
             return View();
         }
-         
+
+        [Route("{employerAccountId}/service/password/change", Name =RouteNames.EmployerChangePassword)]
+        public IActionResult ChangePassword(ReservationsRouteModel model,bool userCancelled = false)
+        {
+            return RedirectToRoute(RouteNames.EmployerIndex,model);
+        }
+        [Route("{employerAccountId}/service/email/change", Name = RouteNames.EmployerChangeEmail)]
+        public IActionResult ChangeEmail(ReservationsRouteModel model, bool userCancelled = false)
+        {
+            return RedirectToRoute(RouteNames.EmployerIndex,null);
+        }
     }
 }

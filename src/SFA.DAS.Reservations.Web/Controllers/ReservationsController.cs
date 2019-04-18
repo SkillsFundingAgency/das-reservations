@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -26,12 +29,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
+        private readonly ILogger<ReservationsController> _logger;
         private readonly ReservationsWebConfiguration _configuration;
 
-        public ReservationsController(IMediator mediator, IStartDateService startDateService, IOptions<ReservationsWebConfiguration> configuration)
+        public ReservationsController(
+            IMediator mediator, 
+            IStartDateService startDateService, 
+            IOptions<ReservationsWebConfiguration> configuration,
+            ILogger<ReservationsController> logger)
         {
             _mediator = mediator;
             _startDateService = startDateService;
+            _logger = logger;
             _configuration = configuration.Value;
         }
 
@@ -192,11 +201,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return View("ApprenticeshipTraining", model);
             }
-            catch (Exception)
+            catch (CachedReservationNotFoundException ex)
             {
-                // todo: log this ex
+                _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
                 var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
-                return View("ApprenticeshipTraining", model);
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
             return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderCompleted : RouteNames.EmployerCompleted, routeModel);

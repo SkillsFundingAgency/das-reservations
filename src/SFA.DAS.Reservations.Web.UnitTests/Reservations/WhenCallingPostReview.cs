@@ -9,15 +9,15 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -103,7 +103,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
             
-            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<ILogger<ReservationsController>>());
 
             var actual = await controller.PostReview(routeModel);
 
@@ -116,23 +116,44 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task And_ArgumentException_Then_Redirects_To_Apprenticeship_Training(
+        public async Task And_CachedReservationNotFoundException_And_Has_Ukprn_Then_Redirects_To_ProviderIndex(
             ReservationsRouteModel routeModel)
         {
             var mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception());
+                .ThrowsAsync(new CachedReservationNotFoundException(routeModel.Id.Value));
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
             
-            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<ILogger<ReservationsController>>());
 
             var actual = await controller.PostReview(routeModel);
 
             actual.Should().NotBeNull();
-            var actualViewResult = actual as ViewResult;
-            actualViewResult.Should().NotBeNull();
-            actualViewResult?.ViewName.Should().Be("ApprenticeshipTraining");
+            var redirectToRouteResult = actual as RedirectToRouteResult;
+            redirectToRouteResult.Should().NotBeNull();
+            redirectToRouteResult?.RouteName.Should().Be(RouteNames.ProviderIndex);
+        }
+
+        [Test, AutoData]
+        public async Task And_CachedReservationNotFoundException_And_No_Ukprn_Then_Redirects_To_EmployerIndex(
+            ReservationsRouteModel routeModel)
+        {
+            routeModel.UkPrn = null;
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new CachedReservationNotFoundException(routeModel.Id.Value));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
+            
+            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<ILogger<ReservationsController>>());
+
+            var actual = await controller.PostReview(routeModel);
+
+            actual.Should().NotBeNull();
+            var redirectToRouteResult = actual as RedirectToRouteResult;
+            redirectToRouteResult.Should().NotBeNull();
+            redirectToRouteResult?.RouteName.Should().Be(RouteNames.EmployerIndex);
         }
     }
 }
