@@ -34,10 +34,11 @@
                 <tbody class="govuk-table__body">
                     @foreach (var employer in Model.Employers)
                     {
-                uint.TryParse(ViewContext.RouteData.Values["ukPrn"].ToString(), out var ukPrn);
+                        uint.TryParse(ViewContext.RouteData.Values["ukPrn"].ToString(), out var ukPrn);
 
                         var viewModel = new ConfirmEmployerViewModel
                         {
+                            UkPrn = ukPrn,
                             AccountId = employer.AccountId,
                             AccountPublicHashedId = employer.AccountPublicHashedId,
                             AccountName = employer.AccountName,

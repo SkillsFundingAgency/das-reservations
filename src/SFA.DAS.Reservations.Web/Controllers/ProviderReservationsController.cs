@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -48,8 +49,26 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("confirm-employer", Name=RouteNames.ProviderConfirmEmployer)]
-        public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
+        public async Task<IActionResult> ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
+
+            if (viewModel.Id.HasValue)
+            {
+                var result = await _mediator.Send(new GetCachedReservationQuery
+                {
+                    Id = viewModel.Id.Value,
+                    UkPrn = viewModel.UkPrn
+                });
+
+                viewModel.AccountLegalEntityName = result.AccountLegalEntityName;
+                viewModel.AccountId = result.AccountId;
+                viewModel.AccountLegalEntityId = result.AccountLegalEntityId;
+                viewModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
+                
+                return View(viewModel);
+
+            }
+
             return View(viewModel);
         }
 
