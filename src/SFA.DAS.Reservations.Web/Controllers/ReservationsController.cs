@@ -164,6 +164,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("Error");//todo: setup view correctly.
             }
 
+            routeModel.FromReview = true;
             var viewModel = new ReviewViewModel(
                 routeModel,
                 cachedReservation.StartDateDescription, 
