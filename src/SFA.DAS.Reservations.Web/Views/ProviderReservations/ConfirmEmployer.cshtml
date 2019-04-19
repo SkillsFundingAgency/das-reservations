@@ -1,6 +1,4 @@
-﻿@using System.Text
-@using Microsoft.AspNetCore.Mvc.ModelBinding
-@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
 @model ConfirmEmployerViewModel
 @{
     ViewBag.Title = "Confirm Employer";
@@ -11,41 +9,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-                    <h2 class="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div class="govuk-error-summary__body">
-                        <ul class="govuk-list govuk-error-summary__list">
-                            @{
-                                var errorStringBuilder = new StringBuilder();
-                                var errorCount = ViewData.ModelState.ErrorCount;
-                                var loopCount = 1;
-                                foreach (var error in ViewData.ModelState)
-                                {
-                                    if (error.Value.ValidationState == ModelValidationState.Invalid)
-                                    {
-                                        errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Select whether to secure funds for this employer or not</a></li>");
-                                        if (loopCount == errorCount - 1)
-                                        {
-                                            errorStringBuilder.Append(" and ");
-                                        }
-                                        else if (loopCount != errorCount)
-                                        {
-                                            errorStringBuilder.Append(", ");
-                                        }
-
-                                        loopCount++;
-                                    }
-                                }
-                            }
-                            @Html.Raw(errorStringBuilder.ToString())
-                        </ul>
-                    </div>
-                </div>
-            }
+            <partial name="_pageErrorsOverview"/>
 
             <h1 class="govuk-heading-xl">Confirm employer</h1>
 
