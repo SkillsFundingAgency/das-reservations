@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirm-employer", Name=RouteNames.ProviderConfirmEmployer)]
+        [Route("confirm-employer/{id?}", Name=RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
 
@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 viewModel.AccountId = result.AccountId;
                 viewModel.AccountLegalEntityId = result.AccountLegalEntityId;
                 viewModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
-                
+                viewModel.AccountName = result.AccountName;
                 return View(viewModel);
 
             }
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
-        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
+        [Route("confirm-employer/{id?}", Name = RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)
@@ -110,7 +110,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
                     AccountLegalEntityName = viewModel.AccountLegalEntityName,
                     AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
-                    UkPrn = viewModel.UkPrn
+                    UkPrn = viewModel.UkPrn,
+                    AccountName = viewModel.AccountName
                 });
 
                 return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
