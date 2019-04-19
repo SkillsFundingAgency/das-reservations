@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string EmployerAccountId { get; set; }
         public Guid? Id { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
+        public bool? FromReview { get; set; }
     }
 }

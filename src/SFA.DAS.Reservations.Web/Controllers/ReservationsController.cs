@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _configuration = configuration.Value;
         }
 
-        [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name = RouteNames.ProviderApprenticeshipTraining)]
+        [Route("{ukPrn}/reservations/{id}/apprenticeship-training/{fromReview?}", Name = RouteNames.ProviderApprenticeshipTraining)]
         [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found
             }
             
-            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null, cachedReservation?.CourseId, cachedReservation?.StartDate);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null, cachedReservation?.CourseId, cachedReservation?.StartDate, routeModel.FromReview);
 
             return View(viewModel);
         }
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("Error");//todo: setup view correctly.
             }
-           
+
             var viewModel = new ReviewViewModel(
                 routeModel,
                 cachedReservation.StartDateDescription, 
@@ -278,8 +278,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Redirect(model.DashboardUrl);
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
-            bool isProvider, string courseId = null, string startDate = null)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,
+            string courseId = null, string startDate = null, bool? routeModelFromReview = false)
         {
             var dates = await _startDateService.GetStartDates();
 
@@ -293,7 +293,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CourseId = courseId,
                 TrainingStartDate = startDate,
                 IsProvider = isProvider,
-                BackLink = isProvider ? RouteNames.ProviderConfirmEmployer : ""
+                BackLink = isProvider ?
+                    routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer 
+                    : ""
             };
         }
     }

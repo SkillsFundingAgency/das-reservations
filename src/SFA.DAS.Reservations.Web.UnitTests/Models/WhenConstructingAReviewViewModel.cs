@@ -22,7 +22,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
                 UkPrn = ukPrn,
                 Id = new Guid(),
-                EmployerAccountId = "123FDS"
+                EmployerAccountId = "123FDS",
+                FromReview = true
             };
             
             //Act
