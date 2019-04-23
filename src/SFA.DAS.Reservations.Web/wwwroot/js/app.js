@@ -29,7 +29,7 @@ $('form.validate-auto-complete').on('submit', function (e) {
 
     var canSubmit = true,
         form = this,
-        validationMessages = []
+        validationMessages = [];
 
     $('.autocomplete__input').each(function () {
         var that = $(this);
@@ -38,7 +38,7 @@ $('form.validate-auto-complete').on('submit', function (e) {
                 var fieldId = that.attr('id'),
                     errorMessage = $('#' + fieldId + '-select').data('validation-message');
 
-                validationMessages.push({ id: fieldId, message: errorMessage })
+                validationMessages.push({ id: fieldId, message: errorMessage });
                 canSubmit = false
             }
         }, 100);
@@ -100,25 +100,30 @@ var hideInlineValidation = function ($field) {
 }
 
 var showErrorSummary = function (validationMessages) {
-    $('.govuk-error-summary').remove();
+    var errorSummary = $('.govuk-error-summary'), 
+        errorList = $('.govuk-list.govuk-error-summary__list');
+    
+    if (typeof errorSummary === 'undefined') {
+        errorSummary = $('<div>').addClass('govuk-error-summary');
+        var errorTitle = $('<h2>').addClass('govuk-error-summary__title').text('There is a problem');
+        var errorBody = $('<div>').addClass('govuk-error-summary__body');
+        errorList = $('<ul>').addClass('govuk-list govuk-error-summary__list');
 
-    var errorSummary = $('<div>').addClass('govuk-error-summary');
-    var errorTitle = $('<h2>').addClass('govuk-error-summary__title').text('There is a problem');
-    var errorBody = $('<div>').addClass('govuk-error-summary__body');
-    var errorList = $('<ul>').addClass('govuk-list govuk-error-summary__list');
+        errorBody.html(errorList);
+        errorSummary.append(errorTitle, errorBody);
 
+        var pageHeading = $('h1.govuk-heading-xl');
+        pageHeading.before(errorSummary);
+    }
+    
     $.each(validationMessages, function (index, value) {
+        if ($('.govuk-list.govuk-error-summary__list li a:contains(' + value.message + ')').length > 0)
+            return;
+        
         var errorLink = $('<a>').html(value.message).attr('href', '#' + value.id);
         var errorListItem = $('<li>').append(errorLink);
         errorList.append(errorListItem);
     });
-
-    errorBody.html(errorList)
-    errorSummary.append(errorTitle, errorBody)
-
-    var pageHeading = $('h1.govuk-heading-xl');
-    pageHeading.before(errorSummary);
-
 }
 
 var hideErrorSummary = function () {
