@@ -103,7 +103,7 @@ var showErrorSummary = function (validationMessages) {
     var errorSummary = $('.govuk-error-summary'), 
         errorList = $('.govuk-list.govuk-error-summary__list');
     
-    if (typeof errorSummary === 'undefined') {
+    if (errorSummary.length === 0) {
         errorSummary = $('<div>').addClass('govuk-error-summary');
         var errorTitle = $('<h2>').addClass('govuk-error-summary__title').text('There is a problem');
         var errorBody = $('<div>').addClass('govuk-error-summary__body');
