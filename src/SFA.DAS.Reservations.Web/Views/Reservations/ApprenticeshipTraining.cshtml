@@ -30,7 +30,7 @@
                                     var errorKey = $"{error.Key}";
                                     if (error.Key.Equals("StartDate"))
                                     {
-                                        errorKey = $"{error.Key}-{firstStartDate}";
+                                        errorKey += $"-{firstStartDate}";
                                     }
 
                                     errorStringBuilder.Append($"<li><a href=\"#{errorKey}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
@@ -110,7 +110,7 @@
                         {
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked">
-                                <label class="govuk-label govuk-radios__label" for="training-start-date-@possibleStartDate.Id">
+                                <label class="govuk-label govuk-radios__label" for="StartDate-@possibleStartDate.Id">
                                     @possibleStartDate.Label
                                 </label>
                             </div>

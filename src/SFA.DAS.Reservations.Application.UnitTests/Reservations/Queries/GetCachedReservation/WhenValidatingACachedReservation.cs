@@ -4,6 +4,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCachedReservation
 {
@@ -14,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
             CachedReservationValidator validator)
         {
-            var cachedReservation = new GetCachedReservationResult
+            var cachedReservation = new CachedReservation
             {
                 Id = Guid.NewGuid(),
                 AccountId = 0,
@@ -27,8 +28,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(GetCachedReservationResult.AccountId))
-                .WhichValue.Should().Be($"{nameof(GetCachedReservationResult.AccountId)} has not been supplied");
+                .Should().ContainKey(nameof(CachedReservation.AccountId))
+                .WhichValue.Should().Be($"{nameof(CachedReservation.AccountId)} has not been supplied");
         }
 
         [TestCase("19-a")]
@@ -41,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
         public async Task And_StartDate_Is_Not_In_The_Correct_Format_Then_Invalid(string startDate)
         {
             var validator = new CachedReservationValidator();
-            var cachedReservation = new GetCachedReservationResult
+            var cachedReservation = new CachedReservation
             {
                 Id = Guid.NewGuid(),
                 AccountId = 1,
@@ -54,15 +55,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(GetCachedReservationResult.StartDate))
-                .WhichValue.Should().Be($"{nameof(GetCachedReservationResult.StartDate)} has not been supplied");
+                .Should().ContainKey(nameof(CachedReservation.StartDate))
+                .WhichValue.Should().Be($"{nameof(CachedReservation.StartDate)} has not been supplied");
         }
 
         [Test, AutoData]
         public async Task And_All_Fields_Invalid_Then_Returns_All_Errors(
             CachedReservationValidator validator)
         {
-            var cachedReservation = new GetCachedReservationResult
+            var cachedReservation = new CachedReservation
             {
                 AccountId = 0,
                 StartDate = "",
@@ -74,16 +75,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(3);
             result.ValidationDictionary
-                .Should().ContainKey(nameof(GetCachedReservationResult.AccountId))
-                .And.ContainKey(nameof(GetCachedReservationResult.StartDate))
-                .And.ContainKey(nameof(GetCachedReservationResult.AccountLegalEntityName));
+                .Should().ContainKey(nameof(CachedReservation.AccountId))
+                .And.ContainKey(nameof(CachedReservation.StartDate))
+                .And.ContainKey(nameof(CachedReservation.AccountLegalEntityName));
         }
 
         [Test, AutoData]
         public async Task And_All_Fields_Valid_Then_Valid(
             CachedReservationValidator validator)
         {
-            var cachedReservation = new GetCachedReservationResult
+            var cachedReservation = new CachedReservation
             {
                 AccountId = 1,
                 StartDate = "2019-07",

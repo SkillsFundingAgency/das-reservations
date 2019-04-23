@@ -2,6 +2,7 @@
 {
     public static class RouteNames
     {
+        public const string ProviderIndex = "provider-index";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
         public const string ProviderCreateApprenticeshipTraining = "provider-create-apprenticeship-training";
         public const string ProviderReview = "provider-review";
@@ -10,9 +11,9 @@
         public const string ProviderSignOut = "provider-signout";
         public const string ProviderPostCompleted = "provider-reservation-completed";
         public const string ProviderChooseEmployer = "provider-choose-employer";
+        public const string ProviderConfirmEmployer = "provider-confirm-employer";
 
-        
-
+        public const string EmployerIndex = "employer-index";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";
@@ -22,5 +23,8 @@
         public const string EmployerSignOut = "employer-signout";
         public const string EmployerSelectCourse = "employer-select-course";
         public const string EmployerSkipSelectCourse = "employer-skip-select-course";
+        public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
+		public const string EmployerChangePassword = "employer-change-password";
+        public const string EmployerChangeEmail = "employer-change-email";
     }
 }

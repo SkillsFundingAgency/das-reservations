@@ -8,14 +8,18 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public ReservationApiRequest(
             string baseUrl,
             long accountId, 
+            uint providerId,
             DateTime startDate, 
             Guid id, 
+            long legalEntityAccountId,
             string accountLegalEntityName,
             string courseId = null) 
         {
             BaseUrl = baseUrl;
             AccountId = accountId;
+            ProviderId = providerId;
             Id = id;
+            AccountLegalEntityId = legalEntityAccountId;
             AccountLegalEntityName = accountLegalEntityName;
             StartDate = startDate.ToString("yyyy-MMM-dd");
             CourseId = courseId;
@@ -30,6 +34,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public Guid Id { get; }
 
         public long AccountId { get; }
+        public uint ProviderId { get; }
 
         public string StartDate { get; }
 
@@ -37,6 +42,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string BaseUrl { get; }
         public string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
+      
+        public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
     }
 

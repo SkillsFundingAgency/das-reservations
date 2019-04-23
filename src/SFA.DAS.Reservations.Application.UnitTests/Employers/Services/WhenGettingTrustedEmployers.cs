@@ -8,8 +8,8 @@ using NUnit.Framework;
 using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Types.Dtos;
 using SFA.DAS.ProviderRelationships.Types.Models;
-using SFA.DAS.Reservations.Application.Employers.Services;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
 {

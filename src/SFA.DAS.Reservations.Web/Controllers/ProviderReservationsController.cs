@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -12,7 +14,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Route("{ukPrn}/reservations")]
+    [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;
@@ -22,9 +24,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var response = await _mediator.Send(new GetFundingRulesQuery());
+
+            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            {
+                return View( "fundingStopped");
+            }
+
+            return View("index");
         }
 
         [HttpGet]
@@ -47,14 +56,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
         public IActionResult ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             return View(viewModel);
         }
 
         [HttpPost]
-        [Route("confirm-employer")]
+        [Route("confirm-employer", Name = RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
             if (!viewModel.Confirm.HasValue)
@@ -81,7 +90,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountId = viewModel.AccountId,
                     AccountLegalEntityId = viewModel.AccountLegalEntityId,
                     AccountLegalEntityName = viewModel.AccountLegalEntityName,
-                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId
+                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
+                    UkPrn = viewModel.UkPrn
                 });
 
                 return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 

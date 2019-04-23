@@ -1,4 +1,5 @@
-﻿@model ChooseEmployerViewModel
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model ChooseEmployerViewModel
 
 
 @{
@@ -24,8 +25,11 @@
             <tbody class="govuk-table__body">
             @foreach (var employer in Model.Employers)
             {
+                uint.TryParse(ViewContext.RouteData.Values["ukPrn"].ToString(), out var ukPrn);
+
                 var viewModel = new ConfirmEmployerViewModel
                 {
+                    UkPrn = ukPrn,
                     AccountId = employer.AccountId,
                     AccountPublicHashedId = employer.AccountPublicHashedId,
                     AccountName = employer.AccountName,
@@ -39,16 +43,7 @@
                     <td class="govuk-table__cell">@employer.AccountName</td>
                     <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric">
-                        <a class="govuk-link" href="@Url.Action("ConfirmEmployer", new
-                                 {
-                                     UkPrn = ViewContext.RouteData.Values["ukPrn"],
-                                     AccountId = employer.AccountId,
-                                     AccountPublicHashedId = employer.AccountPublicHashedId,
-                                     AccountName = employer.AccountName,
-                                     AccountLegalEntityId = employer.AccountLegalEntityId,
-                                     AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
-                                     AccountLegalEntityName = employer.AccountLegalEntityName
-                                 })">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                        <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderConfirmEmployer, viewModel)">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
                     </td>
                 </tr>
             }

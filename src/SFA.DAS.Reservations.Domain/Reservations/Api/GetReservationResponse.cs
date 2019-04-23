@@ -10,5 +10,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public DateTime ExpiryDate { get; set; }
         public Course Course { get; set; }
         public string AccountLegalEntityName { get; set; }
+        public long AccountLegalEntityId { get; set; }
+        public uint ProviderId { get; set; }
     }
 }

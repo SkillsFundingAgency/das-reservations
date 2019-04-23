@@ -6,9 +6,10 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
@@ -17,13 +18,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
     {
         private readonly IValidator<GetReservationQuery> _validator;
         private readonly IApiClient _apiClient;
+        private readonly IReservationAuthorisationService _reservationAuthorisationService;
 
         private ReservationsApiConfiguration _options;
 
-        public GetReservationQueryHandler(IValidator<IReservationQuery> validator, IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
+        public GetReservationQueryHandler(IValidator<IReservationQuery> validator, IApiClient apiClient,
+            IOptions<ReservationsApiConfiguration> options,
+            IReservationAuthorisationService reservationAuthorisationService)
         {
             _validator = validator;
             _apiClient = apiClient;
+            _reservationAuthorisationService = reservationAuthorisationService;
             _options = options.Value;
         }
 
@@ -40,6 +45,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
             var apiRequest = new ReservationApiRequest(_options.Url,request.Id);
 
             var result = await _apiClient.Get<GetReservationResponse>(apiRequest);
+            
+            if (request.UkPrn != default(uint) && !await _reservationAuthorisationService.ProviderReservationAccessAllowed(request.UkPrn, result))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             return new GetReservationResult
             {
@@ -47,7 +57,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                 StartDate = result.StartDate,
                 ExpiryDate = result.ExpiryDate,
                 Course = result.Course ?? new Course(null,null,0),
-                AccountLegalEntityName = result.AccountLegalEntityName
+                AccountLegalEntityId = result.AccountLegalEntityId,
+                AccountLegalEntityName = result.AccountLegalEntityName,
+                UkPrn = result.ProviderId
             };
         }
     }

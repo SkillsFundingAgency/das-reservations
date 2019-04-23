@@ -7,7 +7,8 @@ using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Services
 {
@@ -59,9 +60,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
 
         private async Task<IDictionary<string, Course>> CacheCoursesFromApi()
         {
-            var apiRequest = new CoursesApiRequest(_options.Url);
+            var apiRequest = new GetCoursesApiRequest(_options.Url);
 
-            var result = await _apiClient.Get<GetCoursesResponse>(apiRequest);
+            var result = await _apiClient.Get<GetCoursesApiResponse>(apiRequest);
 
             var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
 

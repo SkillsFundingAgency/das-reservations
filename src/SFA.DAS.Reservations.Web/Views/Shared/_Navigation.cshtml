@@ -24,11 +24,25 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
 {
     <div class="das-account-header das-account-header--employer">
         <div class="govuk-width-container">
+
             <p class="das-account-header__title">Your employer account</p>
-            <nav class="das-user-navigation" id="user-nav">
+            <nav class="das-user-navigation" id="das-user-navigation">
                 <ul class="das-user-navigation__list" role="menu">
                     <li role="menuitem" class="das-user-navigation__list-item">
-                        <a href="#" class="das-user-navigation__link">Sign out</a>
+                        <a asp-external-controller="Service" asp-external-action="help" class="das-user-navigation__link">Help</a>
+                    </li>
+                    <li role="menuitem" class="das-user-navigation__list-item das-user-navigation__list-item--has-sub-menu">
+                        <a href="#" class="das-user-navigation__link">Settings</a>
+                        <ul role="menu" class="das-user-navigation__sub-menu js-hidden" aria-expanded="false">
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service" class="das-user-navigation__sub-menu-link">Your accounts</a></li>
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="rename" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Rename account</a></li>
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-pwd="true" asp-identity-server-chg-email="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your password</a></li>
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-email="true" asp-identity-server-chg-pwd="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your email address</a></li>
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="notifications" class="das-user-navigation__sub-menu-link">Notification settings</a></li>
+                        </ul>
+                    </li>
+                    <li role="menuitem" class="das-user-navigation__list-item">
+                        <a asp-route="@RouteNames.EmployerSignOut" class="das-user-navigation__link">Sign out</a>
                     </li>
                 </ul>
             </nav>
