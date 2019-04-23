@@ -1,19 +1,23 @@
-﻿@using System.Text
-@using Microsoft.AspNetCore.Mvc.ModelBinding
-@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
 @model SelectLegalEntityViewModel
 @{
     ViewData["Title"] = "Reservations - Select Organisation";
+
+    var accountLegalEntityPublicHashedId = Model.LegalEntities.First()?.AccountLegalEntityPublicHashedId;
+
+    var customErrorKeys = new Dictionary<string, string> {{ "LegalEntity", $"LegalEntity-{accountLegalEntityPublicHashedId}" }};
+
+    ViewData["CustomErrorKeys"] = customErrorKeys;
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        
+
         <partial name="_pageErrorsOverview"/>
 
         <h1 class="govuk-heading-xl">Choose organisation</h1>
 
         <form method="post" asp-route="@RouteNames.EmployerSelectLegalEntity" class="validate-auto-complete">
-            <div class="govuk-form-group" @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")>
+            <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
                     Which organisation is named on the contract with the training provider for the apprentices you'd like to add?
                 </span>
@@ -30,8 +34,8 @@
                         @foreach (var legalEntity in Model.LegalEntities)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId" name="legalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
-                                <label class="govuk-label govuk-radios__label" for="legal-entity-@legalEntity.AccountLegalEntityPublicHashedId">
+                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
+                                <label class="govuk-label govuk-radios__label" for="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId">
                                     @legalEntity.Name
                                 </label>
                             </div>
