@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -276,6 +276,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             return Redirect(model.DashboardUrl);
+        }
+
+        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
+        [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
+        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
+        {
+            await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+            return View(ViewNames.ProviderManage, new ManageViewModel());
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
