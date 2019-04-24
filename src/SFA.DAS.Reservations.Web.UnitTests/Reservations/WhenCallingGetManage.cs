@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
@@ -52,6 +53,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_Then_Returns_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
+            ReservationsRouteModel routeModel,
+            GetTrustedEmployersResponse getTrustedEmployersResponse,
+            GetReservationsResult getReservationsResult1,
+            GetReservationsResult getReservationsResult2,
+            GetReservationsResult getReservationsResult3,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getTrustedEmployersResponse);
+            mockMediator
+                .SetupSequence(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getReservationsResult1)
+                .ReturnsAsync(getReservationsResult2)
+                .ReturnsAsync(getReservationsResult3);
+
+            var expectedReservations = new List<ReservationViewModel>();
+            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
+            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
+            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
+
+            var result = await controller.Manage(routeModel) as ViewResult;
+
+            result.Should().NotBeNull();
+            result.ViewName.Should().Be(ViewNames.ProviderManage);
+            var viewModel = result.Model as ManageViewModel;
+            viewModel.Should().NotBeNull();
+            viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
+                options => options.ExcludingMissingMembers());
+        }
+
+        [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_Gets_List_Of_Reservations_For_Single_Employer_Account(
             ReservationsRouteModel routeModel,
             GetReservationsResult getReservationsResult,
@@ -78,35 +113,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Returns_Populated_ViewModel(
+        public async Task And_No_Ukprn_Then_Returns_List_Of_Reservations_For_Single_Employer_Account(
             ReservationsRouteModel routeModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            GetReservationsResult getReservationsResult1,
-            GetReservationsResult getReservationsResult2,
-            GetReservationsResult getReservationsResult3,
+            GetReservationsResult getReservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            routeModel.UkPrn = null;
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-            mockMediator
-                .SetupSequence(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getReservationsResult1)
-                .ReturnsAsync(getReservationsResult2)
-                .ReturnsAsync(getReservationsResult3);
+                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getReservationsResult);
 
             var expectedReservations = new List<ReservationViewModel>();
-            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation => new ReservationViewModel{ Id = reservation.Id }));//todo: other fields
-            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation => new ReservationViewModel{ Id = reservation.Id }));//todo: other fields
-            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation => new ReservationViewModel{ Id = reservation.Id }));//todo: other fields
+            expectedReservations.AddRange(
+                getReservationsResult.Reservations.Select(
+                    reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
 
             var result = await controller.Manage(routeModel) as ViewResult;
 
             result.Should().NotBeNull();
+            result.ViewName.Should().Be(ViewNames.EmployerManage);
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
-            viewModel.Reservations.Should().BeEquivalentTo(expectedReservations, 
+            viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingMissingMembers());
         }
     }

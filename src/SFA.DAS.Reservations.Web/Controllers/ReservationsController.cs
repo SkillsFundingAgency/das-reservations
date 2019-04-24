@@ -287,15 +287,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var employerAccountIds = new List<string>();
             var reservations = new List<ReservationViewModel>();
+            string viewName;
 
             if (routeModel.UkPrn.HasValue)
             {
                 var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
                 employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId.ToString()));
+                viewName = ViewNames.ProviderManage;
             }
             else
             {
                 employerAccountIds.Add(routeModel.EmployerAccountId);
+                viewName = ViewNames.EmployerManage;
             }
 
             foreach (var employerAccountId in employerAccountIds)
@@ -304,7 +307,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 reservations.AddRange(reservationsResult.Reservations.Select(reservation => new ReservationViewModel{Id = reservation.Id}));
             }
             
-            return View(ViewNames.ProviderManage, new ManageViewModel{Reservations = reservations});
+            return View(viewName, new ManageViewModel{Reservations = reservations});
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
