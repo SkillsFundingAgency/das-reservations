@@ -19,8 +19,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
         private readonly IValidator<GetReservationQuery> _validator;
         private readonly IApiClient _apiClient;
         private readonly IReservationAuthorisationService _reservationAuthorisationService;
-
-        private ReservationsApiConfiguration _options;
+        private readonly ReservationsApiConfiguration _options;
 
         public GetReservationQueryHandler(IValidator<IReservationQuery> validator, IApiClient apiClient,
             IOptions<ReservationsApiConfiguration> options,

@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             }
         }
 
-        public async Task<TResponse> GetAll<TResponse>(IGetAllApiRequest request)
+        public async Task<IEnumerable<TResponse>> GetAll<TResponse>(IGetAllApiRequest request)
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
@@ -45,7 +46,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
 
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonConvert.DeserializeObject<TResponse>(json);
+                return JsonConvert.DeserializeObject<IEnumerable<TResponse>>(json);
             }
         }
 
