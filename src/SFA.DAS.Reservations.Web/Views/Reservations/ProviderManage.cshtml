@@ -6,4 +6,10 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">TODO: change</h1>
     </div>
+    <ul>
+    @foreach (var reservation in Model.Reservations)
+    {
+        <li>@reservation.CourseName</li>
+    }
+    </ul>
 </div>
