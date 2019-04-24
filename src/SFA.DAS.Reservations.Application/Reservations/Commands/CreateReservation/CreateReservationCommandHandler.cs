@@ -95,11 +95,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             return new CreateReservationResult
             {
-                Reservation = new Reservation
-                {
-                    Id = response.Id,
-                    AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
-                }
+                Id = response.Id,
+                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
             };
         }
     }

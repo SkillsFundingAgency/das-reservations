@@ -192,7 +192,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 };
 
                 var result = await _mediator.Send(command);
-                routeModel.AccountLegalEntityPublicHashedId = result.Reservation.AccountLegalEntityPublicHashedId;
+                routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
             }
             catch (ValidationException e)
             {

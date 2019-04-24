@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be(RouteNames.ProviderCompleted);
             result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
-            result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId").WhichValue.Should().Be(createReservationResult.Reservation.AccountLegalEntityPublicHashedId);
+            result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId").WhichValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
         }
 
         [Test, AutoData]
