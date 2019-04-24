@@ -11,10 +11,11 @@
 }
 
 <a asp-route="@RouteNames.EmployerIndex" class="govuk-back-link">Back</a>
+<main class="govuk-main-wrapper " id="main-content" role="main">
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <partial name="_pageErrorsOverview"/>
+        <partial name="_pageErrorsOverview" />
 
         <h1 class="govuk-heading-xl">Choose organisation</h1>
 
@@ -24,7 +25,7 @@
                     Which organisation is named on the contract with the training provider for the apprentices you'd like to add?
                 </span>
                 <fieldset class="govuk-fieldset">
-                    
+
                     @if (ViewData.ModelState.ContainsKey("LegalEntity"))
                     {
                         <span id="legal-entity-error" class="govuk-error-message">
@@ -36,7 +37,7 @@
                         @foreach (var legalEntity in Model.LegalEntities)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @(legalEntity.Selected ? "checked":"")>
+                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @(legalEntity.Selected ? "checked" : "")>
                                 <label class="govuk-label govuk-radios__label" for="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId">
                                     @legalEntity.Name
                                 </label>
@@ -64,3 +65,4 @@
         </form>
     </div>
 </div>
+</main>
