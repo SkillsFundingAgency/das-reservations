@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
         {
             await handler.Handle(query, CancellationToken.None);
 
-            //mockApiClient.Verify(client => client.Get<IEnumerable<GetReservationResponse>>(new ReservationApiRequest()));
+            mockApiClient.Verify(client => client.Get<IEnumerable<GetReservationResponse>>(new ReservationApiRequest()));
         }
     }
 }

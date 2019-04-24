@@ -34,14 +34,24 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             request.CreateUrl.Should().Be($"{url}api/accounts/{request.AccountId}/reservations");
         }
 
-        [Test]
-        public void Then_It_Sets_The_GetUrl()
+        [Test, AutoData]
+        public void Then_It_Sets_The_GetUrl(
+            string url,
+            Guid expectedId)
         {
-            var expectedId = Guid.NewGuid();
-            
-            var request = new ReservationApiRequest("http://test/", expectedId);
+            var request = new ReservationApiRequest(url, expectedId);
 
-            request.GetUrl.Should().Be($"http://test/api/reservations/{expectedId}");
+            request.GetUrl.Should().Be($"{url}api/reservations/{expectedId}");
+        }
+
+        [Test, AutoData]
+        public void Then_It_Sets_The_GetAllUrl(
+            string url,
+            long accountId)
+        {
+            var request = new ReservationApiRequest(url, accountId);
+
+            request.GetAllUrl.Should().Be($"{url}api/accounts/{accountId}/reservations");
         }
     }
 }

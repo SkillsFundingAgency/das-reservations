@@ -3,7 +3,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class ReservationApiRequest : IGetApiRequest, IPostApiRequest
+    public class ReservationApiRequest : IGetApiRequest, IGetAllApiRequest, IPostApiRequest
     {
         public ReservationApiRequest(
             string baseUrl,
@@ -31,6 +31,12 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             Id = id;
         }
 
+        public ReservationApiRequest(string baseUrl, long accountId)
+        {
+            BaseUrl = baseUrl;
+            AccountId = accountId;
+        }
+
         public Guid Id { get; }
 
         public long AccountId { get; }
@@ -42,7 +48,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string BaseUrl { get; }
         public string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
-      
+        public string GetAllUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
+
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
     }
