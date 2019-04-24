@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,9 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -282,7 +285,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
         public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
         {
-            await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+            var employerAccountIds = new List<string>();
+            var reservations = new List<ReservationViewModel>();
+
+            if (routeModel.UkPrn.HasValue)
+            {
+                var response = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+                employerAccountIds.AddRange(response.Employers.Select(employer => employer.AccountId.ToString()));
+            }
+            else
+            {
+                employerAccountIds.Add(routeModel.EmployerAccountId);
+            }
+
+            foreach (var employerAccountId in employerAccountIds)
+            {
+                await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
+            }
+            
             return View(ViewNames.ProviderManage, new ManageViewModel());
         }
 
