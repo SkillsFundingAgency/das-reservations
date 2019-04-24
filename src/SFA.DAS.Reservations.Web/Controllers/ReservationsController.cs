@@ -296,7 +296,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 IsProvider = isProvider,
                 BackLink = isProvider ?
                     routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer 
-                    : ""
+                    : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse 
             };
         }
     }

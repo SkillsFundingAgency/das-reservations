@@ -91,7 +91,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewModel = new EmployerSelectCourseViewModel
             {
                 ReservationId = routeModel.Id.Value,
-                Courses = courseViewModels
+                Courses = courseViewModels,
+                BackLink = routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity 
             };
 
             return View(viewModel);

@@ -1,6 +1,13 @@
-﻿@model ReviewViewModel
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model ReviewViewModel
 @{
     ViewData["Title"] = "Reservations";
+    var changeRouteData = (new Dictionary<string, string> {{"fromReview", "true"}});
+}
+
+@if (!string.IsNullOrEmpty(Model.BackLink))
+{
+    <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
 }
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
@@ -34,7 +41,7 @@
                         @Model.StartDateDescription
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName">
+                        <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName" asp-all-route-data="@changeRouteData">
                             Change
                         </a>
                     </dd>
@@ -59,7 +66,7 @@
                         </details>
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName">
+                        <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName" asp-all-route-data="@changeRouteData">
                             Change
                         </a>
                     </dd>

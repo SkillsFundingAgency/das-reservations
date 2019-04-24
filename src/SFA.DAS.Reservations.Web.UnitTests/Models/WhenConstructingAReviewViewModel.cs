@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.EmployerPostReview, actual.ConfirmRouteName);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, actual.ChangeCourseRouteName);
                 Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.ChangeStartDateRouteName);
-                Assert.AreEqual(string.Empty, actual.BackLink);
+                Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.BackLink);
             }
             else
             {
