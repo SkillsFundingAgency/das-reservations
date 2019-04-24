@@ -46,7 +46,7 @@
                         }
                         <div class="govuk-radios">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="confirm-yes" name="Confirm" type="radio" value="True">
+                                <input class="govuk-radios__input" id="confirm-yes" name="Confirm" type="radio" value="True" @(Model.Id.HasValue? "checked":"")>
                                 <label class="govuk-label govuk-radios__label" for="confirm-yes">
                                     Yes, use @Model.AccountLegalEntityName
                                 </label>

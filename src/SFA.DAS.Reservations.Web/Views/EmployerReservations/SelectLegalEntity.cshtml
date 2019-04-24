@@ -36,7 +36,7 @@
                         @foreach (var legalEntity in Model.LegalEntities)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @*checked="@legalEntity.Checked"*@>
+                                <input class="govuk-radios__input" id="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId" name="LegalEntity" type="radio" value="@legalEntity.AccountLegalEntityPublicHashedId" @(legalEntity.Selected ? "checked":"")>
                                 <label class="govuk-label govuk-radios__label" for="LegalEntity-@legalEntity.AccountLegalEntityPublicHashedId">
                                     @legalEntity.Name
                                 </label>
