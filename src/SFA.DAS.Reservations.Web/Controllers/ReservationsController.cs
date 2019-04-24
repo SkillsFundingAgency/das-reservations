@@ -290,8 +290,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (routeModel.UkPrn.HasValue)
             {
-                var response = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
-                employerAccountIds.AddRange(response.Employers.Select(employer => employer.AccountId.ToString()));
+                var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId.ToString()));
             }
             else
             {
@@ -300,10 +300,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             foreach (var employerAccountId in employerAccountIds)
             {
-                await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
+                var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
+                reservations.AddRange(reservationsResult.Reservations.Select(reservation => new ReservationViewModel{Id = reservation.Id}));
             }
             
-            return View(ViewNames.ProviderManage, new ManageViewModel());
+            return View(ViewNames.ProviderManage, new ManageViewModel{Reservations = reservations});
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
