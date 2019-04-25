@@ -25,8 +25,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations
         {
             //todo: validation - accountid not null and parsable to long
             
-            var accountId = long.Parse(request.AccountId);
-            var apiReservations = await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, accountId));
+            var apiReservations = await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, request.AccountId));
             
             var result = new GetReservationsResult
             {

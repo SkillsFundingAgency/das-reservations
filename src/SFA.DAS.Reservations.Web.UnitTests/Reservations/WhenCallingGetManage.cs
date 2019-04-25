@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             {
                 mockMediator.Verify(mediator =>
                         mediator.Send(
-                            It.Is<GetReservationsQuery>(query => query.AccountId == employer.AccountId.ToString()),
+                            It.Is<GetReservationsQuery>(query => query.AccountId == employer.AccountId),
                             It.IsAny<CancellationToken>()),
                     Times.Once);
             }
@@ -73,9 +73,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(getReservationsResult3);
 
             var expectedReservations = new List<ReservationViewModel>();
-            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
-            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
-            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
+            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation => new ReservationViewModel(reservation)));
+            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation => new ReservationViewModel(reservation)));
+            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation => new ReservationViewModel(reservation)));
 
             var result = await controller.Manage(routeModel) as ViewResult;
 
@@ -113,7 +113,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Times.Never);
             mockMediator.Verify(mediator =>
                     mediator.Send(
-                        It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId.ToString()),
+                        It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId),
                         It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -133,7 +133,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(
                 getReservationsResult.Reservations.Select(
-                    reservation => new ReservationViewModel { Id = reservation.Id }));//todo: other fields
+                    reservation => new ReservationViewModel(reservation)));
 
             var result = await controller.Manage(routeModel) as ViewResult;
 

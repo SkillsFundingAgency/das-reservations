@@ -288,27 +288,27 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
         public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
         {
-            var employerAccountIds = new List<string>();
+            var employerAccountIds = new List<long>();
             var reservations = new List<ReservationViewModel>();
             string viewName;
 
             if (routeModel.UkPrn.HasValue)
             {
                 var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
-                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId.ToString()));
+                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId));
                 viewName = ViewNames.ProviderManage;
             }
             else
             {
                 var decodedAccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
-                employerAccountIds.Add(decodedAccountId.ToString());
+                employerAccountIds.Add(decodedAccountId);
                 viewName = ViewNames.EmployerManage;
             }
 
             foreach (var employerAccountId in employerAccountIds)
             {
                 var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
-                reservations.AddRange(reservationsResult.Reservations.Select(reservation => new ReservationViewModel{Id = reservation.Id}));
+                reservations.AddRange(reservationsResult.Reservations.Select(reservation => new ReservationViewModel(reservation)));
             }
             
             return View(viewName, new ManageViewModel{Reservations = reservations});

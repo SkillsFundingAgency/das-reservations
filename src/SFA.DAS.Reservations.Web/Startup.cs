@@ -23,6 +23,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -123,6 +124,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
             services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
+            services.AddScoped(typeof(IValidator<GetReservationsQuery>), typeof(GetReservationsQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();

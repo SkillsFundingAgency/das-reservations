@@ -25,15 +25,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
             [Frozen] Mock<IApiClient> mockApiClient,
             GetReservationsQueryHandler handler)
         {
-            var query = new GetReservationsQuery {AccountId = accountId.ToString()};
+            var query = new GetReservationsQuery {AccountId = accountId};
 
             await handler.Handle(query, CancellationToken.None);
 
             mockApiClient.Verify(client => client.GetAll<GetReservationResponse>(
                 It.Is<IGetAllApiRequest>(request => 
                     request.GetAllUrl.StartsWith(mockOptions.Object.Value.Url) && 
-                    request.GetAllUrl.Contains(query.AccountId))), 
-                /*It.IsAny<IGetAllApiRequest>()),*/
+                    request.GetAllUrl.Contains(query.AccountId.ToString()))), 
                 Times.Once);
         }
 
@@ -45,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
             [Frozen] Mock<IApiClient> mockApiClient,
             GetReservationsQueryHandler handler)
         {
-            var query = new GetReservationsQuery { AccountId = accountId.ToString() };
+            var query = new GetReservationsQuery { AccountId = accountId };
             mockApiClient
                 .Setup(client => client.GetAll<GetReservationResponse>(It.IsAny<IGetAllApiRequest>()))
                 .ReturnsAsync(apiReservations);
