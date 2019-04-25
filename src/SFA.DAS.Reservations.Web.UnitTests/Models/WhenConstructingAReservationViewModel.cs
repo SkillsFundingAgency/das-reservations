@@ -46,6 +46,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
+        public void And_Course_Is_Null_Then_Sets_CourseDescription_To_Unknown(
+            Reservation reservation)
+        {
+            reservation.Course = null;
+
+            var viewModel = new ReservationViewModel(reservation);
+
+            viewModel.CourseName.Should().Be("Unknown");
+        }
+
+        [Test, AutoData]
         public void Then_Sets_AccountLegalEntityName(
             Reservation reservation)
         {
