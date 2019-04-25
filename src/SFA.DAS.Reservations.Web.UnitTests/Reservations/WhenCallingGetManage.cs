@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -90,6 +91,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_No_Ukprn_Then_Gets_List_Of_Reservations_For_Single_Employer_Account(
             ReservationsRouteModel routeModel,
             GetReservationsResult getReservationsResult,
+            long decodedAccountId,
+            [Frozen] Mock<IHashingService> mockHashingService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -97,6 +100,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
+            mockHashingService
+                .Setup(service => service.DecodeValue(routeModel.EmployerAccountId))
+                .Returns(decodedAccountId);
 
             await controller.Manage(routeModel);
 
@@ -107,7 +113,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Times.Never);
             mockMediator.Verify(mediator =>
                     mediator.Send(
-                        It.Is<GetReservationsQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                        It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId.ToString()),
                         It.IsAny<CancellationToken>()),
                 Times.Once);
         }
