@@ -1,0 +1,70 @@
+﻿@using StructureMap.Query
+@model ManageViewModel
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<h1 class="govuk-heading-xl">Your funding reservations</h1>
+
+@if (!Model.Reservations.Any())
+{
+
+    <div class="govuk-width-container">
+        <a href="#" class="govuk-back-link">Back</a>
+
+        <main class="govuk-main-wrapper">
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <h1 class="govuk-heading-xl">There are no funding reservations to use</h1>
+                    <p class="govuk-body">You need to reserve funding in order to add a new apprentice.</p>
+                    <button type="submit" class="govuk-button">Reserve funding</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+}
+else
+{
+
+    <div class="govuk-width-container">
+        <a href="#" class="govuk-back-link">Back</a>
+
+        <main class="govuk-main-wrapper">
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <p class="govuk-body-s">@Model.Reservations.Count reservations</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header govuk-table__header" scope="col">Organisation</th>
+                <th class="govuk-table__header govuk-table__header" scope="col">Apprenticeship training course</th>
+                <th class="govuk-table__header govuk-table__header" scope="col">Start date</th>
+                <th class="govuk-table__header govuk-table__header" scope="col"></th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        @foreach (var reservation in Model.Reservations)
+        {
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-table__cell">@reservation.LegalEntityName</td>
+                <td class="govuk-table__cell govuk-table__cell">@reservation.CourseName</td>
+                <td class="govuk-table__cell govuk-table__cell">@reservation.StartDate</td>
+                <td class="govuk-table__cell govuk-table__cell"><a href="#" class="govuk-link"><strong>Add apprentice</strong></a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+
