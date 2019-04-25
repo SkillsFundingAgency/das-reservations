@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Id = reservation.Id;
             StartDateDescription = $"{reservation.StartDate:MMM yyyy} to {reservation.ExpiryDate:MMM yyyy}";
             Status = reservation.Status.ToString();
-            CourseName = reservation.Course.CourseDescription;
+            CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
         }
 
