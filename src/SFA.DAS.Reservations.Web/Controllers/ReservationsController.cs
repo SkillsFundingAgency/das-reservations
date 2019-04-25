@@ -17,8 +17,8 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
-using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -33,17 +33,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
         private readonly ILogger<ReservationsController> _logger;
+        private readonly IHashingService _hashingService;
         private readonly ReservationsWebConfiguration _configuration;
 
         public ReservationsController(
             IMediator mediator, 
             IStartDateService startDateService, 
             IOptions<ReservationsWebConfiguration> configuration,
-            ILogger<ReservationsController> logger)
+            ILogger<ReservationsController> logger,
+            IHashingService hashingService)
         {
             _mediator = mediator;
             _startDateService = startDateService;
             _logger = logger;
+            _hashingService = hashingService;
             _configuration = configuration.Value;
         }
 
@@ -297,7 +300,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             else
             {
-                employerAccountIds.Add(routeModel.EmployerAccountId);
+                var decodedAccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
+                employerAccountIds.Add(decodedAccountId.ToString());
                 viewName = ViewNames.EmployerManage;
             }
 

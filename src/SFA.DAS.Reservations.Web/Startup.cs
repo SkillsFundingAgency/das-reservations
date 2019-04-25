@@ -16,7 +16,6 @@ using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
