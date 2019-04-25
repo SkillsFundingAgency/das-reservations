@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             {
                 mockMediator.Verify(mediator =>
                         mediator.Send(
-                            It.Is<GetReservationsQuery>(query => query.AccountId == employer.AccountId.ToString()),
+                            It.Is<GetReservationsQuery>(query => query.AccountId == employer.AccountId),
                             It.IsAny<CancellationToken>()),
                     Times.Once);
             }
@@ -113,7 +113,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Times.Never);
             mockMediator.Verify(mediator =>
                     mediator.Send(
-                        It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId.ToString()),
+                        It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId),
                         It.IsAny<CancellationToken>()),
                 Times.Once);
         }
