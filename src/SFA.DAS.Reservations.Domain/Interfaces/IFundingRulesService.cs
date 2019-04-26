@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
-namespace SFA.DAS.Reservations.Application.FundingRules.Services
+namespace SFA.DAS.Reservations.Domain.Interfaces
 {
     public interface IFundingRulesService
     {

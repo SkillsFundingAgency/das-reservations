@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Folder Include="Employers\Services\" />
+    <Folder Include="FundingRules\Queries\GetAvailableDates\" />
   </ItemGroup>
 
 </Project>

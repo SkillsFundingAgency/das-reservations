@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
