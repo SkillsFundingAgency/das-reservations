@@ -143,11 +143,7 @@ namespace SFA.DAS.Reservations.Web
 
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-
-            services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
-                ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
-                : new CurrentDateTime());
-				
+	
 			AddProviderRelationsApi(services, _configuration, _environment);
 
             if (_configuration["Environment"] == "LOCAL")
