@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
@@ -22,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         {
             _expectedAvailableDates = new GetAvailableDatesApiResponse
             {
-                AvailableDates = new List<DateTime>()
+                AvailableDates = new List<StartDateModel>()
             };
 
             _service = new Mock<IFundingRulesService>();

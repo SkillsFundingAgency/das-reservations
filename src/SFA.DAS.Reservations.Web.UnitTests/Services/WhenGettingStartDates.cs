@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using FluentAssertions;
+using MediatR;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -16,49 +18,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
     public class WhenGettingStartDates
     {
         [Test, MoqAutoData]
-        public async Task Then_Returns_A_Date_Based_On_The_Current_Month(
-            [Frozen] Mock<ICurrentDateTime> mockCurrentDateTime, 
+        public async Task Then_Gets_The_Available_Dates_From_The_Query(
+            [Frozen] Mock<IMediator> mockMediator,
+            IList<StartDateModel> expectedAvailableDates,
             StartDateService startDateService)
         {
-            var now = mockCurrentDateTime.Object.Now;
-            var expectedStartDateModel = BuildStartDateModel(now);
+            mockMediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableDatesResult
+                {
+                    AvailableDates = expectedAvailableDates
+                });
 
-            var dates = await startDateService.GetStartDates();
+            await startDateService.GetStartDates();
 
-            dates.ToList().Should().Contain(model => model.StartDate == expectedStartDateModel.StartDate && model.ExpiryDate == expectedStartDateModel.ExpiryDate);
+            mockMediator.Verify(x=>x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Returns_The_Next_Five_Months_After_This_Month(
-            [Frozen] Mock<ICurrentDateTime> mockCurrentDateTime, 
+        public async Task Then_The_Returned_Dates_Are_Mapped_To_The_Model(
+            [Frozen] Mock<IMediator> mockMediator,
+            IList<StartDateModel> expectedAvailableDates,
             StartDateService startDateService)
         {
-            var now = mockCurrentDateTime.Object.Now;
-            var expectedDates = new List<StartDateModel>();
-            for (var i = 0; i < 6; i++)
-            {
-                var startDateModel = BuildStartDateModel(now.AddMonths(i));
-                expectedDates.Add(startDateModel);
-            }
+            mockMediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableDatesResult
+                {
+                    AvailableDates = expectedAvailableDates
+                });
+            
 
             var dates = await startDateService.GetStartDates();
 
-            dates.Count().Should().Be(6);
-            dates.Should().BeEquivalentTo(expectedDates);
-        }
+            Assert.IsNotNull(dates);
+            Assert.AreEqual(expectedAvailableDates.Count,dates.Count());
 
-        private StartDateModel BuildStartDateModel(DateTime now)
-        {
-            var startDate = now.AddDays(1 - now.Day).Date;
-            var threeMonthsFromNow = now.AddMonths(2);
-            var lastDayOfTheMonth = DateTime.DaysInMonth(threeMonthsFromNow.Year, threeMonthsFromNow.Month);
-            var expiryDate = new DateTime(threeMonthsFromNow.Year, threeMonthsFromNow.Month, lastDayOfTheMonth);
-
-            return new StartDateModel
-            {
-                StartDate = startDate,
-                ExpiryDate = expiryDate
-            };
         }
     }
 }

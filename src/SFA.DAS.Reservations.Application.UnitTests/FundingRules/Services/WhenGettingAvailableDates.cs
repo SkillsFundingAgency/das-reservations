@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -19,16 +20,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
-        private List<DateTime> _expectedAvailableDates;
+        private List<StartDateModel> _expectedAvailableDates;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedAvailableDates = new List<DateTime>
+            _expectedAvailableDates = new List<StartDateModel>
             {
-                new DateTime(2019,02,01),
-                new DateTime(2019,03,01),
-                new DateTime(2019,04,01),
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,02,01),
+                    EndDate = new DateTime(2019,04,01)
+                },
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,03,01),
+                    EndDate = new DateTime(2019,05,01)
+                },
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,04,01),
+                    EndDate = new DateTime(2019,06,01)
+                }
             };
 
 
@@ -37,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
                     x.Get<GetAvailableDatesApiResponse>(
                         It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/available-dates"))))
+                                $"{ExpectedBaseUrl}api/rules/available-dates"))))
                 .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
                     AvailableDates = _expectedAvailableDates
