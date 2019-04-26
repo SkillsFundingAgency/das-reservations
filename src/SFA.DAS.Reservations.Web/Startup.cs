@@ -137,7 +137,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
-            services.AddTransient<IFundingRulesService, FundingFundingRulesService>();
+            services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
 

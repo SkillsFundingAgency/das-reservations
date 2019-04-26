@@ -1,49 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
-using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 {
-    public class WhenGettingFundingRules
+    public class WhenGettingAvailableDates
     {
         private IFundingRulesService _service;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
-        private List<ReservationRule> _expectedResevationRules;
-        private List<GlobalRule> _expectedGlobalRules;
+        private List<DateTime> _expectedAvailableDates;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedResevationRules = new List<ReservationRule>
+            _expectedAvailableDates = new List<DateTime>
             {
-                new ReservationRule()
+                new DateTime(2019,02,01),
+                new DateTime(2019,03,01),
+                new DateTime(2019,04,01),
             };
-            
-            _expectedGlobalRules = new List<GlobalRule>
-            {
-                new GlobalRule()
-            };
+
 
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
-                    x.Get<GetFundingRulesApiResponse>(
-                        It.Is<GetFundingRulesApiRequest>(c =>
+                    x.Get<GetAvailableDatesApiResponse>(
+                        It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/rules"))))
-                .ReturnsAsync(new GetFundingRulesApiResponse
+                                $"{ExpectedBaseUrl}api/available-dates"))))
+                .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
-                    Rules = _expectedResevationRules,
-                    GlobalRules = _expectedGlobalRules
+                    AvailableDates = _expectedAvailableDates
                 });
 
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
@@ -56,12 +52,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         public async Task ThenRulesShouldBeReturned()
         {
             //Act
-            var result = await _service.GetFundingRules();
+            var result = await _service.GetAvailableDates();
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedResevationRules, result.Rules);
-            Assert.AreEqual(_expectedGlobalRules, result.GlobalRules);
+            Assert.AreEqual(_expectedAvailableDates, result.AvailableDates);
         }
 
         [Test]
@@ -70,12 +65,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             //Arrange
             var exception = new WebException();
             _apiClient.Setup(x =>
-                    x.Get<GetFundingRulesApiResponse>(
-                        It.IsAny<GetFundingRulesApiRequest>()))
+                    x.Get<GetAvailableDatesApiResponse>(
+                        It.IsAny<GetAvailableDatesApiRequest>()))
                 .ThrowsAsync(exception);
 
             //Act + Assert
-            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetFundingRules());
+            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates());
             Assert.AreEqual(exception, actualException);
         }
     }

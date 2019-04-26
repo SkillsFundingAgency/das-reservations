@@ -6,12 +6,12 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Services
 {
-    public class FundingFundingRulesService : IFundingRulesService
+    public class FundingRulesService : IFundingRulesService
     {
         private readonly IApiClient _apiClient;
         private readonly IOptions<ReservationsApiConfiguration> _options;
 
-        public FundingFundingRulesService(IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
+        public FundingRulesService(IApiClient apiClient, IOptions<ReservationsApiConfiguration> options)
         {
             _apiClient = apiClient;
             _options = options;
@@ -22,6 +22,15 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
             var request = new GetFundingRulesApiRequest(_options.Value.Url);
 
             var response = await _apiClient.Get<GetFundingRulesApiResponse>(request);
+
+            return response;
+        }
+
+        public async Task<GetAvailableDatesApiResponse> GetAvailableDates()
+        {
+            var request = new GetAvailableDatesApiRequest(_options.Value.Url);
+
+            var response = await _apiClient.Get<GetAvailableDatesApiResponse>(request);
 
             return response;
         }

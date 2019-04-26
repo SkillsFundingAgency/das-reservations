@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Services
 {
-    public interface IFundingRulesService
+    public interface IAvailableDatesService
     {
-        Task<GetFundingRulesApiResponse> GetFundingRules();
         Task<GetAvailableDatesApiResponse> GetAvailableDates();
     }
 }
