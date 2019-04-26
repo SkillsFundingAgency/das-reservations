@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         }
 
         [Test]
-        public async Task Then_The_Courses_Are_Returned()
+        public async Task Then_The_FundingRules_Are_Returned()
         {
             //Act
             var actual = await _handler.Handle(new GetFundingRulesQuery(), new CancellationToken());
