@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models

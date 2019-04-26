@@ -9,6 +9,6 @@ namespace SFA.DAS.Reservations.Domain.Rules.Api
             BaseUrl = baseUrl;
         }
         public string BaseUrl { get; }
-        public string GetUrl => $"{BaseUrl}api/available-dates";
+        public string GetUrl => $"{BaseUrl}api/rules/available-dates";
     }
 }
