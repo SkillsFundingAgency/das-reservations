@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         }
 
         [Test]
-        public async Task ThenRulesShouldBeReturned()
+        public async Task Then_The_Available_Dates_Are_Returned()
         {
             //Act
             var result = await _service.GetAvailableDates();
