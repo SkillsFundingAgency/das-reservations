@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         public string AccountLegalEntityName { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public uint UkPrn { get; set; }
+        public string AccountName { get; set; }
     }
 }

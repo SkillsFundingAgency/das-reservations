@@ -33,6 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 c.AccountLegalEntityId.Equals(viewModel.AccountLegalEntityId) &&
                 c.AccountLegalEntityPublicHashedId.Equals(viewModel.AccountLegalEntityPublicHashedId) &&
                 c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName) &&
+                c.AccountName.Equals(viewModel.AccountName) &&
                 c.UkPrn.Equals(viewModel.UkPrn)), It.IsAny<CancellationToken>()), Times.Once);
         }
 
