@@ -1,4 +1,4 @@
-﻿@using System.Text
+@using System.Text
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @using SFA.DAS.Reservations.Web.Infrastructure
 @model CompletedViewModel
@@ -81,13 +81,14 @@
             </p>
             <ul class="govuk-list govuk-list--bullet">
                 <li>
-                    Find an apprentice. You can use our <a href="https://recruit.manage-apprenticeships.service.gov.uk" target="_blank" rel="noopener">recruitment service</a> to find and apprentice.
+                    Find an apprentice. You can use our <a href="https://recruit.manage-apprenticeships.service.gov.uk" target="_blank" rel="noopener">recruitment service</a> to find an apprentice.
                 </li>
                 <li>
                     Find a training provider. Use the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" rel="noopener">find apprenticeship training</a> service to find a training provider who offers the course you would like to take.
                 </li>
             </ul>
             <p>
+
             <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="govuk-button">Return to your account</a>
             </p>
         </div>
