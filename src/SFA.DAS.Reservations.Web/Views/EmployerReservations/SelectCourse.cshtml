@@ -5,71 +5,45 @@
 @{
     ViewData["Title"] = "Reservations - Select Course";
 }
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-                <h2 class="govuk-error-summary__title" id="error-summary-title">
-                    There is a problem
-                </h2>
-                <div class="govuk-error-summary__body">
-                    <ul class="govuk-list govuk-error-summary__list">
-                        @{
-                            var errorStringBuilder = new StringBuilder();
-                            var errorCount = ViewData.ModelState.ErrorCount;
-                            var loopCount = 1;
-                            foreach (var error in ViewData.ModelState)
-                            {
-                                if (error.Value.ValidationState == ModelValidationState.Invalid)
-                                {
-                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Select a course or leave the field empty</a></li>");
-                                    if (loopCount == errorCount - 1)
-                                    {
-                                        errorStringBuilder.Append(" and ");
-                                    }
-                                    else if (loopCount != errorCount)
-                                    {
-                                        errorStringBuilder.Append(", ");
-                                    }
+@if (!string.IsNullOrEmpty(Model.BackLink))
+{
+    <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+}
 
-                                    loopCount++;
-                                }
-                            }
-                        }
-                        @Html.Raw(errorStringBuilder.ToString())
-                    </ul>
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <partial name="_pageErrorsOverview" />
+
+            <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take? (optional)</h1>
+
+            <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
+
+
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="course-search">
+                        Search for a course
+                    </label>
+                    <span id="choose-apprenticeship-hint" class="govuk-hint">
+                        This information can be changed later. If you want to find the correct training,
+                        you can check <a class="govuk-link" target="_blank" href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/">Find apprenticeship training</a> or ask your training provider.
+                    </span>
+                    <partial name="_CourseSearch" />
                 </div>
-            </div>
-        }
 
-        <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take? (optional)</h1>
-
-        <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
-
-
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="course-search">
-                    Search for a course
-                </label>
-                <span id="choose-apprenticeship-hint" class="govuk-hint">
-                    This information can be changed later. If you want to find the correct training,
-                    you can check <a class="govuk-link" target="_blank" href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/">Find apprenticeship training</a> or ask your training provider.
-                </span>
-                <partial name="_CourseSearch" />
-            </div>
-
-            <button type="submit" class="govuk-button">
-                Save and continue
-            </button>
-            <div class="govuk-form-group">
-                <span class="govuk-hint govuk-!-margin-top-4">
-                    <a asp-route="@RouteNames.EmployerSkipSelectCourse" class="govuk-link">
-                        I don't know this yet
-                    </a>
-                </span>
-            </div>
-        </form>
+                <button type="submit" class="govuk-button">
+                    Save and continue
+                </button>
+                <div class="govuk-form-group">
+                    <span class="govuk-hint govuk-!-margin-top-4">
+                        <a asp-route="@RouteNames.EmployerSkipSelectCourse" class="govuk-link">
+                            I don't know this yet
+                        </a>
+                    </span>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</main>

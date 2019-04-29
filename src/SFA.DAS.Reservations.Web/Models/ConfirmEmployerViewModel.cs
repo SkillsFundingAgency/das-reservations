@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Reservations.Web.Models
+﻿using System;
+
+namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmEmployerViewModel
     {   
@@ -11,5 +13,6 @@
         public string AccountLegalEntityName { get; set; }
 
         public bool? Confirm { get; set; }
+        public Guid? Id { get; set; }
     }
 }

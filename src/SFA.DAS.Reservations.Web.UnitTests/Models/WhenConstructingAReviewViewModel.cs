@@ -22,7 +22,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
                 UkPrn = ukPrn,
                 Id = new Guid(),
-                EmployerAccountId = "123FDS"
+                EmployerAccountId = "123FDS",
+                FromReview = true
             };
             
             //Act
@@ -38,6 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.EmployerPostReview, actual.ConfirmRouteName);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, actual.ChangeCourseRouteName);
                 Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.ChangeStartDateRouteName);
+                Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, actual.BackLink);
             }
             else
             {
@@ -45,6 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.ProviderPostReview, actual.ConfirmRouteName);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeCourseRouteName);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeStartDateRouteName);
+                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.BackLink);
             }
             Assert.AreEqual(StartDateDescription, actual.StartDateDescription);
         }

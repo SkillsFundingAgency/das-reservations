@@ -75,6 +75,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test, MoqAutoData]
+        public async Task Then_Updates_Existing_Reservation_If_Supplied(ReservationsRouteModel routeModel,
+            ConfirmLegalEntityViewModel viewModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            long decodedAccountId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IHashingService> mockHashingService,
+            EmployerReservationsController controller)
+        {
+            var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
+            viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockHashingService
+                .Setup(service => service.DecodeValue(routeModel.EmployerAccountId))
+                .Returns(decodedAccountId);
+
+            await controller.PostSelectLegalEntity(routeModel, viewModel);
+
+            mockMediator.Verify(mediator => mediator.Send(
+                    It.Is<CacheReservationEmployerCommand>(command =>
+                        command.Id == routeModel.Id),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Redirects_To_Select_Course(
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
