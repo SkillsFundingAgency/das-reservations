@@ -48,7 +48,7 @@ else
                             <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
                             <td class="govuk-table__cell" data-label="Start date">@reservation.StartDateDescription</td>
                             <td class="govuk-table__cell">
-                                @if (reservation.Status == "1")
+                                @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
                                     <a href="#" class="govuk-link">Add apprentice</a>
                                 }

@@ -31,9 +31,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_Status(
             Reservation reservation)
         {
+            reservation.Status = ReservationStatus.Deleted;
             var viewModel = new ReservationViewModel(reservation);
 
-            viewModel.Status.Should().Be(reservation.Status.ToString());
+            ((int)viewModel.Status).Should().Be((int)reservation.Status);
         }
 
         [Test, AutoData]

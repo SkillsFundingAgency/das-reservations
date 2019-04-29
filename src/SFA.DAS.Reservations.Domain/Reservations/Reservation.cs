@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public Course Course { get; set; }
-        public int Status { get; set; }
+        public ReservationStatus Status { get; set; }
         public uint? ProviderId { get; set; }
     }
 }

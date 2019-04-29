@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations
                     StartDate = apiReservation.StartDate,
                     ExpiryDate = apiReservation.ExpiryDate,
                     Course = apiReservation.Course,
-                    Status = apiReservation.Status,
+                    Status = (ReservationStatus)apiReservation.Status,
                     ProviderId = apiReservation.ProviderId
                 })
             };

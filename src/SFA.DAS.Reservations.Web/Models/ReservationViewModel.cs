@@ -9,13 +9,13 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             Id = reservation.Id;
             StartDateDescription = $"{reservation.StartDate:MMM yyyy} to {reservation.ExpiryDate:MMM yyyy}";
-            Status = reservation.Status.ToString();
+            Status = (ReservationStatusViewModel)reservation.Status;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
         }
 
         public Guid Id { get; }
-        public string Status { get; }
+        public ReservationStatusViewModel Status { get; }
         public string LegalEntityName { get; }
         public string CourseName { get; }
         public string StartDateDescription { get; }
