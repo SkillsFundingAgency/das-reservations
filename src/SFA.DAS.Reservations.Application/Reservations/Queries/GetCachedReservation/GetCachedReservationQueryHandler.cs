@@ -53,7 +53,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                 CourseId = cachedReservation.CourseId,
                 CourseDescription = cachedReservation.CourseDescription,
                 StartDate = cachedReservation.StartDate,
-                StartDateDescription = cachedReservation.StartDateDescription
+                StartDateDescription = cachedReservation.StartDateDescription,
+                AccountName = cachedReservation.AccountName
             };
         }
     }

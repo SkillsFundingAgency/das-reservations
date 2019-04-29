@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string RouteName { get; set; }
         public string TrainingStartDate { get; set; }
         public bool IsProvider { get; set; }
+        public string BackLink { get; set; }
     }
 }

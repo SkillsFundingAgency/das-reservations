@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -56,7 +57,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(expectedStartDates);
             var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel(startDateModel)).OrderBy(model => model.Value);
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
-            
+            routeModel.FromReview = false;
+
             var result = await controller.ApprenticeshipTraining(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()
@@ -68,7 +70,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
             viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
             viewModel.IsProvider.Should().BeTrue();
+            viewModel.RouteName.Should().Be(RouteNames.ProviderCreateApprenticeshipTraining);
+            viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
         }
+
+        [Test, MoqAutoData]
+        public async Task Then_It_Sets_The_Back_Link_Correctly_Coming_From_The_Review_Screen(
+            ReservationsRouteModel routeModel,
+            IEnumerable<StartDateModel> expectedStartDates,
+            GetCoursesResult getCoursesResult,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IStartDateService> mockStartDateService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getCoursesResult);
+            routeModel.FromReview = true;
+
+            var result = await controller.ApprenticeshipTraining(routeModel);
+
+            var viewModel = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
+                .Subject;
+            viewModel.BackLink.Should().Be(RouteNames.ProviderReview);
+        }
+
 
         [Test, MoqAutoData]
         public async Task And_Has_Previous_Reservation_Then_Loads_Existing_Reservation_To_ViewModel(
