@@ -1,99 +1,67 @@
-﻿@using System.Text
-@using Microsoft.AspNetCore.Mvc.ModelBinding
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
 @model ConfirmEmployerViewModel
 @{
     ViewBag.Title = "Confirm Employer";
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+<a asp-route="@RouteNames.ProviderChooseEmployer" class="govuk-back-link">Back</a>
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-                <h2 class="govuk-error-summary__title" id="error-summary-title">
-                    There is a problem
-                </h2>
-                <div class="govuk-error-summary__body">
-                    <ul class="govuk-list govuk-error-summary__list">
-                        @{
-                            var errorStringBuilder = new StringBuilder();
-                            var errorCount = ViewData.ModelState.ErrorCount;
-                            var loopCount = 1;
-                            foreach (var error in ViewData.ModelState)
-                            {
-                                if (error.Value.ValidationState == ModelValidationState.Invalid)
-                                {
-                                    errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">Select whether to secure funds for this employer or not</a></li>");
-                                    if (loopCount == errorCount - 1)
-                                    {
-                                        errorStringBuilder.Append(" and ");
-                                    }
-                                    else if (loopCount != errorCount)
-                                    {
-                                        errorStringBuilder.Append(", ");
-                                    }
+            <partial name="_pageErrorsOverview"/>
 
-                                    loopCount++;
-                                }
-                            }
+            <h1 class="govuk-heading-xl">Confirm employer</h1>
+
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-0">@Model.AccountLegalEntityName</h2>
+
+            <dl class="das-definition-list das-definition-list--inline das-definition-list--muted govuk-!-font-size-24">
+
+                <dt class="das-definition-list__title">Account name</dt>
+                <dd class="das-definition-list__definition">@Model.AccountName</dd>
+
+                <dt class="das-definition-list__title">Agreement ID</dt>
+                <dd class="das-definition-list__definition">@Model.AccountLegalEntityPublicHashedId</dd>
+
+            </dl>
+
+            <form action="@Url.Action("ConfirmEmployer")" method="POST">
+
+                @Html.HiddenFor(model => model.AccountLegalEntityName)
+                @Html.HiddenFor(model => model.AccountLegalEntityId)
+                @Html.HiddenFor(model => model.AccountLegalEntityPublicHashedId)
+                @Html.HiddenFor(model => model.AccountName)
+                @Html.HiddenFor(model => model.AccountId)
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "":"govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Are you sure you want to secure funds for this employer?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("confirm-yes"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["confirm-yes"].Errors.First().ErrorMessage
+                            </span>
                         }
-                        @Html.Raw(errorStringBuilder.ToString())
-                    </ul>
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="confirm-yes" name="Confirm" type="radio" value="True" @(Model.Id.HasValue? "checked":"")>
+                                <label class="govuk-label govuk-radios__label" for="confirm-yes">
+                                    Yes, use @Model.AccountLegalEntityName
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="confirm-no" name="Confirm" type="radio" value="False">
+                                <label class="govuk-label govuk-radios__label" for="confirm-no">
+                                    No, choose a different employer
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
-            </div>
-        }
-
-        <h1 class="govuk-heading-xl">Confirm employer</h1>
-
-        <h2 class="govuk-heading-l govuk-!-margin-bottom-0">@Model.AccountLegalEntityName</h2>
-
-        <dl class="das-definition-list das-definition-list--inline das-definition-list--muted govuk-!-font-size-24">
-
-            <dt class="das-definition-list__title">Account name</dt>
-            <dd class="das-definition-list__definition">@Model.AccountName</dd>
-
-            <dt class="das-definition-list__title">Agreement ID</dt>
-            <dd class="das-definition-list__definition">@Model.AccountLegalEntityPublicHashedId</dd>
-
-        </dl>
-           
-        <form action="@Url.Action("ConfirmEmployer")" method="POST">
-
-            @Html.HiddenFor(model => model.AccountLegalEntityName)
-            @Html.HiddenFor(model => model.AccountLegalEntityId)
-            @Html.HiddenFor(model => model.AccountLegalEntityPublicHashedId)
-            @Html.HiddenFor(model => model.AccountName)
-            @Html.HiddenFor(model => model.AccountId)
-
-            <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "":"govuk-form-group--error")">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        Are you sure you want to secure funds for this employer?
-                    </legend>
-                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("confirm-yes"))
-                    {
-                        <span id="confirm-error" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["confirm-yes"].Errors.First().ErrorMessage
-                        </span>
-                    }
-                    <div class="govuk-radios">
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="confirm-yes" name="Confirm" type="radio" value="True">
-                            <label class="govuk-label govuk-radios__label" for="confirm-yes">
-                                Yes, use @Model.AccountLegalEntityName
-                            </label>
-                        </div>
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="confirm-no" name="Confirm" type="radio" value="False">
-                            <label class="govuk-label govuk-radios__label" for="confirm-no">
-                                No, choose a different employer
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
-            <button type="submit" class="govuk-button">Save and continue</button>
-        </form>
+                <button type="submit" class="govuk-button">Save and continue</button>
+            </form>
+        </div>
     </div>
-</div>
+</main>

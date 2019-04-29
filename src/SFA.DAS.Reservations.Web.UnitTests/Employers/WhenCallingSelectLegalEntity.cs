@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -36,6 +38,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
         {
+            routeModel.Id = null;
+
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
@@ -47,6 +51,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.Should().NotBeNull();
             viewModel?.RouteModel.Should().BeEquivalentTo(routeModel);
             viewModel?.LegalEntities.Should().BeEquivalentTo(getLegalEntitiesResponse.AccountLegalEntities, options => options.ExcludingMissingMembers());
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_There_Is_A_Reservation_Created_The_Entity_Is_Taken_From_The_Cache(ReservationsRouteModel routeModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            routeModel.Id = Guid.NewGuid();
+
+            var result = await controller.SelectLegalEntity(routeModel) as ViewResult;
+
+            result.Should().NotBeNull();
+            mockMediator.Verify(x => x.Send(It.Is<GetCachedReservationQuery>(c=>c.Id.Equals(routeModel.Id)), It.IsAny<CancellationToken>()), Times.Once);
+            var viewModel = result?.Model.Should().BeOfType<SelectLegalEntityViewModel>().Subject;
+            viewModel.Should().NotBeNull();
         }
     }
 }

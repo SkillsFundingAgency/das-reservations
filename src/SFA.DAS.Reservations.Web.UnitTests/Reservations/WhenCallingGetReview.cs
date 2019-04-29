@@ -47,6 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
+            routeModel.FromReview = false;
 
             var result = await controller.Review(routeModel);
 
@@ -58,6 +59,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
             viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
             viewModel.AccountLegalEntityPublicHashedId.Should().Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
+            viewModel.RouteModel.FromReview.Should().BeTrue();
         }
 
         [Test, MoqAutoData]

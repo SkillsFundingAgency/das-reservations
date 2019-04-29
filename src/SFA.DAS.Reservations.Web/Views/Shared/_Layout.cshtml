@@ -57,15 +57,15 @@
                 }
             </div>
         </div>
-        <partial name="_Navigation" />
+
     </header>
+
+    <partial name="_Navigation" />
 
     <partial name="_SubNavigation" />
 
     <div class="govuk-width-container">
-        <main class="govuk-main-wrapper " id="main-content" role="main">
-            @RenderBody()
-        </main>
+        @RenderBody()    
     </div>
 
     <footer class="govuk-footer " role="contentinfo">
@@ -88,12 +88,14 @@
         </div>
     </footer>
 
+    <script src="libs/govuk-frontend/all.js"></script>
     <script src="libs/jquery/jquery.min.js"></script>
     <script src="js/das-all.js"></script>
     <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script>
     <script src="js/app.min.js"></script>
     <script src="/js/app.js" no-cdn></script>
     <script>
+        window.GOVUKFrontend.initAll();
         window.DASFrontend.initAll();
     </script>
 
