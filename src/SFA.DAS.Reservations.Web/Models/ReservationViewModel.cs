@@ -3,9 +3,19 @@ using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class ReservationViewModel
+    public class ReservationViewModel : AddApprenticeViewModel
     {
-        public ReservationViewModel(Reservation reservation)
+        public ReservationViewModel(
+            Reservation reservation, 
+            string apprenticeUrl, 
+            string accountLegalEntityPublicHashedId) 
+            : base(
+                apprenticeUrl, 
+                reservation.ProviderId, 
+                reservation.Id, 
+                accountLegalEntityPublicHashedId, 
+                reservation.StartDate, 
+                reservation.Course)
         {
             Id = reservation.Id;
             StartDateDescription = $"{reservation.StartDate:MMM yyyy} to {reservation.ExpiryDate:MMM yyyy}";

@@ -50,7 +50,7 @@ else
                             <td class="govuk-table__cell">
                                 @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
-                                    <a href="#" class="govuk-link">Add apprentice</a>
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
                                 }
                                 else
                                 {

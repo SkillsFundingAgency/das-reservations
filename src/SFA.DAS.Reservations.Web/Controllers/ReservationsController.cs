@@ -309,7 +309,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             foreach (var employerAccountId in employerAccountIds)
             {
                 var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
-                reservations.AddRange(reservationsResult.Reservations.Select(reservation => new ReservationViewModel(reservation)));
+                reservations.AddRange(reservationsResult.Reservations
+                    .Select(reservation => new ReservationViewModel(
+                        reservation, 
+                        _configuration.ApprenticeUrl, 
+                        _hashingService.HashValue(reservation.AccountLegalEntityId))));
             }
             
             return View(viewName, new ManageViewModel{Reservations = reservations});
