@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
