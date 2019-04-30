@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -13,38 +14,46 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 {
-    public class WhenGettingFundingRules
+    public class WhenGettingAvailableDates
     {
         private IFundingRulesService _service;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
-        private List<ReservationRule> _expectedResevationRules;
-        private List<GlobalRule> _expectedGlobalRules;
+        private List<StartDateModel> _expectedAvailableDates;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedResevationRules = new List<ReservationRule>
+            _expectedAvailableDates = new List<StartDateModel>
             {
-                new ReservationRule()
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,02,01),
+                    EndDate = new DateTime(2019,04,01)
+                },
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,03,01),
+                    EndDate = new DateTime(2019,05,01)
+                },
+                new StartDateModel
+                {
+                    StartDate = new DateTime(2019,04,01),
+                    EndDate = new DateTime(2019,06,01)
+                }
             };
-            
-            _expectedGlobalRules = new List<GlobalRule>
-            {
-                new GlobalRule()
-            };
+
 
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
-                    x.Get<GetFundingRulesApiResponse>(
-                        It.Is<GetFundingRulesApiRequest>(c =>
+                    x.Get<GetAvailableDatesApiResponse>(
+                        It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/rules"))))
-                .ReturnsAsync(new GetFundingRulesApiResponse
+                                $"{ExpectedBaseUrl}api/rules/available-dates"))))
+                .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
-                    Rules = _expectedResevationRules,
-                    GlobalRules = _expectedGlobalRules
+                    AvailableDates = _expectedAvailableDates
                 });
 
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
@@ -54,15 +63,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         }
 
         [Test]
-        public async Task ThenRulesShouldBeReturned()
+        public async Task Then_The_Available_Dates_Are_Returned()
         {
             //Act
-            var result = await _service.GetFundingRules();
+            var result = await _service.GetAvailableDates();
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedResevationRules, result.Rules);
-            Assert.AreEqual(_expectedGlobalRules, result.GlobalRules);
+            Assert.AreEqual(_expectedAvailableDates, result.AvailableDates);
         }
 
         [Test]
@@ -71,12 +79,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             //Arrange
             var exception = new WebException();
             _apiClient.Setup(x =>
-                    x.Get<GetFundingRulesApiResponse>(
-                        It.IsAny<GetFundingRulesApiRequest>()))
+                    x.Get<GetAvailableDatesApiResponse>(
+                        It.IsAny<GetAvailableDatesApiRequest>()))
                 .ThrowsAsync(exception);
 
             //Act + Assert
-            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetFundingRules());
+            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates());
             Assert.AreEqual(exception, actualException);
         }
     }
