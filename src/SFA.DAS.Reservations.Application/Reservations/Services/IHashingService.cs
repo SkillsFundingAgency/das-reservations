@@ -3,5 +3,6 @@
     public interface IHashingService
     {
         long DecodeValue(string id);
+        string HashValue(long id);
     }
 }

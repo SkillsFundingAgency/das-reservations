@@ -4,7 +4,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class CompletedViewModel
+    public class CompletedViewModel : AddApprenticeViewModel
     {
         public CompletedViewModel(
             Guid reservationId, 
@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.Models
             string accountLegalEntityName = "", 
             string dashboardUrl = "", 
             string apprenticeUrl = "",
-            string employerDashboardUrl = "")
+            string employerDashboardUrl = "") : base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
         {
             ReservationId = reservationId;
             StartDate = startDate;
@@ -25,20 +25,8 @@ namespace SFA.DAS.Reservations.Web.Models
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
             UkPrn = ukPrn;
             AccountLegalEntityName = accountLegalEntityName;
-
-            if (!string.IsNullOrWhiteSpace(apprenticeUrl))
-            {
-                apprenticeUrl = $"{apprenticeUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={StartDate:MMyyyy}";
-                if (course != null)
-                {
-                    apprenticeUrl += $"&courseCode={course.Id}";
-                }
-            }
-            
             DashboardUrl = dashboardUrl;
-            ApprenticeUrl = apprenticeUrl;
             EmployerDashboardUrl = employerDashboardUrl;
-
 
             ViewName = ukPrn == null ? ViewNames.EmployerCompleted : ViewNames.ProviderCompleted;
         }
@@ -50,7 +38,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get; }
         public uint? UkPrn { get; }
         public string DashboardUrl { get;}
-		public string ApprenticeUrl { get; }
         public bool ShowDashboardUrl => !string.IsNullOrWhiteSpace(DashboardUrl);
         public bool ShowApprenticeUrl => !string.IsNullOrWhiteSpace(ApprenticeUrl);
 		public string AccountLegalEntityName { get; }

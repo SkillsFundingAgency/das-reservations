@@ -159,5 +159,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             Assert.AreEqual(ViewNames.ProviderCompleted, viewModel.ViewName);
         }
+
+        [Test, AutoData]
+        public void Then_Inherits_From_AddApprenticeViewModel(
+            CompletedViewModel viewModel)
+        {
+            Assert.IsInstanceOf<AddApprenticeViewModel>(viewModel);
+        }
     }
 }

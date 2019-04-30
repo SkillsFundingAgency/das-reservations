@@ -49,7 +49,16 @@ else
                             <th class="govuk-table__header" data-label="Employer" scope="row">@reservation.LegalEntityName</th>
                             <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
                             <td class="govuk-table__cell" data-label="Start date">@reservation.StartDateDescription</td>
-                            <td class="govuk-table__cell"></td>
+                            <td class="govuk-table__cell">
+                                @if (reservation.Status == ReservationStatusViewModel.Pending)
+                                {
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                }
+                                else
+                                {
+                                    <strong class="govuk-tag govuk-tag--inactive">used</strong>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>
