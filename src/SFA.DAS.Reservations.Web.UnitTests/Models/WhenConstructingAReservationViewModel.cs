@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new ReservationViewModel(reservation);
 
-            viewModel.StartDateDescription.Should().Be($"{reservation.StartDate:MMM yyyy} to {reservation.ExpiryDate:MMM yyyy}");
+            viewModel.StartDateDescription.Should().Be($"{reservation.StartDate:MMMM yyyy} to {reservation.ExpiryDate:MMMM yyyy}");
         }
 
         [Test, AutoData]
