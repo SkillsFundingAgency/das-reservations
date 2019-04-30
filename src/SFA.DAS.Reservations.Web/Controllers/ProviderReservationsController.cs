@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
             {
-                return View( "fundingStopped");
+                return View( "ProviderFundingPaused");
             }
 
             return View("index");
