@@ -138,17 +138,13 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
-            services.AddTransient<IFundingRulesService, FundingFundingRulesService>();
+            services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
 
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-
-            services.AddSingleton<ICurrentDateTime>(reservationsWebConfig.CurrentDateTime.HasValue
-                ? new CurrentDateTime(reservationsWebConfig.CurrentDateTime)
-                : new CurrentDateTime());
-				
+	
 			AddProviderRelationsApi(services, _configuration, _environment);
 
             if (_configuration["Environment"] == "LOCAL")

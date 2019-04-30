@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 {
