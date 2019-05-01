@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("index", result.ViewName);
+            Assert.AreEqual("Index", result.ViewName);
         }
 
         [Test]
