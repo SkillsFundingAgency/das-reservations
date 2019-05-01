@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
     {
         Task<GetFundingRulesApiResponse> GetFundingRules();
         Task<GetAvailableDatesApiResponse> GetAvailableDates();
+        Task<GetAccountFundingRulesApiResponse> GetAccountFundingRules(long accountId);
     }
 }

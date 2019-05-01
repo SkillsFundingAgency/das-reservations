@@ -35,5 +35,14 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
 
             return response;
         }
+
+        public async Task<GetAccountFundingRulesApiResponse> GetAccountFundingRules(long accountId)
+        {
+            var request = new GetAccountFundingRulesApiRequest(_options.Value.Url, accountId);
+
+            var response = await _apiClient.Get<GetAccountFundingRulesApiResponse>(request);
+
+            return response;
+        }
     }
 }
