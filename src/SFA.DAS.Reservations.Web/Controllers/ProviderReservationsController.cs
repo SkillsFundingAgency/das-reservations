@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View( "ProviderFundingPaused");
             }
 
-            return View("index");
+            return View("Index");
         }
 
         [HttpGet]
