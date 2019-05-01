@@ -26,7 +26,7 @@
                 </span>
                 <fieldset class="govuk-fieldset">
 
-                    @if (ViewData.ModelState.ContainsKey("LegalEntity"))
+                    @if (ViewData.ModelState.ContainsKey("LegalEntity") && ViewData.ModelState["LegalEntity"].Errors.Any())
                     {
                         <span id="legal-entity-error" class="govuk-error-message">
                             @ViewData.ModelState["LegalEntity"].Errors.First().ErrorMessage
