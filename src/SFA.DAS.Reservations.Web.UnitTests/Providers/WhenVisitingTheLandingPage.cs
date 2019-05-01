@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("fundingStopped", result.ViewName);
+            Assert.AreEqual("ProviderFundingPaused", result.ViewName);
         }
     }
 }
