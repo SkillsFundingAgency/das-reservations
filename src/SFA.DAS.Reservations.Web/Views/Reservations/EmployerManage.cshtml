@@ -44,8 +44,8 @@ else
                 <thead class="govuk-table__head">
                     <tr>
                         <th scope="col" class="govuk-table__header"><span class="no-wrap">Organisation</span></th>
-                        <th scope="col" class="govuk-table__header">Apprenticeship training course</th>
-                        <th scope="col" class="govuk-table__header">Start date</th>
+                        <th scope="col" class="govuk-table__header">Apprenticeship training</th>
+                        <th scope="col" class="govuk-table__header">Apprenticeship start date</th>
                         <th scope="col" class="govuk-table__header"></th>
                     </tr>
                 </thead>
@@ -54,8 +54,8 @@ else
                     {
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell" data-label="Organisation">@reservation.LegalEntityName</td>
-                            <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
-                            <td class="govuk-table__cell" data-label="Start date"> @reservation.StartDateDescription</td>
+                            <td class="govuk-table__cell" data-label="Apprenticeship training">@reservation.CourseName</td>
+                            <td class="govuk-table__cell" data-label="Apprenticeship start date"> @reservation.StartDateDescription</td>
                             <td class="govuk-table__cell">
                                 @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
