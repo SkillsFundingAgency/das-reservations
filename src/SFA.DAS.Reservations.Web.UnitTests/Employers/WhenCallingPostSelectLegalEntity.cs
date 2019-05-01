@@ -133,7 +133,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test, MoqAutoData]
-        public async Task And_ValidationException_Then_Redirects_To_Apprenticeship_Training(
+        public async Task And_ValidationException_Then_Redirects_To_SelectLegalEntity(
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
