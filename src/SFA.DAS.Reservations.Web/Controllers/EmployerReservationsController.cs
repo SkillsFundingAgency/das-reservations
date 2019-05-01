@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("EmployerFundingPaused");
             }
             
-            return View();
+            return View("Index");
         }
 
         [HttpGet]
