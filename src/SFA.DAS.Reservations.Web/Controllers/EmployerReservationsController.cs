@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -32,9 +33,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var response = await _mediator.Send(new GetFundingRulesQuery());
+
+            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            {
+                return View("EmployerFundingPaused");
+            }
+            
+            return View("Index");
         }
 
         [HttpGet]
