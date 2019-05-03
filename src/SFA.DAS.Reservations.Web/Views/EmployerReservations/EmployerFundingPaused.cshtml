@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewData["Title"] = "EmployerFundingPaused";
+}
+
+
+    <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" tabindex="2" class="govuk-back-link">Back</a>
+    <main class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">Government funding is currently paused</h1>
+                <p class="govuk-body">There's currently no government funding available for apprentice training.</p>
+                <p class="govuk-body">Any funding you've already secured is unaffected by this change.</p>
+                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" tabindex="1" draggable="false" class="govuk-button">Return to account</a>
+            </div>
+        </div>
+    </main>
+

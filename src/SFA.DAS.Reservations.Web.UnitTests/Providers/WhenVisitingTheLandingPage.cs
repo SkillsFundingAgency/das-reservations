@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("index", result.ViewName);
+            Assert.AreEqual("Index", result.ViewName);
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("fundingStopped", result.ViewName);
+            Assert.AreEqual("ProviderFundingPaused", result.ViewName);
         }
     }
 }
