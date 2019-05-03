@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task And_Model_Invalid_Then_Shows_View_Again(
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
-            [Frozen] Mock<IMediator> mockMediator, 
+            [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
         {
             controller.ModelState.AddModelError("test", "test");
@@ -33,10 +35,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             result.Should().NotBeNull();
             result.ViewName.Should().Be("SelectLegalEntity");
-            
+
             mockMediator.Verify(mediator => mediator.Send(
-                    It.IsAny<CacheReservationEmployerCommand>(), 
-                    It.IsAny<CancellationToken>()), 
+                    It.IsAny<CacheReservationEmployerCommand>(),
+                    It.IsAny<CancellationToken>()),
                 Times.Never);
         }
 
@@ -54,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId), 
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
             mockHashingService
@@ -64,13 +66,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             await controller.PostSelectLegalEntity(routeModel, viewModel);
 
             mockMediator.Verify(mediator => mediator.Send(
-                    It.Is<CacheReservationEmployerCommand>(command => 
+                    It.Is<CacheReservationEmployerCommand>(command =>
                         command.Id != Guid.Empty &&
                         command.AccountId == decodedAccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
                         command.AccountLegalEntityName == firstLegalEntity.Name &&
-                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId), 
-                    It.IsAny<CancellationToken>()), 
+                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -117,7 +119,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.IsAny<GetLegalEntitiesQuery>(), 
+                    It.IsAny<GetLegalEntitiesQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
 
@@ -125,6 +127,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             result.Should().NotBeNull();
             result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
+
+
+
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_ValidationException_Then_Redirects_To_SelectLegalEntity(
+            ReservationsRouteModel routeModel,
+            ConfirmLegalEntityViewModel viewModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IMediator> mockMediator)
+        {
+            var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
+            viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetLegalEntitiesQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(
+                    new ValidationResult("Failed",
+                        new List<string> {"AccountId| Account reservation limit has been reached."}), null, null));
+
+            var controller = new EmployerReservationsController(mockMediator.Object, mockHashingService.Object);
+            
+            var actual = await controller.PostSelectLegalEntity(routeModel, viewModel);
+
+            actual.Should().NotBeNull();
+            var actualViewResult = actual as ViewResult;
+            actualViewResult.Should().NotBeNull();
+            actualViewResult?.ViewData.ModelState.IsValid.Should().BeFalse();
+            actualViewResult?.ViewData.ModelState.Should().Contain(pair => pair.Key == "AccountId");
+            actualViewResult?.ViewName.Should().Be("SelectLegalEntity");
         }
     }
 }

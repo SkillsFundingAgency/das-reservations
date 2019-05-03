@@ -74,18 +74,31 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
             var reservationId = routeModel.Id ?? Guid.NewGuid();
 
-            await _mediator.Send(new CacheReservationEmployerCommand
+            try
             {
-                Id = reservationId,
-                AccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId),
-                AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
-                AccountLegalEntityName = selectedAccountLegalEntity.Name,
-                AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
-            });
+                await _mediator.Send(new CacheReservationEmployerCommand
+                {
+                    Id = reservationId,
+                    AccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId),
+                    AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
+                    AccountLegalEntityName = selectedAccountLegalEntity.Name,
+                    AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
+                });
 
-            routeModel.Id = reservationId;
+                routeModel.Id = reservationId;
+
+                return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
+            }
+            catch (ValidationException e)
+            {
+                foreach (var member in e.ValidationResult.MemberNames)
+                {
+                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                return await SelectLegalEntity(routeModel);
+            }
             
-            return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
         }
 
         [HttpGet]

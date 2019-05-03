@@ -9,7 +9,8 @@ namespace SFA.DAS.Reservations.Domain.Rules
     {
         All = 0,
         NonLevy = 1,
-        Levy = 2
+        Levy = 2,
+        Account = 3
     }
 
     public class ReservationRule
