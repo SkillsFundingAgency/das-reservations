@@ -1,0 +1,78 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model ManageViewModel
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+
+
+@if (!Model.Reservations.Any())
+{
+    <div class="govuk-width-container">
+        <a href="#" class="govuk-back-link">Back</a>
+        <h1 class="govuk-heading-xl">Your funding reservations</h1>
+        <main class="govuk-main-wrapper">
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <h2 class="govuk-heading-m">There are no funding reservations to use</h2>
+                    <p class="govuk-body">You need to reserve funding in order to add a new apprentice.</p>
+                    <a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+}
+else
+{
+    <div class="govuk-width-container">
+        <a href="#" class="govuk-back-link">Back</a>
+
+        <main class="govuk-main-wrapper">
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <h1 class="govuk-heading-xl">Your funding reservations</h1>
+                    <p class="govuk-heading-m"><a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-link">Secure more funding</a></p>
+                </div>
+            </div>
+
+            <table class="govuk-table das-table--responsive">
+                <p class="govuk-body">@Model.Reservations.Count reservation@(Model.Reservations.Count != 1 ? "s" : null)</p>
+                <thead class="govuk-table__head">
+                    <tr>
+                        <th scope="col" class="govuk-table__header"><span class="no-wrap">Organisation</span></th>
+                        <th scope="col" class="govuk-table__header">Apprenticeship training</th>
+                        <th scope="col" class="govuk-table__header">Apprenticeship start date</th>
+                        <th scope="col" class="govuk-table__header"></th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var reservation in Model.Reservations)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" data-label="Organisation">@reservation.LegalEntityName</td>
+                            <td class="govuk-table__cell" data-label="Apprenticeship training">@reservation.CourseName</td>
+                            <td class="govuk-table__cell" data-label="Apprenticeship start date"> @reservation.StartDateDescription</td>
+                            <td class="govuk-table__cell">
+                                @if (reservation.Status == ReservationStatusViewModel.Pending)
+                                {
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                }
+                                else
+                                {
+                                    <strong class="govuk-tag govuk-tag--inactive">used</strong>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+}
+
+

@@ -2,9 +2,9 @@
 
 namespace SFA.DAS.Reservations.Domain.Interfaces
 {
-    public interface IGetApiRequest : IBaseApiRequest
+    public interface IGetAllApiRequest : IBaseApiRequest
     {
         [JsonIgnore]
-        string GetUrl { get; }
+        string GetAllUrl { get; }
     }
 }

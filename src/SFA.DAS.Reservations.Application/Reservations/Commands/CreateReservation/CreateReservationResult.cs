@@ -1,9 +1,10 @@
-﻿using SFA.DAS.Reservations.Domain.Reservations;
+﻿using System;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation
 {
     public class CreateReservationResult
     {
-        public Reservation Reservation { get; set; }
+        public Guid Id { get; set; }
+        public string AccountLegalEntityPublicHashedId { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,13 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -31,17 +34,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
         private readonly ILogger<ReservationsController> _logger;
+        private readonly IHashingService _hashingService;
         private readonly ReservationsWebConfiguration _configuration;
 
         public ReservationsController(
             IMediator mediator, 
             IStartDateService startDateService, 
             IOptions<ReservationsWebConfiguration> configuration,
-            ILogger<ReservationsController> logger)
+            ILogger<ReservationsController> logger,
+            IHashingService hashingService)
         {
             _mediator = mediator;
             _startDateService = startDateService;
             _logger = logger;
+            _hashingService = hashingService;
             _configuration = configuration.Value;
         }
 
@@ -191,7 +197,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 };
 
                 var result = await _mediator.Send(command);
-                routeModel.AccountLegalEntityPublicHashedId = result.Reservation.AccountLegalEntityPublicHashedId;
+                routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
             }
             catch (ValidationException e)
             {
@@ -278,6 +284,40 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             return Redirect(model.DashboardUrl);
+        }
+
+        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
+        [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
+        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
+        {
+            var employerAccountIds = new List<long>();
+            var reservations = new List<ReservationViewModel>();
+            string viewName;
+
+            if (routeModel.UkPrn.HasValue)
+            {
+                var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId));
+                viewName = ViewNames.ProviderManage;
+            }
+            else
+            {
+                var decodedAccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
+                employerAccountIds.Add(decodedAccountId);
+                viewName = ViewNames.EmployerManage;
+            }
+
+            foreach (var employerAccountId in employerAccountIds)
+            {
+                var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
+                reservations.AddRange(reservationsResult.Reservations
+                    .Select(reservation => new ReservationViewModel(
+                        reservation, 
+                        _configuration.ApprenticeUrl, 
+                        _hashingService.HashValue(reservation.AccountLegalEntityId))));
+            }
+            
+            return View(viewName, new ManageViewModel{Reservations = reservations});
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,

@@ -11,6 +11,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
         public Course Course { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
-        public uint UkPrn { get; set; }
+        public uint? UkPrn { get; set; }
     }
 }
