@@ -182,7 +182,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             rulesService.Setup(x => x.GetAccountFundingRules(It.IsAny<long>())).ReturnsAsync(
                 new GetAccountFundingRulesApiResponse
                 {
-                    GlobalRules = new List<GlobalRule>()
+                    GlobalRules = new List<GlobalRule> { null }
                 });
         }
     }

@@ -32,7 +32,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             else
             {
                 var globalRules = await _rulesService.GetAccountFundingRules(command.AccountId);
-                if (globalRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
+                if (globalRules.GlobalRules.Any(c=> c != null && c.RuleType == GlobalRuleType.ReservationLimit) && 
+                    globalRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
                 {
                     result.AddError(nameof(command.AccountId), "Reservation limit has been reached for this account");
                 }
