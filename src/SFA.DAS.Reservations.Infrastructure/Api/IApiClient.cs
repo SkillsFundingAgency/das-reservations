@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
     {
         Task<TResponse> Get<TResponse>(IGetApiRequest request);
         Task<TResponse> Create<TResponse>(IPostApiRequest request);
+        Task<string> Ping();
     }
 }
