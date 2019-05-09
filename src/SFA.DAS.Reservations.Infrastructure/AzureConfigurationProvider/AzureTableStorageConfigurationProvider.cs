@@ -15,6 +15,8 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
         private readonly string _version;
         private readonly CloudStorageAccount _storageAccount;
 
+        private const string EncodingConfigKey = "SFA.DAS.Encoding";
+
         public AzureTableStorageConfigurationProvider(string connection,string[] configName, string environment, string version)
         {
             _configName = configName;
@@ -36,7 +38,7 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
 
                 var configItem = (ConfigurationItem)result.Result;
 
-                if (config == "SFA.DAS.Encoding")
+                if (config == EncodingConfigKey)
                 {
                     Data.Add(nameof(EncodingConfig), configItem.Data);
                     continue;
