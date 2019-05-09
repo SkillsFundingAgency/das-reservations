@@ -8,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -23,13 +22,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
         private GetReservationQueryHandler _handler;
         private Mock<IValidator<IReservationQuery>> _validator;
         private Mock<IApiClient> _apiClient;
-        private Mock<IHashingService> _hashingService;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private Mock<IReservationAuthorisationService> _reservationAuthorisationService;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
-        private const long ExpectedAccountId = 44321;
         private const uint ExpectedProviderId = 554421;
-        private const string ExpectedHashedId = "TGF45";
         private const string ExpectedBaseUrl = "https://test.local/reservation/";
         private const long ExpectedLegalEntityId = 88;
         private const string ExpectedLegalEntityName = "Test Legal Entity";
@@ -64,9 +60,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
                             c.GetUrl.Equals(
                                 $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))
                 .ReturnsAsync(_response);
-
-            _hashingService = new Mock<IHashingService>();
-            _hashingService.Setup(x => x.DecodeValue(ExpectedHashedId)).Returns(ExpectedAccountId);
 
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
             _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);

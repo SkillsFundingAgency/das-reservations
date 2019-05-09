@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using HashidsNet;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -133,11 +132,6 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IEncodingService, EncodingService>();
-            services.AddSingleton<IHashingService, HashingService>();
-            services.AddSingleton<IHashids>(new Hashids(
-                reservationsWebConfig.EmployerAccountHashSalt, 
-                reservationsWebConfig.EmployerAccountHashLength, 
-                reservationsWebConfig.EmployerAccountHashAlphabet));
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
