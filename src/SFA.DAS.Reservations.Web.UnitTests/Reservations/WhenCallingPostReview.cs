@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -104,7 +105,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult{Courses = new List<Course>()});
 
-            var controller = new ReservationsController(mockMediator.Object, Mock.Of<IStartDateService>(), Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<ILogger<ReservationsController>>(), Mock.Of<IHashingService>());
+            var controller = new ReservationsController(
+                mockMediator.Object, 
+                Mock.Of<IStartDateService>(), 
+                Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
+                Mock.Of<ILogger<ReservationsController>>(),
+                Mock.Of<IEncodingService>());
 
             var actual = await controller.PostReview(routeModel);
 

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -50,7 +51,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Mock.Of<IStartDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(),
                 Mock.Of<ILogger<ReservationsController>>(),
-                Mock.Of<IHashingService>());
+                Mock.Of<IEncodingService>());
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
