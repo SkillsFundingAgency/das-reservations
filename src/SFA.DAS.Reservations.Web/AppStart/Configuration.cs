@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SFA.DAS.EAS.Account.Api.Client;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
-using SFA.DAS.Reservations.Web.Services;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
 
 namespace SFA.DAS.Reservations.Web.AppStart
@@ -40,6 +41,10 @@ namespace SFA.DAS.Reservations.Web.AppStart
             IServiceCollection services,
             IConfiguration configuration)
         {
+            var encodingConfigJson = configuration.GetSection(nameof(EncodingConfig)).Value;
+            var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
+            services.AddSingleton(encodingConfig);
+
             services.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
             services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));

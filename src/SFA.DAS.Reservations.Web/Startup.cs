@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
@@ -106,6 +107,7 @@ namespace SFA.DAS.Reservations.Web
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
+
             services.AddMvc(
                     options =>
                     {
@@ -130,6 +132,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
+            services.AddSingleton<IEncodingService, EncodingService>();
             services.AddSingleton<IHashingService, HashingService>();
             services.AddSingleton<IHashids>(new Hashids(
                 reservationsWebConfig.EmployerAccountHashSalt, 
