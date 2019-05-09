@@ -68,6 +68,22 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             }
         }
 
+        public async Task<string> Ping()
+        {
+            var pingUrl = _apiOptions.Value.Url;
+
+            pingUrl += pingUrl.EndsWith("/") ? "ping" : "/ping";
+
+            using (var client = new HttpClient())//not unit testable using directly
+            {
+                var response = await client.GetAsync(pingUrl).ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+                var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return result;
+            }
+        }
+
         private async Task<string> GetAccessTokenAsync()
         {
             var clientCredential = new ClientCredential(_apiOptions.Value.Id, _apiOptions.Value.Secret);
