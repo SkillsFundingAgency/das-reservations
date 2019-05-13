@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -20,6 +22,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenCallingPostSelectLegalEntity
     {
         [Test, MoqAutoData]
@@ -49,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
@@ -59,8 +62,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
-            mockHashingService
-                .Setup(service => service.DecodeValue(routeModel.EmployerAccountId))
+            mockEncodingService
+                .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(decodedAccountId);
 
             await controller.PostSelectLegalEntity(routeModel, viewModel);
@@ -82,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
@@ -92,8 +95,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
-            mockHashingService
-                .Setup(service => service.DecodeValue(routeModel.EmployerAccountId))
+            mockEncodingService
+                .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(decodedAccountId);
 
             await controller.PostSelectLegalEntity(routeModel, viewModel);
@@ -112,7 +115,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IHashingService> mockHashingService,
             EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
@@ -137,8 +139,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
-            [Frozen] Mock<IHashingService> mockHashingService,
-            [Frozen] Mock<IMediator> mockMediator)
+            Mock<IEncodingService> mockEncodingService,
+            Mock<IMediator> mockMediator)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
@@ -152,7 +154,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     new ValidationResult("Failed",
                         new List<string> {"AccountId| Account reservation limit has been reached."}), null, null));
 
-            var controller = new EmployerReservationsController(mockMediator.Object, mockHashingService.Object);
+            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object);
             
             var actual = await controller.PostSelectLegalEntity(routeModel, viewModel);
 

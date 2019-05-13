@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,12 +7,11 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -20,6 +20,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenCallingGetManage
     {
         [Test, MoqAutoData]
@@ -64,7 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetReservationsResult getReservationsResult3,
             string hashedId,
             [Frozen] ReservationsWebConfiguration config,
-            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -76,8 +77,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(getReservationsResult1)
                 .ReturnsAsync(getReservationsResult2)
                 .ReturnsAsync(getReservationsResult3);
-            mockHashingService
-                .Setup(service => service.HashValue(It.IsAny<long>()))
+            mockEncodingService
+                .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
             var expectedReservations = new List<ReservationViewModel>();
@@ -100,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationsResult getReservationsResult,
             long decodedAccountId,
-            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -108,8 +109,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
-            mockHashingService
-                .Setup(service => service.DecodeValue(routeModel.EmployerAccountId))
+            mockEncodingService
+                .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(decodedAccountId);
 
             await controller.Manage(routeModel);
@@ -132,7 +133,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetReservationsResult getReservationsResult,
             string hashedId,
             [Frozen] ReservationsWebConfiguration config,
-            [Frozen] Mock<IHashingService> mockHashingService,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -140,8 +141,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
-            mockHashingService
-                .Setup(service => service.HashValue(It.IsAny<long>()))
+            mockEncodingService
+                .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
             var expectedReservations = new List<ReservationViewModel>();

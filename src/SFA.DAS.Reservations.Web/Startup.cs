@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using HashidsNet;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
@@ -115,6 +115,7 @@ namespace SFA.DAS.Reservations.Web
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
+
             services.AddMvc(
                     options =>
                     {
@@ -139,11 +140,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
-            services.AddSingleton<IHashingService, HashingService>();
-            services.AddSingleton<IHashids>(new Hashids(
-                reservationsWebConfig.EmployerAccountHashSalt, 
-                reservationsWebConfig.EmployerAccountHashLength, 
-                reservationsWebConfig.EmployerAccountHashAlphabet));
+            services.AddSingleton<IEncodingService, EncodingService>();
             services.AddTransient<IStartDateService, StartDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();

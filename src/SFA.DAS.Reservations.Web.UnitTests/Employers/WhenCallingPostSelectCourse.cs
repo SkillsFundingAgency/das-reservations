@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +9,11 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
@@ -27,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Course _course;
         private GetCachedReservationResult _cachedReservationResult;
         private Mock<IMediator> _mediator;
-        private Mock<IHashingService> _hashingService;
+        private Mock<IEncodingService> _encodingService;
         private EmployerReservationsController _controller;
 
         [SetUp]
@@ -37,10 +35,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             _course = new Course("1-4-5", "test", 1);
             _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
-            _hashingService = new Mock<IHashingService>();
+            _encodingService = new Mock<IEncodingService>();
 
             _mediator = new Mock<IMediator>();
-            _controller = new EmployerReservationsController(_mediator.Object,_hashingService.Object);
+            _controller = new EmployerReservationsController(_mediator.Object,_encodingService.Object);
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),

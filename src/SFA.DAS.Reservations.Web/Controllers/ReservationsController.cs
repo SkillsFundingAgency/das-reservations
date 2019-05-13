@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IStartDateService _startDateService;
         private readonly ILogger<ReservationsController> _logger;
-        private readonly IHashingService _hashingService;
+        private readonly IEncodingService _encodingService;
         private readonly ReservationsWebConfiguration _configuration;
 
         public ReservationsController(
@@ -42,12 +43,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IStartDateService startDateService, 
             IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ReservationsController> logger,
-            IHashingService hashingService)
+            IEncodingService encodingService)
         {
             _mediator = mediator;
             _startDateService = startDateService;
             _logger = logger;
-            _hashingService = hashingService;
+            _encodingService = encodingService;
             _configuration = configuration.Value;
         }
 
@@ -302,7 +303,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             else
             {
-                var decodedAccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId);
+                var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
                 employerAccountIds.Add(decodedAccountId);
                 viewName = ViewNames.EmployerManage;
             }
@@ -314,7 +315,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     .Select(reservation => new ReservationViewModel(
                         reservation, 
                         _configuration.ApprenticeUrl, 
-                        _hashingService.HashValue(reservation.AccountLegalEntityId))));
+                        _encodingService.Encode(reservation.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId))));
+                
             }
             
             return View(viewName, new ManageViewModel{Reservations = reservations});

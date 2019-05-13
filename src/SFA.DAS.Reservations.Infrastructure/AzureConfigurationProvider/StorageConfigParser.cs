@@ -17,8 +17,10 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
             {
                 foreach (var jToken in child.Children().Children())
                 {
-                    var child1 = (JProperty)jToken;
-                    configDictionary.Add($"{child.Path}:{child1.Name}", child1.Value.ToString());
+                    if (jToken.GetType() != typeof(JProperty)) continue;
+                    
+                    var property = (JProperty)jToken;
+                    configDictionary.Add($"{child.Path}:{property.Name}", property.Value.ToString());
                 }
 
                 if (string.IsNullOrEmpty(defaultSectionName))

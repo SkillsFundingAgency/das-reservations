@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -58,7 +57,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 var jsonRequest = JsonConvert.SerializeObject(request);
-                var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                var stringContent = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
                 
                 var response = await client.PostAsync(request.CreateUrl, stringContent).ConfigureAwait(false);
 

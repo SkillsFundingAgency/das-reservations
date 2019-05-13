@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
-using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -24,12 +23,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class EmployerReservationsController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly IHashingService _hashingService;
+        private readonly IEncodingService _encodingService;
 
-        public EmployerReservationsController(IMediator mediator, IHashingService hashingService)
+        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService)
         {
             _mediator = mediator;
-            _hashingService = hashingService;
+            _encodingService = encodingService;
         }
 
         // GET
@@ -79,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 await _mediator.Send(new CacheReservationEmployerCommand
                 {
                     Id = reservationId,
-                    AccountId = _hashingService.DecodeValue(routeModel.EmployerAccountId),
+                    AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId),
                     AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
                     AccountLegalEntityName = selectedAccountLegalEntity.Name,
                     AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
