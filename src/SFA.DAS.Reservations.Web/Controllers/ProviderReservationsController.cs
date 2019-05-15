@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -127,6 +128,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 foreach (var member in e.ValidationResult.MemberNames)
                 {
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                }
+
+                foreach (var entry in ModelState)
+                {
+                    if (entry.Value?.Errors?.Count > 0 && entry.Value.Errors[0].ErrorMessage == "Reservation limit has been reached for this account")
+                    {
+                        return View("FundingLimitReached");
+                    }
                 }
 
                 return View("ConfirmEmployer", viewModel);
