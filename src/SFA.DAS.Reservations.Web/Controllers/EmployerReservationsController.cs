@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Id = reservationId,
                     AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId),
                     AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
-                    AccountLegalEntityName = selectedAccountLegalEntity.Name,
+                    AccountLegalEntityName = selectedAccountLegalEntity.AccountLegalEntityName,
                     AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
                 });
 

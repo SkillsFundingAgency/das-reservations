@@ -14,7 +14,6 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -73,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                         command.Id != Guid.Empty &&
                         command.AccountId == decodedAccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
-                        command.AccountLegalEntityName == firstLegalEntity.Name &&
+                        command.AccountLegalEntityName == firstLegalEntity.AccountLegalEntityName &&
                         command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
