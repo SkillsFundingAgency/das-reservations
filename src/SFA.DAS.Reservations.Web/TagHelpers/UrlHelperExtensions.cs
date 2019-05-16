@@ -20,12 +20,15 @@ namespace SFA.DAS.Reservations.Web.TagHelpers
         public string ExternalSubDomain { get; set; }
         [HtmlAttributeName("asp-external-folder")]
         public string ExternalFolder { get; set; }
+        [HtmlAttributeName("asp-external-querystring")]
+        public string QueryString { get; set; }
+
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             base.Process(context,output);
 
-            output.Attributes.SetAttribute("href",_helper.GenerateUrl(ExternalId, ExternalController, ExternalAction, ExternalSubDomain, ExternalFolder));
+            output.Attributes.SetAttribute("href",_helper.GenerateUrl(ExternalId, ExternalController, ExternalAction, ExternalSubDomain, ExternalFolder, QueryString));
         }
 
         public ExtendedAnchorTagHelper(IHtmlGenerator generator,IExternalUrlHelper helper) : base(generator)

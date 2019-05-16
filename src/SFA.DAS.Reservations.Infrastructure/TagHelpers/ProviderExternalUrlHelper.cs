@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
-        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "", string folder="")
+        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "", string folder="", string queryString="")
         {
             var urlString = new StringBuilder();
 
@@ -41,6 +41,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             if (!string.IsNullOrEmpty(action))
             {
                 urlString.Append($"{action}/");
+            }
+
+            if (!string.IsNullOrEmpty(queryString))
+            {
+                return $"{urlString.ToString().TrimEnd('/')}{queryString}";
             }
 
             return urlString.ToString().TrimEnd('/');
