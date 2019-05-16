@@ -119,5 +119,20 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             Assert.IsNotNull(actual);
             Assert.AreEqual($"https://{subDomain}.test.local.dashboard/{folder}/{controller}", actual);
         }
+
+        [Test]
+        public void Then_The_Query_String_Is_Appened()
+        {
+            //Arrange
+            var controller = "test-controller";
+            var subDomain = "testDomain";
+            var queryString = "?test=12345";
+
+            //Act
+            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain, queryString:queryString);
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual($"https://{subDomain}.test.local/{controller}?test=12345", actual);
+        }
     }
 }
