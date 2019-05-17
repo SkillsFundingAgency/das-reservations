@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -6,8 +7,12 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -60,6 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         public async Task Then_If_Confirmed_And_Funding_Limit_Not_Reached_User_Is_Redirected_To_Next_Stage(
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IFundingRulesService> mockFundingRulesService,
             ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
@@ -67,6 +73,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
+
+            mockFundingRulesService.Setup(m => m.GetAccountFundingRules(It.IsAny<long>()))
+                .ReturnsAsync(new GetAccountFundingRulesApiResponse()
+                {
+                    GlobalRules = new List<GlobalRule>()
+                });
    
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
@@ -79,7 +91,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         }
 
         [Test, MoqAutoData]
-        public async Task Then_If_Confirmed_And_Funding_Limit_Is_Reached_User_Is_Redirected_To_FundingLimitReached_Page(
+        public async Task Then_If_Confirmed_And_Funding_Limit_Is_Reached_User_Is_Redirected_To_ReservationLimitReached_Page(
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
             ProviderReservationsController controller,
@@ -91,16 +103,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             validationResult.AddError(nameof(viewModel.AccountId), "Reservation limit has been reached for this account");
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ValidationException(
-                    new System.ComponentModel.DataAnnotations.ValidationResult("The following parameters have failed validation", validationResult.ErrorList),
-                    null, null));
+                .ThrowsAsync(new ReservationLimitReachedException(It.IsAny<long>()));
+
 
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
             var viewResult = result as ViewResult;
 
             Assert.IsNotNull(viewResult);
-            Assert.AreEqual("FundingLimitReached", viewResult.ViewName);
+            
+            Assert.AreEqual("ReservationLimitReached", viewResult.ViewName);
             
         }
 

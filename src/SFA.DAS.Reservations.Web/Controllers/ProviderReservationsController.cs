@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -115,7 +115,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountName = viewModel.AccountName
                 });
 
-                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
+                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new
                 {
                     Id = reservationId,
                     EmployerAccountId = viewModel.AccountPublicHashedId,
@@ -130,15 +130,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                foreach (var entry in ModelState)
-                {
-                    if (entry.Value?.Errors?.Count > 0 && entry.Value.Errors[0].ErrorMessage == "Reservation limit has been reached for this account")
-                    {
-                        return View("FundingLimitReached");
-                    }
-                }
-
                 return View("ConfirmEmployer", viewModel);
+            }
+            catch (ReservationLimitReachedException r)
+            {
+                return View("ReservationLimitReached");
             }
         }
     }
