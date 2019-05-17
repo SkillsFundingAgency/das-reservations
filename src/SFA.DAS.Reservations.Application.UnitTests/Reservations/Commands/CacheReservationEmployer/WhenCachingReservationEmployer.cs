@@ -90,17 +90,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             CacheReservationEmployerCommand command)
         {
             //Arrange
-            _mockFundingRulesService.Setup(m => m.GetAccountFundingRules(It.IsAny<long>()))
-                .ReturnsAsync(new GetAccountFundingRulesApiResponse()
-                {
-                    GlobalRules = new List<GlobalRule>()
-                    {
-                        new GlobalRule()
-                        {
-                            RuleType = GlobalRuleType.ReservationLimit
-                        }
-                    }
-                });
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(new ValidationResult{FailedRuleValidation = true,ValidationDictionary = new Dictionary<string, string>()});
 
             //Act + Assert
             Assert.ThrowsAsync<ReservationLimitReachedException>( () => _commandHandler.Handle(command, CancellationToken.None));

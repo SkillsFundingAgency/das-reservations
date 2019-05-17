@@ -35,9 +35,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
             }
 
-            var fundingRules = await _rulesService.GetAccountFundingRules(command.AccountId);
-            if (fundingRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
-                fundingRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
+            if (validationResult.FailedRuleValidation)
             {
                 throw new ReservationLimitReachedException(command.AccountId);
             }
