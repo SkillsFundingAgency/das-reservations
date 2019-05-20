@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
             
             mockApiClient
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
 
             await handler.Handle(query, CancellationToken.None);
 
-            mockApiClient.Verify(client => client.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(r => r.AccountId.ToString().Equals(query.AccountId))), Times.Once);
+            mockApiClient.Verify(client => client.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(r => r.AccountId.Equals(query.AccountId))), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             mockOptions.Setup(c => c.Value).Returns(configuration);
 
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
 
             mockApiClient
@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync(cachedLegalEntities);
 
             await handler.Handle(query, CancellationToken.None);
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
 
             mockApiClient
@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             
             await handler.Handle(query, CancellationToken.None);
 
-            mockCacheService.Verify(service => service.SaveToCache(query.AccountId, It.IsAny<IEnumerable<AccountLegalEntity>>(), 1), Times.Once);
+            mockCacheService.Verify(service => service.SaveToCache(query.AccountId.ToString(), It.IsAny<IEnumerable<AccountLegalEntity>>(), 1), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -113,7 +113,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
 
             mockApiClient
@@ -134,7 +134,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
 
             mockApiClient
@@ -155,7 +155,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
+                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId.ToString()))
                 .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
 
             mockApiClient

@@ -4,11 +4,11 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
     public class GetAccountLegalEntitiesRequest : IGetAllApiRequest
     {
-        public string AccountId { get; }
+        public long AccountId { get; }
         public string BaseUrl { get; }
         public string GetAllUrl => $"{BaseUrl}api/accountlegalentities/{AccountId}";
 
-        public GetAccountLegalEntitiesRequest(string baseUrl, string accountId)
+        public GetAccountLegalEntitiesRequest(string baseUrl, long accountId)
         {
             AccountId = accountId;
             BaseUrl = baseUrl;

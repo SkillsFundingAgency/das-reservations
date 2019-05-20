@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 
         public async Task<GetLegalEntitiesResponse> Handle(GetLegalEntitiesQuery request, CancellationToken cancellationToken)
         {
-            var legalEntities = await _cacheStorageService.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(request.AccountId);
+            var legalEntities = await _cacheStorageService.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(request.AccountId.ToString());
 
             if (legalEntities != null)
             {
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 
             if (accountLegalEntities.Any())
             {
-                await _cacheStorageService.SaveToCache(request.AccountId, accountLegalEntities, 1);
+                await _cacheStorageService.SaveToCache(request.AccountId.ToString(), accountLegalEntities, 1);
             }
 
             return new GetLegalEntitiesResponse

@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
             }
 
-            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
+            var response = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId), });
             var viewModel = new SelectLegalEntityViewModel(routeModel, response.AccountLegalEntities, cachedResponse?.AccountLegalEntityId);
             return View("SelectLegalEntity", viewModel);
         }
@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return await SelectLegalEntity(routeModel);
             }
 
-            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = routeModel.EmployerAccountId});
+            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
             var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
                 model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
             var reservationId = routeModel.Id ?? Guid.NewGuid();

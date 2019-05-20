@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
             mockEncodingService
@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
             mockEncodingService

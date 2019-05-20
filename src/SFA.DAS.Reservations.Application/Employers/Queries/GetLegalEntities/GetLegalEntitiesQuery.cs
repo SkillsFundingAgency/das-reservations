@@ -4,6 +4,6 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 {
     public class GetLegalEntitiesQuery : IRequest<GetLegalEntitiesResponse>
     {
-        public string AccountId { get; set; }
+        public long AccountId { get; set; }
     }
 }
