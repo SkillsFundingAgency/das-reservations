@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Services
@@ -29,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                     AvailableDates = expectedAvailableDates
                 });
 
-            await startDateService.GetStartDates();
+            await startDateService.GetStartDates(1);
 
             mockMediator.Verify(x=>x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -47,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                 });
             
 
-            var dates = await startDateService.GetStartDates();
+            var dates = await startDateService.GetStartDates(1);
 
             Assert.IsNotNull(dates);
             Assert.AreEqual(expectedAvailableDates.Count,dates.Count());

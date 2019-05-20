@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found
             }
             
-            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null, cachedReservation?.CourseId, cachedReservation?.StartDate, routeModel.FromReview);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel, cachedReservation?.CourseId, cachedReservation?.StartDate, routeModel.FromReview);
 
             return View(viewModel);
         }
@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel, formModel.SelectedCourseId);
                 return View("ApprenticeshipTraining", model);
             }
             
@@ -135,7 +135,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
                 
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel, formModel.SelectedCourseId);
                 return View("ApprenticeshipTraining", model);
             }
 
@@ -206,13 +206,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
             {
                 _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
+                var model = await BuildApprenticeshipTrainingViewModel(routeModel);
                 return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
@@ -330,10 +330,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel{Reservations = reservations});
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(ReservationsRouteModel routeModel,
             string courseId = null, string startDate = null, bool? routeModelFromReview = false)
         {
-            var dates = await _startDateService.GetStartDates();
+            var isProvider = routeModel.UkPrn != null;
+
+            var accountLegalEntityId = _encodingService.Decode(
+                routeModel.AccountLegalEntityPublicHashedId,
+                EncodingType.PublicAccountLegalEntityId);
+            var dates = await _startDateService.GetStartDates(accountLegalEntityId);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 

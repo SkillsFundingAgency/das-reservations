@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -24,17 +25,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
             ReservationsRouteModel routeModel,
-            IEnumerable<StartDateModel> expectedStartDates,
+            long accountLegalEntityId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
         {
-            mockStartDateService
-                .Setup(service => service.GetStartDates())
-                .ReturnsAsync(expectedStartDates);
-   
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockStartDateService.Verify(provider => provider.GetStartDates(), Times.Once);
+            mockStartDateService.Verify(provider => provider.GetStartDates(accountLegalEntityId), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -43,6 +47,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             IEnumerable<StartDateModel> expectedStartDates,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
+            long accountLegalEntityId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -53,8 +59,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getCoursesResult);
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
             mockStartDateService
-                .Setup(service => service.GetStartDates())
+                .Setup(service => service.GetStartDates(accountLegalEntityId))
                 .ReturnsAsync(expectedStartDates);
             var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel(startDateModel)).OrderBy(model => model.Value);
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
@@ -78,10 +89,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Sets_The_Back_Link_Correctly_Coming_From_The_Review_Screen(
             ReservationsRouteModel routeModel,
-            IEnumerable<StartDateModel> expectedStartDates,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
-            [Frozen] Mock<IStartDateService> mockStartDateService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -129,7 +138,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Employer_Then_IsProvider_Is_False(
             ReservationsRouteModel routeModel,
-            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
