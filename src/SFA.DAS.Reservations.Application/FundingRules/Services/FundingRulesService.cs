@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
             return response;
         }
 
-        public async Task<GetAvailableDatesApiResponse> GetAvailableDates()
+        public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long queryAccountLegalEntityId)
         {
             var request = new GetAvailableDatesApiRequest(_options.Value.Url);
 

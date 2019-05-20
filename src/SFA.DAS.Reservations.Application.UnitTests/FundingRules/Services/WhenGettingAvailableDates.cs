@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         public async Task Then_The_Available_Dates_Are_Returned()
         {
             //Act
-            var result = await _service.GetAvailableDates();
+            var result = await _service.GetAvailableDates(0);
 
             //Assert
             Assert.IsNotNull(result);
@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
                 .ThrowsAsync(exception);
 
             //Act + Assert
-            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates());
+            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates(0));
             Assert.AreEqual(exception, actualException);
         }
     }
