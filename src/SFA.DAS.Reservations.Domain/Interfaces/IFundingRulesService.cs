@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
     public interface IFundingRulesService
     {
         Task<GetFundingRulesApiResponse> GetFundingRules();
-        Task<GetAvailableDatesApiResponse> GetAvailableDates(long queryAccountLegalEntityId);
+        Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId);
         Task<GetAccountFundingRulesApiResponse> GetAccountFundingRules(long accountId);
     }
 }

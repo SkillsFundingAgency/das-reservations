@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -21,43 +22,31 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
         private List<StartDateModel> _expectedAvailableDates;
+        private long _accountLegalEntityId;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedAvailableDates = new List<StartDateModel>
-            {
-                new StartDateModel
-                {
-                    StartDate = new DateTime(2019,02,01),
-                    EndDate = new DateTime(2019,04,01)
-                },
-                new StartDateModel
-                {
-                    StartDate = new DateTime(2019,03,01),
-                    EndDate = new DateTime(2019,05,01)
-                },
-                new StartDateModel
-                {
-                    StartDate = new DateTime(2019,04,01),
-                    EndDate = new DateTime(2019,06,01)
-                }
-            };
+            var fixture = new Fixture();
 
-
+            _accountLegalEntityId = fixture.Create<long>();
+            _expectedAvailableDates = fixture.Create<List<StartDateModel>>();
+            
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>
                     x.Get<GetAvailableDatesApiResponse>(
                         It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/rules/available-dates"))))
+                                $"{ExpectedBaseUrl}api/rules/available-dates/{_accountLegalEntityId}"))))
                 .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
                     AvailableDates = _expectedAvailableDates
                 });
 
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
+            _options
+                .Setup(x => x.Value.Url)
+                .Returns(ExpectedBaseUrl);
 
             _service = new FundingRulesService(_apiClient.Object, _options.Object);
         }
@@ -66,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         public async Task Then_The_Available_Dates_Are_Returned()
         {
             //Act
-            var result = await _service.GetAvailableDates(0);
+            var result = await _service.GetAvailableDates(_accountLegalEntityId);
 
             //Assert
             Assert.IsNotNull(result);
@@ -84,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
                 .ThrowsAsync(exception);
 
             //Act + Assert
-            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates(0));
+            var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates(_accountLegalEntityId));
             Assert.AreEqual(exception, actualException);
         }
     }
