@@ -17,7 +17,8 @@ namespace SFA.DAS.Reservations.Web.Services
 
         public async Task<IEnumerable<StartDateModel>> GetStartDates(long accountLegalEntityId)
         {
-            var datesToUse = await _mediator.Send(new GetAvailableDatesQuery());
+            var datesToUse = await _mediator.Send(new GetAvailableDatesQuery
+                {AccountLegalEntityId = accountLegalEntityId});
             
             return await Task.FromResult(datesToUse.AvailableDates);
         }
