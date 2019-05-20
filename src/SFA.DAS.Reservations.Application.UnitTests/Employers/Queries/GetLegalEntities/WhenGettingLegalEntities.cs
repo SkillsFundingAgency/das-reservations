@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -47,6 +48,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             [Frozen] Mock<IApiClient> mockApiClient,
             [Frozen] Mock<ICacheStorageService> mockCacheService,
             [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
+            [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] ReservationsApiConfiguration configuration,
             GetLegalEntitiesQueryHandler handler)
         {
@@ -84,11 +86,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
 
 
         [Test, MoqAutoData]
-        public async Task Then_Caches_Legal_Entities(
+        public async Task Then_Caches_Legal_Entities_And_Hashes_The_Id(
             GetLegalEntitiesQuery query,
             IEnumerable<AccountLegalEntity> legalEntities,
             [Frozen] Mock<IApiClient> mockApiClient,
             [Frozen] Mock<ICacheStorageService> mockCacheService,
+            [Frozen] Mock<IEncodingService> encodingService,
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService
@@ -102,6 +105,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             await handler.Handle(query, CancellationToken.None);
 
             mockCacheService.Verify(service => service.SaveToCache(query.AccountId.ToString(), It.IsAny<IEnumerable<AccountLegalEntity>>(), 1), Times.Once);
+            encodingService.Verify(service => service.Encode(legalEntities.FirstOrDefault().AccountLegalEntityId,EncodingType.PublicAccountLegalEntityId), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -110,6 +114,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
             IEnumerable<AccountLegalEntity> legalEntities,
             [Frozen] Mock<IApiClient> mockApiClient,
             [Frozen] Mock<ICacheStorageService> mockCacheService,
+            [Frozen] Mock<IEncodingService> encodingService,
             GetLegalEntitiesQueryHandler handler)
         {
             mockCacheService

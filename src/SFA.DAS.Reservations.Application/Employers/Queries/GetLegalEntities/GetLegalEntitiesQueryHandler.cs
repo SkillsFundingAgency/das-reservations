@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -14,17 +15,20 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
 {
     public class GetLegalEntitiesQueryHandler : IRequestHandler<GetLegalEntitiesQuery, GetLegalEntitiesResponse>
     {
-        private readonly IApiClient _accountApiClient;
+        private readonly IApiClient _apiClient;
         private readonly ICacheStorageService _cacheStorageService;
+        private readonly IEncodingService _encodingService;
         private readonly ReservationsApiConfiguration _configuration;
 
         public GetLegalEntitiesQueryHandler(
             IApiClient apiClient, 
             ICacheStorageService cacheStorageService,
-            IOptions<ReservationsApiConfiguration> options)
+            IOptions<ReservationsApiConfiguration> options,
+            IEncodingService encodingService)
         {
-            _accountApiClient = apiClient;
+            _apiClient = apiClient;
             _cacheStorageService = cacheStorageService;
+            _encodingService = encodingService;
             _configuration = options.Value;
         }
 
@@ -40,7 +44,19 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities
                 };
             }
 
-            legalEntities = await _accountApiClient.GetAll<AccountLegalEntity>(new GetAccountLegalEntitiesRequest(_configuration.Url, request.AccountId));
+            legalEntities = await _apiClient.GetAll<AccountLegalEntity>(new GetAccountLegalEntitiesRequest(_configuration.Url, request.AccountId));
+
+            if (legalEntities != null)
+            {
+                foreach (var accountLegalEntity in legalEntities)
+                {
+                    accountLegalEntity.AccountLegalEntityPublicHashedId =
+                        _encodingService.Encode(accountLegalEntity.AccountLegalEntityId,
+                            EncodingType.PublicAccountLegalEntityId);
+                }
+            }
+            
+
 
             var accountLegalEntities = legalEntities as AccountLegalEntity[] ?? legalEntities?.ToArray() ?? new AccountLegalEntity[0];
 
