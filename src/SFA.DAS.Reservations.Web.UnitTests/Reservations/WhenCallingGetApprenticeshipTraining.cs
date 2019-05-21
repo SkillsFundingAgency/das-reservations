@@ -25,14 +25,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
             ReservationsRouteModel routeModel,
+            GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IStartDateService> mockStartDateService,
             ReservationsController controller)
         {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
             mockEncodingService
                 .Setup(service => service.Decode(
-                    routeModel.AccountLegalEntityPublicHashedId,
+                    cachedReservationResult.AccountLegalEntityPublicHashedId,
                     EncodingType.PublicAccountLegalEntityId))
                 .Returns(accountLegalEntityId);
 
@@ -61,7 +66,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(getCoursesResult);
             mockEncodingService
                 .Setup(service => service.Decode(
-                    routeModel.AccountLegalEntityPublicHashedId,
+                    cachedReservationResult.AccountLegalEntityPublicHashedId,
                     EncodingType.PublicAccountLegalEntityId))
                 .Returns(accountLegalEntityId);
             mockStartDateService
@@ -119,10 +124,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {          
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockMediator.Verify(mediator => mediator.Send(It.Is<GetCachedReservationQuery>(query => query.Id == routeModel.Id), It.IsAny<CancellationToken>()), Times.Once);
+            mockMediator.Verify(mediator => mediator.Send(
+                It.Is<GetCachedReservationQuery>(query => query.Id == routeModel.Id), 
+                It.IsAny<CancellationToken>()), 
+                Times.Once);
         }
 
-        [Test, MoqAutoData]
+        [Test, MoqAutoData]//todo: this scenario can't happen any longer.
         public async Task And_No_Previous_Reservation_Then_Not_Load_Existing_Reservation(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
@@ -132,7 +140,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockMediator.Verify(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockMediator.Verify(mediator => mediator.Send(
+                It.IsAny<GetCachedReservationQuery>(), 
+                It.IsAny<CancellationToken>()), 
+                Times.Never);
         }
 
         [Test, MoqAutoData]
