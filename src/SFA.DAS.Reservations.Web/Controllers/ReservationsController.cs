@@ -104,9 +104,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-		 		var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+		 		var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
-                if (existingCommand == null)
+                if (cachedReservation == null)
                 {
                     throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
                 }
@@ -115,7 +115,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 				{             
 	                var courseCommand = new CacheReservationCourseCommand
 	                {
-	                    Id = existingCommand.Id,
+	                    Id = cachedReservation.Id,
 	                    CourseId = course?.Id,
 	                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
 	                };
@@ -125,7 +125,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var startDateCommand = new CacheReservationStartDateCommand
                 {
-                    Id = existingCommand.Id,
+                    Id = cachedReservation.Id,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
                     UkPrn = routeModel.UkPrn.GetValueOrDefault()
@@ -204,15 +204,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
             }
-            catch (ValidationException e)
+            catch (ValidationException ex)
             {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
-
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);//todo: this should redirect to account selection
-                return View("ApprenticeshipTraining", model);
+                _logger.LogWarning(ex, "Validation error when trying to create reservation from cached reservation.");
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
             catch (CachedReservationNotFoundException ex)
             {
@@ -335,8 +330,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
-            bool isProvider = false,
-            string accountLegalEntityPublicHashedId = null,
+            bool isProvider,
+            string accountLegalEntityPublicHashedId,
             string courseId = null, 
             string startDate = null, 
             bool? routeModelFromReview = false)
