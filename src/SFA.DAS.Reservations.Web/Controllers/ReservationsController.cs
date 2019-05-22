@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -18,7 +19,6 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -221,7 +221,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderCompleted)]
         [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerCompleted)]
         public async Task<IActionResult> Completed(ReservationsRouteModel routeModel)
@@ -320,6 +319,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             
             return View(viewName, new ManageViewModel{Reservations = reservations});
+        }
+        
+        [Route("{ukPrn}/reservations/manage/create", Name = RouteNames.ProviderManageCreate)]
+        [Route("accounts/{employerAccountId}/reservations/manage/create", Name = RouteNames.EmployerManageCreate)]
+        public async Task<IActionResult> CreateReservation(ReservationsRouteModel routeModel)
+        {
+            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", "EmployerReservations", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RestrictionStartDate = nextGlobalRuleStartDate.Value,
+                BackLink = RouteNames.EmployerManage
+            };
+
+            return View("FundingRestrictionNotification", viewModel);
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,

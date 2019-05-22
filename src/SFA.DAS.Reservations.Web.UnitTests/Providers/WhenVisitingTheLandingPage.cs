@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -32,11 +33,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
-                    FundingRules = new GetFundingRulesApiResponse
-                    {
-                        Rules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>()
-                    }
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>()
                 });
 
             //Act
@@ -54,13 +52,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
-                    FundingRules = new GetFundingRulesApiResponse
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>
                     {
-                        Rules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>
-                        {
-                            new GlobalRule()
-                        }
+                        new GlobalRule{ActiveFrom = DateTime.Now.AddDays(-2)}
                     }
                 });
 

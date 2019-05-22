@@ -1,0 +1,37 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model FundingRestrictionNotificationViewModel
+
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    @if (!string.IsNullOrEmpty(Model.BackLink))
+    {
+        if (Model.BackLink.StartsWith("http"))
+        {
+            <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+        }
+        else
+        {
+            <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+        }
+
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    Upcoming change to government-funded training
+                </h1>
+                <div class="govuk-panel__body">
+                    Government funding for apprenticeship training will be paused
+                    on @Model.RestrictionStartDate.ToString("d MMMM yyyy") . You must
+                    reserve funding for your training before this date.
+
+                    This change will not affect funding reserved before @Model.RestrictionStartDate.ToString("d MMMM yyyy")
+                </div>
+                <a asp-route="@RouteNames.EmployerStart" class="govuk-link">
+                    Continue
+                </a>
+            </div>
+        </div>
+    </div>
+</main>

@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
-            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
             {
                 return View( "ProviderFundingPaused");
             }
