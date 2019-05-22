@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -9,10 +10,13 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CacheReservationEmployer
@@ -21,6 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
     {
         private Mock<IValidator<CacheReservationEmployerCommand>> _mockValidator;
         private Mock<ICacheStorageService> _mockCacheStorageService;
+        private Mock<IFundingRulesService> _mockFundingRulesService;
         private CacheReservationEmployerCommandHandler _commandHandler;
 
         [SetUp]
@@ -36,6 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                 .ReturnsAsync(new ValidationResult());
 
             _mockCacheStorageService = fixture.Freeze<Mock<ICacheStorageService>>();
+            _mockFundingRulesService = fixture.Freeze<Mock<IFundingRulesService>>();
 
             _commandHandler = fixture.Create<CacheReservationEmployerCommandHandler>();
         }
@@ -43,6 +49,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, AutoData]
         public async Task Then_It_Validates_The_Command(CacheReservationEmployerCommand command)
         {
+            GetAccountFundingRulesApiResponse response = new GetAccountFundingRulesApiResponse()
+            {
+                GlobalRules = new List<GlobalRule>()
+            };
+
+            _mockFundingRulesService.Setup(m => m.GetAccountFundingRules(It.IsAny<long>()))
+                .ReturnsAsync(response);
+             
             //Act
             await _commandHandler.Handle(command, CancellationToken.None);
 
@@ -70,6 +84,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             act.Should().ThrowExactly<ValidationException>()
                 .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
+
+        [Test, AutoData]
+        public void And_If_There_Are_Global_Funding_Rules_Then_Throws_ReservationLimitReached_Exception(
+            CacheReservationEmployerCommand command)
+        {
+            //Arrange
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(new ValidationResult{FailedRuleValidation = true,ValidationDictionary = new Dictionary<string, string>()});
+
+            //Act + Assert
+            Assert.ThrowsAsync<ReservationLimitReachedException>( () => _commandHandler.Handle(command, CancellationToken.None));
+
+        }
         
         [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Does_Not_Cache_Reservation(
@@ -94,6 +122,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, AutoData]
         public async Task Then_Calls_Cache_Service_To_Save_Reservation(CacheReservationEmployerCommand command)
         {
+            GetAccountFundingRulesApiResponse response = new GetAccountFundingRulesApiResponse()
+            {
+                GlobalRules = new List<GlobalRule>()
+            };
+
+            _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
+                .ReturnsAsync(response);
+
             //Act
             await _commandHandler.Handle(command, CancellationToken.None);
 

@@ -18,7 +18,6 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
-using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -311,12 +310,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
             foreach (var employerAccountId in employerAccountIds)
             {
                 var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
-                reservations.AddRange(reservationsResult.Reservations
-                    .Select(reservation => new ReservationViewModel(
+
+                foreach (var reservation in reservationsResult.Reservations)
+                {
+                    if (!reservation.ProviderId.HasValue || reservation.ProviderId == 0)
+                    {
+                        reservation.ProviderId = routeModel.UkPrn;
+                    }
+
+                    var viewModel = new ReservationViewModel(
                         reservation, 
                         _configuration.ApprenticeUrl, 
-                        _encodingService.Encode(reservation.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId))));
-                
+                        _encodingService.Encode(reservation.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId));
+
+                    reservations.Add(viewModel);
+                }
             }
             
             return View(viewName, new ManageViewModel{Reservations = reservations});

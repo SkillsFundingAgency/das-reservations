@@ -24,6 +24,7 @@ namespace SFA.DAS.Reservations.Application.Validation
         }
 
         public List<string> ErrorList => ValidationDictionary.Select(c => c.Key + "|" + c.Value).ToList();
+        public bool FailedRuleValidation { get; set; }
 
         public bool IsValid()
         {
