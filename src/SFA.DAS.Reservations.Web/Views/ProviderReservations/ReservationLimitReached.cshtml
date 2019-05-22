@@ -1,0 +1,23 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+
+@{
+    ViewData["Title"] = "ReservationLimitReached";
+}
+
+<a asp-route="@RouteNames.ProviderChooseEmployer" tabindex="2" class="govuk-back-link">Back</a>
+<main class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Funding restrictions</h1>
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    This employer has reached their limit for active funding reservations and cannot reserve any more funding at this time.
+                </strong>
+            </div>
+            <p class="govuk-body">Any funding you have previously reserved for this employer is unaffected by this restriction.</p>
+            <a asp-external-controller="Account" role="button" draggable="false" tabindex="1" class="govuk-button">Return to account</a>
+        </div>
+    </div>
+</main>
