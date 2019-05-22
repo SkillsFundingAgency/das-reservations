@@ -89,6 +89,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.IsProvider.Should().BeTrue();
             viewModel.RouteName.Should().Be(RouteNames.ProviderCreateApprenticeshipTraining);
             viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
+            viewModel.AccountLegalEntityPublicHashedId.Should()
+                .Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
         }
 
         [Test, MoqAutoData]

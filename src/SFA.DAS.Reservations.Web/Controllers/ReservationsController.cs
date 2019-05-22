@@ -80,38 +80,37 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             StartDateModel startDateModel = null;
-
-            if (!ModelState.IsValid)
-            {
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, null, formModel.SelectedCourseId, formModel.StartDate);//todo: need to get ale again.
-                return View("ApprenticeshipTraining", model);
-            }
-            
-            if (!string.IsNullOrWhiteSpace(formModel.StartDate))
-                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
-
             Course course = null;
-
-            if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
-            {
-                var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
-
-                var selectedCourse =
-                    getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
-
-                course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
-            }
 
             try
             {
+                if (!string.IsNullOrWhiteSpace(formModel.StartDate))
+                    startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
+
+                if (!ModelState.IsValid)
+                {
+                    var model = await BuildApprenticeshipTrainingViewModel(
+                        isProvider, 
+                        formModel.AccountLegalEntityPublicHashedId, 
+                        formModel.SelectedCourseId, 
+                        startDateModel?.StartDate.ToString("yyyy-MM"));
+                    return View("ApprenticeshipTraining", model);
+                }
+
+                if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
+                {
+                    var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+
+                    var selectedCourse =
+                        getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
+
+                    course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
+                    //todo: should be a validation exception, also this throw is not unit tested
+                }
+
 		 		var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
-                if (cachedReservation == null)
-                {
-                    throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
-                }
-			
-				if(isProvider)
+                if(isProvider)
 				{             
 	                var courseCommand = new CacheReservationCourseCommand
 	                {
@@ -140,8 +139,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
                 
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, null, formModel.SelectedCourseId);//todo: add ale
+                var model = await BuildApprenticeshipTrainingViewModel(
+                    isProvider, 
+                    formModel.AccountLegalEntityPublicHashedId, 
+                    formModel.SelectedCourseId,
+                    formModel.StartDate);
                 return View("ApprenticeshipTraining", model);
+            }
+            catch (CachedReservationNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
             var reviewRouteName = isProvider ? 
@@ -349,6 +357,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
+                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
                 TrainingStartDate = startDate,
                 IsProvider = isProvider,
                 BackLink = isProvider ?
