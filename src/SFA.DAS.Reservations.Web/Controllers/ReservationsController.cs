@@ -363,12 +363,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel{Reservations = reservations});
         }
 
+        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
+        public void Delete(ReservationsRouteModel routeModel)
+        {
+
+        }
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
             string courseId = null, 
             string startDate = null, 
             bool? routeModelFromReview = false)
+
         {
             var accountLegalEntityId = _encodingService.Decode(
                 accountLegalEntityPublicHashedId,
