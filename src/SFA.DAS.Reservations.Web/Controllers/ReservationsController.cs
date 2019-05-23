@@ -365,9 +365,31 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
-        public void Delete(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
         {
+            if (!routeModel.Id.HasValue)
+            {
+                throw new ArgumentException("Reservation ID must be in URL.", nameof(routeModel.Id));
+            }
 
+            var query = new GetReservationQuery
+            {
+                Id = routeModel.Id.Value,
+                UkPrn = routeModel.UkPrn.GetValueOrDefault()
+            };
+            var queryResult = await _mediator.Send(query);
+            //todo: null check on result
+
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
+
+            return View(viewName, new DeleteViewModel
+            {
+                ReservationId = queryResult.ReservationId,
+                StartDate = queryResult.StartDate,
+                ExpiryDate = queryResult.ExpiryDate,
+                Course = queryResult.Course,
+                AccountLegalEntityName = queryResult.AccountLegalEntityName
+            });
         }
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
