@@ -11,6 +11,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {

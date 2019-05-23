@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Services;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Services
 {

@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Domain.Authentication;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccountService
 {
