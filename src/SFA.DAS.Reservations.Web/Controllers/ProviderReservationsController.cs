@@ -49,6 +49,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
 
+            if (!employers.Employers.Any())
+            {
+                return View("NoPermissions");
+            }
+
             var viewModel = new ChooseEmployerViewModel
             {
                 Employers = employers.Employers
