@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -64,10 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<DeleteViewModel>().Subject;
 
-            viewModel.Should().BeEquivalentTo(getReservationResult, 
-                options => options
-                    .Excluding(reservationResult => reservationResult.AccountLegalEntityId)
-                    .Excluding(reservationResult => reservationResult.UkPrn));
+            viewModel.Should().BeEquivalentTo(new DeleteViewModel(getReservationResult));
         }
 
         [Test, MoqAutoData]

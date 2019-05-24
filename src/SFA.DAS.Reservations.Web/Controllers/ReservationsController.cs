@@ -382,14 +382,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
 
-            return View(viewName, new DeleteViewModel
-            {
-                ReservationId = queryResult.ReservationId,
-                StartDate = queryResult.StartDate,
-                ExpiryDate = queryResult.ExpiryDate,
-                Course = queryResult.Course,
-                AccountLegalEntityName = queryResult.AccountLegalEntityName
-            });
+            return View(viewName, new DeleteViewModel(queryResult));
         }
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
