@@ -5,10 +5,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -19,13 +22,36 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly ReservationsWebConfiguration _config;
 
-        public ProviderReservationsController(IMediator mediator)
+        public ProviderReservationsController(IMediator mediator, IOptions<ReservationsWebConfiguration> options)
         {
             _mediator = mediator;
+            _config = options.Value;
         }
 
         public async Task<IActionResult> Index()
+        {
+            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RestrictionStartDate = nextGlobalRuleStartDate.Value,
+                BackLink = _config.DashboardUrl
+            };
+
+            return View("FundingRestrictionNotification", viewModel);
+        }
+
+        [Route("start", Name = RouteNames.ProviderStart)]
+        public async Task<IActionResult> Start()
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 

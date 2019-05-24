@@ -3,6 +3,7 @@
     public static class RouteNames
     {
         public const string ProviderIndex = "provider-index";
+        public const string ProviderStart = "provider-start";
         public const string ProviderManage = "provider-manage";
         public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
