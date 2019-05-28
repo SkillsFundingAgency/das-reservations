@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule
 {
@@ -24,9 +23,8 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlo
             var nextRule = response?.GlobalRules?.Where(rule => rule.ActiveFrom.HasValue && rule.ActiveFrom >= DateTime.Now)
                 .OrderBy(r => r.ActiveFrom)
                 .FirstOrDefault();
-
-            //TODO: Remove global rule injection (?? ...) when finished styling work
-            return new GetNextActiveGlobalFundingRuleResult{ Rule = nextRule ?? new GlobalRule{ActiveFrom = DateTime.Now} };
+            
+            return new GetNextActiveGlobalFundingRuleResult{ Rule = nextRule };
         }
     }
 }
