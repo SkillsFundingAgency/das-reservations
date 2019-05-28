@@ -1,0 +1,132 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoFixture.NUnit3;
+using FluentAssertions;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
+using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Testing.AutoFixture;
+
+namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+{
+    [TestFixture]
+    public class WhenCallingPostDelete
+    {
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_ValidationException_Then_Returns_To_Provider_Delete_View(
+            ReservationsRouteModel routeModel,
+            ValidationException validationException,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Throws(validationException);
+
+            var result = await controller.PostDelete(routeModel, true) as ViewResult;
+
+            result.ViewName.Should().Be(ViewNames.ProviderDelete);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_And_ValidationException_Then_Returns_To_Employer_Delete_View(
+            ReservationsRouteModel routeModel,
+            ValidationException validationException,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Throws(validationException);
+
+            var result = await controller.PostDelete(routeModel, true) as ViewResult;
+
+            result.ViewName.Should().Be(ViewNames.EmployerDelete);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_Exception_Then_Redirects_To_Provider_Error(
+            ReservationsRouteModel routeModel,
+            Exception exception,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Throws(exception);
+
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderError);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_And_Exception_Then_Redirects_To_Employer_Error(
+            ReservationsRouteModel routeModel,
+            Exception exception,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
+                .Throws(exception);
+
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerError);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Delete_True_And_Has_Ukprn_Then_Redirects_To_Provider_Completed_Route(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderDeleteCompleted);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Delete_True_And_No_Ukprn_Then_Redirects_To_Employer_Completed_Route(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerDeleteCompleted);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Delete_False_And_Has_Ukprn_Then_Redirects_To_Provider_Manage_Route(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            var result = await controller.PostDelete(routeModel, false) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderManage);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Delete_False_And_No_Ukprn_Then_Redirects_To_Employer_Manage_Route(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+
+            var result = await controller.PostDelete(routeModel, false) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerManage);
+        }
+    }
+}

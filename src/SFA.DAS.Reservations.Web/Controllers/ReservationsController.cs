@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Commands;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -383,6 +384,39 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
 
             return View(viewName, new DeleteViewModel(queryResult));
+        }
+
+        [HttpPost]
+        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
+        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, bool? delete)
+        {
+            var isProvider = routeModel.UkPrn.HasValue;
+            try
+            {
+                if (delete.HasValue && !delete.Value)
+                {
+                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
+                    return RedirectToRoute(manageRoute, routeModel);
+                }
+                
+                await _mediator.Send(new DeleteReservationCommand());
+
+                var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
+                return RedirectToRoute(completedRoute, routeModel);
+            }
+            catch (ValidationException ex)
+            {
+                //todo: get error into modelstate blah blah
+                var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
+                return View(deleteViewName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error trying to delete reservation [{routeModel.Id}]");
+                var errorRoute = isProvider ? RouteNames.ProviderError : RouteNames.EmployerError;
+                return RedirectToRoute(errorRoute, routeModel);
+            }
         }
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
