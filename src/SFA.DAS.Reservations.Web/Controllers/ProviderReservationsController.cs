@@ -132,7 +132,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("ConfirmEmployer", viewModel);
             }
-            catch (ReservationLimitReachedException r)
+            catch (ReservationLimitReachedException)
             {
                 return View("ReservationLimitReached");
             }

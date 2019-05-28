@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -32,17 +35,39 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string employerAccountId)
         {
-            var response = await _mediator.Send(new GetFundingRulesQuery());
-
-            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            try
             {
-                return View("EmployerFundingPaused");
+                var globalRules = await _mediator.Send(new GetFundingRulesQuery());
+                var accountRules = await _mediator.Send(new GetAccountFundingRulesQuery
+                {
+                    AccountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId)
+                });
+
+                if (globalRules?.ActiveRule != null | accountRules?.ActiveRule != null)
+                {
+                    GlobalRuleType? rule =
+                        globalRules?.ActiveRule != null ? globalRules.ActiveRule : accountRules.ActiveRule;
+
+                    switch (rule)
+                    {
+                        case GlobalRuleType.FundingPaused:
+                            return View("EmployerFundingPaused");
+
+                        case GlobalRuleType.ReservationLimit:
+                            return View("ReservationLimitReached");
+                    }
+                }
+
+                return View("Index");
             }
-            
-            return View("Index");
+            catch (ValidationException)
+            {
+                return View("Error");
+            }
         }
+            
 
         [HttpGet]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
@@ -96,6 +121,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 return await SelectLegalEntity(routeModel);
+            }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached");
             }
             
         }
