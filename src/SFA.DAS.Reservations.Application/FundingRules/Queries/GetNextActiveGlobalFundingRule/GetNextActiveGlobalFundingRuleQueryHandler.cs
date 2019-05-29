@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlo
             var nextRule = response?.GlobalRules?.Where(rule => rule.ActiveFrom.HasValue && rule.ActiveFrom >= DateTime.Now)
                 .OrderBy(r => r.ActiveFrom)
                 .FirstOrDefault();
-           
+            
             return new GetNextActiveGlobalFundingRuleResult{ Rule = nextRule };
         }
     }

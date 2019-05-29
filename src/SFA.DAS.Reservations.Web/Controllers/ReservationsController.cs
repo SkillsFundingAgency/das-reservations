@@ -336,11 +336,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var viewModel = new FundingRestrictionNotificationViewModel
             {
-                RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = RouteNames.EmployerManage
+                RestrictionStartDate = nextGlobalRuleStartDate.Value
             };
 
-            return View("FundingRestrictionNotification", viewModel);
+            if (routeModel.UkPrn.HasValue)
+            {
+                viewModel.BackLink = RouteNames.ProviderManage;
+
+                return View("../ProviderReservations/FundingRestrictionNotification", viewModel);
+            }
+
+            viewModel.BackLink = RouteNames.EmployerManage;
+
+            return View("../EmployerReservations/FundingRestrictionNotification", viewModel);
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,
