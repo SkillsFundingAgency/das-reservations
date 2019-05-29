@@ -5,8 +5,8 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ConfirmationRedirectViewModel
     {
-        [Required(ErrorMessage = "Select whether to add an apprentice now or later")]
-        public bool? AddApprentice { get; set; }
+        [Required(ErrorMessage = "Select what you would like to do next")]
+        public string WhatsNext { get; set; }
         public string DashboardUrl { get; set; }
         public string ApprenticeUrl { get; set; }
         public Guid ReservationId { get; set; }
@@ -16,5 +16,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string CourseId { get; set; }
         public int Level { get; set; }
         public string CourseTitle { get; set; }
+
     }
 }
