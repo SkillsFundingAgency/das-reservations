@@ -5,10 +5,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
@@ -51,6 +56,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Delet
 
             act.Should().ThrowExactly<ValidationException>()
                 .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Sends_Delete_Request_To_Reservations_Api(
+            DeleteReservationCommand command,
+            [Frozen] Mock<IValidator<DeleteReservationCommand>> mockValidator,
+            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
+            DeleteReservationCommandHandler handler)
+        {
+            var expectedApiRequest = new ReservationApiRequest(mockOptions.Object.Value.Url, command.ReservationId);
+            mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(new ValidationResult());
+
+            await handler.Handle(command, CancellationToken.None);
+
+            mockApiClient
+                .Verify(client => client.Delete(
+                        It.Is<IDeleteApiRequest>(request => request.DeleteUrl == expectedApiRequest.DeleteUrl)), 
+                    Times.Once);
         }
     }
 }
