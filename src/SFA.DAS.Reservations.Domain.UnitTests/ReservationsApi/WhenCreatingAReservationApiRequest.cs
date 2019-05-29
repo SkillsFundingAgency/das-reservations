@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             request.Id.Should().Be(id);
         }
 
-        [Test, AutoData]
+        [Test]
         public void Then_It_Sets_StartDate()
         {
             var startDate = DateTime.Now.AddDays(-10);
@@ -52,6 +52,16 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             var request = new ReservationApiRequest(url, accountId);
 
             request.GetAllUrl.Should().Be($"{url}api/accounts/{accountId}/reservations");
+        }
+
+        [Test, AutoData]
+        public void Then_It_Sets_The_DeleteUrl(
+            string url,
+            Guid reservationId)
+        {
+            var request = new ReservationApiRequest(url, reservationId);
+
+            request.DeleteUrl.Should().Be($"{url}api/reservations/{reservationId}");
         }
     }
 }
