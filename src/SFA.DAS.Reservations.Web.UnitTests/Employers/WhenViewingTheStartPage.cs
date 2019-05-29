@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +7,11 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -24,28 +26,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object);
+            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
         }
 
         [Test]
         public async Task ThenRedirectToIndexIfNoFundingRulesExist()
         {
             //arrange
-            var result = _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetFundingRulesResult()
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
                     {
-                        FundingRules = new GetFundingRulesApiResponse()
-                        {
-                            GlobalRules = new List<GlobalRule>(),
-                            Rules = new List<ReservationRule>()
-                        }
+                        AccountRules = new List<ReservationRule>(),
+                        GlobalRules = new List<GlobalRule>()
                     });
 
             //act 
-            var view = await _controller.Index() as ViewResult;
+            var view = await _controller.Start() as ViewResult;
 
             //assert
-            Assert.IsNotNull(result);
+            Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "Index");
         }
 
@@ -53,21 +52,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
         {
             //arrange
-            var result = _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetFundingRulesResult()
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
                 {
-                    FundingRules = new GetFundingRulesApiResponse()
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>
                     {
-                        GlobalRules = new List<GlobalRule>(){new GlobalRule()},
-                        Rules = new List<ReservationRule>()
+                        new GlobalRule {ActiveFrom = DateTime.Now.AddDays(-2)}
                     }
                 });
 
             //act 
-            var view = await _controller.Index() as ViewResult;
+            var view = await _controller.Start() as ViewResult;
 
             //assert
-            Assert.IsNotNull(result);
+            Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "EmployerFundingPaused");
         }
     }

@@ -1,8 +1,9 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 {
@@ -21,7 +22,8 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 
             return new GetFundingRulesResult
             {
-                FundingRules = response
+               AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],
+               GlobalRules = response?.GlobalRules?.ToArray() ?? new GlobalRule[0]
             };
         }
     }

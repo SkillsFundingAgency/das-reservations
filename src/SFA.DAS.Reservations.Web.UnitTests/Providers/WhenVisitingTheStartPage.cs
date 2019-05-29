@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
-    public class WhenVisitingTheLandingPage
+    public class WhenVisitingTheStartPage
     {
         private ProviderReservationsController _controller;
         private Mock<IMediator> _mediator;
@@ -22,25 +24,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         {
             _mediator = new Mock<IMediator>();
 
-            _controller = new ProviderReservationsController(_mediator.Object);
+            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
         }
         
         [Test]
-        public async Task ThenWillBeRoutedToProviderLandingPage()
+        public async Task ThenWillBeRoutedToProviderStartPage()
         {
             //Arrange
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
-                    FundingRules = new GetFundingRulesApiResponse
-                    {
-                        Rules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>()
-                    }
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>()
                 });
 
             //Act
-            var result = await _controller.Index() as ViewResult;
+            var result = await _controller.Start() as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
@@ -54,18 +53,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
-                    FundingRules = new GetFundingRulesApiResponse
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>
                     {
-                        Rules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>
-                        {
-                            new GlobalRule()
-                        }
+                        new GlobalRule{ActiveFrom = DateTime.Now.AddDays(-2)}
                     }
                 });
 
             //Act
-            var result = await _controller.Index() as ViewResult;
+            var result = await _controller.Start() as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);

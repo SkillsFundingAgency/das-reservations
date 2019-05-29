@@ -5,13 +5,16 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -24,19 +27,43 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
+        private ReservationsWebConfiguration _config;
 
-        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService)
+        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
         {
             _mediator = mediator;
             _encodingService = encodingService;
+            _config = options.Value;
         }
 
         // GET
         public async Task<IActionResult> Index()
         {
+            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RestrictionStartDate = nextGlobalRuleStartDate.Value,
+                BackLink = _config.EmployerDashboardUrl
+            };
+
+            return View("FundingRestrictionNotification", viewModel);
+        }
+
+        [HttpGet]
+        [Route("start",Name = RouteNames.EmployerStart)]
+        public async Task<IActionResult> Start()
+        {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
-            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
             {
                 return View("EmployerFundingPaused");
             }
@@ -97,7 +124,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return await SelectLegalEntity(routeModel);
             }
-            
         }
 
         [HttpGet]
@@ -135,7 +161,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
-
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand
