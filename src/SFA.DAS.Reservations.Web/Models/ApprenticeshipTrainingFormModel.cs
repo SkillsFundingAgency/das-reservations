@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -6,7 +7,7 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         [Required(ErrorMessage = "You must select a start date")]
         public string StartDate { get; set; }
-        
         public string SelectedCourseId { get; set; }
+        public string AccountLegalEntityPublicHashedId { get; set; }
     }
 }

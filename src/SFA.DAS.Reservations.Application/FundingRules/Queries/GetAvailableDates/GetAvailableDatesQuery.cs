@@ -4,6 +4,6 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDate
 {
     public class GetAvailableDatesQuery : IRequest<GetAvailableDatesResult>
     {
-
+        public long AccountLegalEntityId { get; set; }
     }
 }

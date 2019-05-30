@@ -2,10 +2,11 @@
 {
     public class AccountLegalEntity
     {
-        public string DasAccountId { get; set; }
+        public string AccountId { get; set; }
         public long LegalEntityId { get; set; }
-        public string Name { get; set; }
+        public string AccountLegalEntityName { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
+        public int ReservationLimit { get; set; }
     }
 }

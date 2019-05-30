@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -19,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDate
 
         public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
         {
-            var availableDates = await _fundingRulesService.GetAvailableDates();
+            var availableDates = await _fundingRulesService.GetAvailableDates(request.AccountLegalEntityId);
 
             return new GetAvailableDatesResult
             {

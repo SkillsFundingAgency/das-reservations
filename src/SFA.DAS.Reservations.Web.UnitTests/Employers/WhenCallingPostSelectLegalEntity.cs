@@ -15,8 +15,6 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -61,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
             mockEncodingService
@@ -75,7 +73,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                         command.Id != Guid.Empty &&
                         command.AccountId == decodedAccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
-                        command.AccountLegalEntityName == firstLegalEntity.Name &&
+                        command.AccountLegalEntityName == firstLegalEntity.AccountLegalEntityName &&
                         command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
@@ -94,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId),
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);
             mockEncodingService
