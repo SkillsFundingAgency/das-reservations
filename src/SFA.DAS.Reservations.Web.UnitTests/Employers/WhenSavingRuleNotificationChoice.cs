@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedTypeOfRule = RuleType.GlobalRule;
             var expectedUserId = "123";
 
-            var claim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, expectedUserId);
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
 
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
             {
@@ -55,13 +55,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             };
 
             //act
-            await _controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule);
+            await _controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule, true);
 
             //assert
             _mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c => 
                 c.Id.Equals(expectedUserId) &&
                 c.RuleId.Equals(expectedRuleId) &&
                 c.TypeOfRule.Equals(expectedTypeOfRule)), It.IsAny<CancellationToken>()));
+        }
+
+        [Test]
+        public async Task ThenDoesNotSendsCommandIfNotMarkedAsRead()
+        {
+            //act
+            await _controller.SaveRuleNotificationChoice(12, RuleType.GlobalRule, false);
+
+            //assert
+            _mockMediator.Verify(m => m.Send(
+                It.IsAny<MarkRuleAsReadCommand>(), 
+                It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

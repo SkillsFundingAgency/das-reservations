@@ -24,11 +24,23 @@
                 <p>Government funding for apprenticeship training will be paused on @Model.RestrictionStartDate.ToString("d MMMM yyyy"). 
                     You must reserve funding for your training before this date.</p>
                 <p>This change will not affect funding reserved before @Model.RestrictionStartDate.ToString("d MMMM yyyy")</p>
-                <p>
-                    <a asp-route="@RouteNames.EmployerStart" class="govuk-button das-button--inverted das-panel__button">
+                
+                <form asp-route="@RouteNames.EmployerSaveRuleNotificationChoice">
+                    <input type="hidden" name="RuleId" value="@Model.RuleId" />
+                    <input type="hidden" name="TypeOfRule" value="@Model.TypeOfRule" />
+                    <button type="submit" class="govuk-button das-button--inverted das-panel__button">
                         Continue
-                    </a>
-                </p>
+                    </button>
+                
+                    <p>
+                    <div class="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input type="checkbox" class="govuk-checkboxes__input" id="markAsReadCheckbox" name="markRuleAsRead" value="true"/>
+                            <label class="govuk-checkboxes__label" for="markAsReadCheckbox">Do not show this message again</label>
+                        </div>
+                    </div>
+                    </p>
+                </form>
             </div>
         </div>
     </div>

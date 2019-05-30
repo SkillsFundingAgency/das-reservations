@@ -45,15 +45,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = employerAccountClaim.Value});
 
+            var nextGlobalRuleId = response?.Rule?.Id;
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 
-            if (!nextGlobalRuleStartDate.HasValue)
+            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel
             {
+                RuleId = nextGlobalRuleId.Value,
+                TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
                 BackLink = _config.EmployerDashboardUrl
             };
@@ -63,11 +66,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
-        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule)
+        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
         {
-            var employerAccountClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+            if(!markRuleAsRead)
+            {
+                return RedirectToRoute(RouteNames.EmployerStart);
+            }
 
-            var userId = employerAccountClaim.Value;
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+
+            var userId = userAccountIdClaim.Value;
 
             var command = new MarkRuleAsReadCommand
             {
@@ -75,10 +83,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RuleId = ruleId,
                 TypeOfRule = typeOfRule
             };
-
+            
             await _mediator.Send(command);
 
-            return RedirectToAction("Start");
+            return RedirectToRoute(RouteNames.EmployerStart);
         }
 
 

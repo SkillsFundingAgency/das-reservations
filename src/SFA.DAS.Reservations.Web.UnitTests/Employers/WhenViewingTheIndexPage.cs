@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -30,7 +31,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [SetUp]
         public void Arrange()
         {
-            _expectedRule = new GlobalRule {ActiveFrom = DateTime.Now.AddDays(2)};
+            _expectedRule = new GlobalRule
+            {
+                Id = 2, 
+                ActiveFrom = DateTime.Now.AddDays(2)
+            };
 
            var result = new GetNextUnreadGlobalFundingRuleResult {Rule = _expectedRule};
 
@@ -96,7 +101,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(view);
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(view.ViewName, "FundingRestrictionNotification");
+            Assert.AreEqual(_expectedRule.Id, viewModel.RuleId);
+            Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
+            Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(_employerConfig.EmployerDashboardUrl, viewModel.BackLink);
+        }
+
+        [Test]
+        public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule()
+        {
+            //arrange
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
+
+            //act 
+            var redirect = await _controller.Index() as RedirectToActionResult;
+
+            //assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual(redirect.ActionName, "Start");
         }
 
         [Test]
@@ -104,7 +127,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule()});
+                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
             var redirect = await _controller.Index() as RedirectToActionResult;
