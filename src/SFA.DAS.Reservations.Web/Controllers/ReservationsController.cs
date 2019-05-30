@@ -60,10 +60,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
             if (routeModel.Id.HasValue)
             {
                 cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
-                //todo: error handling if fails validation e.g. id not found
+                //todo: error handling if fails validation e.g. id not found, redirect to index.
             }
             
-            var viewModel = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null, cachedReservation?.CourseId, cachedReservation?.StartDate, routeModel.FromReview);
+            var viewModel = await BuildApprenticeshipTrainingViewModel(
+                routeModel.UkPrn != null, 
+                cachedReservation?.AccountLegalEntityPublicHashedId, 
+                cachedReservation?.CourseId, 
+                cachedReservation?.StartDate, 
+                routeModel.FromReview);
 
             return View(viewModel);
         }
@@ -75,42 +80,41 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             StartDateModel startDateModel = null;
-
-            if (!ModelState.IsValid)
-            {
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
-                return View("ApprenticeshipTraining", model);
-            }
-            
-            if (!string.IsNullOrWhiteSpace(formModel.StartDate))
-                startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
-
             Course course = null;
-
-            if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
-            {
-                var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
-
-                var selectedCourse =
-                    getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
-
-                course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
-            }
 
             try
             {
-		 		var existingCommand = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+                if (!string.IsNullOrWhiteSpace(formModel.StartDate))
+                    startDateModel = JsonConvert.DeserializeObject<StartDateModel>(formModel.StartDate);
 
-                if (existingCommand == null)
+                if (!ModelState.IsValid)
                 {
-                    throw new ArgumentException("Could not find reservation with given ID", nameof(routeModel));
+                    var model = await BuildApprenticeshipTrainingViewModel(
+                        isProvider, 
+                        formModel.AccountLegalEntityPublicHashedId, 
+                        formModel.SelectedCourseId, 
+                        startDateModel?.StartDate.ToString("yyyy-MM"));
+                    return View("ApprenticeshipTraining", model);
                 }
-			
-				if(isProvider)
+
+                if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
+                {
+                    var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+
+                    var selectedCourse =
+                        getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
+
+                    course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
+                    //todo: should be a validation exception, also this throw is not unit tested
+                }
+
+		 		var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+
+                if(isProvider)
 				{             
 	                var courseCommand = new CacheReservationCourseCommand
 	                {
-	                    Id = existingCommand.Id,
+	                    Id = cachedReservation.Id,
 	                    CourseId = course?.Id,
 	                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
 	                };
@@ -120,7 +124,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var startDateCommand = new CacheReservationStartDateCommand
                 {
-                    Id = existingCommand.Id,
+                    Id = cachedReservation.Id,
                     StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
                     StartDateDescription = startDateModel?.ToString(),
                     UkPrn = routeModel.UkPrn.GetValueOrDefault()
@@ -135,8 +139,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
                 
-                var model = await BuildApprenticeshipTrainingViewModel(isProvider, formModel.SelectedCourseId);
+                var model = await BuildApprenticeshipTrainingViewModel(
+                    isProvider, 
+                    formModel.AccountLegalEntityPublicHashedId, 
+                    formModel.SelectedCourseId,
+                    formModel.StartDate);
                 return View("ApprenticeshipTraining", model);
+            }
+            catch (CachedReservationNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
             var reviewRouteName = isProvider ? 
@@ -199,20 +212,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
             }
-            catch (ValidationException e)
+            catch (ValidationException ex)
             {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
-
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
-                return View("ApprenticeshipTraining", model);
+                _logger.LogWarning(ex, "Validation error when trying to create reservation from cached reservation.");
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
             catch (CachedReservationNotFoundException ex)
             {
                 _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
-                var model = await BuildApprenticeshipTrainingViewModel(routeModel.UkPrn != null);
                 return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
@@ -330,10 +337,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel{Reservations = reservations});
         }
 
-        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(bool isProvider,
-            string courseId = null, string startDate = null, bool? routeModelFromReview = false)
+        private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
+            bool isProvider,
+            string accountLegalEntityPublicHashedId,
+            string courseId = null, 
+            string startDate = null, 
+            bool? routeModelFromReview = false)
         {
-            var dates = await _startDateService.GetStartDates();
+            var accountLegalEntityId = _encodingService.Decode(
+                accountLegalEntityPublicHashedId,
+                EncodingType.PublicAccountLegalEntityId);
+            var dates = await _startDateService.GetStartDates(accountLegalEntityId);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
@@ -343,6 +357,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
+                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
                 TrainingStartDate = startDate,
                 IsProvider = isProvider,
                 BackLink = isProvider ?

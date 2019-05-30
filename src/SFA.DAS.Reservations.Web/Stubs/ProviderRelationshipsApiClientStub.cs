@@ -19,30 +19,30 @@ namespace SFA.DAS.Reservations.Web.Stubs
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "111ABC",
+                        AccountPublicHashedId = "LDMVWV",
                         AccountName = "Account 1",
                         AccountLegalEntityId = 11,
-                        AccountLegalEntityPublicHashedId = "111DEF",
+                        AccountLegalEntityPublicHashedId = "DJWWDJ",//123
                         AccountLegalEntityName = "Legal Entity 1",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "111ABC",
+                        AccountPublicHashedId = "LDMVWV",
                         AccountName = "Account 1",
                         AccountLegalEntityId = 22,
-                        AccountLegalEntityPublicHashedId = "222DEF",
+                        AccountLegalEntityPublicHashedId = "JBPN4J",//456
                         AccountLegalEntityName = "Legal Entity 2",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "111ABC",
+                        AccountPublicHashedId = "LDMVWV",
                         AccountName = "Account 1",
                         AccountLegalEntityId = 33,
-                        AccountLegalEntityPublicHashedId = "333DEF",
+                        AccountLegalEntityPublicHashedId = "JKW37J",//789
                         AccountLegalEntityName = "Legal Entity 3",
                         AccountProviderId = withPermissionRequest.Ukprn
                     }
