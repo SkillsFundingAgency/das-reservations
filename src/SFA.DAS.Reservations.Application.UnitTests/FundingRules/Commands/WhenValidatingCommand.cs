@@ -19,6 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Commands
             {
                 Id = "ABC",
                 RuleId = -12,
+                TypeOfRule = RuleType.None
             };
 
             //Act
@@ -26,10 +27,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Commands
 
             //Assert
             result.IsValid().Should().BeFalse();
-            result.ValidationDictionary.Count.Should().Be(2);
+            result.ValidationDictionary.Count.Should().Be(3);
             result.ValidationDictionary
                 .Should().ContainKey(nameof( MarkRuleAsReadCommand.Id))
-                .And.ContainKey(nameof( MarkRuleAsReadCommand.RuleId));
+                .And.ContainKey(nameof( MarkRuleAsReadCommand.RuleId))
+                .And.ContainKey(nameof( MarkRuleAsReadCommand.TypeOfRule));
         }
 
         [Test]
@@ -45,10 +47,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Commands
 
             //Assert
             result.IsValid().Should().BeFalse();
-            result.ValidationDictionary.Count.Should().Be(2);
+            result.ValidationDictionary.Count.Should().Be(3);
             result.ValidationDictionary
                 .Should().ContainKey(nameof( MarkRuleAsReadCommand.Id))
-                .And.ContainKey(nameof( MarkRuleAsReadCommand.RuleId));
+                .And.ContainKey(nameof( MarkRuleAsReadCommand.RuleId))
+                .And.ContainKey(nameof( MarkRuleAsReadCommand.TypeOfRule));
         }
 
         [Test]

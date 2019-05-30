@@ -4,8 +4,9 @@ namespace SFA.DAS.Reservations.Domain.Rules.Api
 {
     public enum RuleType
     {
-        CourseRule = 0,
-        GlobalRule =1
+        None = 0,
+        CourseRule = 1,
+        GlobalRule = 2
     }
 
     public class MarkRuleAsReadApiRequest : IPostApiRequest
