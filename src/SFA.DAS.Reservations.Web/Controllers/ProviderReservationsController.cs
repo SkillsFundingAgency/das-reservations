@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,15 +27,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(uint ukPrn)
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
-            if (response?.FundingRules?.GlobalRules != null && response.FundingRules.GlobalRules.Any())
+            if (response?.FundingRules?.GlobalRules != null && EnumerableExtensions.Any(response.FundingRules.GlobalRules))
             {
                 return View( "ProviderFundingPaused");
             }
 
+            var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();
+
+            if (employers.Any() && employers.Count > 0)
+            {
+                return View("NoPermissions");
+            }
+            
             return View("Index");
         }
 
@@ -48,11 +56,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
-
-            if (!employers.Employers.Any())
-            {
-                return View("NoPermissions");
-            }
 
             var viewModel = new ChooseEmployerViewModel
             {

@@ -55,23 +55,5 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             viewModel.Employers.Should().BeEquivalentTo(expectedEmployers);
         }
 
-        [Test, MoqAutoData]
-        public async Task Then_If_There_Are_No_Trusted_Employers_The_No_Permissions_View_Is_Returned(
-            [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller,
-            ReservationsRouteModel routeModel)
-        {
-            //Arrange
-            mockMediator
-                .Setup(service => service.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse { Employers = new List<Employer>() });
-
-            //Act
-            var result = await controller.ChooseEmployer(routeModel);
-
-            //Assert
-            result.Should().BeOfType<ViewResult>()
-                .Which.ViewName.Should().Be("NoPermissions");
-        }
     }
 }
