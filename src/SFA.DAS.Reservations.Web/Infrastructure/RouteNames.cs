@@ -4,6 +4,7 @@
     {
         public const string ProviderIndex = "provider-index";
         public const string ProviderManage = "provider-manage";
+        public const string ProviderDelete = "provider-delete";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
         public const string ProviderCreateApprenticeshipTraining = "provider-create-apprenticeship-training";
         public const string ProviderReview = "provider-review";
@@ -16,6 +17,7 @@
 
         public const string EmployerIndex = "employer-index";
         public const string EmployerManage = "employer-manage";
+        public const string EmployerDelete = "employer-delete";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";
