@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -73,7 +74,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getTrustedEmployersResponse);
             mockMediator
-                .SetupSequence(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .SetupSequence(mediator =>
+                    mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult1)
                 .ReturnsAsync(getReservationsResult2)
                 .ReturnsAsync(getReservationsResult3);
@@ -82,9 +84,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Returns(hashedId);
 
             var expectedReservations = new List<ReservationViewModel>();
-            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation => new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
-            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation => new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
-            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation => new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation =>
+                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation =>
+                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation =>
+                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
 
             var result = await controller.Manage(routeModel) as ViewResult;
 
@@ -159,5 +164,44 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingMissingMembers());
         }
+
+        [Test, MoqAutoData]
+        public async Task UkPrnWillBePopulatedFromRouteModelIfNotPopulatedInReservation(
+             ReservationsRouteModel routeModel,
+            GetTrustedEmployersResponse getTrustedEmployersResponse,
+            Reservation reservation,
+            string hashedId,
+            [Frozen] ReservationsWebConfiguration config,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getTrustedEmployersResponse);
+
+            reservation.ProviderId = null;
+            routeModel.UkPrn = 2000032;
+
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetReservationsResult
+                {
+                    Reservations = new []{reservation}
+                });
+
+            mockEncodingService
+                .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
+                .Returns(hashedId);
+            
+            var result = await controller.Manage(routeModel) as ViewResult;
+            
+            var viewModel = result?.Model as ManageViewModel;
+            viewModel.Should().NotBeNull();
+
+            Assert.IsTrue(viewModel.Reservations.First().ApprenticeUrl.StartsWith($"{config.ApprenticeUrl}/{routeModel.UkPrn}/"));
+
+        }
+
     }
 }

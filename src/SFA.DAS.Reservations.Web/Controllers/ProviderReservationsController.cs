@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -140,7 +141,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     AccountName = viewModel.AccountName
                 });
 
-                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new 
+                return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new
                 {
                     Id = reservationId,
                     EmployerAccountId = viewModel.AccountPublicHashedId,
@@ -156,6 +157,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 return View("ConfirmEmployer", viewModel);
+            }
+            catch (ReservationLimitReachedException r)
+            {
+                return View("ReservationLimitReached");
             }
         }
     }

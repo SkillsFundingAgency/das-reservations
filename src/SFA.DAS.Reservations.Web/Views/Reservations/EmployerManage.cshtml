@@ -56,10 +56,11 @@ else
                             <td class="govuk-table__cell" data-label="Organisation">@reservation.LegalEntityName</td>
                             <td class="govuk-table__cell" data-label="Apprenticeship training">@reservation.CourseName</td>
                             <td class="govuk-table__cell" data-label="Apprenticeship start date"> @reservation.StartDateDescription</td>
-                            <td class="govuk-table__cell">
+                            <td class="govuk-table__cell govuk-table__cell--numeric">
                                 @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
-                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a><br/>
+                                    <a asp-route="@RouteNames.EmployerDelete" class="govuk-link">Delete</a>
                                 }
                                 else
                                 {

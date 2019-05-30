@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 {
     public class CacheReservationEmployerCommandValidator : IValidator<CacheReservationEmployerCommand>
     {
-        private readonly IFundingRulesService _rulesService;
+        private IFundingRulesService _rulesService;
 
         public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService)
         {
@@ -32,10 +32,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             else
             {
                 var globalRules = await _rulesService.GetAccountFundingRules(command.AccountId);
-                if (globalRules.GlobalRules.Any(c=> c != null && c.RuleType == GlobalRuleType.ReservationLimit) && 
+                if (globalRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
                     globalRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
                 {
-                    result.AddError(nameof(command.AccountId), "Reservation limit has been reached for this account");
+                    result.FailedRuleValidation = true;
                 }
             }
 

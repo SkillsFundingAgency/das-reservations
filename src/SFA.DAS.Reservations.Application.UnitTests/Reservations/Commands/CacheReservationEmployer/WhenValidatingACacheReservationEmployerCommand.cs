@@ -34,6 +34,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, MoqAutoData]
+        public async Task Then_The_Account_Is_Checked_Against_The_AccountRules_And_An_Error_Returned_If_Not_Valid(
+            CacheReservationEmployerCommand command,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            rulesService.Setup(x => x.GetAccountFundingRules(command.AccountId)).ReturnsAsync(
+                new GetAccountFundingRulesApiResponse
+                {
+                    GlobalRules = new List<GlobalRule> {new GlobalRule
+                    {
+                        Restriction = AccountRestriction.Account,
+                        RuleType = GlobalRuleType.ReservationLimit
+                    }}
+                });
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedRuleValidation.Should().BeTrue();
+        }
+
+        [Test, MoqAutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
             CacheReservationEmployerCommand command, 
             [Frozen]Mock<IFundingRulesService> rulesService,
@@ -151,30 +173,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var result = await validator.ValidateAsync(command);
 
             result.IsValid().Should().BeTrue();
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_The_Account_Is_Checked_Against_The_AccountRules_And_An_Error_Returned_If_Not_Valid(
-            CacheReservationEmployerCommand command,
-            [Frozen]Mock<IFundingRulesService> rulesService,
-            CacheReservationEmployerCommandValidator validator)
-        {
-            rulesService.Setup(x => x.GetAccountFundingRules(command.AccountId)).ReturnsAsync(
-                new GetAccountFundingRulesApiResponse
-                {
-                    GlobalRules = new List<GlobalRule> {new GlobalRule
-                    {
-                        Restriction = AccountRestriction.Account,
-                        RuleType = GlobalRuleType.ReservationLimit
-                    }}
-                });
-
-            var result = await validator.ValidateAsync(command);
-
-            result.IsValid().Should().BeFalse();
-            result.ValidationDictionary
-                .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountId))
-                .WhichValue.Should().Be("Reservation limit has been reached for this account");
+            result.FailedRuleValidation.Should().BeFalse();
         }
 
         private static void ConfigureRulesServiceWithNoGlobalRules(Mock<IFundingRulesService> rulesService)
