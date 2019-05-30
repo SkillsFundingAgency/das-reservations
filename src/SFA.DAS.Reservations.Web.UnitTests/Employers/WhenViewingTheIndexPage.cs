@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -6,11 +7,13 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
@@ -22,13 +25,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IEncodingService> _mockEncodingService;
         private GlobalRule _expectedRule;
         private ReservationsWebConfiguration _employerConfig;
+        private string ExpectedUserId = "123";
 
         [SetUp]
         public void Arrange()
         {
             _expectedRule = new GlobalRule {ActiveFrom = DateTime.Now.AddDays(2)};
 
-           var result = new GetNextActiveGlobalFundingRuleResult {Rule = _expectedRule};
+           var result = new GetNextUnreadGlobalFundingRuleResult {Rule = _expectedRule};
 
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
@@ -43,16 +47,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
 
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextActiveGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
+
+            var claim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, ExpectedUserId);
+
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+        }
+
+        [Test]
+        public async Task ThenChecksIfRelatedUnreadRulesExists()
+        {
+            //act 
+            await _controller.Index();
+
+            //assert
+            _mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
+                q => q.Id.Equals(ExpectedUserId)),It.IsAny<CancellationToken>()));
         }
 
         [Test]
         public async Task ThenRedirectToStartIfNoFundingRulesExist()
         {
             //arrange
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextActiveGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((GetNextActiveGlobalFundingRuleResult) null);
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
             var redirect = await _controller.Index() as RedirectToActionResult;
@@ -81,8 +103,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule()
         {
             //arrange
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextActiveGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetNextActiveGlobalFundingRuleResult {Rule = new GlobalRule()});
+            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule()});
 
             //act 
             var redirect = await _controller.Index() as RedirectToActionResult;

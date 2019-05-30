@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -29,9 +29,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
 
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
                 {
                     Rule = new GlobalRule(){ActiveFrom = DateTime.Now}
                 });
@@ -56,9 +56,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //arrange
             routeModel.UkPrn = 120;
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
                 {
                     Rule = new GlobalRule {ActiveFrom = DateTime.Now}
                 });
@@ -82,9 +82,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //arrange
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult());
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
 
             //act
             var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;

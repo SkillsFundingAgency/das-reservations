@@ -4,16 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 {
-    public class WhenGettingNextActiveGlobalFundingRules
+    public class WhenGettingNextUnreadGlobalFundingRules
     {
-        private GetNextActiveGlobalFundingRuleQueryHandler _handler;
+        private GetNextUnreadGlobalFundingRuleQueryHandler _handler;
         private Mock<IFundingRulesService> _service;
         private GlobalRule _expectedGlobalRule;
 
@@ -37,19 +37,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             };
             
             _service = new Mock<IFundingRulesService>();
-            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
 
-            _handler = new GetNextActiveGlobalFundingRuleQueryHandler(_service.Object);
+            _handler = new GetNextUnreadGlobalFundingRuleQueryHandler(_service.Object);
         }
 
         [Test]
         public async Task Then_The_Next_Active_Funding_Rule_Is_Returned()
         {
             //Act
-            var actual = await _handler.Handle(new GetNextActiveGlobalFundingRuleQuery(), new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
 
            //Assert
            Assert.AreEqual(_expectedGlobalRule, actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_The_User_Id_Is_Used_To_Filter_Results()
+        {
+            //Act
+            var expectedUserId = "123";
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = expectedUserId}, new CancellationToken());
+
+            //Assert
+            _service.Verify(s => s.GetUnreadFundingRules(expectedUserId), Times.Once);
         }
 
         [Test]
@@ -57,11 +68,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         {
             //Arrange
             var expectedException = new Exception();
-            _service.Setup(s => s.GetFundingRules()).Throws(expectedException);
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).Throws(expectedException);
 
             //Act
             var actualException = Assert.ThrowsAsync<Exception>(() => 
-                _handler.Handle(new GetNextActiveGlobalFundingRuleQuery(), new CancellationToken()));
+                _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken()));
 
             //Assert
             Assert.AreEqual(expectedException, actualException);
@@ -77,10 +88,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>()
             };
 
-            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
 
             //Act
-            var actual = await _handler.Handle(new GetNextActiveGlobalFundingRuleQuery(), new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
 
             //Assert
             Assert.IsNull(actual.Rule);
@@ -99,10 +110,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 }
             };
 
-            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
 
             //Act
-            var actual = await _handler.Handle(new GetNextActiveGlobalFundingRuleQuery(), new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
 
             //Assert
             Assert.IsNull(actual.Rule);

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery());
 
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 

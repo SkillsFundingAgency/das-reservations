@@ -18,6 +18,7 @@
 
         public const string EmployerIndex = "employer-index";
         public const string EmployerStart = "employer-start";
+        public const string EmployerSaveRuleNotificationChoice = "employer-save-rule-notification-choice";
         public const string EmployerManage = "employer-manage";
         public const string EmployerManageCreate = "employer-manage-create";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";

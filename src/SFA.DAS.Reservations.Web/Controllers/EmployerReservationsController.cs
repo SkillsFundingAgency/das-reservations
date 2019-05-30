@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -39,7 +41,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         // GET
         public async Task<IActionResult> Index()
         {
-            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+            var employerAccountClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+            
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = employerAccountClaim.Value});
 
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 
@@ -56,6 +60,27 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return View("FundingRestrictionNotification", viewModel);
         }
+
+        [HttpPost]
+        [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule)
+        {
+            var employerAccountClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+
+            var userId = employerAccountClaim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = userId,
+                RuleId = ruleId,
+                TypeOfRule = typeOfRule
+            };
+
+            await _mediator.Send(command);
+
+            return RedirectToAction("Start");
+        }
+
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]

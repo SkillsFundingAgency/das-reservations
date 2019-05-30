@@ -9,5 +9,7 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
         Task<GetFundingRulesApiResponse> GetUnreadFundingRules(string id);
         Task<GetAvailableDatesApiResponse> GetAvailableDates();
         Task<GetAccountFundingRulesApiResponse> GetAccountFundingRules(long accountId);
+
+        Task MarkRuleAsRead(string id, long ruleId, RuleType type);
     }
 }

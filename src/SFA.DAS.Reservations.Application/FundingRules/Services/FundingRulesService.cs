@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -52,6 +53,18 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
             var response = await _apiClient.Get<GetAccountFundingRulesApiResponse>(request);
 
             return response;
+        }
+
+        public async Task MarkRuleAsRead(string id, long ruleId, RuleType type)
+        {
+            var request = new MarkRuleAsReadApiRequest(_options.Value.Url)
+            {
+                Id = id,
+                RuleId = ruleId,
+                TypeOfRule = type
+            };
+
+            await _apiClient.Create<MarkRuleAsReadApiResponse>(request);
         }
     }
 }
