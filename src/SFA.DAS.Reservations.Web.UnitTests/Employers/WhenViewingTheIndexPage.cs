@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
 
-            var claim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, ExpectedUserId);
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, ExpectedUserId);
 
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
             {

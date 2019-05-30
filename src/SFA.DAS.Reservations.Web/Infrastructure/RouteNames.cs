@@ -4,6 +4,7 @@
     {
         public const string ProviderIndex = "provider-index";
         public const string ProviderStart = "provider-start";
+        public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
         public const string ProviderManage = "provider-manage";
         public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
@@ -33,5 +34,6 @@
         public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";
+        
     }
 }

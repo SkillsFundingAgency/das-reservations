@@ -41,9 +41,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         // GET
         public async Task<IActionResult> Index()
         {
-            var employerAccountClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = employerAccountClaim.Value});
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
             var nextGlobalRuleId = response?.Rule?.Id;
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
