@@ -17,5 +17,12 @@ namespace SFA.DAS.Reservations.Web.Models
         public int Level { get; set; }
         public string CourseTitle { get; set; }
 
+        public struct RedirectOptions
+        {
+            public const string RecruitAnApprentice = "recruit-an-apprentice";
+            public const string AddAnApprentice = "add-an-apprentice";
+            public const string ProviderHomepage = "provider-homepage";
+        }
+
     }
 }

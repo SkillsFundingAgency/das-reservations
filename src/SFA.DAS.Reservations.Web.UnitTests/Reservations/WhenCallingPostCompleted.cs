@@ -2,10 +2,14 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using StructureMap.Query;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
@@ -49,21 +53,43 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.IsNotNull(actualModel);
             Assert.AreEqual(ViewNames.EmployerCompleted, actualModel.ViewName);
         }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Then_The_Request_Is_Redirected_Based_On_The_Selection(bool selection)
+        
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage)]
+        public void Then_The_Request_Is_Redirected_Based_On_The_Selection(string selection)
         {
+            var urlHelper = _fixture.Freeze<IExternalUrlHelper>();
             var model = _fixture.Create<ConfirmationRedirectViewModel>();
             var routeModel = _fixture.Create<ReservationsRouteModel>();
-            model.AddApprentice = selection;
             var controller = _fixture.Create<ReservationsController>();
+            model.WhatsNext = selection;
+            var url = urlHelper.GenerateUrl(id: routeModel.Id.ToString(),subDomain: "recruit");
+
 
             var actual = controller.PostCompleted(routeModel, model);
 
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);
-            Assert.AreEqual(selection ? model.ApprenticeUrl : model.DashboardUrl, result.Url);
+            switch (selection)
+            {
+                case (ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice):
+                    Assert.AreEqual(url,result.Url);
+                    break;
+
+                case (ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice):
+                    Assert.AreEqual(model.ApprenticeUrl, result.Url);
+                    break;
+
+                case (ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage):
+                    Assert.AreEqual(model.DashboardUrl,result.Url);
+                    break;
+
+                default: 
+                    Assert.Fail();
+                    break;
+
+            }
         }
     }
 }

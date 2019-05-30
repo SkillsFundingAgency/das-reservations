@@ -17,6 +17,7 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -99,6 +100,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel)
         {
             var mockMediator = _fixture.Freeze<Mock<IMediator>>();
+            var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
             mockMediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
@@ -109,7 +111,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Mock.Of<IStartDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
                 Mock.Of<ILogger<ReservationsController>>(),
-                Mock.Of<IEncodingService>());
+                Mock.Of<IEncodingService>(),
+                mockUrlHelper.Object);
 
             var actual = await controller.PostReview(routeModel);
 
