@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [Route("{ukprn}/signout",Name = RouteNames.ProviderSignOut)]
-        [Route("accounts/{employerAccountId}/signout", Name = RouteNames.EmployerSignOut)]
         public IActionResult SignOut(string ukprn)
         {
             _logger.LogDebug($"User signed out {ukprn}");
@@ -30,7 +30,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 WsFederationDefaults.AuthenticationScheme);
         }
-        
+
+        [Route("accounts/{employerAccountId}/signout", Name = RouteNames.EmployerSignOut)]
+        public IActionResult SignOutEmployer(string employerAccountId)
+        {
+            _logger.LogDebug($"User signed out {employerAccountId}");
+            return SignOut(
+                new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+                {
+                    RedirectUri = "",
+                    AllowRefresh = true
+                },
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
+
         [Route("notAvailable", Name="FeatureNotAvailable")]
         public IActionResult FeatureNotAvailable()
         {
