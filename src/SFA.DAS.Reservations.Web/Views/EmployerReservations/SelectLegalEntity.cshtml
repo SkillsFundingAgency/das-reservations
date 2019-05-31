@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Reservations - Select Organisation";
 
-    var accountLegalEntityPublicHashedId = Model.LegalEntities.First()?.AccountLegalEntityPublicHashedId;
+    var accountLegalEntityPublicHashedId = Model.LegalEntities.FirstOrDefault()?.AccountLegalEntityPublicHashedId;
 
     var customErrorKeys = new Dictionary<string, string> {{ "LegalEntity", $"LegalEntity-{accountLegalEntityPublicHashedId}" }};
 

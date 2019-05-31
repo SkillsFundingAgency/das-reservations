@@ -4,13 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EAS.Account.Api.Client;
-using SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalEntities
 {
@@ -18,118 +21,77 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries.GetLegalE
     public class WhenGettingLegalEntities
     {
         [Test, MoqAutoData]
-        public async Task And_No_Cache_Then_Gets_Legal_Entities_For_Account(
+        public async Task Then_Gets_Legal_Entities_For_Account(
             GetLegalEntitiesQuery query,
-            LegalEntityViewModel legalEntityViewModel,
-            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
-            [Frozen] Mock<ICacheStorageService> mockCacheService,
+            IEnumerable<AccountLegalEntity> legalEntities,
+            [Frozen] Mock<IApiClient> mockApiClient,
             GetLegalEntitiesQueryHandler handler)
         {
-            mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
-                .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
-            mockAccountApiClient
-                .Setup(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(legalEntityViewModel);
+            
+            mockApiClient
+                .Setup(client => client.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
+                .ReturnsAsync(legalEntities);
 
             await handler.Handle(query, CancellationToken.None);
 
-            mockAccountApiClient.Verify(client => client.GetLegalEntitiesConnectedToAccount(query.AccountId), Times.Once);
+            mockApiClient.Verify(client => client.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(r => r.AccountId.Equals(query.AccountId))), Times.Once);
         }
 
         [Test, MoqAutoData]
-        public async Task And_Is_Cache_Then_Gets_Legal_Entities_From_Cache(
+        public async Task Then_Uses_correct_Api_Base_Url(
             GetLegalEntitiesQuery query,
-            IEnumerable<AccountLegalEntity> cachedLegalEntities,
-            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
-            [Frozen] Mock<ICacheStorageService> mockCacheService,
+            IEnumerable<AccountLegalEntity> legalEntities,
+            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] ReservationsApiConfiguration configuration,
             GetLegalEntitiesQueryHandler handler)
         {
-            mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
-                .ReturnsAsync(cachedLegalEntities);
+            mockOptions.Setup(c => c.Value).Returns(configuration);
 
-            await handler.Handle(query, CancellationToken.None);
-
-            mockAccountApiClient.Verify(client => client.GetLegalEntitiesConnectedToAccount(query.AccountId), Times.Never);
-            mockAccountApiClient.Verify(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()), Times.Never);
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_Gets_Legal_Entities_Details(
-            GetLegalEntitiesQuery query,
-            List<ResourceViewModel> resourceViewModels,
-            LegalEntityViewModel legalEntityViewModel,
-            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
-            [Frozen] Mock<ICacheStorageService> mockCacheService,
-            GetLegalEntitiesQueryHandler handler)
-        {
-            mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
-                .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
-
-            mockAccountApiClient
-                .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
-                .ReturnsAsync(resourceViewModels);
-            mockAccountApiClient
-                .Setup(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(legalEntityViewModel);
-
-            await handler.Handle(query, CancellationToken.None);
-
-            resourceViewModels.ForEach(model => 
-                mockAccountApiClient.Verify(client => client.GetResource<LegalEntityViewModel>(model.Href), Times.Once));
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_Caches_Legal_Entities_Details(
-            GetLegalEntitiesQuery query,
-            List<ResourceViewModel> resourceViewModels,
-            LegalEntityViewModel legalEntityViewModel,
-            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
-            [Frozen] Mock<ICacheStorageService> mockCacheService,
-            GetLegalEntitiesQueryHandler handler)
-        {
-            mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
-                .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
-
-            mockAccountApiClient
-                .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
-                .ReturnsAsync(resourceViewModels);
-            mockAccountApiClient
-                .Setup(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(legalEntityViewModel);
+            mockApiClient
+                .Setup(client => client.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
+                .ReturnsAsync(legalEntities);
             
             await handler.Handle(query, CancellationToken.None);
 
-            mockCacheService.Verify(service => service.SaveToCache(query.AccountId, It.IsAny<IEnumerable<AccountLegalEntity>>(), 1), Times.Once);
+            mockApiClient.Verify(client => client.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(r => r.BaseUrl.Equals(configuration.Url))), Times.Once);
         }
+
+        [Test, MoqAutoData]
+        public async Task Then_Hashes_The_Id(
+            GetLegalEntitiesQuery query,
+            IEnumerable<AccountLegalEntity> legalEntities,
+            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IEncodingService> encodingService,
+            GetLegalEntitiesQueryHandler handler)
+        {
+
+            mockApiClient
+                .Setup(client => client.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
+                .ReturnsAsync(legalEntities);
+            
+            await handler.Handle(query, CancellationToken.None);
+
+            encodingService.Verify(service => service.Encode(legalEntities.FirstOrDefault().AccountLegalEntityId,EncodingType.PublicAccountLegalEntityId), Times.Once);
+        }
+
 
         [Test, MoqAutoData]
         public async Task Then_Returns_Legal_Entities(
             GetLegalEntitiesQuery query,
-            List<ResourceViewModel> resourceViewModels,
-            LegalEntityViewModel legalEntityViewModel,
-            [Frozen] Mock<IAccountApiClient> mockAccountApiClient,
-            [Frozen] Mock<ICacheStorageService> mockCacheService,
+            IEnumerable<AccountLegalEntity> legalEntities,
+            [Frozen] Mock<IApiClient> mockApiClient,
             GetLegalEntitiesQueryHandler handler)
         {
-            mockCacheService
-                .Setup(service => service.RetrieveFromCache<IEnumerable<AccountLegalEntity>>(query.AccountId))
-                .ReturnsAsync((IEnumerable<AccountLegalEntity>)null);
-
-            mockAccountApiClient
-                .Setup(client => client.GetLegalEntitiesConnectedToAccount(It.IsAny<string>()))
-                .ReturnsAsync(resourceViewModels);
-            mockAccountApiClient
-                .Setup(client => client.GetResource<LegalEntityViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(legalEntityViewModel);
+            
+            mockApiClient
+                .Setup(client => client.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
+                .ReturnsAsync(legalEntities);
             
             var result = await handler.Handle(query, CancellationToken.None);
 
-            result.AccountLegalEntities.Count().Should().Be(resourceViewModels.Count);
-            result.AccountLegalEntities.First().Should().BeEquivalentTo(legalEntityViewModel, options => options.ExcludingMissingMembers());
+            result.AccountLegalEntities.Count().Should().Be(legalEntities.Count());
         }
     }
 }

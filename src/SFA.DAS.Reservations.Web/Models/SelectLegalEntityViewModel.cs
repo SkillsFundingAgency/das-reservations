@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public LegalEntityViewModel(AccountLegalEntity accountLegalEntity, long?selectedLegalEntity)
         {
-            Name = accountLegalEntity.Name;
+            Name = accountLegalEntity.AccountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId;
             Selected = selectedLegalEntity.HasValue && selectedLegalEntity.Value == accountLegalEntity.AccountLegalEntityId;
         }

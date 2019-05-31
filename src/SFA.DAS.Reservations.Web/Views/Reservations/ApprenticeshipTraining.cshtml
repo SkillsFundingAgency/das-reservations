@@ -32,6 +32,7 @@
         }
 
         <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
+            <input id="accountLegalEntityPublicHashedId" name="accountLegalEntityPublicHashedId" type="hidden" value="@Model.AccountLegalEntityPublicHashedId"/>
             @if (Model.IsProvider)
             {
             <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take? (optional)</h2>
