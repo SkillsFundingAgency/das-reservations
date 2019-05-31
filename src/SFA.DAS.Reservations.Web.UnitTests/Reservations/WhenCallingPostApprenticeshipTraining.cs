@@ -21,6 +21,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -78,8 +79,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
-        public async Task Then_The_Model_Is_Validated_And_Confirmation_Returned(ApprenticeshipTrainingFormModel model, ReservationsRouteModel routeModel)
+        public async Task Then_The_Model_Is_Validated_And_Confirmation_Returned(
+            ApprenticeshipTrainingFormModel model, 
+            StartDateModel startDateModel,
+            ReservationsRouteModel routeModel)
         {
+            model.StartDate = JsonConvert.SerializeObject(startDateModel);
             _controller.ModelState.AddModelError("StartDate", "StartDate");
 
             var actual = await _controller.PostApprenticeshipTraining(routeModel, model);
@@ -213,13 +218,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Start_Date_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel,
-            GetCoursesResult coursesResult)
+            ApprenticeshipTrainingFormModel formModel)
         {
             formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
             
-            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()))
+            _mediator
+                .Setup(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "TrainingStartDate|The TrainingStartDate field is not valid." }), null, null));
            
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
@@ -235,8 +240,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Course_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             StartDateModel startDateModel,
-            ApprenticeshipTrainingFormModel formModel,
-            GetCoursesResult coursesResult)
+            ApprenticeshipTrainingFormModel formModel)
         {
             formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
             formModel.SelectedCourseId = _course.Id;
@@ -254,6 +258,47 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.IsNotNull(actualViewResult);
             Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
             Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("CourseId"));
+        }
+
+        [Test, AutoData]
+        public async Task And_CachedReservationNotFoundException_And_Has_Ukprn_Then_Redirect_To_ProviderIndex(
+            ReservationsRouteModel routeModel,
+            StartDateModel startDateModel,
+            ApprenticeshipTrainingFormModel formModel,
+            CachedReservationNotFoundException notFoundException)
+        {
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.SelectedCourseId = _course.Id;
+
+            _mediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(notFoundException);
+
+            var actual = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
+
+            actual.Should().NotBeNull();
+            actual.RouteName.Should().Be(RouteNames.ProviderIndex);
+        }
+
+        [Test, AutoData]
+        public async Task And_CachedReservationNotFoundException_And_No_Ukprn_Then_Redirect_To_EmployerIndex(
+            ReservationsRouteModel routeModel,
+            StartDateModel startDateModel,
+            ApprenticeshipTrainingFormModel formModel,
+            CachedReservationNotFoundException notFoundException)
+        {
+            formModel.StartDate = JsonConvert.SerializeObject(startDateModel);
+            formModel.SelectedCourseId = _course.Id;
+            routeModel.UkPrn = null;
+
+            _mediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(notFoundException);
+
+            var actual = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
+
+            actual.Should().NotBeNull();
+            actual.RouteName.Should().Be(RouteNames.EmployerIndex);
         }
     }
 }

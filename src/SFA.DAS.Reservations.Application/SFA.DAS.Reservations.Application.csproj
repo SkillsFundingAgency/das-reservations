@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Employers\Services\**" />
+    <EmbeddedResource Remove="Employers\Services\**" />
+    <None Remove="Employers\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hashids.net" Version="1.2.2" />
     <PackageReference Include="MediatR" Version="6.0.0" />
   </ItemGroup>
@@ -12,10 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Employers\Services\" />
   </ItemGroup>
 
 </Project>
