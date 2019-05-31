@@ -1,33 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 {
     public class WhenGettingAvailableDates
     {
+        private GetAvailableDatesQuery _query;
         private GetAvailableDatesQueryHandler _handler;
         private Mock<IFundingRulesService> _service;
-        private GetAvailableDatesApiResponse _expectedAvailableDates;
+        private GetAvailableDatesApiResponse _expectedApiResponse;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedAvailableDates = new GetAvailableDatesApiResponse
-            {
-                AvailableDates = new List<StartDateModel>()
-            };
+            var fixture = new Fixture();
+            _query = fixture.Create<GetAvailableDatesQuery>();
+            _expectedApiResponse = fixture.Create<GetAvailableDatesApiResponse>();
 
             _service = new Mock<IFundingRulesService>();
-            _service.Setup(s => s.GetAvailableDates()).ReturnsAsync(_expectedAvailableDates);
+            _service
+                .Setup(s => s.GetAvailableDates(_query.AccountLegalEntityId))
+                .ReturnsAsync(_expectedApiResponse);
 
             _handler = new GetAvailableDatesQueryHandler(_service.Object);
         }
@@ -36,10 +37,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         public async Task Then_The_AvailableDates_Are_Returned()
         {
             //Act
-            var actual = await _handler.Handle(new GetAvailableDatesQuery(), new CancellationToken());
+            var actual = await _handler.Handle(_query, new CancellationToken());
 
             //Assert
-            actual.AvailableDates.Should().BeEquivalentTo(_expectedAvailableDates.AvailableDates);
+            actual.AvailableDates.Should().BeEquivalentTo(_expectedApiResponse.AvailableDates);
         }
 
         [Test]
@@ -47,7 +48,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         {
             //Arrange
             var expectedException = new Exception();
-            _service.Setup(s => s.GetAvailableDates()).Throws(expectedException);
+            _service
+                .Setup(s => s.GetAvailableDates(It.IsAny<long>()))
+                .Throws(expectedException);
 
             //Act
             var actualException = Assert.ThrowsAsync<Exception>(() =>

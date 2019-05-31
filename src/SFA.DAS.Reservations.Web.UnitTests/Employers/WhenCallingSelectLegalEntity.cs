@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -20,13 +21,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task Then_Gets_Legal_Entities(
             ReservationsRouteModel routeModel,
+            long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             EmployerReservationsController controller)
         {
+            mockEncodingService
+                .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
+                .Returns(decodedAccountId);
+
             await controller.SelectLegalEntity(routeModel);
 
             mockMediator.Verify(mediator => mediator.Send(
-                It.Is<GetLegalEntitiesQuery>(query => query.AccountId == routeModel.EmployerAccountId), 
+                It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedAccountId), 
                 It.IsAny<CancellationToken>()), 
                 Times.Once);
         }

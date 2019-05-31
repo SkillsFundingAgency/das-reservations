@@ -4,11 +4,13 @@ namespace SFA.DAS.Reservations.Domain.Rules.Api
 {
     public class GetAvailableDatesApiRequest : IGetApiRequest
     {
-        public GetAvailableDatesApiRequest(string baseUrl)
+        public GetAvailableDatesApiRequest(string baseUrl, long accountLegalEntityId)
         {
             BaseUrl = baseUrl;
+            AccountLegalEntityId = accountLegalEntityId;
         }
         public string BaseUrl { get; }
-        public string GetUrl => $"{BaseUrl}api/rules/available-dates";
+        public long AccountLegalEntityId{ get; }
+        public string GetUrl => $"{BaseUrl}api/rules/available-dates/{AccountLegalEntityId}";
     }
 }
