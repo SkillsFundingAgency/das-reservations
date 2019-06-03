@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace SFA.DAS.Reservations.Domain.Rules
 {
     public enum GlobalRuleType
     {
-        FundingPaused = 0,
-        ReservationLimit = 1
+        None = 0,
+        FundingPaused = 1,
+        ReservationLimit = 2
     }
 
     public class GlobalRule
@@ -17,6 +17,8 @@ namespace SFA.DAS.Reservations.Domain.Rules
         public DateTime? ActiveFrom { get; set; }
         public GlobalRuleType RuleType { get; set; }
         public AccountRestriction Restriction { get; set; }
+        public IEnumerable<UserRuleAcknowledgement> UserRuleAcknowledgements { get; set; }
+
         
         [JsonIgnore]
         public string RuleTypeText => Enum.GetName(typeof(GlobalRuleType), RuleType);

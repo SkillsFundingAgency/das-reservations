@@ -13,9 +13,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 {
     public class WhenGettingNextUnreadGlobalFundingRules
     {
+        private const int UkPrn = 12345;
+
         private GetNextUnreadGlobalFundingRuleQueryHandler _handler;
         private Mock<IFundingRulesService> _service;
         private GlobalRule _expectedGlobalRule;
+        
 
         [SetUp]
         public void Arrange()
@@ -46,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         public async Task Then_The_Next_Active_Funding_Rule_Is_Returned()
         {
             //Act
-            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
            //Assert
            Assert.AreEqual(_expectedGlobalRule, actual.Rule);
@@ -56,11 +59,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         public async Task Then_The_User_Id_Is_Used_To_Filter_Results()
         {
             //Act
-            var expectedUserId = "123";
-            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = expectedUserId}, new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
-            _service.Verify(s => s.GetUnreadFundingRules(expectedUserId), Times.Once);
+            _service.Verify(s => s.GetUnreadFundingRules(UkPrn.ToString()), Times.Once);
         }
 
         [Test]
@@ -72,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 
             //Act
             var actualException = Assert.ThrowsAsync<Exception>(() => 
-                _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken()));
+                _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken()));
 
             //Assert
             Assert.AreEqual(expectedException, actualException);
@@ -91,7 +93,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
 
             //Act
-            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
             Assert.IsNull(actual.Rule);
@@ -113,10 +115,157 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
 
             //Act
-            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = "123"}, new CancellationToken());
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
             Assert.IsNull(actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_No_Provider_Acknowledged_Rules_Are_Returned()
+        {
+            //Arrange
+            const int ukPrn = 12345;
+
+            var acknowledgement = new UserRuleAcknowledgement
+            {
+                TypeOfRule = RuleType.GlobalRule,
+                UkPrn = ukPrn
+            };
+
+            var rule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(2),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>{ acknowledgement }
+            };
+
+            var fundingRules = new GetFundingRulesApiResponse
+            {
+                Rules = new List<ReservationRule>(),
+                GlobalRules = new List<GlobalRule>{ rule }
+            };
+
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+
+            //Act
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
+
+            //Assert
+            Assert.IsNull(actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_No_Employer_Acknowledged_Rules_Are_Returned()
+        {
+            //Arrange
+            var userId = Guid.NewGuid();
+
+            var acknowledgement = new UserRuleAcknowledgement
+            {
+                TypeOfRule = RuleType.GlobalRule,
+                UserId = userId
+            };
+
+            var rule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(2),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>{ acknowledgement }
+            };
+
+            var fundingRules = new GetFundingRulesApiResponse
+            {
+                Rules = new List<ReservationRule>(),
+                GlobalRules = new List<GlobalRule>{ rule }
+            };
+
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+
+            //Act
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = userId.ToString()}, new CancellationToken());
+
+            //Assert
+            Assert.IsNull(actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_Will_Return_Rules_Not_Acknowledged_By_User()
+        {
+            //Arrange
+            const int ukPrn = 12345;
+
+            var acknowledgement = new UserRuleAcknowledgement
+            {
+                TypeOfRule = RuleType.GlobalRule,
+                RuleId = 1,
+                UkPrn = 222
+            };
+
+            var rule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(2),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>{ acknowledgement }
+            };
+
+            var fundingRules = new GetFundingRulesApiResponse
+            {
+                Rules = new List<ReservationRule>(),
+                GlobalRules = new List<GlobalRule>{ rule }
+            };
+
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+
+            //Act
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
+
+            //Assert
+            Assert.IsNotNull(actual.Rule);
+            Assert.AreEqual(rule, actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_Will_Return_Nearest_Rules_That_Has_Not_Been_Acknowledged_By_User()
+        {
+            //Arrange
+            const int ukPrn = 12345;
+
+            var acknowledgement = new UserRuleAcknowledgement
+            {
+                TypeOfRule = RuleType.GlobalRule,
+                UkPrn = ukPrn
+            };
+
+            var acknowledgeRule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(2),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>{ acknowledgement }
+            };
+
+            var expectedRule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(3),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>()
+            };
+
+            var futureRule = new GlobalRule
+            {
+                ActiveFrom = DateTime.Now.AddDays(4),
+                UserRuleAcknowledgements = new List<UserRuleAcknowledgement>()
+            };
+
+            var fundingRules = new GetFundingRulesApiResponse
+            {
+                Rules = new List<ReservationRule>(),
+                GlobalRules = new List<GlobalRule>{ acknowledgeRule, expectedRule, futureRule }
+            };
+
+            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+
+            //Act
+            var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
+
+            //Assert
+            Assert.IsNotNull(actual.Rule);
+            Assert.AreEqual(expectedRule, actual.Rule);
         }
     }
 }
