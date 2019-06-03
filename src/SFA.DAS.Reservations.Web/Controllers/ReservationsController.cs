@@ -320,7 +320,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 foreach (var reservation in reservationsResult.Reservations)
                 {
-                    if (!reservation.ProviderId.HasValue || reservation.ProviderId == 0)
+                    if (routeModel.UkPrn.HasValue)
                     {
                         reservation.ProviderId = routeModel.UkPrn;
                     }
