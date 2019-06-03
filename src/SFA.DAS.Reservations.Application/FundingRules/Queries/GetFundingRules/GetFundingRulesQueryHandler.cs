@@ -22,9 +22,10 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 
             return new GetFundingRulesResult
             {
-               AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],
-               GlobalRules = response?.GlobalRules?.ToArray() ?? new GlobalRule[0]
+                AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],
+                GlobalRules = response?.GlobalRules?.ToArray() ?? new GlobalRule[0]
             };
+
         }
     }
 }

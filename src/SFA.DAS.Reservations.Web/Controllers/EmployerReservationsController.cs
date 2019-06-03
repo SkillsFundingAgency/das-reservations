@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -27,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
-        private ReservationsWebConfiguration _config;
+        private readonly ReservationsWebConfiguration _config;
 
         public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
         {
@@ -59,17 +61,36 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
-        public async Task<IActionResult> Start()
+        public async Task<IActionResult> Start(string employerAccountId)
         {
-            var response = await _mediator.Send(new GetFundingRulesQuery());
-
-            if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
+            try
             {
-                return View("EmployerFundingPaused");
+                var globalRules = await _mediator.Send(new GetFundingRulesQuery());
+
+                if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
+                {
+                    return View("Index");
+                }
+
+                var rule = globalRules.ActiveGlobalRules.First().RuleType;
+
+                switch (rule)
+                {
+                    case GlobalRuleType.FundingPaused:
+                        return View("EmployerFundingPaused");
+
+                    case GlobalRuleType.ReservationLimit:
+                        return View("ReservationLimitReached");
+                    default:
+                        return View("Index");
+                }
             }
-            
-            return View("Index");
+            catch (ValidationException)
+            {
+                return View("Error");
+            }
         }
+            
 
         [HttpGet]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
@@ -124,6 +145,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return await SelectLegalEntity(routeModel);
             }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached");
+            }
+            
         }
 
         [HttpGet]

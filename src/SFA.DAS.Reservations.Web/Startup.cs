@@ -135,6 +135,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped(typeof(IValidator<GetReservationsQuery>), typeof(GetReservationsQueryValidator));
+           
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using AutoFixture.NUnit3;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -27,47 +28,67 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+          
         }
 
-        [Test]
-        public async Task ThenRedirectToIndexIfNoFundingRulesExist()
+        [Test, MoqAutoData]
+        public async Task ThenRedirectToIndexIfNoFundingRulesExist([Frozen] long accountId)
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
-                    {
-                        AccountRules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>()
-                    });
+                {
+                    GlobalRules = new List<GlobalRule>(),
+                    AccountRules = new List<ReservationRule>()
+                });
 
             //act 
-            var view = await _controller.Start() as ViewResult;
+            var view = await _controller.Start(accountId.ToString()) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "Index");
         }
 
-        [Test]
-        public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
+        [Test,MoqAutoData]
+        public async Task ThenRedirectToFundingPausedIfFundingRulesExist([Frozen] long accountId)
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
-                    AccountRules = new List<ReservationRule>(),
-                    GlobalRules = new List<GlobalRule>
-                    {
-                        new GlobalRule {ActiveFrom = DateTime.Now.AddDays(-2)}
-                    }
+                    GlobalRules = new List<GlobalRule>{ new GlobalRule{RuleType = GlobalRuleType.FundingPaused, ActiveFrom = DateTime.Now.AddDays(-2)} },
+                    AccountRules = new List<ReservationRule>()
                 });
 
             //act 
-            var view = await _controller.Start() as ViewResult;
+            var view = await _controller.Start(accountId.ToString()) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "EmployerFundingPaused");
+        }
+
+        [Test,MoqAutoData]
+        public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage(
+            [Frozen] Mock<IMediator> mediatorMock,
+            [Frozen] long accountId)
+        {
+            //arrange
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
+                {
+                    GlobalRules = new List<GlobalRule>{ new GlobalRule{RuleType = GlobalRuleType.ReservationLimit, ActiveFrom = DateTime.Now.AddDays(-2)} }
+                });
+
+            var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+
+            //act
+            var result = await controller.Start(accountId.ToString()) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("ReservationLimitReached",result.ViewName);
         }
     }
 }
