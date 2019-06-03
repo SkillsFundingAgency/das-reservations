@@ -19,6 +19,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
@@ -36,19 +37,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly ILogger<ReservationsController> _logger;
         private readonly IEncodingService _encodingService;
         private readonly ReservationsWebConfiguration _configuration;
+        private readonly IExternalUrlHelper _urlHelper;
 
         public ReservationsController(
             IMediator mediator, 
             IStartDateService startDateService, 
             IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ReservationsController> logger,
-            IEncodingService encodingService)
+            IEncodingService encodingService,
+            IExternalUrlHelper urlHelper)
         {
             _mediator = mediator;
             _startDateService = startDateService;
             _logger = logger;
             _encodingService = encodingService;
             _configuration = configuration.Value;
+            _urlHelper = urlHelper;
         }
 
         [Route("{ukPrn}/reservations/{id}/apprenticeship-training/{fromReview?}", Name = RouteNames.ProviderApprenticeshipTraining)]
@@ -256,7 +260,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 queryResult.AccountLegalEntityName,
                 _configuration.DashboardUrl, 
                 _configuration.ApprenticeUrl,
-                _configuration.EmployerDashboardUrl
+                _configuration.EmployerDashboardUrl,
+                _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString())
+
             );
             return View(model.ViewName, model);
         }
@@ -279,18 +285,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     model.AccountLegalEntityName,
                     _configuration.DashboardUrl,
                     _configuration.ApprenticeUrl,
-                    _configuration.EmployerDashboardUrl
+                    _configuration.EmployerDashboardUrl,
+                    model.RecruitApprenticeUrl
+                    
                 );
                 
                 return View(viewModel.ViewName, viewModel);
             }
 
-            if (model.AddApprentice.HasValue && model.AddApprentice.Value)
+            if (!string.IsNullOrEmpty(model.WhatsNext) && !string.IsNullOrWhiteSpace(model.WhatsNext))
             {
-                return Redirect(model.ApprenticeUrl);
+
+                switch (model.WhatsNext)
+                {
+                    case ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice:
+                        return Redirect(model.RecruitApprenticeUrl);
+
+                    case ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice:
+                        return Redirect(model.ApprenticeUrl);
+
+                    case ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage:
+                        return Redirect(model.DashboardUrl);
+                }
             }
 
-            return Redirect(model.DashboardUrl);
+            ModelState.AddModelError("WhatsNext", "Select what you would like to do next");
+            return PostCompleted(routeModel, model);
         }
 
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]

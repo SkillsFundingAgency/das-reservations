@@ -49,21 +49,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.IsNotNull(actualModel);
             Assert.AreEqual(ViewNames.EmployerCompleted, actualModel.ViewName);
         }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Then_The_Request_Is_Redirected_Based_On_The_Selection(bool selection)
+        
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage)]
+        public void Then_The_Request_Is_Redirected_Based_On_The_Selection(string selection)
         {
             var model = _fixture.Create<ConfirmationRedirectViewModel>();
             var routeModel = _fixture.Create<ReservationsRouteModel>();
-            model.AddApprentice = selection;
             var controller = _fixture.Create<ReservationsController>();
+            model.WhatsNext = selection;
 
             var actual = controller.PostCompleted(routeModel, model);
 
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);
-            Assert.AreEqual(selection ? model.ApprenticeUrl : model.DashboardUrl, result.Url);
+            switch (selection)
+            {
+                case (ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice):
+                    Assert.AreEqual(model.RecruitApprenticeUrl,result.Url);
+                    break;
+
+                case (ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice):
+                    Assert.AreEqual(model.ApprenticeUrl, result.Url);
+                    break;
+
+                case (ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage):
+                    Assert.AreEqual(model.DashboardUrl,result.Url);
+                    break;
+
+                default: 
+                    Assert.Fail();
+                    break;
+
+            }
         }
     }
 }
