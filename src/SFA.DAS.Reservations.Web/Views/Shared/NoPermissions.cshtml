@@ -1,0 +1,16 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<a asp-external-controller="Account" class="govuk-back-link">Back</a>
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">You need permission to do this</h1>
+            <p class="govuk-body">An employer needs to give you permission first before you can do this on their behalf.</p>
+            
+            <a asp-external-controller="Account" role="button" draggable="false" tabindex="1" class="govuk-button">Go to homepage</a>
+        </div>
+    </div>
+</main>

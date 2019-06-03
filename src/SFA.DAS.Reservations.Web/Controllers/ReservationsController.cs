@@ -324,6 +324,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             if (routeModel.UkPrn.HasValue)
             {
                 var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+
+                if (!trustedEmployersResponse.Employers.Any())
+                {
+                    return View("NoPermissions");
+                }
+
                 employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId));
                 viewName = ViewNames.ProviderManage;
             }

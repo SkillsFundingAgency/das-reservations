@@ -45,13 +45,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = expectedEmployers});
 
            
-            var result =   await controller.ChooseEmployer(routeModel);
+            var result = await controller.ChooseEmployer(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ChooseEmployerViewModel>()
                 .Subject;
-            
+            result.Should().BeOfType<ViewResult>()
+                .Which.ViewName.Should().NotBe("NoPermissions");
             viewModel.Employers.Should().BeEquivalentTo(expectedEmployers);
         }
+
     }
 }
