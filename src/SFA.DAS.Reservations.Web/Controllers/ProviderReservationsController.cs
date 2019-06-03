@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();
 
-            if (employers.Any() && employers.Count > 0)
+            if (!employers.Any())
             {
                 return View("NoPermissions");
             }

@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -201,6 +202,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             Assert.IsTrue(viewModel.Reservations.First().ApprenticeUrl.StartsWith($"{config.ApprenticeUrl}/{routeModel.UkPrn}/"));
 
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Provider_Has_Not_TrustedEmployers_A_NoPermissions_View_Is_Returned(
+            ReservationsRouteModel routeModel,
+            GetTrustedEmployersResponse getTrustedEmployersResponse,
+            Reservation reservation,
+            string hashedId,
+            [Frozen] ReservationsWebConfiguration config,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new List<Employer>()});
+
+            var result = await controller.Manage(routeModel) as ViewResult;
+
+            result.ViewName.Should().Be("NoPermissions");
         }
 
     }
