@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             };
             
             _service = new Mock<IFundingRulesService>();
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             _handler = new GetNextUnreadGlobalFundingRuleQueryHandler(_service.Object);
         }
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
-            _service.Verify(s => s.GetUnreadFundingRules(UkPrn.ToString()), Times.Once);
+            _service.Verify(s => s.GetFundingRules(), Times.Once);
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         {
             //Arrange
             var expectedException = new Exception();
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).Throws(expectedException);
+            _service.Setup(s => s.GetFundingRules()).Throws(expectedException);
 
             //Act
             var actualException = Assert.ThrowsAsync<Exception>(() => 
@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>()
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
@@ -112,7 +112,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 }
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
@@ -145,7 +145,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>{ rule }
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
@@ -178,7 +178,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>{ rule }
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = userId.ToString()}, new CancellationToken());
@@ -212,7 +212,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>{ rule }
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
@@ -258,7 +258,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 GlobalRules = new List<GlobalRule>{ acknowledgeRule, expectedRule, futureRule }
             };
 
-            _service.Setup(s => s.GetUnreadFundingRules(It.IsAny<string>())).ReturnsAsync(fundingRules);
+            _service.Setup(s => s.GetFundingRules()).ReturnsAsync(fundingRules);
 
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());

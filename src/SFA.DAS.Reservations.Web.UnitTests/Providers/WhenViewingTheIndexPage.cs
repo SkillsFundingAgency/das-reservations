@@ -64,11 +64,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await _controller.Index() as RedirectToRouteResult;
+            var redirect = await _controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.RouteName, RouteNames.ProviderStart);
+            Assert.AreEqual(redirect.ActionName, "Start");
         }
 
         [Test]
@@ -97,11 +97,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToRouteResult;
+            var redirect = await _controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.RouteName, RouteNames.ProviderStart);
+            Assert.AreEqual(redirect.ActionName, "Start");
         }
 
         [Test]
@@ -112,11 +112,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToRouteResult;
+            var redirect = await _controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.RouteName, RouteNames.ProviderStart);
+            Assert.AreEqual(redirect.ActionName, "Start");
         }
     }
 }

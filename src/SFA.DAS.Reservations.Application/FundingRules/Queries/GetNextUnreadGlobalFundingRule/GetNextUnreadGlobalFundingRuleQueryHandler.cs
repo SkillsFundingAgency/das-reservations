@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlo
 
         public async Task<GetNextUnreadGlobalFundingRuleResult> Handle(GetNextUnreadGlobalFundingRuleQuery request, CancellationToken cancellationToken)
         {
-            var response = await _service.GetUnreadFundingRules(request.Id);
+            var response = await _service.GetFundingRules();
 
             var globalRules =
                 response?.GlobalRules?.Where(rule => rule.ActiveFrom.HasValue && rule.ActiveFrom >= DateTime.Now);

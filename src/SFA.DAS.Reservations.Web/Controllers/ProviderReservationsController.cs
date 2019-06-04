@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
             {
-                return RedirectToRoute(RouteNames.ProviderStart, RouteData?.Values);
+                return RedirectToAction("Start", RouteData?.Values);
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel
