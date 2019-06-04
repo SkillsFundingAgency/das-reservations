@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
@@ -96,12 +97,23 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
-            if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
+            var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
+
+            if (activeGlobalRule == null)
             {
-                return View("Error");
+                return View("Index");
             }
-            
-            return View("Index");
+
+            switch (activeGlobalRule.RuleType)
+            {
+                case GlobalRuleType.FundingPaused:
+                    return View("EmployerFundingPaused");
+                        
+                case GlobalRuleType.ReservationLimit:
+                    return View("ReservationLimitReached");
+                
+                default: return View("Index");
+            }
         }
             
 

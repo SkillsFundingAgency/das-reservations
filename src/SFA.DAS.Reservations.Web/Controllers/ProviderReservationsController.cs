@@ -34,7 +34,59 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _config = options.Value;
         }
 
-        public async Task<IActionResult> Index(uint ukPrn)
+        public async Task<IActionResult> Index()
+        {
+            var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+            
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = providerUkPrnClaim.Value});
+
+            var nextGlobalRuleId = response?.Rule?.Id;
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RuleId = nextGlobalRuleId.Value,
+                TypeOfRule = RuleType.GlobalRule,
+                RestrictionStartDate = nextGlobalRuleStartDate.Value,
+                BackLink = _config.DashboardUrl
+            };
+
+            return View("FundingRestrictionNotification", viewModel);
+        }
+
+        [HttpPost]
+        [Route("saveRuleNotificationChoice",Name = RouteNames.ProviderSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
+        {
+            if (!markRuleAsRead)
+            {
+                return RedirectToRoute(RouteNames.ProviderStart);
+            }
+
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+
+            var userId = userAccountIdClaim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = userId,
+                RuleId = ruleId,
+                TypeOfRule = typeOfRule
+            };
+
+            await _mediator.Send(command);
+
+            return RedirectToRoute(RouteNames.ProviderStart);
+        }
+
+
+        [Route("start", Name = RouteNames.ProviderStart)]
+        public async Task<IActionResult> Start(uint ukPrn)
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 

@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         private ProviderReservationsController _controller;
         private Mock<IMediator> _mediator;
+        private const uint ukPrn = 1234;
 
         [SetUp]
         public void Arrange()
@@ -27,12 +28,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator = new Mock<IMediator>();
 
             _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
-        }
-        
-        [Test]
-        public async Task ThenWillBeRoutedToProviderStartPage()
-        {
-            //Arrange
+
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
@@ -44,19 +40,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     Employers = new List<Employer> { new Employer() }
                 });
-
-            _controller = new ProviderReservationsController(_mediator.Object);
         }
         
         [Test]
-        public async Task ThenWillBeRoutedToProviderLandingPage()
+        public async Task ThenWillShowStartPage()
         {
             //Act
-            var result = await _controller.Start() as ViewResult;
+            var result = await _controller.Start(ukPrn) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("Index", result.ViewName);
+           
         }
 
         [Test]
@@ -74,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             //Act
-            var result = await _controller.Start() as ViewResult;
+            var result = await _controller.Start(ukPrn) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
@@ -88,11 +83,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new List<Employer> { }
+                    Employers = new List<Employer>()
                 });
 
             //Act
-            var result = await _controller.Index(123) as ViewResult;
+            var result = await _controller.Start(ukPrn) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
