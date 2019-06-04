@@ -394,13 +394,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var isProvider = routeModel.UkPrn.HasValue;
             try
             {
-                if (delete.HasValue && !delete.Value)
+                if (delete.HasValue && !delete.Value ||
+                    !routeModel.Id.HasValue)
                 {
                     var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
                     return RedirectToRoute(manageRoute, routeModel);
                 }
                 
-                await _mediator.Send(new DeleteReservationCommand());
+                await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value});
 
                 var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
                 return RedirectToRoute(completedRoute, routeModel);
@@ -408,6 +409,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ValidationException ex)
             {
                 //todo: get error into modelstate blah blah
+                _logger.LogInformation(ex, $"Validation error trying to delete reservation [{routeModel.Id}]");
                 var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
                 return View(deleteViewName);
             }
@@ -418,6 +420,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(errorRoute, routeModel);
             }
         }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,

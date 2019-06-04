@@ -20,6 +20,31 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCallingPostDelete
     {
         [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_No_Id_Then_Redirect_To_Provider_Manage(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            routeModel.Id = null;
+
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderManage);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_And_No_Id_Then_Redirect_To_Employer_Manage(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            routeModel.Id = null;
+
+            var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerManage);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_ValidationException_Then_Returns_To_Provider_Delete_View(
             ReservationsRouteModel routeModel,
             ValidationException validationException,
@@ -88,16 +113,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Delete_True_And_Has_Ukprn_Then_Redirects_To_Provider_Completed_Route(
             ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderDeleteCompleted);
+            mockMediator.Verify(mediator => mediator.Send(
+                It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id),
+                It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task And_Delete_True_And_No_Ukprn_Then_Redirects_To_Employer_Completed_Route(
             ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
@@ -105,6 +136,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostDelete(routeModel, true) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.EmployerDeleteCompleted);
+            mockMediator.Verify(mediator => mediator.Send(
+                    It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         [Test, MoqAutoData]

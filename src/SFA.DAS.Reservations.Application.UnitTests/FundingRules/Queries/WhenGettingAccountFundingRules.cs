@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -13,6 +11,7 @@ using Moq;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
+using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
