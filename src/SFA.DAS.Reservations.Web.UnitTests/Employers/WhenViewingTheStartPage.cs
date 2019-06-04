@@ -28,7 +28,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
-          
         }
 
         [Test, MoqAutoData]
@@ -43,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //act 
-            var view = await _controller.Start(accountId.ToString()) as ViewResult;
+            var view = await _controller.Start() as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -62,7 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //act 
-            var view = await _controller.Start(accountId.ToString()) as ViewResult;
+            var view = await _controller.Start() as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -84,7 +83,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
             //act
-            var result = await controller.Start(accountId.ToString()) as ViewResult;
+            var result = await controller.Start() as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);

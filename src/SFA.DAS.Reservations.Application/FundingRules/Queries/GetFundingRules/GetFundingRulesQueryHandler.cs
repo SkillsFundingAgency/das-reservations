@@ -17,9 +17,9 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
         }
 
         public async Task<GetFundingRulesResult> Handle(GetFundingRulesQuery request, CancellationToken cancellationToken)
-        {
+        {           
             var response = await _service.GetFundingRules();
-
+           
             return new GetFundingRulesResult
             {
                 AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],

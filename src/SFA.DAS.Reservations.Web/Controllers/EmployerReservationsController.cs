@@ -58,10 +58,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return View("FundingRestrictionNotification", viewModel);
         }
+            
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
-        public async Task<IActionResult> Start(string employerAccountId)
+        public async Task<IActionResult> Start()
         {
             try
             {

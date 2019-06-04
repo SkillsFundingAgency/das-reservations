@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [Route("start", Name = RouteNames.ProviderStart)]
-        public async Task<IActionResult> Start()
+        public async Task<IActionResult> Start(uint ukPrn)
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
@@ -61,6 +61,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View( "ProviderFundingPaused");
             }
 
+            var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();
+
+            if (!employers.Any())
+            {
+                return View("NoPermissions");
+            }
+            
             return View("Index");
         }
 
