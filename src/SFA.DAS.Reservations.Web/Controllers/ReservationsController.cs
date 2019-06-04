@@ -400,12 +400,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
-        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, bool? delete)
+        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, DeleteConfirmationViewModel viewModel)
         {
             var isProvider = routeModel.UkPrn.HasValue;
             try
             {
-                if (delete.HasValue && !delete.Value ||
+                if (viewModel.Delete.HasValue && !viewModel.Delete.Value ||
                     !routeModel.Id.HasValue)
                 {
                     var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
