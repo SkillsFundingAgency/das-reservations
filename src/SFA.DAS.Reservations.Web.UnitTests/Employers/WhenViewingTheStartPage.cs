@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private EmployerReservationsController _controller;
         private Mock<IMediator> _mockMediator;
         private Mock<IEncodingService> _mockEncodingService;
+        private Mock<IFundingRulesService> _fundingRulesService;
 
         [SetUp]
         public void Arrange()
@@ -48,8 +49,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(view.ViewName, "Index");
         }
 
-        [Test]
-        public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
+        [Test,MoqAutoData]
+        public async Task ThenRedirectToFundingPausedIfFundingRulesExist(
+            [Frozen] long accountId)
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
@@ -68,6 +70,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //assert
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "EmployerFundingPaused");
+        }
+
+        [Test,MoqAutoData]
+        public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage(
+            [Frozen] Mock<IMediator> mediatorMock,
+            [Frozen] long accountId)
+        {
+            //arrange
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult()
+                {
+                    ActiveRule = GlobalRuleType.ReservationLimit
+                });
+
+            var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object);
+
+            //act
+            var result = await controller.Index(accountId.ToString()) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("ReservationLimitReached",result.ViewName);
         }
     }
 }

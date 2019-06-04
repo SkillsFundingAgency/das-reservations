@@ -98,11 +98,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
             {
-                return View("EmployerFundingPaused");
+                return View("Error");
             }
             
             return View("Index");
         }
+            
 
         [HttpGet]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
