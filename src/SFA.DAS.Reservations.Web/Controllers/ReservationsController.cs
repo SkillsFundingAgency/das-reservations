@@ -432,6 +432,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
+        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
+        public IActionResult DeleteCompleted(ReservationsRouteModel routeModel)
+        {
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
+
+            return View(viewName);
+        }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
