@@ -28,18 +28,6 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
             return response;
         }
 
-        public async Task<GetFundingRulesApiResponse> GetUnreadFundingRules(string id)
-        {
-            var request = new GetUnreadFundingRulesApiRequest(_options.Value.Url)
-            {
-                Id = id
-            };
-
-            var response = await _apiClient.Get<GetFundingRulesApiResponse>(request);
-
-            return response;
-        }
-
         public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId)
         {
             var request = new GetAvailableDatesApiRequest(_options.Value.Url, accountLegalEntityId);
