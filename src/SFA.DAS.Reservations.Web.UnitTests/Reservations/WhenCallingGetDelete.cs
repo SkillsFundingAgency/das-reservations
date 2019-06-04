@@ -19,17 +19,30 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCallingGetDelete
     {
         [Test, MoqAutoData]
-        public void And_No_Id_Then_Throws_ArgumentException(
+        public async Task And_Has_Ukprn_And_No_Id_Then_Redirects_To_Provider_Manage(
             ReservationsRouteModel routeModel,
             ReservationsController controller)
         {
             routeModel.Id = null;
 
-            var act  = new Func<Task>(async ()  => await controller.Delete(routeModel));
+            var result  = await controller.Delete(routeModel) as RedirectToRouteResult;
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("Reservation ID must be in URL.*")
-                .And.ParamName.Should().Be(nameof(routeModel.Id));
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.ProviderManage);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_And_No_Id_Then_Redirects_To_Employer_Manage(
+            ReservationsRouteModel routeModel,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            routeModel.Id = null;
+
+            var result  = await controller.Delete(routeModel) as RedirectToRouteResult;
+
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.EmployerManage);
         }
 
         [Test, MoqAutoData]

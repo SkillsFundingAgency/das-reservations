@@ -368,22 +368,33 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
         public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
         {
-            if (!routeModel.Id.HasValue)
+            var isProvider = routeModel.UkPrn.HasValue;
+            try
             {
-                throw new ArgumentException("Reservation ID must be in URL.", nameof(routeModel.Id));
+                if (!routeModel.Id.HasValue)
+                {
+                    _logger.LogInformation($"Reservation ID must be in URL, parameter [{nameof(routeModel.Id)}]");
+                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
+                    return RedirectToRoute(manageRoute, routeModel);
+                }
+
+                var query = new GetReservationQuery
+                {
+                    Id = routeModel.Id.Value,
+                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
+                };
+                var queryResult = await _mediator.Send(query);
+                //todo: null check on result
+
+                var viewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
+
+                return View(viewName, new DeleteViewModel(queryResult));
             }
-
-            var query = new GetReservationQuery
+            catch (Exception e)
             {
-                Id = routeModel.Id.Value,
-                UkPrn = routeModel.UkPrn.GetValueOrDefault()
-            };
-            var queryResult = await _mediator.Send(query);
-            //todo: null check on result
-
-            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
-
-            return View(viewName, new DeleteViewModel(queryResult));
+                _logger.LogError(e, "Error preparing for the delete view");
+                throw;
+            }
         }
 
         [HttpPost]
