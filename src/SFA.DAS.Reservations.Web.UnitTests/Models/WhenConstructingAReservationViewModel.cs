@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
@@ -21,14 +22,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
-        public void Then_Sets_StartDateDescription(
+        public void Then_Sets_StartDateDescription_From_StartDateModel(
             Reservation reservation,
             string url,
             string alephid)
         {
             var viewModel = new ReservationViewModel(reservation, url, alephid);
 
-            viewModel.StartDateDescription.Should().Be($"{reservation.StartDate:MMM yyyy} to {reservation.ExpiryDate:MMM yyyy}");
+            var expectedStartDateDescription = new StartDateModel
+            {
+                StartDate = reservation.StartDate, 
+                EndDate = reservation.ExpiryDate
+            }.ToString();
+            viewModel.StartDateDescription.Should().Be(expectedStartDateDescription);
         }
 
         [Test, AutoData]
