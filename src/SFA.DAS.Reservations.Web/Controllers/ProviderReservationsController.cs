@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
             _config = options.Value;
         }
-
+      
         public async Task<IActionResult> Index()
         {
             var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
