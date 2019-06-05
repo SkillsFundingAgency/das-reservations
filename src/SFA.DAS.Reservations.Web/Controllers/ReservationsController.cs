@@ -263,7 +263,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _configuration.EmployerDashboardUrl,
                  routeModel.UkPrn != null?
                      _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString()) :
-                     _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId)
+                     _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId),
+                _configuration.FindApprenticeshipTrainingUrl
+                
                                                             
 
             );
@@ -289,7 +291,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     _configuration.DashboardUrl,
                     _configuration.ApprenticeUrl,
                     _configuration.EmployerDashboardUrl,
-                    model.RecruitApprenticeUrl
+                    model.RecruitApprenticeUrl,
+                    _configuration.FindApprenticeshipTrainingUrl
                     
                 );
                 
@@ -304,8 +307,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice:
                         return Redirect(model.RecruitApprenticeUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.FindTrainingProvider:
-                        return Redirect(model.FindTrainingProviderUrl);
+                    case ConfirmationRedirectViewModel.RedirectOptions.FindApprenticeshipTraining:
+                        return Redirect(model.FindApprenticeshipTrainingUrl);
 
                     case ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice:
                         return Redirect(model.ApprenticeUrl);

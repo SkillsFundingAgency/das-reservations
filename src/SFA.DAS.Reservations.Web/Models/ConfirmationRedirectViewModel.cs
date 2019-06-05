@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string DashboardUrl { get; set; }
         public string ApprenticeUrl { get; set; }
         public string RecruitApprenticeUrl { get; set; }
-        public string FindTrainingProviderUrl { get; set; }
+        public string FindApprenticeshipTrainingUrl { get; set; }
         public Guid ReservationId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.Models
             public const string RecruitAnApprentice = "recruit-an-apprentice";
             public const string AddAnApprentice = "add-an-apprentice";
             public const string ProviderHomepage = "provider-homepage";
-            public const string FindTrainingProvider = "find-training-provider";
+            public const string FindApprenticeshipTraining = "find-apprenticeship-training";
         }
 
     }

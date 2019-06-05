@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice)]
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice)]
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage)]
-        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.FindTrainingProvider)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.FindApprenticeshipTraining)]
         public void Then_The_Request_Is_Redirected_Based_On_The_Selection(string selection)
         {
             var model = _fixture.Create<ConfirmationRedirectViewModel>();
@@ -71,8 +71,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     Assert.AreEqual(model.RecruitApprenticeUrl,result.Url);
                     break;
 
-                case (ConfirmationRedirectViewModel.RedirectOptions.FindTrainingProvider):
-                    Assert.AreEqual(model.FindTrainingProviderUrl,result.Url);
+                case (ConfirmationRedirectViewModel.RedirectOptions.FindApprenticeshipTraining):
+                    Assert.AreEqual(model.FindApprenticeshipTrainingUrl,result.Url);
                     break;
 
                 case (ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice):
