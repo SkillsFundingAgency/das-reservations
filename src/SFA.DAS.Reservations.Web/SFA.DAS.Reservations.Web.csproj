@@ -11,6 +11,12 @@
     <None Remove="Pages\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Views\Error\AccessDenied.cshtml" />
+    <Content Remove="Views\Error\ApplicationError.cshtml" />
+    <Content Remove="Views\Error\PageNotFound.cshtml" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="6.0.0" />
@@ -48,6 +54,13 @@
     <Content Update="Views\ProviderReservations\ChooseEmployer.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="Views\Error\AccessDenied.cshtml" />
+    <None Include="Views\Error\ApplicationError.cshtml" />
+    <None Include="Views\Error\PageNotFound.cshtml" />
   </ItemGroup>
 
 </Project>
