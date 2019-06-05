@@ -28,7 +28,7 @@
         }
         else
         {
-            <h1 class="govuk-heading-xl">When will the apprentice start their off-the-job training?</h1>
+            <h1 class="govuk-heading-xl">When will the apprentice start their apprenticeship training?</h1>
         }
 
         <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
@@ -87,25 +87,6 @@
                     </div>
                 </fieldset>
             </div>
-            <details class="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        I want a later start date
-                    </span>
-                </summary>
-                @if (Model.IsProvider)
-                {
-                    <div class="govuk-details__text">
-                        You can secure funding no more than 6 months in advance of the apprenticeship training start date. If you want to secure funding for a later date, come back later.
-                    </div>
-                }
-                else
-                {
-                    <div class="govuk-details__text">
-                        You are securing funding for a non-levy employer to take on an apprentice. This will be paid directly to the training provider, who the employer will confirm at a later date.
-                    </div>
-                }
-            </details>
             <button type="submit" class="govuk-button">
                 Save and continue
             </button>
