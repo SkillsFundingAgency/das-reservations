@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
@@ -169,6 +170,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 return await SelectLegalEntity(routeModel);
+            }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached");
             }
         }
 
