@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class DeleteCompletedViewModel
     {
-        [Required(ErrorMessage = "Please choose what's next")]
+        [Required(ErrorMessage = "Select what you want to do next")]
         public bool? Manage { get; set; }
     }
 }

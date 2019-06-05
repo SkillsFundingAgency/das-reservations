@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.Models
                                 new Course(null, null, 0).CourseDescription;
         }
 
-        [Required(ErrorMessage = "Select whether you want to delete this reservation or not")]
+        [Required(ErrorMessage = "Select whether you want to delete this reservation")]
         public bool? Delete { get; set; }
         public Guid Id { get; set; }
         public string StartDateDescription { get; set; }
