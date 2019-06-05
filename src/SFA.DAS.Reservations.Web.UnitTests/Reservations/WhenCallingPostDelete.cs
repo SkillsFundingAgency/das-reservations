@@ -20,6 +20,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCallingPostDelete
     {
         [Test, MoqAutoData]
+        public async Task And_Delete_Invalid_And_Has_Ukprn_Then_Shows_Provider_Delete_View_Again(
+            ReservationsRouteModel routeModel,
+            DeleteViewModel viewModel,
+            ReservationsController controller)
+        {
+            controller.ModelState.AddModelError("key", "error message");
+
+            var result = await controller.PostDelete(routeModel, viewModel) as ViewResult;
+
+            result.ViewName.Should().Be(ViewNames.ProviderDelete);
+            result.Model.Should().Be(viewModel);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Delete_Invalid_And_No_Ukprn_Then_Shows_Employer_Delete_View_Again(
+            ReservationsRouteModel routeModel,
+            DeleteViewModel viewModel,
+            ReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            controller.ModelState.AddModelError("key", "error message");
+
+            var result = await controller.PostDelete(routeModel, viewModel) as ViewResult;
+
+            result.ViewName.Should().Be(ViewNames.EmployerDelete);
+            result.Model.Should().Be(viewModel);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_No_Id_Then_Redirect_To_Provider_Manage(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
@@ -181,33 +210,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.EmployerManage);
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Delete_Invalid_And_Has_Ukprn_Then_Shows_Provider_Delete_View_Again(
-            ReservationsRouteModel routeModel,
-            DeleteViewModel viewModel,
-            ReservationsController controller)
-        {
-            controller.ModelState.AddModelError("key", "error message");
-
-            var result = await controller.PostDelete(routeModel, viewModel) as ViewResult;
-
-            result.ViewName.Should().Be(ViewNames.ProviderDelete);
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Delete_Invalid_And_No_Ukprn_Then_Shows_Employer_Delete_View_Again(
-            ReservationsRouteModel routeModel,
-            DeleteViewModel viewModel,
-            ReservationsController controller)
-        {
-            routeModel.UkPrn = null;
-            controller.ModelState.AddModelError("key", "error message");
-
-            var result = await controller.PostDelete(routeModel, viewModel) as ViewResult;
-
-            result.ViewName.Should().Be(ViewNames.EmployerDelete);
         }
     }
 }
