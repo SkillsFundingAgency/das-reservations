@@ -42,6 +42,9 @@
             </div>
 
             <form method="post" asp-route="@RouteNames.ProviderDelete">
+                <input type="hidden" id="AccountLegalEntityName" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName"/>
+                <input type="hidden" id="StartDateDescription" name="StartDateDescription" value="@Model.StartDateDescription"/>
+                <input type="hidden" id="CourseDescription" name="CourseDescription" value="@Model.CourseDescription"/>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">

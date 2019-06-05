@@ -8,7 +8,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
 {
     [TestFixture]
-    public class WhenConstructingADeleteViewModel
+    public class WhenConstructingADeleteViewModelFromGetReservationResult
     {
         [Test, AutoData]
         public void Then_Sets_ReservationId(
@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new DeleteViewModel(getReservationResult);
 
-            viewModel.ReservationId.Should().Be(getReservationResult.ReservationId);
+            viewModel.Id.Should().Be(getReservationResult.ReservationId);
         }
 
         [Test, AutoData]

@@ -400,11 +400,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
-        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, DeleteConfirmationViewModel viewModel)
+        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, DeleteViewModel viewModel)
         {
             var isProvider = routeModel.UkPrn.HasValue;
+            var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View(deleteViewName, viewModel);
+                }
+
                 if (viewModel.Delete.HasValue && !viewModel.Delete.Value ||
                     !routeModel.Id.HasValue)
                 {
@@ -421,8 +427,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 //todo: get error into modelstate blah blah
                 _logger.LogInformation(ex, $"Validation error trying to delete reservation [{routeModel.Id}]");
-                var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
-                return View(deleteViewName);
+                return View(deleteViewName, viewModel);
             }
             catch (Exception ex)
             {
