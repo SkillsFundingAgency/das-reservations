@@ -10,7 +10,7 @@
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-panel govuk-panel--confirmation">
                 <h1 class="govuk-panel__title">
-                    Funding secured for this apprenticeship
+                    You have successfully reserved funding for apprenticeship training
                 </h1>
             </div>
             <div class="govuk-summary-list">
@@ -59,38 +59,70 @@
             </p>
 
             <p>
-                You cannot change:
+                You will need to reserve new funding to change the apprenticeship training start date to outside of the 3-month window you originally selected.
             </p>
 
-            <ul class="govuk-list govuk-list--bullet">
-                <li>
-                    the off-the-job training start date, outside of the 3 month window you selected
-                </li>
-            </ul>
-            <p>
-                To select a different apprenticeship start date, you will need to start again and secure new funding.
-            </p>
-            <h2 class="govuk-heading-l">
-                What you need to do now
-            </h2>
-            <p>
-                If you know who your apprentice and training provider will be, you can add the apprentice's details.
-            </p>
-            <p>
-                If you do not know who the apprentice or training provider will be, you will need to:
-            </p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>
-                    Find an apprentice. You can use our <a href="https://recruit.manage-apprenticeships.service.gov.uk" target="_blank" rel="noopener">recruitment service</a> to find an apprentice.
-                </li>
-                <li>
-                    Find a training provider. Use the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" rel="noopener">find apprenticeship training</a> service to find a training provider who offers the course you would like to take.
-                </li>
-            </ul>
-            <p>
+            <form method="post" asp-route="@RouteNames.EmployerCompleted">
 
-                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-querystring="?reservationId=@Model.ReservationId" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="govuk-button">Return to your account</a>
-            </p>
+                <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
+                <input type="hidden" name="ApprenticeUrl" value="@Model.ApprenticeUrl" />
+                <input type="hidden" name="DashboardUrl" value="@Model.DashboardUrl" />
+                <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
+                <input type="hidden" name="StartDate" value="@Model.StartDate" />
+                <input type="hidden" name="Level" value="@Model.Course.Level" />
+                <input type="hidden" name="CourseId" value="@Model.Course.Id" />
+                <input type="hidden" name="CourseTitle" value="@Model.Course.Title" />
+                <input type="hidden" name="ExpiryDate" value="@Model.ExpiryDate" />
+                <input type="hidden" name="RecruitApprenticeUrl" value="@Model.RecruitApprenticeUrl" />
+                <input type="hidden" name="FindTrainingProviderUrl" value="@Model.FindTrainingProviderUrl" />
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            What's next?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("WhatsNext"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["WhatsNext"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whats-next-recruit" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="whats-next-recruit">
+                                    Recruit an apprentice
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whats-next-training" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.FindTrainingProvider">
+                                <label class="govuk-label govuk-radios__label" for="whats-next-training">
+                                    Find a training provider
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whats-next-add" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="whats-next-add">
+                                    Add apprentice's details
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whats-next-home" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage">
+                                <label class="govuk-label govuk-radios__label" for="whats-next-home">
+                                    Go to homepage
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <p>
+
+                    <button type="submit" draggable="false" class="govuk-button">
+                        Continue
+                    </button>
+
+                </p>
+            </form>
         </div>
     </div>
 </main>

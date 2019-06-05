@@ -17,7 +17,8 @@ namespace SFA.DAS.Reservations.Web.Models
             string dashboardUrl = "", 
             string apprenticeUrl = "",
             string employerDashboardUrl = "",
-            string recruitApprenticeUrl = "") : base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
+            string recruitApprenticeUrl = "",
+            string findTrainingProviderUrl = ""): base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
         {
             ReservationId = reservationId;
             StartDate = startDate;
@@ -29,6 +30,8 @@ namespace SFA.DAS.Reservations.Web.Models
             DashboardUrl = dashboardUrl;
             RecruitApprenticeUrl = recruitApprenticeUrl;
             EmployerDashboardUrl = employerDashboardUrl;
+            FindTrainingProviderUrl = findTrainingProviderUrl;
+
 
             ViewName = ukPrn == null ? ViewNames.EmployerCompleted : ViewNames.ProviderCompleted;
         }
@@ -46,5 +49,6 @@ namespace SFA.DAS.Reservations.Web.Models
 		public string AccountLegalEntityName { get; }
         public string ViewName { get; }
         public string EmployerDashboardUrl { get; }
+        public string FindTrainingProviderUrl { get; }
     }
 }
