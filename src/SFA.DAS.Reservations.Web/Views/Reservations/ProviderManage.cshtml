@@ -7,7 +7,7 @@
 @if (!Model.Reservations.Any())
 {
     <div class="govuk-width-container">
-        <a href="#" class="govuk-back-link">Back</a>
+        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
         <main class="govuk-main-wrapper">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
@@ -23,7 +23,7 @@
 else
 {
     <div class="govuk-width-container">
-        <a href="#" class="govuk-back-link">Back</a>
+        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
         <main class="govuk-main-wrapper">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
