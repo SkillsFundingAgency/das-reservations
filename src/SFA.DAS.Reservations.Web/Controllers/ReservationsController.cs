@@ -384,7 +384,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     UkPrn = routeModel.UkPrn.GetValueOrDefault()
                 };
                 var queryResult = await _mediator.Send(query);
-                //todo: null check on result
 
                 var viewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
 
