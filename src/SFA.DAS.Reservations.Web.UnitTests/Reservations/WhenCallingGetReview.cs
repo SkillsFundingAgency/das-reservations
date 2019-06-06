@@ -12,6 +12,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -95,7 +96,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
             ReservationsRouteModel routeModel,
             ApprenticeshipTrainingFormModel formModel,
-            Mock<IMediator> mockMediator)
+            Mock<IMediator> mockMediator,
+            Mock<IExternalUrlHelper> mockUrlHelper)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -105,7 +107,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 Mock.Of<IStartDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
                 Mock.Of<ILogger<ReservationsController>>(), 
-                Mock.Of<IEncodingService>());
+                Mock.Of<IEncodingService>(),
+                mockUrlHelper.Object);
             
             var result = await controller.Review(routeModel);
             
