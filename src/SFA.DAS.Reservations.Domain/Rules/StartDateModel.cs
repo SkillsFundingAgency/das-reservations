@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
         public override string ToString()
         {
-            return $"{StartDate:MMMM yyyy} to {EndDate:MMMM yyyy}";
+            return $"{StartDate:MMM yyyy} to {EndDate:MMM yyyy}";
         }
     }
 }
