@@ -1,6 +1,4 @@
-@using System.Text
-@using Microsoft.AspNetCore.Mvc.ModelBinding
-@using SFA.DAS.Reservations.Web.Infrastructure
+@using SFA.DAS.Reservations.Web.Extensions
 @model CompletedViewModel
 @{
     ViewData["Title"] = "Reservations";
@@ -27,7 +25,7 @@
                         Apprenticeship start date
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.StartDate.ToString("MMMM yyyy") to @Model.ExpiryDate.ToString("MMMM yyyy")
+                        @Model.StartDate.GetDasShortDateString() to @Model.ExpiryDate.GetDasShortDateString()
                     </dd>
                 </dl>
                 <dl class="govuk-summary-list__row">
