@@ -1,4 +1,5 @@
-﻿@model ReviewViewModel
+﻿@using SFA.DAS.Reservations.Web.Extensions
+@model ReviewViewModel
 @{
     ViewData["Title"] = "Reservations";
     var changeRouteData = (new Dictionary<string, string> {{"fromReview", "true"}});
@@ -39,7 +40,7 @@
                         Apprenticeship training start date
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.StartDateDescription
+                        @Model.TrainingDate.GetDasShortDateString()
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName" asp-all-route-data="@changeRouteData" >

@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
         public async Task Then_The_Returned_Dates_Are_Mapped_To_The_Model(
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
-            IList<TraningDateModel> expectedAvailableDates,
+            IList<TrainingDateModel> expectedAvailableDates,
             TrainingDateService trainingDateService)
         {
             mockMediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()))

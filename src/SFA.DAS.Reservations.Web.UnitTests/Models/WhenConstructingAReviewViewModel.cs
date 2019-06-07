@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_The_Model_Is_Constructed_With_Correct_Route_Names(uint? ukPrn)
         {
             //Arrange
-            var startDate = new TraningDateModel{StartDate = DateTime.Now};
+            var startDate = new TrainingDateModel{StartDate = DateTime.Now};
 
             var reservationsRouteModel = new ReservationsRouteModel
             {

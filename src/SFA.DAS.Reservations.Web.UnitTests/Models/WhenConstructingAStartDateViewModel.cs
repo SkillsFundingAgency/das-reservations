@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
     {
         [Test, AutoData]
         public void Then_Sets_Id(
-            [Frozen] TraningDateModel model,
+            [Frozen] TrainingDateModel model,
             TrainingDateViewModel viewModel)
         {
             viewModel.Id.Should().Be($"{model.StartDate:yyyy-MM}");
@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
         [Test, AutoData]
         public void Then_Sets_Value(
-            [Frozen] TraningDateModel model,
+            [Frozen] TrainingDateModel model,
             TrainingDateViewModel viewModel)
         {
             viewModel.Value.Should().Be(JsonConvert.SerializeObject(model));
@@ -28,28 +28,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
         [Test, AutoData]
         public void Then_Sets_Label(
-            [Frozen] TraningDateModel model,
+            [Frozen] TrainingDateModel model,
             TrainingDateViewModel viewModel)
         {
             viewModel.Label.Should().Be($"{model.StartDate:MMMM yyyy}");
         }
 
         [Test, AutoData]
-        public void Then_Sets_Checked(TraningDateModel model)
+        public void Then_Sets_Checked(TrainingDateModel model)
         {
             var viewModel = new TrainingDateViewModel(model, true);
             viewModel.Checked.Should().Be("checked");
         }
 
         [Test, AutoData]
-        public void And_Not_Match_StartDate_Then_Checked_Is_Null(TraningDateModel model)
+        public void And_Not_Match_StartDate_Then_Checked_Is_Null(TrainingDateModel model)
         {
             var viewModel = new TrainingDateViewModel(model);
             viewModel.Checked.Should().BeNull();
         }
 
         [Test, AutoData]
-        public void And_Null_StartDate_Then_Checked_Is_Null(TraningDateModel model)
+        public void And_Null_StartDate_Then_Checked_Is_Null(TrainingDateModel model)
         {
             var viewModel = new TrainingDateViewModel(model);
             viewModel.Checked.Should().BeNull();

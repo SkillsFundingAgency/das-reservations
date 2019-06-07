@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             {
                 Id = Guid.NewGuid(),
                 AccountId = 0,
-                TrainingDate = new TraningDateModel{StartDate = DateTime.Now},
+                TrainingDate = new TrainingDateModel{StartDate = DateTime.Now},
                 AccountLegalEntityName = "Test Name"
             };
 
@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             var cachedReservation = new CachedReservation
             {
                 AccountId = 1,
-                TrainingDate = new TraningDateModel(),
+                TrainingDate = new TrainingDateModel(),
                 AccountLegalEntityName = "Test Name"
             };
 
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             var cachedReservation = new CachedReservation
             {
                 AccountId = 1,
-                TrainingDate = new TraningDateModel(){StartDate = DateTime.Now},
+                TrainingDate = new TrainingDateModel(){StartDate = DateTime.Now},
                 AccountLegalEntityName = "Test Name"
             };
 

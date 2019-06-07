@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Web.Services
 {
     public interface ITrainingDateService
     {
-        Task<IEnumerable<TraningDateModel>> GetTrainingDates(long accountLegalEntityId);
+        Task<IEnumerable<TrainingDateModel>> GetTrainingDates(long accountLegalEntityId);
     }
 }

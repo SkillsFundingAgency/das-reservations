@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             _cachedReservation = fixture.Create<CachedReservation>();
             _expectedStartDate = fixture.Create<DateTime>().Date;
-            _cachedReservation.TrainingDate = new TraningDateModel{ StartDate = _expectedStartDate };
+            _cachedReservation.TrainingDate = new TrainingDateModel{ StartDate = _expectedStartDate };
             _cachedReservation.AccountId = _expectedAccountId;
             _cachedReservation.AccountLegalEntityName = _expectedLegalEntityName;
             _apiResponse = fixture.Create<CreateReservationResponse>();

@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Values(
             ReservationsRouteModel routeModel,
-            IEnumerable<TraningDateModel> expectedStartDates,
+            IEnumerable<TrainingDateModel> expectedStartDates,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,

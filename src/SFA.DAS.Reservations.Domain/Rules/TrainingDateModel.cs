@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.Reservations.Domain.Rules
 {
-    public class TraningDateModel
+    public class TrainingDateModel
     {
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
         public override bool Equals(object obj)
         {
-            if (!(obj is TraningDateModel targetModel)) return false;
+            if (!(obj is TrainingDateModel targetModel)) return false;
 
             return StartDate.Year.Equals(targetModel.StartDate.Year) && 
                    StartDate.Month.Equals(targetModel.StartDate.Month) && 

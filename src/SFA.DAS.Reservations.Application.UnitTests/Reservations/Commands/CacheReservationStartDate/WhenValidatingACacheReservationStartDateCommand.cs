@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var validator = new CacheReservationStartDateCommandValidator();
             var command = new CacheReservationStartDateCommand
             {
-                TrainingDate = new TraningDateModel{StartDate = DateTime.Now}
+                TrainingDate = new TrainingDateModel{StartDate = DateTime.Now}
             };
 
             var result = await validator.ValidateAsync(command);
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new CacheReservationStartDateCommand
             {
                 Id = Guid.NewGuid(),
-                TrainingDate = new TraningDateModel()
+                TrainingDate = new TrainingDateModel()
             };
 
             var result = await validator.ValidateAsync(command);
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new CacheReservationStartDateCommand
             {
                 Id = Guid.NewGuid(),
-                TrainingDate = new TraningDateModel {StartDate = DateTime.Now}
+                TrainingDate = new TrainingDateModel {StartDate = DateTime.Now}
             };
 
             var result = await validator.ValidateAsync(command);
