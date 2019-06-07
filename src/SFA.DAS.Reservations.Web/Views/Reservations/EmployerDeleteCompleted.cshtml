@@ -4,7 +4,7 @@
     ViewData["Title"] = "Reservations";
 }
 
-<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
@@ -18,7 +18,7 @@
                 </h1>
             </div>
 
-            <form method="post" asp-route="@RouteNames.ProviderDeleteCompleted">
+            <form method="post" asp-route="@RouteNames.EmployerDeleteCompleted">
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

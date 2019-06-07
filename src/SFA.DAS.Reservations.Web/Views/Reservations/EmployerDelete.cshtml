@@ -4,7 +4,7 @@
     ViewData["Title"] = "Reservations";
 }
 
-<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
@@ -40,7 +40,7 @@
                 </dl>
             </div>
 
-            <form method="post" asp-route="@RouteNames.ProviderDelete">
+            <form method="post" asp-route="@RouteNames.EmployerDelete">
                 <input type="hidden" id="AccountLegalEntityName" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName"/>
                 <input type="hidden" id="StartDateDescription" name="StartDateDescription" value="@Model.StartDateDescription"/>
                 <input type="hidden" id="CourseDescription" name="CourseDescription" value="@Model.CourseDescription"/>
