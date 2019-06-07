@@ -1,5 +1,6 @@
 ﻿using System;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -18,7 +19,12 @@ namespace SFA.DAS.Reservations.Web.Models
                 reservation.Course)
         {
             Id = reservation.Id;
-            StartDateDescription = $"{reservation.StartDate:MMMM yyyy} to {reservation.ExpiryDate:MMMM yyyy}";
+            TrainingDate = new TrainingDateModel
+            {
+                StartDate = reservation.StartDate, 
+                EndDate = reservation.ExpiryDate
+            };
+            
             Status = (ReservationStatusViewModel)reservation.Status;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
@@ -28,6 +34,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public ReservationStatusViewModel Status { get; }
         public string LegalEntityName { get; }
         public string CourseName { get; }
-        public string StartDateDescription { get; }
+        public TrainingDateModel TrainingDate { get; }
     }
 }
