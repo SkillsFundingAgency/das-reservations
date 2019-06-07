@@ -7,7 +7,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     public class CacheReservationStartDateCommand : IRequest<Unit>
     {
         public Guid Id { get; set; }
-        public StartDateModel TrainingDate { get; set; }
+        public TraningDateModel TrainingDate { get; set; }
         public uint UkPrn { get; set; }
     }
 }

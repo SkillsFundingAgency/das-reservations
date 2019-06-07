@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
-        public StartDateModel TrainingDate { get; set; }
+        public TraningDateModel TrainingDate { get; set; }
         public string CourseId { get; set; }
         public string CourseDescription { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }

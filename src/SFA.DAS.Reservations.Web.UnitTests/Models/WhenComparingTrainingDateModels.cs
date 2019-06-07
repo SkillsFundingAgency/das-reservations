@@ -4,13 +4,13 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
 {
-    public class WhenComparingStartDateModels
+    public class WhenComparingTrainingDateModels
     {
         [Test]
         public void ThenWillReturnSameIfBothDatesAreSetAndEqual()
         {
-            var source = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
-            var target = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
+            var source = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
+            var target = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
 
             Assert.IsTrue(source.Equals(target));
         }
@@ -18,8 +18,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void ThenWillReturnSameIfStartDateSetAndEqual()
         {
-            var source = new StartDateModel {StartDate = DateTime.Now};
-            var target = new StartDateModel {StartDate = DateTime.Now};
+            var source = new TraningDateModel {StartDate = DateTime.Now};
+            var target = new TraningDateModel {StartDate = DateTime.Now};
 
             Assert.IsTrue(source.Equals(target));
         }
@@ -27,8 +27,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void ThenWillReturnDifferentIfStartDatesAreSetAndNotEqual()
         {
-            var source = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
-            var target = new StartDateModel {StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(1)};
+            var source = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
+            var target = new TraningDateModel {StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(1)};
 
             Assert.IsFalse(source.Equals(target));
         }
@@ -36,8 +36,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void ThenWillReturnDifferentIfEndDatesAreSetAndNotEqual()
         {
-            var source = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
-            var target = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(2)};
+            var source = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
+            var target = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(2)};
 
             Assert.IsFalse(source.Equals(target));
         }
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void ThenWillReturnDifferentIfTargetIsNotSameType()
         {
-            var source = new StartDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
+            var source = new TraningDateModel {StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(1)};
 
             Assert.IsFalse(source.Equals(123));
         }
@@ -53,8 +53,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test]
         public void ThenWillReturnSameIfBothAreUnset()
         {
-            var source = new StartDateModel();
-            var target = new StartDateModel();
+            var source = new TraningDateModel();
+            var target = new TraningDateModel();
 
             Assert.IsTrue(source.Equals(target));
         }

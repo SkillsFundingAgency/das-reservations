@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReviewViewModel
     {
-        public ReviewViewModel(ReservationsRouteModel routeModel, StartDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
+        public ReviewViewModel(ReservationsRouteModel routeModel, TraningDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
         {
             ConfirmRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerPostReview :

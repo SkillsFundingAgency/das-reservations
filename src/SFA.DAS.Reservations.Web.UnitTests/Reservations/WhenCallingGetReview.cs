@@ -104,7 +104,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Id|The Id field is not valid." }), null, null));
             var controller = new ReservationsController(
                 mockMediator.Object, 
-                Mock.Of<IStartDateService>(), 
+                Mock.Of<ITrainingDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
                 Mock.Of<ILogger<ReservationsController>>(), 
                 Mock.Of<IEncodingService>(),

@@ -13,15 +13,15 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.UnitTests.Services
 {
     [TestFixture]
-    public class WhenGettingStartDates
+    public class WhenGettingTrainingDates
     {
         [Test, MoqAutoData]
         public async Task Then_Gets_The_Available_Dates_From_The_Query(
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
-            StartDateService startDateService)
+            TrainingDateService trainingDateService)
         {
-            await startDateService.GetStartDates(accountLegalEntityId);
+            await trainingDateService.GetTrainingDates(accountLegalEntityId);
 
             mockMediator.Verify(x=>x.Send(
                 It.Is<GetAvailableDatesQuery>(query => query.AccountLegalEntityId == accountLegalEntityId), 
@@ -33,8 +33,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
         public async Task Then_The_Returned_Dates_Are_Mapped_To_The_Model(
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
-            IList<StartDateModel> expectedAvailableDates,
-            StartDateService startDateService)
+            IList<TraningDateModel> expectedAvailableDates,
+            TrainingDateService trainingDateService)
         {
             mockMediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAvailableDatesResult
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                     AvailableDates = expectedAvailableDates
                 });
 
-            var dates = await startDateService.GetStartDates(accountLegalEntityId);
+            var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId);
 
             Assert.IsNotNull(dates);
             Assert.AreEqual(expectedAvailableDates.Count,dates.Count());

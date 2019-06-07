@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDate
 {
     public class GetAvailableDatesResult
     {
-        public IList<StartDateModel> AvailableDates { get; set; }
+        public IList<TraningDateModel> AvailableDates { get; set; }
     }
 }
