@@ -101,7 +101,7 @@
 
                 <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
                 <input type="hidden" name="ApprenticeUrl" value="@Model.ApprenticeUrl" />
-                <input type="hidden" name="DashboardUrl" value="@Model.DashboardUrl" />
+                <input type="hidden" name="DashboardUrl" value="@Model.EmployerDashboardUrl" />
                 <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
                 <input type="hidden" name="StartDate" value="@Model.StartDate" />
                 <input type="hidden" name="Level" value="@Model.Course.Level" />
@@ -142,7 +142,7 @@
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="whats-next-home" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage">
+                                <input class="govuk-radios__input" id="whats-next-home" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.Homepage">
                                 <label class="govuk-label govuk-radios__label" for="whats-next-home">
                                     Go to homepage
                                 </label>

@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             public const string RecruitAnApprentice = "recruit-an-apprentice";
             public const string AddAnApprentice = "add-an-apprentice";
-            public const string ProviderHomepage = "provider-homepage";
+            public const string Homepage = "homepage"; 
             public const string FindApprenticeshipTraining = "find-apprenticeship-training";
         }
 

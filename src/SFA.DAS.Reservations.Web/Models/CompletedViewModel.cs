@@ -18,7 +18,14 @@ namespace SFA.DAS.Reservations.Web.Models
             string apprenticeUrl = "",
             string employerDashboardUrl = "",
             string recruitApprenticeUrl = "",
-            string findApprenticeshipTrainingUrl = ""): base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
+            string findApprenticeshipTrainingUrl = "")
+            : base(
+                apprenticeUrl, 
+                ukPrn, 
+                reservationId, 
+                accountLegalEntityPublicHashedId, 
+                startDate, 
+                course)
         {
             ReservationId = reservationId;
             StartDate = startDate;

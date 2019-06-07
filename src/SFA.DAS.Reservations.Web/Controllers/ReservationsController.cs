@@ -313,7 +313,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice:
                         return Redirect(model.ApprenticeUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage:
+                    case ConfirmationRedirectViewModel.RedirectOptions.Homepage:
                         return Redirect(model.DashboardUrl);
                 }
             }

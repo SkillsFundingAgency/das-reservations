@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice)]
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice)]
-        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage)]
+        [TestCase(ConfirmationRedirectViewModel.RedirectOptions.Homepage)]
         [TestCase(ConfirmationRedirectViewModel.RedirectOptions.FindApprenticeshipTraining)]
         public void Then_The_Request_Is_Redirected_Based_On_The_Selection(string selection)
         {
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     Assert.AreEqual(model.ApprenticeUrl, result.Url);
                     break;
 
-                case (ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage):
+                case (ConfirmationRedirectViewModel.RedirectOptions.Homepage):
                     Assert.AreEqual(model.DashboardUrl,result.Url);
                     break;
 
