@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Which.Model.Should().BeOfType<ReviewViewModel>().Subject;
 
             viewModel.RouteModel.Should().BeEquivalentTo(routeModel);
-            viewModel.StartDateDescription.Should().Be(cachedReservationResult.TrainingDate.ToString());
+            viewModel.TrainingDate.Should().Be(cachedReservationResult.TrainingDate);
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
             viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
             viewModel.AccountLegalEntityPublicHashedId.Should().Be(cachedReservationResult.AccountLegalEntityPublicHashedId);

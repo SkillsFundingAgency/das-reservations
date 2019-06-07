@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             [Frozen] TrainingDateModel model,
             TrainingDateViewModel viewModel)
         {
-            viewModel.Value.Should().Be(JsonConvert.SerializeObject(model));
+            viewModel.SerializedModel.Should().Be(JsonConvert.SerializeObject(model));
         }
 
         [Test, AutoData]
@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             [Frozen] TrainingDateModel model,
             TrainingDateViewModel viewModel)
         {
-            viewModel.Label.Should().Be($"{model.StartDate:MMMM yyyy}");
+            viewModel.StartDate.Should().Be(model.StartDate);
         }
 
         [Test, AutoData]

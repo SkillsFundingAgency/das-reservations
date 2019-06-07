@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockStartDateService
                 .Setup(service => service.GetTrainingDates(accountLegalEntityId))
                 .ReturnsAsync(expectedStartDates);
-            var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.Value);
+            var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
             routeModel.FromReview = false;
 
