@@ -149,8 +149,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationStartDateCommand>(c =>
-                        c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                        c.StartDateDescription.Equals(startDateModel.ToString()) &&
+                        c.TrainingDate.Equals(startDateModel) &&
                         c.UkPrn.Equals(routeModel.UkPrn)),
                     It.IsAny<CancellationToken>()));
         }
@@ -174,8 +173,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationStartDateCommand>(c =>
-                    c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                    c.StartDateDescription.Equals(startDateModel.ToString())),
+                    c.TrainingDate.Equals(startDateModel)),
                 It.IsAny<CancellationToken>()));
         }
 
@@ -197,8 +195,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationStartDateCommand>(c =>
-                    c.StartDate.Equals(startDateModel.StartDate.ToString("yyyy-MM")) &&
-                    c.StartDateDescription.Equals(startDateModel.ToString()) &&
+                    c.TrainingDate.Equals(startDateModel) &&
                     c.UkPrn.Equals(routeModel.UkPrn)),
                 It.IsAny<CancellationToken>()));
         }

@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 routeModel.UkPrn != null, 
                 cachedReservation?.AccountLegalEntityPublicHashedId, 
                 cachedReservation?.CourseId, 
-                cachedReservation?.StartDate, 
+                cachedReservation?.TrainingDate, 
                 routeModel.FromReview);
 
             return View(viewModel);
@@ -97,7 +97,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         isProvider, 
                         formModel.AccountLegalEntityPublicHashedId, 
                         formModel.SelectedCourseId, 
-                        startDateModel?.StartDate.ToString("yyyy-MM"));
+                        startDateModel);
+                       
                     return View("ApprenticeshipTraining", model);
                 }
 
@@ -129,8 +130,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var startDateCommand = new CacheReservationStartDateCommand
                 {
                     Id = cachedReservation.Id,
-                    StartDate = startDateModel?.StartDate.ToString("yyyy-MM"),
-                    StartDateDescription = startDateModel?.ToString(),
+                    TrainingDate = startDateModel,
                     UkPrn = routeModel.UkPrn.GetValueOrDefault()
                 };
 
@@ -147,7 +147,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     isProvider, 
                     formModel.AccountLegalEntityPublicHashedId, 
                     formModel.SelectedCourseId,
-                    formModel.StartDate);
+                    startDateModel);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
@@ -189,9 +189,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             routeModel.FromReview = true;
+
             var viewModel = new ReviewViewModel(
                 routeModel,
-                cachedReservation.StartDateDescription, 
+                cachedReservation.TrainingDate, 
                 cachedReservation.CourseDescription, 
                 cachedReservation.AccountLegalEntityName, 
                 cachedReservation.AccountLegalEntityPublicHashedId);
@@ -367,7 +368,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             bool isProvider,
             string accountLegalEntityPublicHashedId,
             string courseId = null, 
-            string startDate = null, 
+            StartDateModel selectedStartDate = null, 
             bool? routeModelFromReview = false)
         {
             var accountLegalEntityId = _encodingService.Decode(
@@ -380,11 +381,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
-                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDate)).OrderBy(model => model.Value),
+                PossibleStartDates = dates.Select(startDateModel => new StartDateViewModel(startDateModel, startDateModel.Equals(selectedStartDate))).OrderBy(model => model.Value),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
-                TrainingStartDate = startDate,
                 IsProvider = isProvider,
                 BackLink = isProvider ?
                     routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer 

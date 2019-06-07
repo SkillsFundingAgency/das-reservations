@@ -35,26 +35,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
-        public void Then_Sets_Checked(
-            StartDateModel model)
+        public void Then_Sets_Checked(StartDateModel model)
         {
-            var startDate = $"{model.StartDate:yyyy-MM}";
-            var viewModel = new StartDateViewModel(model, startDate);
+            var viewModel = new StartDateViewModel(model, true);
             viewModel.Checked.Should().Be("checked");
         }
 
         [Test, AutoData]
-        public void And_Not_Match_StartDate_Then_Checked_Is_Null(
-            StartDateModel model)
+        public void And_Not_Match_StartDate_Then_Checked_Is_Null(StartDateModel model)
         {
-            var startDate = $"{model.StartDate.AddMonths(1):yyyy-MM}";
-            var viewModel = new StartDateViewModel(model, startDate);
+            var viewModel = new StartDateViewModel(model);
             viewModel.Checked.Should().BeNull();
         }
 
         [Test, AutoData]
-        public void And_Null_StartDate_Then_Checked_Is_Null(
-            StartDateModel model)
+        public void And_Null_StartDate_Then_Checked_Is_Null(StartDateModel model)
         {
             var viewModel = new StartDateViewModel(model);
             viewModel.Checked.Should().BeNull();

@@ -1,10 +1,12 @@
-﻿using SFA.DAS.Reservations.Web.Infrastructure;
+﻿using System;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReviewViewModel
     {
-        public ReviewViewModel(ReservationsRouteModel routeModel,string startDateDescription, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
+        public ReviewViewModel(ReservationsRouteModel routeModel, StartDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
         {
             ConfirmRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerPostReview :
@@ -26,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.Models
                 RouteNames.EmployerApprenticeshipTraining : RouteNames.ProviderApprenticeshipTraining;
 
             RouteModel = routeModel;
-            StartDateDescription = startDateDescription;
+            StartDateDescription = trainingDate?.ToString();
             CourseDescription = courseDescription;
             AccountLegalEntityName = accountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;

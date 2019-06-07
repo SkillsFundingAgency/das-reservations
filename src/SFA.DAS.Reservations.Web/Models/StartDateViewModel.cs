@@ -1,5 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models
@@ -11,14 +10,12 @@ namespace SFA.DAS.Reservations.Web.Models
         public string Label { get; }
         public string Checked { get; }
 
-        public StartDateViewModel(StartDateModel model, string startDate = null)
+        public StartDateViewModel(StartDateModel model, bool isSelected = false)
         {
             Id = $"{model.StartDate:yyyy-MM}";
             Value = JsonConvert.SerializeObject(model);
             Label = $"{model.StartDate:MMMM yyyy}";
-            Checked = Id.Equals(startDate, StringComparison.InvariantCulture)
-                ? "checked"
-                : null;
+            Checked = isSelected ? "checked" : null;
         }
     }
 }

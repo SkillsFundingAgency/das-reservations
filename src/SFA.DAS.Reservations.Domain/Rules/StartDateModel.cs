@@ -9,7 +9,9 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
         public override string ToString()
         {
-            return $"{StartDate:MMMM yyyy} to {EndDate:MMMM yyyy}";
+            return EndDate == default(DateTime) ? 
+                $"{StartDate:MMMM yyyy}" : 
+                $"{StartDate:MMMM yyyy} to {EndDate:MMMM yyyy}";
         }
 
         public override bool Equals(object obj)
