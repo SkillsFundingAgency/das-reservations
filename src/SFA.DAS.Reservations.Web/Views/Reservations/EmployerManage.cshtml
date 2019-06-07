@@ -60,7 +60,7 @@ else
                                 @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
                                     <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a><br/>
-                                    <a asp-route="@RouteNames.EmployerDelete" class="govuk-link">Delete</a>
+                                    <a asp-route="@RouteNames.EmployerDelete" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                 }
                                 else
                                 {

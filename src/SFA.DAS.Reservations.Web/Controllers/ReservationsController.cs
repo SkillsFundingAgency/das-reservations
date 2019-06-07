@@ -426,7 +426,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ValidationException ex)
             {
-                //todo: get error into modelstate blah blah
                 _logger.LogInformation(ex, $"Validation error trying to delete reservation [{routeModel.Id}]");
                 return View(deleteViewName, viewModel);
             }
