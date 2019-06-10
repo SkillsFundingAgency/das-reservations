@@ -17,7 +17,6 @@ using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
@@ -126,6 +125,7 @@ namespace SFA.DAS.Reservations.Web
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped(typeof(IValidator<GetReservationsQuery>), typeof(GetReservationsQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAccountFundingRulesQuery>), typeof(GetAccountFundingRulesValidator));
+           
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
@@ -177,7 +177,7 @@ namespace SFA.DAS.Reservations.Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/error/500");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseDasHsts();
             }
