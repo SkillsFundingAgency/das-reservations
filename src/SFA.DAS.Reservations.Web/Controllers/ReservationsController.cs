@@ -360,7 +360,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
             }
             
-            return View(viewName, new ManageViewModel{Reservations = reservations});
+            return View(viewName, new ManageViewModel
+            {
+                Reservations = reservations,
+                BackLink = routeModel.UkPrn.HasValue ?
+                    _urlHelper.GenerateUrl(controller: "Account") :
+                    _urlHelper.GenerateUrl(controller: "teams", subDomain: "accounts", folder: "accounts",id: routeModel.EmployerAccountId)
+            });
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
