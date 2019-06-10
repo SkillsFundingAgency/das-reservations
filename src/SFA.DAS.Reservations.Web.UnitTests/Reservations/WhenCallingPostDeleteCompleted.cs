@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -72,7 +73,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public void And_Has_Ukprn_And_Manage_False_Then_Redirects_To_Provider_(
+        public void And_Has_Ukprn_And_Manage_False_Then_Redirects_To_Provider_Dashboard(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
@@ -86,18 +87,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public void And_No_Ukprn_And_Manage_False_Then_Redirects_To_Employer_(
+        public void And_No_Ukprn_And_Manage_False_Then_Redirects_To_Employer_Dashboard(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
+            string expectedUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
             viewModel.Manage = false;
-
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(routeModel.EmployerAccountId, "teams", null, "accounts", "accounts", null))
+                .Returns(expectedUrl);
+            
             var result = controller.PostDeleteCompleted(routeModel, viewModel) as RedirectResult;
 
-            result.Url.Should().Be(mockOptions.Object.Value.EmployerDashboardUrl);
+            result.Url.Should().Be(expectedUrl);
         }
     }
 }
