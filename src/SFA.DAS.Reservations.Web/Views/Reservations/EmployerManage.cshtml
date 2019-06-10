@@ -10,7 +10,7 @@
 @if (!Model.Reservations.Any())
 {
     <div class="govuk-width-container">
-        <a href="#" class="govuk-back-link">Back</a>
+        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
         <h1 class="govuk-heading-xl">Your funding reservations</h1>
         <main class="govuk-main-wrapper">
 
@@ -28,7 +28,7 @@
 else
 {
     <div class="govuk-width-container">
-        <a href="#" class="govuk-back-link">Back</a>
+        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
 
         <main class="govuk-main-wrapper">
 

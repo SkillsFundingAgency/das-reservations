@@ -99,7 +99,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
-                options => options.ExcludingMissingMembers());
+                options => options.ExcludingMissingMembers().ExcludingFields().Excluding(c=>c.ApprenticeUrl));
         }
 
         [Test, MoqAutoData]
@@ -167,10 +167,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task UkPrnWillBePopulatedFromRouteModelIfNotPopulatedInReservation(
+        public async Task UkPrn_Will_Be_Populated_From_RouteModel_For_Each_Reservation(
              ReservationsRouteModel routeModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             Reservation reservation,
+             Reservation reservationTwo,
             string hashedId,
             [Frozen] ReservationsWebConfiguration config,
             [Frozen] Mock<IEncodingService> mockEncodingService,
@@ -188,7 +189,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetReservationsResult
                 {
-                    Reservations = new []{reservation}
+                    Reservations = new []{reservation, reservationTwo }
                 });
 
             mockEncodingService
@@ -200,7 +201,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var viewModel = result?.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
 
-            Assert.IsTrue(viewModel.Reservations.First().ApprenticeUrl.StartsWith($"{config.ApprenticeUrl}/{routeModel.UkPrn}/"));
+            Assert.IsTrue(viewModel.Reservations.All(c=>c.ApprenticeUrl.StartsWith($"{config.ApprenticeUrl}/{routeModel.UkPrn}/")));
 
         }
 
