@@ -16,7 +16,8 @@ namespace SFA.DAS.Reservations.Web.Models
             string accountLegalEntityName = "", 
             string dashboardUrl = "", 
             string apprenticeUrl = "",
-            string employerDashboardUrl = "") : base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
+            string employerDashboardUrl = "",
+            string recruitApprenticeUrl = "") : base(apprenticeUrl, ukPrn, reservationId, accountLegalEntityPublicHashedId, startDate, course)
         {
             ReservationId = reservationId;
             StartDate = startDate;
@@ -26,6 +27,7 @@ namespace SFA.DAS.Reservations.Web.Models
             UkPrn = ukPrn;
             AccountLegalEntityName = accountLegalEntityName;
             DashboardUrl = dashboardUrl;
+            RecruitApprenticeUrl = recruitApprenticeUrl;
             EmployerDashboardUrl = employerDashboardUrl;
 
             ViewName = ukPrn == null ? ViewNames.EmployerCompleted : ViewNames.ProviderCompleted;
@@ -38,6 +40,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get; }
         public uint? UkPrn { get; }
         public string DashboardUrl { get;}
+        public string RecruitApprenticeUrl { get; }
         public bool ShowDashboardUrl => !string.IsNullOrWhiteSpace(DashboardUrl);
         public bool ShowApprenticeUrl => !string.IsNullOrWhiteSpace(ApprenticeUrl);
 		public string AccountLegalEntityName { get; }

@@ -41,12 +41,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                     Employers = new List<Employer> { new Employer() }
                 });
         }
-        
+
         [Test]
-        public async Task ThenWillShowStartPage()
+        public async Task ThenWillBeRoutedToProviderStartPage()
         {
             //Act
-            var result = await _controller.Start(ukPrn) as ViewResult;
+            var result = await _controller.Start(123) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             //Act
-            var result = await _controller.Start(ukPrn) as ViewResult;
+            var result = await _controller.Start(123) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
@@ -83,11 +83,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new List<Employer>()
+                    Employers = new List<Employer> ()
                 });
 
             //Act
-            var result = await _controller.Start(ukPrn) as ViewResult;
+            var result = await _controller.Start(123) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);

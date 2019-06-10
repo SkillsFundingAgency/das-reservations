@@ -19,6 +19,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationSta
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
@@ -36,6 +37,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         private Mock<IMediator> _mediator;
         private ReservationsController _controller;
         private IFixture _fixture;
+        private Mock<IExternalUrlHelper> _urlHelper;
 
         [SetUp]
         public void Arrange()
@@ -46,12 +48,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _cachedReservationResult = _fixture.Create<GetCachedReservationResult>();
 
             _mediator = new Mock<IMediator>();
+            _urlHelper = new Mock<IExternalUrlHelper>();
             _controller = new ReservationsController(
                 _mediator.Object, 
                 Mock.Of<IStartDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(),
                 Mock.Of<ILogger<ReservationsController>>(),
-                Mock.Of<IEncodingService>());
+                Mock.Of<IEncodingService>(),
+                _urlHelper.Object);
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),

@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
-        private ReservationsWebConfiguration _config;
+        private readonly ReservationsWebConfiguration _config;
 
         public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
         {
@@ -65,6 +65,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return View("FundingRestrictionNotification", viewModel);
         }
+            
 
         [HttpPost]
         [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
@@ -175,6 +176,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached");
             }
+
         }
 
         [HttpGet]

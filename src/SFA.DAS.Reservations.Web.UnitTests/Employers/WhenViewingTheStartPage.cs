@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private EmployerReservationsController _controller;
         private Mock<IMediator> _mockMediator;
         private Mock<IEncodingService> _mockEncodingService;
+
         
         [SetUp]
         public void Arrange()
@@ -35,10 +36,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
-                    {
-                        AccountRules = new List<ReservationRule>(),
-                        GlobalRules = new List<GlobalRule>()
-                    });
+                {
+                    GlobalRules = new List<GlobalRule>(),
+                    AccountRules = new List<ReservationRule>()
+                });
 
             //act 
             var view = await _controller.Start() as ViewResult;
