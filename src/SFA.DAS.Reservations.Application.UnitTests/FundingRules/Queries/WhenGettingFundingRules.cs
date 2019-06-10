@@ -40,8 +40,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             //Act
             var actual = await _handler.Handle(new GetFundingRulesQuery(), new CancellationToken());
 
-            //Assert
-            actual.FundingRules.Should().BeEquivalentTo(_expectedFundingRules);
+           //Assert
+           actual.GlobalRules.Should().BeEquivalentTo(_expectedFundingRules.GlobalRules);
+           actual.AccountRules.Should().BeEquivalentTo(_expectedFundingRules.Rules);
         }
 
         [Test]

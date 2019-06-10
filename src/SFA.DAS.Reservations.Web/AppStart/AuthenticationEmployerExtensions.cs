@@ -47,9 +47,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 })
                 .AddCookie(options =>
                 {
-                    options.AccessDeniedPath = new PathString("/Service/AccessDenied");
+                    options.AccessDeniedPath = new PathString("/error/403");
                     options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                    options.Events.OnRedirectToAccessDenied = RedirectToAccessDenied;
                     options.Cookie.Name = "SFA.DAS.Reservations.Web.Auth";
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.SlidingExpiration = true;
@@ -66,25 +65,5 @@ namespace SFA.DAS.Reservations.Web.AppStart
             ctx.Principal.Identities.First().AddClaim(associatedAccountsClaim);
         }
 
-        private static Task RedirectToAccessDenied(RedirectContext<CookieAuthenticationOptions> context)
-        {
-            var routeData = context.HttpContext.GetRouteData();
-            var path = context.Request.Path.Value;
-            path = path.EndsWith("/") ? path.Substring(0, path.Length - 1) : path;
-            
-            //TODO
-            if (path.Contains("Home/Index") || path.Equals($"/Accounts/{routeData.Values["employerAccountId"]}"))
-            {
-                //default path
-                context.Response.Redirect(context.RedirectUri);
-            }
-            else
-            {
-                //custom
-                context.Response.Redirect(context.Request.PathBase + $"/Accounts/{routeData.Values["employerAccountId"]}/Home/Index");
-            }
-
-            return Task.CompletedTask;
-        }
     }
 }

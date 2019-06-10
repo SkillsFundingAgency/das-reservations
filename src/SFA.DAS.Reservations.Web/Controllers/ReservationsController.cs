@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -232,7 +233,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderCompleted)]
         [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerCompleted)]
         public async Task<IActionResult> Completed(ReservationsRouteModel routeModel)
@@ -362,7 +362,43 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
             }
             
-            return View(viewName, new ManageViewModel{Reservations = reservations});
+            return View(viewName, new ManageViewModel
+            {
+                Reservations = reservations,
+                BackLink = routeModel.UkPrn.HasValue ?
+                    _urlHelper.GenerateUrl(controller: "Account") :
+                    _urlHelper.GenerateUrl(controller: "teams", subDomain: "accounts", folder: "accounts",id: routeModel.EmployerAccountId)
+            });
+        }
+        
+        [Route("{ukPrn}/reservations/manage/create", Name = RouteNames.ProviderManageCreate)]
+        [Route("accounts/{employerAccountId}/reservations/manage/create", Name = RouteNames.EmployerManageCreate)]
+        public async Task<IActionResult> CreateReservation(ReservationsRouteModel routeModel)
+        {
+            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", "EmployerReservations", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RestrictionStartDate = nextGlobalRuleStartDate.Value
+            };
+
+            if (routeModel.UkPrn.HasValue)
+            {
+                viewModel.BackLink = RouteNames.ProviderManage;
+
+                return View("../ProviderReservations/FundingRestrictionNotification", viewModel);
+            }
+
+            viewModel.BackLink = RouteNames.EmployerManage;
+
+            return View("../EmployerReservations/FundingRestrictionNotification", viewModel);
         }
 
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]

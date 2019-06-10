@@ -1,0 +1,27 @@
+﻿
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+
+        <div class="govuk-grid-column-two-thirds">
+
+            <h1 class="govuk-heading-xl">Page not found</h1>
+
+
+            @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+            {
+                <p class="govuk-body">If you entered a web address please check it was correct.</p>
+                <p class="govuk-body">
+                    You can return to the
+                    <a asp-external-controller="account">start page</a>
+                    to try again.
+                </p>
+            }
+            else
+            {
+                <p class="govuk-body">If you entered a web address, check that it's correct. Or you can <a asp-external-controller="service" asp-external-action="accounts">return to the homepage</a>.</p>
+            }
+
+
+        </div>
+    </div>
+</main>

@@ -8,6 +8,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
@@ -15,6 +16,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
@@ -39,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _encodingService = new Mock<IEncodingService>();
 
             _mediator = new Mock<IMediator>();
-            _controller = new EmployerReservationsController(_mediator.Object,_encodingService.Object);
+            _controller = new EmployerReservationsController(_mediator.Object,_encodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
