@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Web.Extensions
     {
         public static string GetGDSShortDateString(this DateTime datetime)
         {
-            return datetime.ToString("MMM yyyy");
+            return datetime.ToString("MMMM yyyy");
         }
     }
 }

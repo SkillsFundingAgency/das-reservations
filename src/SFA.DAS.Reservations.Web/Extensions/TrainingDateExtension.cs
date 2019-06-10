@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Web.Extensions
         public static string GetGDSShortDateString(this TrainingDateModel model)
         {
             return  model.EndDate == default(DateTime) ? 
-                $"{model.StartDate:MMM yyyy}" : 
+                $"{model.StartDate:MMMM yyyy}" : 
                 $"{model.StartDate:MMM yyyy} to {model.EndDate:MMM yyyy}";
         }
     }
