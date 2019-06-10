@@ -52,7 +52,7 @@
       "type": "string"
     },
     "loggingRedisConnectionString": {
-      "type": "string"
+      "type": "securestring"
     },
     "featureToggleOn": {
       "type": "string"
