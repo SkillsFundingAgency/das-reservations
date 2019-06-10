@@ -40,7 +40,7 @@
                         Apprenticeship training start date
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.TrainingDate.GetDasShortDateString()
+                        @Model.TrainingDate.GetGDSShortDateString()
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName" asp-all-route-data="@changeRouteData" >

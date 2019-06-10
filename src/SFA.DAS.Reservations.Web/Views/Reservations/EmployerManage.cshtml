@@ -54,7 +54,7 @@ else
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell" data-label="Organisation">@reservation.LegalEntityName</td>
                             <td class="govuk-table__cell" data-label="Apprenticeship training">@reservation.CourseName</td>
-                            <td class="govuk-table__cell" data-label="Apprenticeship start date"> @reservation.TrainingDate.GetDasShortDateString()</td>
+                            <td class="govuk-table__cell" data-label="Apprenticeship start date"> @reservation.TrainingDate.GetGDSShortDateString()</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">
                                 @if (reservation.Status == ReservationStatusViewModel.Pending)
                                 {
