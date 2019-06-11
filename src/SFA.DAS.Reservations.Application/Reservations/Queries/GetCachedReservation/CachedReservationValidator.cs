@@ -20,35 +20,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                 result.AddError(nameof(reservation.AccountLegalEntityName));
             }
 
-            if (string.IsNullOrEmpty(reservation.StartDate))
+            if (reservation.TrainingDate == null)
             {
-                result.AddError(nameof(reservation.StartDate));
+                result.AddError(nameof(reservation.TrainingDate));
             }
-            else
+            else if (reservation.TrainingDate.StartDate == DateTime.MinValue)
             {
-                var dateSplit = reservation.StartDate.Split("-");
-
-                if (dateSplit.Length != 2)
-                {
-                    result.AddError(nameof(reservation.StartDate));
-                    return Task.FromResult(result);
-                }
-
-                var yearValid = int.TryParse(dateSplit[0], out var year);
-                var monthValid = int.TryParse(dateSplit[1], out var month);
-
-                if (!yearValid || !monthValid)
-                {
-                    result.AddError(nameof(reservation.StartDate));
-                    return Task.FromResult(result);
-                }
-
-                var startDate = DateTime.TryParse($"{year}-{month}-01", out var parseDateTime);
-
-                if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
-                {
-                    result.AddError(nameof(reservation.StartDate));
-                }
+                result.AddError(nameof(reservation.TrainingDate), $"{nameof(reservation.TrainingDate.StartDate)} must be set on {nameof(reservation.TrainingDate)}");
             }
 
             return Task.FromResult(result);

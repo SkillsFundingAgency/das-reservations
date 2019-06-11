@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Which.Model.Should().BeOfType<ReviewViewModel>().Subject;
 
             viewModel.RouteModel.Should().BeEquivalentTo(routeModel);
-            viewModel.StartDateDescription.Should().Be(cachedReservationResult.StartDateDescription);
+            viewModel.TrainingDate.Should().Be(cachedReservationResult.TrainingDate);
             viewModel.CourseDescription.Should().Be(cachedReservationResult.CourseDescription);
             viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
             viewModel.AccountLegalEntityPublicHashedId.Should().Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
@@ -105,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Id|The Id field is not valid." }), null, null));
             var controller = new ReservationsController(
                 mockMediator.Object, 
-                Mock.Of<IStartDateService>(), 
+                Mock.Of<ITrainingDateService>(), 
                 Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
                 Mock.Of<ILogger<ReservationsController>>(), 
                 Mock.Of<IEncodingService>(),

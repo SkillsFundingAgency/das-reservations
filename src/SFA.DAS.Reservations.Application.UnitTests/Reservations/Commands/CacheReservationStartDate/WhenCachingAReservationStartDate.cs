@@ -90,8 +90,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             
             _mockCacheStorageService.Verify(service => service.SaveToCache(originalCommand.Id.ToString(), It.Is<CachedReservation>(reservation => 
                 reservation.Id == originalCommand.Id && 
-                reservation.StartDate == originalCommand.StartDate &&
-                reservation.StartDateDescription == originalCommand.StartDateDescription &&
+                reservation.TrainingDate.Equals(originalCommand.TrainingDate) &&
                 reservation.AccountId == _cachedReservation.AccountId &&
                 reservation.AccountLegalEntityId == _cachedReservation.AccountLegalEntityId &&
                 reservation.AccountLegalEntityName == _cachedReservation.AccountLegalEntityName &&

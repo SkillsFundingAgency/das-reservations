@@ -1,5 +1,6 @@
 ﻿@using System.Text
 @using Microsoft.AspNetCore.Mvc.ModelBinding
+@using SFA.DAS.Reservations.Web.Extensions
 @model ApprenticeshipTrainingViewModel
 @{
     ViewData["Title"] = "Reservations - Apprenticeship training";
@@ -78,9 +79,9 @@
                         @foreach (var possibleStartDate in Model.PossibleStartDates)
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.Value" checked="@possibleStartDate.Checked" required>
+                                <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.SerializedModel" checked="@possibleStartDate.Checked" required>
                                 <label class="govuk-label govuk-radios__label" for="StartDate-@possibleStartDate.Id">
-                                    @possibleStartDate.Label
+                                    @possibleStartDate.StartDate.GetGDSLongDateString()
                                 </label>
                             </div>
                         }

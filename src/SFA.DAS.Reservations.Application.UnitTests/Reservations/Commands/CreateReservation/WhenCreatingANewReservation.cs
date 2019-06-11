@@ -11,11 +11,11 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             _cachedReservation = fixture.Create<CachedReservation>();
             _expectedStartDate = fixture.Create<DateTime>().Date;
-            _cachedReservation.StartDate = $"{_expectedStartDate:yyyy-MM}";
+            _cachedReservation.TrainingDate = new TrainingDateModel{ StartDate = _expectedStartDate };
             _cachedReservation.AccountId = _expectedAccountId;
             _cachedReservation.AccountLegalEntityName = _expectedLegalEntityName;
             _apiResponse = fixture.Create<CreateReservationResponse>();

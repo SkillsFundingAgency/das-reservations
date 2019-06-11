@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -15,16 +14,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationStartDateCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
-        private readonly ICachedReservationRespository _cachedReservationRespository;
+        private readonly ICachedReservationRespository _cachedReservationRepository;
 
         public CacheReservationStartDateCommandHandler(
             IValidator<CacheReservationStartDateCommand> validator,
             ICacheStorageService cacheStorageService, 
-            ICachedReservationRespository cachedReservationRespository)
+            ICachedReservationRespository cachedReservationRepository)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
-            _cachedReservationRespository = cachedReservationRespository;
+            _cachedReservationRepository = cachedReservationRepository;
         }
 
         public async Task<Unit> Handle(CacheReservationStartDateCommand command, CancellationToken cancellationToken)
@@ -41,11 +40,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (command.UkPrn == default(uint))
             {
-                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+                cachedReservation = await _cachedReservationRepository.GetEmployerReservation(command.Id);
             }
             else
             {
-                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+                cachedReservation = await _cachedReservationRepository.GetProviderReservation(command.Id, command.UkPrn);
             }
 
             if (cachedReservation == null)
@@ -53,8 +52,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 throw new CachedReservationNotFoundException(command.Id);
             }
 
-            cachedReservation.StartDate = command.StartDate;
-            cachedReservation.StartDateDescription = command.StartDateDescription;
+            cachedReservation.TrainingDate = command.TrainingDate;
             
             await _cacheStorageService.SaveToCache(command.Id.ToString(), cachedReservation, 1);
             return Unit.Value;

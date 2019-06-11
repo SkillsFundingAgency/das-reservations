@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            [Frozen] Mock<IStartDateService> mockStartDateService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
             ReservationsController controller)
         {
             mockMediator
@@ -44,18 +44,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockStartDateService.Verify(provider => provider.GetStartDates(accountLegalEntityId), Times.Once);
+            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId), Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Values(
             ReservationsRouteModel routeModel,
-            IEnumerable<StartDateModel> expectedStartDates,
+            IEnumerable<TrainingDateModel> expectedStartDates,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            [Frozen] Mock<IStartDateService> mockStartDateService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -71,9 +71,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     EncodingType.PublicAccountLegalEntityId))
                 .Returns(accountLegalEntityId);
             mockStartDateService
-                .Setup(service => service.GetStartDates(accountLegalEntityId))
+                .Setup(service => service.GetTrainingDates(accountLegalEntityId))
                 .ReturnsAsync(expectedStartDates);
-            var mappedDates = expectedStartDates.Select(startDateModel => new StartDateViewModel(startDateModel)).OrderBy(model => model.Value);
+            var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
             routeModel.FromReview = false;
 
@@ -86,7 +86,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.PossibleStartDates.Should().BeEquivalentTo(mappedDates);
             viewModel.Courses.Should().BeEquivalentTo(mappedCourses);
             viewModel.CourseId.Should().Be(cachedReservationResult.CourseId);
-            viewModel.TrainingStartDate.Should().Be(cachedReservationResult.StartDate);
             viewModel.IsProvider.Should().BeTrue();
             viewModel.RouteName.Should().Be(RouteNames.ProviderCreateApprenticeshipTraining);
             viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
