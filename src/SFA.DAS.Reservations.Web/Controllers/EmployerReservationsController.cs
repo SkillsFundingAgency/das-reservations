@@ -5,16 +5,18 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -27,40 +29,62 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
+        private readonly ReservationsWebConfiguration _config;
 
-        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService)
+        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
         {
             _mediator = mediator;
             _encodingService = encodingService;
+            _config = options.Value;
         }
 
         // GET
-        public async Task<IActionResult> Index(string employerAccountId)
+        public async Task<IActionResult> Index()
+        {
+            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+
+            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+            if (!nextGlobalRuleStartDate.HasValue)
+            {
+                return RedirectToAction("Start", RouteData?.Values);
+            }
+
+            var viewModel = new FundingRestrictionNotificationViewModel
+            {
+                RestrictionStartDate = nextGlobalRuleStartDate.Value,
+                BackLink = _config.EmployerDashboardUrl
+            };
+
+            return View("FundingRestrictionNotification", viewModel);
+        }
+            
+
+        [HttpGet]
+        [Route("start",Name = RouteNames.EmployerStart)]
+        public async Task<IActionResult> Start()
         {
             try
             {
                 var globalRules = await _mediator.Send(new GetFundingRulesQuery());
-                var accountRules = await _mediator.Send(new GetAccountFundingRulesQuery
+
+                if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
                 {
-                    AccountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId)
-                });
-
-                if (globalRules?.ActiveRule != null | accountRules?.ActiveRule != null)
-                {
-                    GlobalRuleType? rule =
-                        globalRules?.ActiveRule != null ? globalRules.ActiveRule : accountRules.ActiveRule;
-
-                    switch (rule)
-                    {
-                        case GlobalRuleType.FundingPaused:
-                            return View("EmployerFundingPaused");
-
-                        case GlobalRuleType.ReservationLimit:
-                            return View("ReservationLimitReached");
-                    }
+                    return View("Index");
                 }
 
-                return View("Index");
+                var rule = globalRules.ActiveGlobalRules.First().RuleType;
+
+                switch (rule)
+                {
+                    case GlobalRuleType.FundingPaused:
+                        return View("EmployerFundingPaused");
+
+                    case GlobalRuleType.ReservationLimit:
+                        return View("ReservationLimitReached");
+                    default:
+                        return View("Index");
+                }
             }
             catch (ValidationException)
             {
@@ -164,7 +188,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {
-
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand

@@ -30,8 +30,11 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     {
                         await PopulateProviderClaims(ctx);
                     };
-                    
-                }).AddCookie(options => { options.ReturnUrlParameter = "/{ukprn}/reservations"; }); ;
+                }).AddCookie(options =>
+                {
+                    options.ReturnUrlParameter = "/{ukprn}/reservations";
+                    options.AccessDeniedPath = "/error/403";
+                }); ;
         }
 
         private static Task PopulateProviderClaims(SecurityTokenValidatedContext ctx)

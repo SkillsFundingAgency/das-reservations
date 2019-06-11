@@ -14,36 +14,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             {
                 result.AddError(nameof(command.Id));
             }
-
-            if (string.IsNullOrEmpty(command.StartDate))
+            
+            if (command.TrainingDate == null)
             {
-                result.AddError(nameof(command.StartDate));
+                result.AddError(nameof(command.TrainingDate));
             }
-            else
+            else if (command.TrainingDate.StartDate == DateTime.MinValue)
             {
-                var dateSplit = command.StartDate.Split("-");
-
-                if (dateSplit.Length != 2)
-                {
-                    result.AddError(nameof(command.StartDate));
-                    return Task.FromResult(result);
-                }
-
-                var yearValid = int.TryParse(dateSplit[0], out var year);
-                var monthValid = int.TryParse(dateSplit[1], out var month);
-
-                if (!yearValid || !monthValid)
-                {
-                    result.AddError(nameof(command.StartDate));
-                    return Task.FromResult(result);
-                }
-
-                var startDate = DateTime.TryParse($"{year}-{month}-01", out var parseDateTime);
-
-                if (!startDate || parseDateTime.Year != year || parseDateTime.Month != month)
-                {
-                    result.AddError(nameof(command.StartDate));
-                }
+                result.AddError(nameof(command.TrainingDate), $"{nameof(command.TrainingDate.StartDate)} must be set on {nameof(command.TrainingDate)}");
             }
 
             return Task.FromResult(result);
