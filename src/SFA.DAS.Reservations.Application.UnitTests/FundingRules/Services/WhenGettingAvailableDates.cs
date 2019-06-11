@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -21,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
-        private List<StartDateModel> _expectedAvailableDates;
+        private List<TrainingDateModel> _expectedAvailableDates;
         private long _accountLegalEntityId;
 
         [SetUp]
@@ -30,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             var fixture = new Fixture();
 
             _accountLegalEntityId = fixture.Create<long>();
-            _expectedAvailableDates = fixture.Create<List<StartDateModel>>();
+            _expectedAvailableDates = fixture.Create<List<TrainingDateModel>>();
             
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x =>

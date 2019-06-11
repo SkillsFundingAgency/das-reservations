@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
         private readonly IOptions<ReservationsApiConfiguration> _apiOptions;
         private readonly IApiClient _apiClient;
         private readonly ICacheStorageService _cacheStorageService;
-        private readonly ICachedReservationRespository _cachedReservationRespository;
+        private readonly ICachedReservationRespository _cachedReservationRepository;
 
         public CreateReservationCommandHandler(
             IValidator<CreateReservationCommand> createReservationValidator,
@@ -30,14 +30,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             IOptions<ReservationsApiConfiguration> apiOptions,
             IApiClient apiClient,
             ICacheStorageService cacheStorageService,
-            ICachedReservationRespository cachedReservationRespository)
+            ICachedReservationRespository cachedReservationRepository)
         {
             _createReservationValidator = createReservationValidator;
             _cachedReservationValidator = cachedReservationValidator;
             _apiOptions = apiOptions;
             _apiClient = apiClient;
             _cacheStorageService = cacheStorageService;
-            _cachedReservationRespository = cachedReservationRespository;
+            _cachedReservationRepository = cachedReservationRepository;
         }
 
         public async Task<CreateReservationResult> Handle(CreateReservationCommand command, CancellationToken cancellationToken)
@@ -54,11 +54,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (command.UkPrn == default(uint))
             {
-                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+                cachedReservation = await _cachedReservationRepository.GetEmployerReservation(command.Id);
             }
             else
             {
-                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+                cachedReservation = await _cachedReservationRepository.GetProviderReservation(command.Id, command.UkPrn);
             }
 
             if (cachedReservation == null)
@@ -73,15 +73,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                     new ValidationResult("The following parameters have failed validation", createValidationResult.ErrorList), null, null);
             }
 
-            var startDateComponents = cachedReservation.StartDate.Split("-");
-            var startYear = Convert.ToInt32(startDateComponents[0]);
-            var startMonth = Convert.ToInt32(startDateComponents[1]);
-
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 cachedReservation.AccountId, 
                 cachedReservation.UkPrn,
-                new DateTime(startYear, startMonth, 1),
+                new DateTime(cachedReservation.TrainingDate.StartDate.Year, cachedReservation.TrainingDate.StartDate.Month, 1),
                 cachedReservation.Id,
                 cachedReservation.AccountLegalEntityId,
                 cachedReservation.AccountLegalEntityName,

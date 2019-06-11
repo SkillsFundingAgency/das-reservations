@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -10,13 +11,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         private const string AccountLegalEntityName = "Test Name";
         private const string AccountLegalEntityPublicHashedId = "123RDF";
         private const string CourseDescription = "Course 1";
-        private const string StartDateDescription = "2019-01";
+       
 
         [TestCase(null)]
         [TestCase((uint)1564564)]
         public void Then_The_Model_Is_Constructed_With_Correct_Route_Names(uint? ukPrn)
         {
             //Arrange
+            var startDate = new TrainingDateModel{StartDate = DateTime.Now};
+
             var reservationsRouteModel = new ReservationsRouteModel
             {
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
@@ -27,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             };
             
             //Act
-            var actual = new ReviewViewModel(reservationsRouteModel,StartDateDescription,CourseDescription,AccountLegalEntityName,AccountLegalEntityPublicHashedId);
+            var actual = new ReviewViewModel(reservationsRouteModel, startDate,CourseDescription,AccountLegalEntityName,AccountLegalEntityPublicHashedId);
 
             //Assert
             Assert.AreEqual(AccountLegalEntityName,actual.AccountLegalEntityName);
@@ -49,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.ChangeStartDateRouteName);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, actual.BackLink);
             }
-            Assert.AreEqual(StartDateDescription, actual.StartDateDescription);
+            Assert.AreEqual(startDate, actual.TrainingDate);
         }
     }
 }
