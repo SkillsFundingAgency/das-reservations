@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Web.Extensions;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -16,11 +17,11 @@ namespace SFA.DAS.Reservations.Web.Models
         public DeleteViewModel(GetReservationResult queryResult)
         {
             Id = queryResult.ReservationId;
-            StartDateDescription = new StartDateModel
+            StartDateDescription = new TrainingDateModel
             {
                 StartDate = queryResult.StartDate,
                 EndDate = queryResult.ExpiryDate
-            }.ToString();
+            }.GetGDSDateString();
             AccountLegalEntityName = queryResult.AccountLegalEntityName;
             CourseDescription = queryResult.Course?.CourseDescription ?? 
                                 new Course(null, null, 0).CourseDescription;

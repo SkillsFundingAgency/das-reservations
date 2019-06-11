@@ -3,6 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
@@ -52,11 +53,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_StartDateDescription(
             GetReservationResult getReservationResult)
         {
-            var expectedDateDescription = new StartDateModel
+            var expectedDateDescription = new TrainingDateModel
             {
                 StartDate = getReservationResult.StartDate, 
                 EndDate = getReservationResult.ExpiryDate
-            }.ToString();
+            }.GetGDSDateString();
 
             var viewModel = new DeleteViewModel(getReservationResult);
 
