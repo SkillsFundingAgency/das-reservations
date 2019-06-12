@@ -4,8 +4,8 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
-    public interface IStartDateService
+    public interface ITrainingDateService
     {
-        Task<IEnumerable<StartDateModel>> GetStartDates(long accountLegalEntityId);
+        Task<IEnumerable<TrainingDateModel>> GetTrainingDates(long accountLegalEntityId);
     }
 }

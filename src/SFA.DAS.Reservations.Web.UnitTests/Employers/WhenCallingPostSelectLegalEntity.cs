@@ -9,11 +9,13 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -153,7 +155,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     new ValidationResult("Failed",
                         new List<string> {"AccountId| Account reservation limit has been reached."}), null, null));
 
-            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object);
+            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
             
             var actual = await controller.PostSelectLegalEntity(routeModel, viewModel);
 
