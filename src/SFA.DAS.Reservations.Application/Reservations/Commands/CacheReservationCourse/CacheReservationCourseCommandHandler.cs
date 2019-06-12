@@ -16,18 +16,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationCourseCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
-        private readonly ICachedReservationRespository _cachedReservationRespository;
+        private readonly ICachedReservationRespository _cachedReservationRepository;
         private readonly ICourseService _courseService;
 
         public CacheReservationCourseCommandHandler(
             IValidator<CacheReservationCourseCommand> validator, 
             ICacheStorageService cacheStorageService, 
-            ICachedReservationRespository cachedReservationRespository,
+            ICachedReservationRespository cachedReservationRepository,
             ICourseService courseService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
-            _cachedReservationRespository = cachedReservationRespository;
+            _cachedReservationRepository = cachedReservationRepository;
             _courseService = courseService;
         }
 
@@ -45,11 +45,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (command.UkPrn == default(uint))
             {
-                cachedReservation = await _cachedReservationRespository.GetEmployerReservation(command.Id);
+                cachedReservation = await _cachedReservationRepository.GetEmployerReservation(command.Id);
             }
             else
             {
-                cachedReservation = await _cachedReservationRespository.GetProviderReservation(command.Id, command.UkPrn);
+                cachedReservation = await _cachedReservationRepository.GetProviderReservation(command.Id, command.UkPrn);
             }
 
             if (cachedReservation == null)

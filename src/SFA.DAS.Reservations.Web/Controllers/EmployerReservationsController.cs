@@ -177,13 +177,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [HttpGet]
-        [Route("{id}/skip-course-selection",Name = RouteNames.EmployerSkipSelectCourse)]
-        public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
-        {
-            return await PostSelectCourse(routeModel, null);
-        }
-
         [HttpPost]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
