@@ -84,10 +84,9 @@ forms.on('submit', function (e) {
 
 var checkField = function ($field) {
     var textInput = $field,
-        selectField = $('#' + textInput.attr('id') + '-select'),
-        valueLength = $field.val().length;
+        selectField = $('#' + textInput.attr('id') + '-select');
 
-    if (valueLength > 0 && selectField[0].selectedIndex === 0) {
+    if (selectField[0].selectedIndex === 0) {
         showSelectValidationMessage(selectField);
         return false;
 
