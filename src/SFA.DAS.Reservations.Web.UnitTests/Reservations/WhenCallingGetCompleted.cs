@@ -65,6 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.CourseDescription.Should().Be(mediatorResult.Course.CourseDescription);
             model.StartDate.Should().Be(mediatorResult.StartDate);
             model.CourseId.Should().Be(mediatorResult.Course.Id);
+            model.UkPrn.Should().Be(mediatorResult.UkPrn);
         }
 
         [Test, MoqAutoData]

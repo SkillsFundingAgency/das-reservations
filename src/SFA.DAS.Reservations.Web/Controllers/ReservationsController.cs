@@ -261,7 +261,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }.GetGDSDateString(),
                 CourseDescription = queryResult.Course.CourseDescription,
                 StartDate = queryResult.StartDate,
-                CourseId = queryResult.Course?.Id
+                CourseId = queryResult.Course?.Id,
+                UkPrn = queryResult.UkPrn.GetValueOrDefault()
             };
 
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
@@ -292,7 +293,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
-                        routeModel.UkPrn, 
+                        model.UkPrn, 
                         routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId, 
                         model.StartDate, model.CourseId);
