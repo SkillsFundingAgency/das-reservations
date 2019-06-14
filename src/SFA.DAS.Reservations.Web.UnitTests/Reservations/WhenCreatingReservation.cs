@@ -160,7 +160,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillRedirtectToCreateReservationPageIfGlobalRuleNotFound(
+        public async Task ThenWillRedirtectToEmployerCreateReservationPageIfGlobalRuleNotFound(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            //arrange   
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
+            mockMediator.Setup(m => m.Send(
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
+
+            //act
+            var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;
+
+            //assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual("EmployerReservations", redirect.ControllerName);
+            Assert.AreEqual("Start", redirect.ActionName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task ThenWillRedirtectToProviderCreateReservationPageIfGlobalRuleNotFound(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -183,7 +212,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual("EmployerReservations", redirect.ControllerName);
+            Assert.AreEqual("ProviderReservations", redirect.ControllerName);
             Assert.AreEqual("Start", redirect.ActionName);
         }
     }
