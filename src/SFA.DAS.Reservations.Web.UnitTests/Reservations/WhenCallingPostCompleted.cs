@@ -67,6 +67,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var config = _fixture.Freeze<IOptions<ReservationsWebConfiguration>>();
             var providerRecruitUrl = _fixture.Create<string>();
             var addApprenticeUrl = _fixture.Create<string>();
+            var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
             mockUrlHelper
                 .Setup(helper => helper.GenerateUrl(routeModel.UkPrn.ToString(), "", "", "recruit", "", ""))
@@ -74,6 +75,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(model.UkPrn, routeModel.Id.Value, routeModel.AccountLegalEntityPublicHashedId, model.StartDate, model.CourseId))
                 .Returns(addApprenticeUrl);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl("", "accounts", "", "", "", ""))
+                .Returns(homeUrl);
             var controller = _fixture.Create<ReservationsController>();
             
             var actual = controller.PostCompleted(routeModel, model);
@@ -95,7 +99,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     break;
 
                 case (CompletedReservationWhatsNext.Homepage):
-                    Assert.AreEqual(config.Value.DashboardUrl,result.Url);
+                    Assert.AreEqual(homeUrl,result.Url);
                     break;
 
                 default: 
@@ -118,6 +122,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var config = _fixture.Freeze<IOptions<ReservationsWebConfiguration>>();
             var employerRecruitUrl = _fixture.Create<string>();
             var addApprenticeUrl = _fixture.Create<string>();
+            var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
             mockUrlHelper
                 .Setup(helper =>
@@ -126,6 +131,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(model.UkPrn, routeModel.Id.Value, routeModel.AccountLegalEntityPublicHashedId, model.StartDate, model.CourseId))
                 .Returns(addApprenticeUrl);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(routeModel.EmployerAccountId, "teams", "", "", "accounts", ""))
+                .Returns(homeUrl);
             var controller = _fixture.Create<ReservationsController>();
             
             var actual = controller.PostCompleted(routeModel, model);
@@ -147,7 +155,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     break;
 
                 case (CompletedReservationWhatsNext.Homepage):
-                    Assert.AreEqual(config.Value.EmployerDashboardUrl,result.Url);
+                    Assert.AreEqual(homeUrl,result.Url);
                     break;
 
                 default: 

@@ -300,10 +300,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(addApprenticeUrl);
 
                 default:
-                    var dashboardUrl = routeModel.UkPrn.HasValue ?
-                        _configuration.DashboardUrl :
-                        _configuration.EmployerDashboardUrl;
-                    return Redirect(dashboardUrl);
+                    var homeUrl = routeModel.UkPrn.HasValue ?
+                        _urlHelper.GenerateUrl(controller:"accounts") :
+                        _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
+                    return Redirect(homeUrl);
             }
         }
 
