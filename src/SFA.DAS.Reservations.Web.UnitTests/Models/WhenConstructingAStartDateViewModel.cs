@@ -12,51 +12,46 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
     {
         [Test, AutoData]
         public void Then_Sets_Id(
-            [Frozen] StartDateModel model,
-            StartDateViewModel viewModel)
+            [Frozen] TrainingDateModel model,
+            TrainingDateViewModel viewModel)
         {
             viewModel.Id.Should().Be($"{model.StartDate:yyyy-MM}");
         }
 
         [Test, AutoData]
         public void Then_Sets_Value(
-            [Frozen] StartDateModel model,
-            StartDateViewModel viewModel)
+            [Frozen] TrainingDateModel model,
+            TrainingDateViewModel viewModel)
         {
-            viewModel.Value.Should().Be(JsonConvert.SerializeObject(model));
+            viewModel.SerializedModel.Should().Be(JsonConvert.SerializeObject(model));
         }
 
         [Test, AutoData]
         public void Then_Sets_Label(
-            [Frozen] StartDateModel model,
-            StartDateViewModel viewModel)
+            [Frozen] TrainingDateModel model,
+            TrainingDateViewModel viewModel)
         {
-            viewModel.Label.Should().Be($"{model.StartDate:MMMM yyyy}");
+            viewModel.StartDate.Should().Be(model.StartDate);
         }
 
         [Test, AutoData]
-        public void Then_Sets_Checked(
-            StartDateModel model)
+        public void Then_Sets_Checked(TrainingDateModel model)
         {
-            var startDate = $"{model.StartDate:yyyy-MM}";
-            var viewModel = new StartDateViewModel(model, startDate);
+            var viewModel = new TrainingDateViewModel(model, true);
             viewModel.Checked.Should().Be("checked");
         }
 
         [Test, AutoData]
-        public void And_Not_Match_StartDate_Then_Checked_Is_Null(
-            StartDateModel model)
+        public void And_Not_Match_StartDate_Then_Checked_Is_Null(TrainingDateModel model)
         {
-            var startDate = $"{model.StartDate.AddMonths(1):yyyy-MM}";
-            var viewModel = new StartDateViewModel(model, startDate);
+            var viewModel = new TrainingDateViewModel(model);
             viewModel.Checked.Should().BeNull();
         }
 
         [Test, AutoData]
-        public void And_Null_StartDate_Then_Checked_Is_Null(
-            StartDateModel model)
+        public void And_Null_StartDate_Then_Checked_Is_Null(TrainingDateModel model)
         {
-            var viewModel = new StartDateViewModel(model);
+            var viewModel = new TrainingDateViewModel(model);
             viewModel.Checked.Should().BeNull();
         }
     }

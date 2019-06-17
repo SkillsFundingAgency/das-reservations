@@ -6,16 +6,16 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
-    public class StartDateService : IStartDateService
+    public class TrainingDateService : ITrainingDateService
     {
         private readonly IMediator _mediator;
 
-        public StartDateService(IMediator mediator)
+        public TrainingDateService(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        public async Task<IEnumerable<StartDateModel>> GetStartDates(long accountLegalEntityId)
+        public async Task<IEnumerable<TrainingDateModel>> GetTrainingDates(long accountLegalEntityId)
         {
             var datesToUse = await _mediator.Send(new GetAvailableDatesQuery
                 {AccountLegalEntityId = accountLegalEntityId});

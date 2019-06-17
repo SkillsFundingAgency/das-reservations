@@ -28,7 +28,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new ReservationViewModel(reservation, url, alephid);
 
-            viewModel.StartDateDescription.Should().Be($"{reservation.StartDate:MMMM yyyy} to {reservation.ExpiryDate:MMMM yyyy}");
+            viewModel.TrainingDate.StartDate.Should().Be(reservation.StartDate);
+            viewModel.TrainingDate.EndDate.Should().Be(reservation.ExpiryDate);
         }
 
         [Test, AutoData]

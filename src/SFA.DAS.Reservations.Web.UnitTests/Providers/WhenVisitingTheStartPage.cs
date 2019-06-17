@@ -45,6 +45,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [Test]
         public async Task ThenWillBeRoutedToProviderStartPage()
         {
+            //Arrange
+            _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
+                {
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>()
+                });
+
             //Act
             var result = await _controller.Start(123) as ViewResult;
 

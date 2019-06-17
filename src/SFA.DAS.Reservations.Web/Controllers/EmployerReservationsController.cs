@@ -176,7 +176,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached");
             }
-
         }
 
         [HttpGet]
