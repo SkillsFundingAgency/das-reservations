@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.EmployerStart);
             }
 
-            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+            var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
 
             var userId = userAccountIdClaim.Value;
 
