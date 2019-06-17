@@ -17,14 +17,16 @@
 
             <partial name="_pageErrorsOverview" />
 
+            <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take?</h1>
+
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
-                    <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take?</h1>
+
 
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <span id="Course" class="govuk-error-message">
-                            Select a course from the list.
+                            Select a course from the list
                         </span>
                     }
 
