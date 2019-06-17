@@ -24,6 +24,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -248,70 +249,62 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 UkPrn = routeModel.UkPrn.GetValueOrDefault()
             };
             var queryResult = await _mediator.Send(query);
-            //todo: null check on result
+            //todo: null check on result, redirect to error
 
             var model = new CompletedViewModel
-            (
-                queryResult.ReservationId,
-                queryResult.StartDate,
-                queryResult.ExpiryDate,
-                queryResult.Course,
-                routeModel.AccountLegalEntityPublicHashedId,
-				routeModel.UkPrn,
-                queryResult.AccountLegalEntityName,
-                _configuration.DashboardUrl, 
-                _configuration.ApprenticeUrl,
-                _configuration.EmployerDashboardUrl,
-                _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString())
+            {
+                AccountLegalEntityName = queryResult.AccountLegalEntityName,
+                TrainingDateDescription = new TrainingDateModel()
+                {
+                    StartDate = queryResult.StartDate,
+                    EndDate = queryResult.ExpiryDate
+                }.GetGDSDateString(),
+                CourseDescription = queryResult.Course.CourseDescription,
+                StartDate = queryResult.StartDate,
+                CourseId = queryResult.Course?.Id,
+                UkPrn = queryResult.UkPrn.GetValueOrDefault()
+            };
 
-            );
-            return View(model.ViewName, model);
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
+            return View(viewName, model);
         }
 
         [HttpPost]
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
         [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerPostCompleted)]
-        public IActionResult PostCompleted(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        public IActionResult PostCompleted(ReservationsRouteModel routeModel, CompletedViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var viewModel = new CompletedViewModel
-                (
-                    model.ReservationId,
-                    model.StartDate,
-                    model.ExpiryDate,
-                    new Course(model.CourseId, model.CourseTitle, model.Level),
-                    routeModel.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn,
-                    model.AccountLegalEntityName,
-                    _configuration.DashboardUrl,
-                    _configuration.ApprenticeUrl,
-                    _configuration.EmployerDashboardUrl,
-                    model.RecruitApprenticeUrl
-                    
-                );
-                
-                return View(viewModel.ViewName, viewModel);
+                var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
+                return View(viewName, model);
             }
 
-            if (!string.IsNullOrEmpty(model.WhatsNext) && !string.IsNullOrWhiteSpace(model.WhatsNext))
+            switch (model.WhatsNext)
             {
+                case CompletedReservationWhatsNext.RecruitAnApprentice:
+                    var recruitUrl = routeModel.UkPrn.HasValue ?
+                        _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString()) :
+                        _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId);
+                    return Redirect(recruitUrl);
 
-                switch (model.WhatsNext)
-                {
-                    case ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice:
-                        return Redirect(model.RecruitApprenticeUrl);
+                case CompletedReservationWhatsNext.FindApprenticeshipTraining:
+                    return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice:
-                        return Redirect(model.ApprenticeUrl);
+                case CompletedReservationWhatsNext.AddAnApprentice:
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
+                        model.UkPrn, 
+                        routeModel.Id.Value,
+                        routeModel.AccountLegalEntityPublicHashedId, 
+                        model.StartDate, model.CourseId);
+                    return Redirect(addApprenticeUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage:
-                        return Redirect(model.DashboardUrl);
-                }
+                default:
+                    var homeUrl = routeModel.UkPrn.HasValue ?
+                        _urlHelper.GenerateUrl(controller:"accounts") :
+                        _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
+                    return Redirect(homeUrl);
             }
-
-            ModelState.AddModelError("WhatsNext", "Select what you would like to do next");
-            return PostCompleted(routeModel, model);
         }
 
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
