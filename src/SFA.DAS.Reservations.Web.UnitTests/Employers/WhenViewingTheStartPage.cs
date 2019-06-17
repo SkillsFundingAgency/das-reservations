@@ -25,9 +25,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [SetUp]
         public void Arrange()
         {
+            var options = new Mock<IOptions<ReservationsWebConfiguration>>();
+            options.SetupGet(o => o.Value).Returns(new ReservationsWebConfiguration
+                {
+                    FindApprenticeshipTrainingUrl = "test", 
+                    ApprenticeshipFundingRulesUrl = "test"
+                });
+
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
         }
 
         [Test, MoqAutoData]
@@ -71,7 +78,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test,MoqAutoData]
         public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage(
             [Frozen] Mock<IMediator> mediatorMock,
-            [Frozen] long accountId)
+            [Frozen] long accountId, 
+            IOptions<ReservationsWebConfiguration> options)
         {
             //arrange
             mediatorMock.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
@@ -80,7 +88,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     GlobalRules = new List<GlobalRule>{ new GlobalRule{RuleType = GlobalRuleType.ReservationLimit, ActiveFrom = DateTime.Now.AddDays(-2)} }
                 });
 
-            var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object, options);
 
             //act
             var result = await controller.Start() as ViewResult;

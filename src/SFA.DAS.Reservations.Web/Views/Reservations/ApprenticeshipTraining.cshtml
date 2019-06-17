@@ -10,6 +10,16 @@
     var customErrorKeys = new Dictionary<string, string> {{"StartDate", $"StartDate-{firstStartDate}"}};
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
+
+    var courseInvalid = !ViewData.ModelState.IsValid && 
+                        ViewData.ModelState.ContainsKey("CourseId") &&
+                        ViewData.ModelState["CourseId"].Errors != null &&
+                        ViewData.ModelState["CourseId"].Errors.Any();
+
+    var startDateInvalid = !ViewData.ModelState.IsValid 
+                           && ViewData.ModelState.ContainsKey("StartDate") &&
+                           ViewData.ModelState["StartDate"].Errors != null &&
+                           ViewData.ModelState["StartDate"].Errors.Any();
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
@@ -36,19 +46,26 @@
             <input id="accountLegalEntityPublicHashedId" name="accountLegalEntityPublicHashedId" type="hidden" value="@Model.AccountLegalEntityPublicHashedId"/>
             @if (Model.IsProvider)
             {
-            <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take? (optional)</h2>
-            <div class="govuk-form-group">
+                <div class="govuk-form-group @(courseInvalid ? "govuk-form-group--error" : "")">
+                    <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take?</h2>
 
-                <label class="govuk-label" for="course-search">
-                    Search for a course
-                </label>
-                <partial name="_CourseSearch" />
-                <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
-                    This information can be changed later.
-                </span>
-            </div>
+                    @if (courseInvalid)
+                    {
+                        <span id="Course" class="govuk-error-message">
+                           Select a course from the list.
+                        </span>
+                    }
+
+                    <label class="govuk-label" for="course-search">
+                        Search for a course
+                    </label>
+                    <partial name="_CourseSearch" />
+                    <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
+                        This information can be changed later.
+                    </span>
+                </div>
             }
-            <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+            <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
                 <fieldset class="govuk-fieldset">
                     @if (Model.IsProvider)
                     {
@@ -68,14 +85,19 @@
                         </span>
                     }
                     
-                    @if (ViewData.ModelState.ContainsKey("StartDate"))
+                    @if (startDateInvalid)
                     {
-                        <span id="StartDate" class="govuk-error-message">
-                            @ViewData.ModelState["StartDate"].Errors.First().ErrorMessage
-                        </span>
+                        var startDateModelState = @ViewData.ModelState["StartDate"];
+
+                        if (startDateModelState.Errors != null && startDateModelState.Errors.Any())
+                        {
+                            <span id="StartDate" class="govuk-error-message">
+                                @startDateModelState.Errors.First().ErrorMessage
+                            </span>
+                        }
                     }
 
-                    <div class="govuk-radios" data-validation-message="You must select a start date">
+                    <div class="govuk-radios" data-validation-message="You must select a start date" data-validation-summary-message="Select a start date">
                         @foreach (var possibleStartDate in Model.PossibleStartDates)
                         {
                             <div class="govuk-radios__item">

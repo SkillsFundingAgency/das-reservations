@@ -66,11 +66,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             try
             {
+                var viewModel = new EmployerStartViewModel
+                {
+                    FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+                };
+
                 var globalRules = await _mediator.Send(new GetFundingRulesQuery());
 
                 if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
                 {
-                    return View("Index");
+                    return View("Index", viewModel);
                 }
 
                 var rule = globalRules.ActiveGlobalRules.First().RuleType;
@@ -83,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case GlobalRuleType.ReservationLimit:
                         return View("ReservationLimitReached");
                     default:
-                        return View("Index");
+                        return View("Index", viewModel);
                 }
             }
             catch (ValidationException)
@@ -175,13 +181,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             };
 
             return View(viewModel);
-        }
-
-        [HttpGet]
-        [Route("{id}/skip-course-selection",Name = RouteNames.EmployerSkipSelectCourse)]
-        public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
-        {
-            return await PostSelectCourse(routeModel, null);
         }
 
         [HttpPost]
