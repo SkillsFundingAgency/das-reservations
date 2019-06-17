@@ -7,6 +7,8 @@
         public const string ProviderManage = "provider-manage";
         public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderDelete = "provider-delete";
+        public const string ProviderDeleteCompleted = "provider-delete-completed";
+        public const string ProviderError = "provider-error";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
         public const string ProviderCreateApprenticeshipTraining = "provider-create-apprenticeship-training";
         public const string ProviderReview = "provider-review";
@@ -22,6 +24,8 @@
         public const string EmployerManage = "employer-manage";
         public const string EmployerManageCreate = "employer-manage-create";
         public const string EmployerDelete = "employer-delete";
+        public const string EmployerDeleteCompleted = "employer-delete-completed";
+        public const string EmployerError = "employer-error";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";

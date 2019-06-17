@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Reflection.Metadata.Ecma335;
 
 namespace SFA.DAS.Reservations.Domain.Courses
 {

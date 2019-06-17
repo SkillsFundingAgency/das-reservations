@@ -1,0 +1,55 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            <partial name="_PageErrorsOverview"/>
+
+            <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-8">
+                <h1 class="govuk-panel__title">
+                    Reservation successfully deleted
+                </h1>
+            </div>
+
+            <form method="post" asp-route="@RouteNames.EmployerDeleteCompleted">
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            What's next?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Manage"))
+                        {
+                            <span id="manage-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["Manage"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Manage" name="Manage" type="radio" value="True">
+                                <label class="govuk-label govuk-radios__label" for="Manage">
+                                    Return to manage reservations
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Manage-no" name="Manage" type="radio" value="False">
+                                <label class="govuk-label govuk-radios__label" for="Manage-no">
+                                    Go to homepage
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <button type="submit" draggable="false" class="govuk-button">
+                    Continue
+                </button>
+            </form>
+        </div>
+    </div>
+</main>

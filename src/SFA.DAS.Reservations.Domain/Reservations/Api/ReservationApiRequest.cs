@@ -3,7 +3,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class ReservationApiRequest : IGetApiRequest, IGetAllApiRequest, IPostApiRequest
+    public class ReservationApiRequest : IGetApiRequest, IGetAllApiRequest, IPostApiRequest, IDeleteApiRequest
     {
         public ReservationApiRequest(
             string baseUrl,
@@ -49,6 +49,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
         public string GetAllUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
+
+        public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}";
 
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
