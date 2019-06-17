@@ -51,6 +51,17 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return urlString.ToString().TrimEnd('/');
         }
 
+        public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
+        {
+            var apprenticeUrl = $"{_options.ApprenticeUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
+            if (!string.IsNullOrWhiteSpace(courseId))
+            {
+                apprenticeUrl += $"&courseCode={courseId}";
+            }
+
+            return apprenticeUrl;
+        }
+
         private static string FormatBaseUrl(string url, string subDomain = "", string folder = "")
         {
             var returnUrl = url.EndsWith("/")

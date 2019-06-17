@@ -1,4 +1,7 @@
+@using System.Text
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 @using SFA.DAS.Reservations.Web.Extensions
+@using SFA.DAS.Reservations.Web.Infrastructure
 @model CompletedViewModel
 @{
     ViewData["Title"] = "Reservations";
@@ -6,6 +9,9 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
+
+            <partial name="_PageErrorsOverview"/>
+            
             <div class="govuk-panel govuk-panel--confirmation">
                 <h1 class="govuk-panel__title">
                     You have successfully reserved funding for apprenticeship training
@@ -25,7 +31,7 @@
                         Apprenticeship start date
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.StartDate.GetGDSShortDateString() to @Model.ExpiryDate.GetGDSShortDateString()
+                        @Model.TrainingDateDescription
                     </dd>
                 </dl>
                 <dl class="govuk-summary-list__row">
@@ -33,7 +39,7 @@
                         Apprenticeship training
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.Course.CourseDescription
+                        @Model.CourseDescription
                         <details class="govuk-details">
                             <summary class="govuk-details__summary">
                                 <span class="govuk-details__summary-text">
@@ -57,38 +63,65 @@
             </p>
 
             <p>
-                You cannot change:
+                You will need to reserve new funding to change the apprenticeship training start date to outside of the 3-month window you originally selected.
             </p>
 
-            <ul class="govuk-list govuk-list--bullet">
-                <li>
-                    the off-the-job training start date, outside of the 3 month window you selected
-                </li>
-            </ul>
-            <p>
-                To select a different apprenticeship start date, you will need to start again and secure new funding.
-            </p>
-            <h2 class="govuk-heading-l">
-                What you need to do now
-            </h2>
-            <p>
-                If you know who your apprentice and training provider will be, you can add the apprentice's details.
-            </p>
-            <p>
-                If you do not know who the apprentice or training provider will be, you will need to:
-            </p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>
-                    Find an apprentice. You can use our <a href="https://recruit.manage-apprenticeships.service.gov.uk" target="_blank" rel="noopener">recruitment service</a> to find an apprentice.
-                </li>
-                <li>
-                    Find a training provider. Use the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" rel="noopener">find apprenticeship training</a> service to find a training provider who offers the course you would like to take.
-                </li>
-            </ul>
-            <p>
+            <form method="post" asp-route="@RouteNames.EmployerCompleted">
 
-                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-querystring="?reservationId=@Model.ReservationId" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="govuk-button">Return to your account</a>
-            </p>
+                <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
+                <input type="hidden" name="TrainingDateDescription" value="@Model.TrainingDateDescription" />
+                <input type="hidden" name="CourseDescription" value="@Model.CourseDescription" />
+                <input type="hidden" name="StartDate" value="@Model.StartDate" />
+                <input type="hidden" name="CourseId" value="@Model.CourseId" />
+                <input type="hidden" name="UkPrn" value="@Model.UkPrn" />
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            What's next?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("WhatsNext"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["WhatsNext"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.RecruitAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext">
+                                    Recruit an apprentice
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext-training" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.FindApprenticeshipTraining">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext-training">
+                                    Find a training provider
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext-add" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.AddAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext-add">
+                                    Add apprentice's details
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext-home" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.Homepage">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext-home">
+                                    Go to homepage
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <p>
+
+                    <button type="submit" draggable="false" class="govuk-button">
+                        Continue
+                    </button>
+
+                </p>
+            </form>
         </div>
     </div>
 </main>

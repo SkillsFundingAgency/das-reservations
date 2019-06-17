@@ -9,41 +9,9 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="error-summary">
-                    <h2 class="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div class="govuk-error-summary__body">
-                        <ul class="govuk-list govuk-error-summary__list">
-                            @{
-                                var errorStringBuilder = new StringBuilder();
-                                var errorCount = ViewData.ModelState.ErrorCount;
-                                var loopCount = 1;
-                                foreach (var error in ViewData.ModelState)
-                                {
-                                    if (error.Value.ValidationState == ModelValidationState.Invalid)
-                                    {
-                                        errorStringBuilder.Append($"<li><a href=\"#{error.Key}\">{error.Value.Errors.First().ErrorMessage}</a></li>");
-                                        if (loopCount == errorCount - 1)
-                                        {
-                                            errorStringBuilder.Append(" and ");
-                                        }
-                                        else if (loopCount != errorCount)
-                                        {
-                                            errorStringBuilder.Append(", ");
-                                        }
 
-                                        loopCount++;
-                                    }
-                                }
-                            }
-                            @Html.Raw(errorStringBuilder.ToString())
-                        </ul>
-                    </div>
-                </div>
-            }
+            <partial name="_PageErrorsOverview"/>
+            
             <div class="govuk-panel govuk-panel--confirmation">
                 <h1 class="govuk-panel__title">
                     You have successfully reserved funding for apprenticeship training
@@ -63,7 +31,7 @@
                         Apprenticeship start date
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.StartDate.GetGDSShortDateString() to @Model.ExpiryDate.GetGDSShortDateString()
+                        @Model.TrainingDateDescription
                     </dd>
                 </dl>
                 <dl class="govuk-summary-list__row">
@@ -71,7 +39,7 @@
                         Apprenticeship training
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.Course.CourseDescription
+                        @Model.CourseDescription
                     </dd>
                 </dl>
             </div>
@@ -100,64 +68,57 @@
                 To select a different employer or apprenticeship training start date, you will need to start a new funding reservation.
             </p>
 
-            @if (Model.ShowApprenticeUrl && Model.ShowDashboardUrl)
-            {
+            <form method="post" asp-route="@RouteNames.ProviderCompleted">
 
-                <form method="post" asp-route="@RouteNames.ProviderCompleted">
+                <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
+                <input type="hidden" name="TrainingDateDescription" value="@Model.TrainingDateDescription" />
+                <input type="hidden" name="CourseDescription" value="@Model.CourseDescription" />
+                <input type="hidden" name="StartDate" value="@Model.StartDate" />
+                <input type="hidden" name="CourseId" value="@Model.CourseId" />
+                <input type="hidden" name="UkPrn" value="@Model.UkPrn" />
 
-                    <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
-                    <input type="hidden" name="ApprenticeUrl" value="@Model.ApprenticeUrl" />
-                    <input type="hidden" name="DashboardUrl" value="@Model.DashboardUrl" />
-                    <input type="hidden" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName" />
-                    <input type="hidden" name="StartDate" value="@Model.StartDate" />
-                    <input type="hidden" name="Level" value="@Model.Course.Level" />
-                    <input type="hidden" name="CourseId" value="@Model.Course.Id" />
-                    <input type="hidden" name="CourseTitle" value="@Model.Course.Title" />
-                    <input type="hidden" name="ExpiryDate" value="@Model.ExpiryDate" />
-                    <input type="hidden" name="RecruitApprenticeUrl" value="@Model.RecruitApprenticeUrl" />
-
-                    <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
-                        <fieldset class="govuk-fieldset">
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                What's next?
-                            </legend>
-                            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("WhatsNext"))
-                            {
-                                <span id="confirm-error" class="govuk-error-message">
-                                    <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["WhatsNext"].Errors.First().ErrorMessage
-                                </span>
-                            }
-                            <div class="govuk-radios">
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="WhatsNext" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice">
-                                    <label class="govuk-label govuk-radios__label" for="whats-next-recruit">
-                                        Recruit an apprentice
-                                    </label>
-                                </div>
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="whats-next-add" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice">
-                                    <label class="govuk-label govuk-radios__label" for="whats-next-add">
-                                        Add apprentice's details
-                                    </label>
-                                </div>
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="whats-next-home" name="WhatsNext" type="radio" value="@ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage">
-                                    <label class="govuk-label govuk-radios__label" for="whats-next-home">
-                                        Go to homepage
-                                    </label>
-                                </div>
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            What's next?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("WhatsNext"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["WhatsNext"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.RecruitAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext">
+                                    Recruit an apprentice
+                                </label>
                             </div>
-                        </fieldset>
-                    </div>
-                    <p>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext-add" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.AddAnApprentice">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext-add">
+                                    Add apprentice's details
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="WhatsNext-home" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.Homepage">
+                                <label class="govuk-label govuk-radios__label" for="WhatsNext-home">
+                                    Go to homepage
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <p>
 
-                        <button type="submit" draggable="false" class="govuk-button">
-                            Continue
-                        </button>
+                    <button type="submit" draggable="false" class="govuk-button">
+                        Continue
+                    </button>
 
-                    </p>
-                </form>
-            }
+                </p>
+            </form>
+            
         </div>
     </div>
 </main>

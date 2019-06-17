@@ -9,8 +9,10 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
@@ -23,9 +25,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Calls_Mediator_To_Get_Reservation(
             ReservationsRouteModel routeModel,
+            GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
+                .ReturnsAsync(mediatorResult);
+
             await controller.Completed(routeModel);
 
             mockMediator.Verify(mediator => mediator.Send(It.Is<GetReservationQuery>(query => query.Id == routeModel.Id), CancellationToken.None));
@@ -49,16 +56,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var model = viewResult.Model.Should().BeOfType<CompletedViewModel>().Subject;
 
             viewResult.ViewName.Should().Be(ViewNames.ProviderCompleted);
-        
-            model.ReservationId.Should().Be(mediatorResult.ReservationId);
+
+            model.AccountLegalEntityName.Should().Be(mediatorResult.AccountLegalEntityName);
+            model.TrainingDateDescription.Should().Be(new TrainingDateModel
+            {
+                StartDate = mediatorResult.StartDate,
+                EndDate = mediatorResult.ExpiryDate
+            }.GetGDSDateString());
+            model.CourseDescription.Should().Be(mediatorResult.Course.CourseDescription);
             model.StartDate.Should().Be(mediatorResult.StartDate);
-            model.ExpiryDate.Should().Be(mediatorResult.ExpiryDate);
-            model.Course.Should().BeEquivalentTo(mediatorResult.Course);
-            model.AccountLegalEntityName.Should().BeEquivalentTo(mediatorResult.AccountLegalEntityName);
-            model.AccountLegalEntityPublicHashedId.Should().BeEquivalentTo(routeModel.AccountLegalEntityPublicHashedId);
-            model.ApprenticeUrl.Should().StartWith(mockConfig.Object.Value.ApprenticeUrl);
-            model.DashboardUrl.Should().Be(mockConfig.Object.Value.DashboardUrl);
-            model.EmployerDashboardUrl.Should().Be(mockConfig.Object.Value.EmployerDashboardUrl);
+            model.CourseId.Should().Be(mediatorResult.Course.Id);
+            model.UkPrn.Should().Be(mediatorResult.UkPrn);
         }
 
         [Test, MoqAutoData]
