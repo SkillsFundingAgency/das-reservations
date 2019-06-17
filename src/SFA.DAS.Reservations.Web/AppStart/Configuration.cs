@@ -20,6 +20,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
             
+            services.AddSingleton<IAuthorizationHandler, EmployerAccountAuthorizationHandler>();
+
             AddSharedConfiguration(services, configuration);
         }
 
@@ -28,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
-            
+            services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
             AddSharedConfiguration(services, configuration);
         }
 
@@ -44,16 +46,15 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
             services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
-
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
+
             services.AddSingleton<IAccountApiConfiguration, AccountApiConfiguration>(cfg => cfg.GetService<IOptions<AccountApiConfiguration>>().Value);
             services.AddTransient<IAccountApiClient, AccountApiClient>();
             services.AddTransient<IEmployerAccountService, EmployerAccountService>();
-            services.AddSingleton<IEmployerAccountAuthorisationHandler, EmployerAccountAuthorizationHandler>();
-            services.AddSingleton<IProviderAuthorisationHandler, ProviderAuthorizationHandler>();
+
             services.AddSingleton<IAuthorizationHandler, HasProviderOrEmployerAccountAuthorisationHandler>();
-            
-            
+            services.AddSingleton<IProviderAuthorisationHandler, ProviderAuthorizationHandler>();
+            services.AddSingleton<IEmployerAccountAuthorisationHandler, EmployerAccountAuthorizationHandler>();
         }
     }
 }
