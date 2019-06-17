@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -21,6 +23,74 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCreatingReservation
     {
         [Test, MoqAutoData]
+        public async Task ThenWillGetAnyProviderGlobalRulesUserHasNotRead(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            //arrange
+            var expectedUkPrnId = "555";
+            var claim = new Claim(ProviderClaims.ProviderUkprn, expectedUkPrnId);
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
+            mockMediator.Setup(m => m.Send(
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
+                {
+                    Rule = new GlobalRule{ActiveFrom = DateTime.Now}
+                });
+            
+            //act
+            await controller.CreateReservation(routeModel);
+          
+            //assert
+            mockMediator.Verify(m => m.Send(
+                It.Is<GetNextUnreadGlobalFundingRuleQuery>(query => query.Id.Equals(expectedUkPrnId)),
+                It.IsAny<CancellationToken>()),Times.Once());
+
+        }
+
+        [Test, MoqAutoData]
+        public async Task ThenWillGetAnyEmployerGlobalRulesUserHasNotRead(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            //arrange
+            var expectedUserId = "12564";
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
+            routeModel.UkPrn = null;
+
+            mockMediator.Setup(m => m.Send(
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
+                {
+                    Rule = new GlobalRule{ActiveFrom = DateTime.Now}
+                });
+            
+            //act
+            await controller.CreateReservation(routeModel);
+          
+            //assert
+            mockMediator.Verify(m => m.Send(
+                It.Is<GetNextUnreadGlobalFundingRuleQuery>(query => query.Id.Equals(expectedUserId)),
+                It.IsAny<CancellationToken>()),Times.Once());
+
+        }
+
+        [Test, MoqAutoData]
         public async Task ThenWillShowEmployerRestrictionNotificationIfGlobalRuleIsFound(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
@@ -28,13 +98,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //arrange
             routeModel.UkPrn = null;
+            
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, "123");
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
 
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
                 {
-                    Rule = new GlobalRule(){ActiveFrom = DateTime.Now}
+                    Rule = new GlobalRule{Id = 2, ActiveFrom = DateTime.Now}
                 });
 
             //act
@@ -56,12 +133,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //arrange
             routeModel.UkPrn = 120;
+            
+            var claim = new Claim(ProviderClaims.ProviderUkprn, "555");
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult
                 {
-                    Rule = new GlobalRule {ActiveFrom = DateTime.Now}
+                    Rule = new GlobalRule {Id = 2, ActiveFrom = DateTime.Now}
                 });
 
             //act
@@ -76,16 +161,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillRedirtectToCreateReservationPageIfGlobalRuleNotFound(
+        public async Task ThenWillRedirtectToEmployerCreateReservationPageIfGlobalRuleNotFound(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            //arrange
+            //arrange   
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
             mockMediator.Setup(m => m.Send(
-                    It.IsAny<GetNextActiveGlobalFundingRuleQuery>(),
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new GetNextActiveGlobalFundingRuleResult());
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
 
             //act
             var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;
@@ -93,6 +186,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual("EmployerReservations", redirect.ControllerName);
+            Assert.AreEqual("Start", redirect.ActionName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task ThenWillRedirtectToProviderCreateReservationPageIfGlobalRuleNotFound(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            //arrange           
+            var claim = new Claim(ProviderClaims.ProviderUkprn, "444");
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
+            };
+
+            mockMediator.Setup(m => m.Send(
+                    It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
+
+            //act
+            var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;
+
+            //assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual("ProviderReservations", redirect.ControllerName);
             Assert.AreEqual("Start", redirect.ActionName);
         }
     }

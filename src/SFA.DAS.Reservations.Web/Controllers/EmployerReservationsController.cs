@@ -9,13 +9,15 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -41,17 +43,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
         // GET
         public async Task<IActionResult> Index()
         {
-            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+            
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
+            var nextGlobalRuleId = response?.Rule?.Id;
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 
-            if (!nextGlobalRuleStartDate.HasValue)
+            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel
             {
+                RuleId = nextGlobalRuleId.Value,
+                TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
                 BackLink = _config.EmployerDashboardUrl
             };
@@ -60,35 +67,54 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
             
 
+        [HttpPost]
+        [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
+        {
+            if(!markRuleAsRead)
+            {
+                return RedirectToRoute(RouteNames.EmployerStart);
+            }
+
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+
+            var userId = userAccountIdClaim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = userId,
+                RuleId = ruleId,
+                TypeOfRule = typeOfRule
+            };
+            
+            await _mediator.Send(command);
+
+            return RedirectToRoute(RouteNames.EmployerStart);
+        }
+
+
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
         public async Task<IActionResult> Start()
         {
-            try
+            var response = await _mediator.Send(new GetFundingRulesQuery());
+
+            var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
+
+            if (activeGlobalRule == null)
             {
-                var globalRules = await _mediator.Send(new GetFundingRulesQuery());
-
-                if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
-                {
-                    return View("Index");
-                }
-
-                var rule = globalRules.ActiveGlobalRules.First().RuleType;
-
-                switch (rule)
-                {
-                    case GlobalRuleType.FundingPaused:
-                        return View("EmployerFundingPaused");
-
-                    case GlobalRuleType.ReservationLimit:
-                        return View("ReservationLimitReached");
-                    default:
-                        return View("Index");
-                }
+                return View("Index");
             }
-            catch (ValidationException)
+
+            switch (activeGlobalRule.RuleType)
             {
-                return View("Error");
+                case GlobalRuleType.FundingPaused:
+                    return View("EmployerFundingPaused");
+                        
+                case GlobalRuleType.ReservationLimit:
+                    return View("ReservationLimitReached");
+                
+                default: return View("Index");
             }
         }
             
@@ -150,7 +176,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached");
             }
-            
         }
 
         [HttpGet]

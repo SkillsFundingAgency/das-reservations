@@ -1,4 +1,5 @@
-﻿using System.Linq;
+
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -17,15 +18,14 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
         }
 
         public async Task<GetFundingRulesResult> Handle(GetFundingRulesQuery request, CancellationToken cancellationToken)
-        {           
-            var response = await _service.GetFundingRules();
-           
+        {            
+            var response = await _service.GetFundingRules();          
+          
             return new GetFundingRulesResult
             {
-                AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],
-                GlobalRules = response?.GlobalRules?.ToArray() ?? new GlobalRule[0]
+               AccountRules = response?.Rules?.ToArray() ?? new ReservationRule[0],
+               GlobalRules = response?.GlobalRules?.ToArray() ?? new GlobalRule[0]
             };
-
         }
     }
 }

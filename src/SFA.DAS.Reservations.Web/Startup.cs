@@ -17,6 +17,7 @@ using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
@@ -137,7 +138,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
             services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
             services.AddScoped(typeof(IValidator<GetReservationsQuery>), typeof(GetReservationsQueryValidator));
-           
+            services.AddScoped(typeof(IValidator<MarkRuleAsReadCommand>), typeof(MarkRuleAsReadCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 

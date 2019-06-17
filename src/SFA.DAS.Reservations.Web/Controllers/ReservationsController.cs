@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -23,6 +23,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -376,17 +377,40 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/manage/create", Name = RouteNames.EmployerManageCreate)]
         public async Task<IActionResult> CreateReservation(ReservationsRouteModel routeModel)
         {
-            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+            string userId;
 
+            if (routeModel.UkPrn.HasValue)
+            {
+                var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+                userId = providerUkPrnClaim.Value;
+            }
+            else
+            {
+                var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+                userId = userAccountIdClaim.Value;
+            }
+           
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userId});
+
+            var nextGlobalRuleId = response?.Rule?.Id;
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 
-            if (!nextGlobalRuleStartDate.HasValue)
+            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
-                return RedirectToAction("Start", "EmployerReservations", RouteData?.Values);
+                if (routeModel.UkPrn.HasValue)
+                {
+                    return RedirectToAction("Start", "ProviderReservations", RouteData?.Values);
+                }
+                else
+                {
+                    return RedirectToAction("Start", "EmployerReservations", RouteData?.Values);
+                }
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel
             {
+                RuleId = nextGlobalRuleId.Value,
+                TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value
             };
 
