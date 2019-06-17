@@ -1,23 +1,27 @@
 ﻿@using SFA.DAS.Reservations.Web.Infrastructure
 
-﻿@{
+@model SFA.DAS.Reservations.Web.Models.EmployerStartViewModel
+
+@{
     ViewData["Title"] = "Reservations";
  }
 <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts"  asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="govuk-back-link">Back</a>
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Get funding for taking on an apprentice</h1>
-            <p class="govuk-body">Use this service to secure government funding for training an apprentice. Government funding will pay for part, or all of the cost of training an apprentice. You can secure funding no more than 6 months in advance of the date the apprentice starts their off-the-job training.</p>
-            <p class="govuk-body">Before you start you will need:</p>
+            <h1 class="govuk-heading-xl">Reserve funding for training an apprentice</h1>
+            <p class="govuk-body">Apprenticeship funding can pay for part or all of the cost of training an apprentice - up to the funding band maximum. 
+                <a href="@Model.ApprenticeshipFundingRulesUrl" target="_blank" class="govuk-link">You may need to pay</a> up to a maximum of 5% of the total cost of the training and assessment.</p>
+            <p class="govuk-body">To ensure apprenticeship funding is available for your apprenticeship training, you will need reserve funding.</p>
+            <p class="govuk-body">The reservation can be no more than 6 months in advance of the apprentice’s planned apprenticeship training start date.</p>
+            <h2 class="govuk-heading-m">What you'll need</h2>
+            <p class="govuk-body">To reserve apprenticeship funding you will need:</p>
+            
             <ul class="govuk-list govuk-list--bullet">
                 <li>an estimate of which month the apprentice will start their apprenticeship training, which can be flexible up to 3 months</li>
-                <li>an idea of the <a href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/" target="_blank" class="govuk-link">apprenticeship training</a> the apprentice will take (optional)</li>
+                <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">apprenticeship training</a> the apprentice will take, which can be changed later</li>
             </ul>
-            <p class="govuk-body">You will be securing funding for 1 apprentice at a time. Repeat the process for more apprentices.</p>
-        
-        <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
-
+            <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button govuk-button--start" tabindex="1">Start</a>
         </div>
     </div>
  </main>
