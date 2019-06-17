@@ -98,18 +98,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> Start()
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
-                var viewModel = new EmployerStartViewModel
-                {
-                    FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
-                };
+            var viewModel = new EmployerStartViewModel
+            {
+                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+            };
 
 
             var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
 
             if (activeGlobalRule == null)
             {
-                    return View("Index", viewModel);
+                return View("Index", viewModel);
             }
 
             switch (activeGlobalRule.RuleType)
@@ -119,9 +119,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         
                 case GlobalRuleType.ReservationLimit:
                     return View("ReservationLimitReached");
-                
-                        return View("Index", viewModel);
             }
+
+            return View("Index", viewModel);
         }
             
 
