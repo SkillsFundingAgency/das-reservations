@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -9,6 +11,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -53,8 +57,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedUserId = "123";
 
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
-
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
+                {
+                    GlobalRules = new List<GlobalRule>
+                    {
+                        new GlobalRule
+                        {
+                            Id = expectedRuleId,
+                            RuleType = GlobalRuleType.ReservationLimit,
+                            ActiveFrom = DateTime.UtcNow.AddDays(-2)
+                        }
+                    }
+                });
 
             //act
             await controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule, true);

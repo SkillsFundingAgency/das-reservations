@@ -77,6 +77,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+			var viewModel = new EmployerStartViewModel
+            {
+                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+            };
+
+            var globalRules = await _mediator.Send(new GetFundingRulesQuery());
+
+            if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
+            {
+                return View("Index", viewModel);
+            }
 
             var userId = userAccountIdClaim.Value;
 
@@ -97,31 +109,38 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("start",Name = RouteNames.EmployerStart)]
         public async Task<IActionResult> Start()
         {
-            var response = await _mediator.Send(new GetFundingRulesQuery());
-            var viewModel = new EmployerStartViewModel
+            try
             {
-                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
-            };
+                var viewModel = new EmployerStartViewModel
+                {
+                    FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+                };
+                var response = await _mediator.Send(new GetFundingRulesQuery());
+                var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
 
+	            if (activeGlobalRule == null)
+	            {
+	                return View("Index");
+	            }
 
-            var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
+                var rule = activeGlobalRule.RuleType;
 
-            if (activeGlobalRule == null)
-            {
-                return View("Index", viewModel);
+                switch (rule)
+                {
+                    case GlobalRuleType.FundingPaused:
+                        return View("EmployerFundingPaused");
+
+                    case GlobalRuleType.ReservationLimit:
+                        return View("ReservationLimitReached");
+                    default:
+                        return View("Index", viewModel);
+                }
             }
-
-            switch (activeGlobalRule.RuleType)
+            catch (ValidationException)
             {
-                case GlobalRuleType.FundingPaused:
-                    return View("EmployerFundingPaused");
-                        
-                case GlobalRuleType.ReservationLimit:
-                    return View("ReservationLimitReached");
+                return View("Error");
             }
-
-            return View("Index", viewModel);
         }
             
 
@@ -208,7 +227,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
+         [HttpPost]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {

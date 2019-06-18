@@ -4,11 +4,11 @@
     {
         public const string ProviderIndex = "provider-index";
         public const string ProviderStart = "provider-start";
-        public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
+		public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
         public const string ProviderManage = "provider-manage";
+        public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderDelete = "provider-delete";
         public const string ProviderDeleteCompleted = "provider-delete-completed";
-        public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderError = "provider-error";
         public const string ProviderApprenticeshipTraining = "provider-apprenticeship-training";
         public const string ProviderCreateApprenticeshipTraining = "provider-create-apprenticeship-training";
@@ -22,12 +22,12 @@
 
         public const string EmployerIndex = "employer-index";
         public const string EmployerStart = "employer-start";
-        public const string EmployerSaveRuleNotificationChoice = "employer-save-rule-notification-choice";
+		public const string EmployerSaveRuleNotificationChoice = "employer-save-rule-notification-choice";
         public const string EmployerManage = "employer-manage";
+        public const string EmployerManageCreate = "employer-manage-create";
         public const string EmployerDelete = "employer-delete";
         public const string EmployerDeleteCompleted = "employer-delete-completed";
-        public const string EmployerManageCreate = "employer-manage-create";
-        public const string EmployerError = "employer-error";
+		public const string EmployerError = "employer-error";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";
@@ -36,7 +36,6 @@
         public const string EmployerPostCompleted = "employer-post-completed";
         public const string EmployerSignOut = "employer-signout";
         public const string EmployerSelectCourse = "employer-select-course";
-        public const string EmployerSkipSelectCourse = "employer-skip-select-course";
         public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";
