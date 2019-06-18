@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextActiveGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -30,26 +33,57 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
             _config = options.Value;
         }
-      
+
         public async Task<IActionResult> Index()
         {
-            var response = await _mediator.Send(new GetNextActiveGlobalFundingRuleQuery());
+            var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+            
+            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = providerUkPrnClaim.Value});
 
+            var nextGlobalRuleId = response?.Rule?.Id;
             var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
 
-            if (!nextGlobalRuleStartDate.HasValue)
+            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
             {
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel
             {
+                RuleId = nextGlobalRuleId.Value,
+                TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
                 BackLink = _config.DashboardUrl
             };
 
             return View("FundingRestrictionNotification", viewModel);
         }
+
+        [HttpPost]
+        [Route("saveRuleNotificationChoice",Name = RouteNames.ProviderSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
+        {
+            if (!markRuleAsRead)
+            {
+                return RedirectToRoute(RouteNames.ProviderStart);
+            }
+
+            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+
+            var userId = userAccountIdClaim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = userId,
+                RuleId = ruleId,
+                TypeOfRule = typeOfRule
+            };
+
+            await _mediator.Send(command);
+
+            return RedirectToRoute(RouteNames.ProviderStart);
+        }
+
 
         [Route("start", Name = RouteNames.ProviderStart)]
         public async Task<IActionResult> Start(uint ukPrn)

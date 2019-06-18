@@ -20,11 +20,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         private ProviderReservationsController _controller;
         private Mock<IMediator> _mediator;
+        private const uint ukPrn = 1234;
 
         [SetUp]
         public void Arrange()
         {
             _mediator = new Mock<IMediator>();
+
+            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
@@ -36,8 +40,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     Employers = new List<Employer> { new Employer() }
                 });
-
-            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
         }
 
         [Test]
@@ -57,6 +59,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("Index", result.ViewName);
+           
         }
 
         [Test]
