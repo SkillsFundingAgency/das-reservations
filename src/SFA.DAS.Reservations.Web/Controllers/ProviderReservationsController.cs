@@ -60,6 +60,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("saveRuleNotificationChoice",Name = RouteNames.ProviderSaveRuleNotificationChoice)]
         public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
         {
@@ -150,6 +151,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("confirm-employer/{id?}", Name = RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ProcessConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
