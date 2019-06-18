@@ -170,6 +170,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(RouteNames.EmployerStart, redirect.RouteName);
+            Assert.IsNull(redirect.RouteValues);
         }
 
         [Test, MoqAutoData]
@@ -194,6 +195,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(RouteNames.ProviderStart, redirect.RouteName);
+            Assert.IsNotNull(redirect.RouteValues);
         }
     }
 }
