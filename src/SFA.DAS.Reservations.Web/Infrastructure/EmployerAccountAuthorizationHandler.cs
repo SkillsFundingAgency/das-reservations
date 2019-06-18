@@ -62,8 +62,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 var updatedEmployerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(updatedAccountClaim?.Value);
 
                 userClaim.Subject.AddClaim(updatedAccountClaim);
-                userClaim.Subject.RemoveClaim(userClaim);
-
+                
                 if (!updatedEmployerAccounts.ContainsKey(accountIdFromUrl))
                 {
                     return false;
