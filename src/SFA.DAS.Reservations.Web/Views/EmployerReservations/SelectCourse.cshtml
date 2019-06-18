@@ -17,12 +17,19 @@
 
             <partial name="_pageErrorsOverview" />
 
-            <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take? (optional)</h1>
+            <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take?</h1>
 
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
 
 
-                <div class="govuk-form-group">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <span id="Course" class="govuk-error-message">
+                            Select a course from the list
+                        </span>
+                    }
+
                     <label class="govuk-label" for="course-search">
                         Search for a course
                     </label>
@@ -36,13 +43,6 @@
                 <button type="submit" class="govuk-button">
                     Save and continue
                 </button>
-                <div class="govuk-form-group">
-                    <span class="govuk-hint govuk-!-margin-top-4">
-                        <a asp-route="@RouteNames.EmployerSkipSelectCourse" class="govuk-link">
-                            I don't know this yet
-                        </a>
-                    </span>
-                </div>
             </form>
         </div>
     </div>

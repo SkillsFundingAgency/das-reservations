@@ -1,7 +1,7 @@
 @model SelectCourseViewModel
 
 
-<select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint" data-validation-message="Select a course or leave the field empty">
+<select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint" data-validation-message="Select a course from the list" data-validation-summary-message="Select a course">
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {

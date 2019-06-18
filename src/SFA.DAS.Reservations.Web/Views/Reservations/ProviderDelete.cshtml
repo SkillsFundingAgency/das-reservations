@@ -1,0 +1,82 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model DeleteViewModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <partial name="_PageErrorsOverview"/>
+
+            <h1 class="govuk-heading-xl">Delete Reservation</h1>
+            <div class="govuk-summary-list">
+                <dl class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Employer
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.AccountLegalEntityName
+                    </dd>
+                </dl>
+                <dl class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Apprenticeship start date
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.StartDateDescription
+                    </dd>
+                </dl>
+                <dl class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Apprenticeship training course
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.CourseDescription
+                    </dd>
+                </dl>
+            </div>
+
+            <form method="post" asp-route="@RouteNames.ProviderDelete">
+                <input type="hidden" id="AccountLegalEntityName" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName"/>
+                <input type="hidden" id="StartDateDescription" name="StartDateDescription" value="@Model.StartDateDescription"/>
+                <input type="hidden" id="CourseDescription" name="CourseDescription" value="@Model.CourseDescription"/>
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Are you sure that you want to delete this reservation?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Delete"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["Delete"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Delete" name="Delete" type="radio" value="True">
+                                <label class="govuk-label govuk-radios__label" for="Delete">
+                                    Yes, delete this reservation
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Delete-no" name="Delete" type="radio" value="False">
+                                <label class="govuk-label govuk-radios__label" for="Delete-no">
+                                    No, go back to manage reservations
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <button type="submit" draggable="false" class="govuk-button">
+                    Confirm
+                </button>
+            </form>
+        </div>
+    </div>
+</main>

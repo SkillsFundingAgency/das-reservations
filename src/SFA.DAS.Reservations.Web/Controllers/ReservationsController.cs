@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalF
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -25,6 +26,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -249,70 +251,63 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 UkPrn = routeModel.UkPrn.GetValueOrDefault()
             };
             var queryResult = await _mediator.Send(query);
-            //todo: null check on result
+            //todo: null check on result, redirect to error
 
             var model = new CompletedViewModel
-            (
-                queryResult.ReservationId,
-                queryResult.StartDate,
-                queryResult.ExpiryDate,
-                queryResult.Course,
-                routeModel.AccountLegalEntityPublicHashedId,
-				routeModel.UkPrn,
-                queryResult.AccountLegalEntityName,
-                _configuration.DashboardUrl, 
-                _configuration.ApprenticeUrl,
-                _configuration.EmployerDashboardUrl,
-                _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString())
+            {
+                AccountLegalEntityName = queryResult.AccountLegalEntityName,
+                TrainingDateDescription = new TrainingDateModel()
+                {
+                    StartDate = queryResult.StartDate,
+                    EndDate = queryResult.ExpiryDate
+                }.GetGDSDateString(),
+                CourseDescription = queryResult.Course.CourseDescription,
+                StartDate = queryResult.StartDate,
+                CourseId = queryResult.Course?.Id,
+                UkPrn = queryResult.UkPrn.GetValueOrDefault()
+            };
 
-            );
-            return View(model.ViewName, model);
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
+            return View(viewName, model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
         [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerPostCompleted)]
-        public IActionResult PostCompleted(ReservationsRouteModel routeModel, ConfirmationRedirectViewModel model)
+        public IActionResult PostCompleted(ReservationsRouteModel routeModel, CompletedViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var viewModel = new CompletedViewModel
-                (
-                    model.ReservationId,
-                    model.StartDate,
-                    model.ExpiryDate,
-                    new Course(model.CourseId, model.CourseTitle, model.Level),
-                    routeModel.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn,
-                    model.AccountLegalEntityName,
-                    _configuration.DashboardUrl,
-                    _configuration.ApprenticeUrl,
-                    _configuration.EmployerDashboardUrl,
-                    model.RecruitApprenticeUrl
-                    
-                );
-                
-                return View(viewModel.ViewName, viewModel);
+                var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
+                return View(viewName, model);
             }
 
-            if (!string.IsNullOrEmpty(model.WhatsNext) && !string.IsNullOrWhiteSpace(model.WhatsNext))
+            switch (model.WhatsNext)
             {
+                case CompletedReservationWhatsNext.RecruitAnApprentice:
+                    var recruitUrl = routeModel.UkPrn.HasValue ?
+                        _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString()) :
+                        _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId);
+                    return Redirect(recruitUrl);
 
-                switch (model.WhatsNext)
-                {
-                    case ConfirmationRedirectViewModel.RedirectOptions.RecruitAnApprentice:
-                        return Redirect(model.RecruitApprenticeUrl);
+                case CompletedReservationWhatsNext.FindApprenticeshipTraining:
+                    return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.AddAnApprentice:
-                        return Redirect(model.ApprenticeUrl);
+                case CompletedReservationWhatsNext.AddAnApprentice:
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
+                        model.UkPrn, 
+                        routeModel.Id.Value,
+                        routeModel.AccountLegalEntityPublicHashedId, 
+                        model.StartDate, model.CourseId);
+                    return Redirect(addApprenticeUrl);
 
-                    case ConfirmationRedirectViewModel.RedirectOptions.ProviderHomepage:
-                        return Redirect(model.DashboardUrl);
-                }
+                default:
+                    var homeUrl = routeModel.UkPrn.HasValue ?
+                        _urlHelper.GenerateUrl(controller:"accounts") :
+                        _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
+                    return Redirect(homeUrl);
             }
-
-            ModelState.AddModelError("WhatsNext", "Select what you would like to do next");
-            return PostCompleted(routeModel, model);
         }
 
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
@@ -424,12 +419,120 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View("../EmployerReservations/FundingRestrictionNotification", viewModel);
         }
 
+        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
+        public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
+        {
+            var isProvider = routeModel.UkPrn.HasValue;
+            try
+            {
+                if (!routeModel.Id.HasValue)
+                {
+                    _logger.LogInformation($"Reservation ID must be in URL, parameter [{nameof(routeModel.Id)}]");
+                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
+                    return RedirectToRoute(manageRoute, routeModel);
+                }
+
+                var query = new GetReservationQuery
+                {
+                    Id = routeModel.Id.Value,
+                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
+                };
+                var queryResult = await _mediator.Send(query);
+
+                var viewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
+
+                return View(viewName, new DeleteViewModel(queryResult));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error preparing for the delete view");
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
+        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, DeleteViewModel viewModel)
+        {
+            var isProvider = routeModel.UkPrn.HasValue;
+            var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(deleteViewName, viewModel);
+                }
+
+                if (viewModel.Delete.HasValue && !viewModel.Delete.Value ||
+                    !routeModel.Id.HasValue)
+                {
+                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
+                    return RedirectToRoute(manageRoute, routeModel);
+                }
+                
+                await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value});
+
+                var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
+                return RedirectToRoute(completedRoute, routeModel);
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogInformation(ex, $"Validation error trying to delete reservation [{routeModel.Id}]");
+                return View(deleteViewName, viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error trying to delete reservation [{routeModel.Id}]");
+                var errorRoute = isProvider ? RouteNames.ProviderError : RouteNames.EmployerError;
+                return RedirectToRoute(errorRoute, routeModel);
+            }
+        }
+
+        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
+        public IActionResult DeleteCompleted(ReservationsRouteModel routeModel)
+        {
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
+
+            return View(viewName);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
+        public IActionResult PostDeleteCompleted(ReservationsRouteModel routeModel, DeleteCompletedViewModel viewModel)
+        {
+            var isProvider = routeModel.UkPrn.HasValue;
+            var deleteCompletedViewName = isProvider ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
+            var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
+            var dashboardUrl = isProvider ? 
+                _configuration.DashboardUrl : 
+                _urlHelper.GenerateUrl(routeModel.EmployerAccountId, "teams", null, "accounts", "accounts", null);
+            
+            if (!ModelState.IsValid)
+            {
+                return View(deleteCompletedViewName, viewModel);
+            }
+
+            if (viewModel.Manage.HasValue && viewModel.Manage.Value)
+            {
+                return RedirectToRoute(manageRouteName);
+            }
+
+            return Redirect(dashboardUrl);
+        }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
             string courseId = null, 
             TrainingDateModel selectedTrainingDate = null, 
             bool? routeModelFromReview = false)
+
         {
             var accountLegalEntityId = _encodingService.Decode(
                 accountLegalEntityPublicHashedId,

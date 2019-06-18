@@ -41,8 +41,9 @@ forms.on('submit', function (e) {
         setTimeout(function () {
             if (!checkField(that)) {
                 var fieldId = that.attr('id'),
-                    errorMessage = $('#' + fieldId + '-select').data('validation-message');
-                validationMessages.unshift({ id: fieldId, message: errorMessage });
+                    errorMessage = $('#' + fieldId + '-select').data('validation-message'),
+                    errorSummaryMessage = $('#' + fieldId + '-select').data('validation-summary-message') || $('#' + fieldId + '-select').data('validation-message');
+                validationMessages.unshift({ id: fieldId, message: errorMessage, summaryMessage: errorSummaryMessage });
                 canSubmit = false
             }
         }, 100);
@@ -84,10 +85,9 @@ forms.on('submit', function (e) {
 
 var checkField = function ($field) {
     var textInput = $field,
-        selectField = $('#' + textInput.attr('id') + '-select'),
-        valueLength = $field.val().length;
+        selectField = $('#' + textInput.attr('id') + '-select');
 
-    if (valueLength > 0 && selectField[0].selectedIndex === 0) {
+    if (selectField[0].selectedIndex === 0) {
         showSelectValidationMessage(selectField);
         return false;
 
@@ -113,7 +113,8 @@ var showSelectValidationMessage = function ($field) {
 var showRadioValidationMessage = function ($field) {
     var $parent = $field.closest('.govuk-form-group'),
         $radioGroup = $field.closest('.govuk-radios'),
-        validationMessageText = $radioGroup.data('validation-message');
+        validationMessageText = $radioGroup.data('validation-message'),
+        validationSummaryMessageText = $radioGroup.data('validation-summary-message') || $radioGroup.data('validation-message');
 
     if (!$parent.hasClass('govuk-form-group--error')) {
         var validationMessage = $('<span>')
@@ -126,7 +127,7 @@ var showRadioValidationMessage = function ($field) {
             'aria-describedby': 'validation-' + slugify(validationMessage),
             'aria-invalid': 'true'
         });
-        return { id: $field.attr('id'), message: validationMessageText }
+        return { id: $field.attr('id'), message: validationMessageText, summaryMessage: validationSummaryMessageText }
     }
 };
 
@@ -156,7 +157,7 @@ var showErrorSummary = function (validationMessages) {
     }
 
     $.each(validationMessages, function (index, value) {
-        var errorLink = $('<a>').html(value.message).attr('href', '#' + value.id);
+        var errorLink = $('<a>').html(value.summaryMessage).attr('href', '#' + value.id);
         var errorListItem = $('<li>').append(errorLink);
         errorList.append(errorListItem);
     });

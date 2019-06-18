@@ -97,24 +97,37 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("start",Name = RouteNames.EmployerStart)]
         public async Task<IActionResult> Start()
         {
-            var response = await _mediator.Send(new GetFundingRulesQuery());
-
-            var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
-
-            if (activeGlobalRule == null)
+            try
             {
-                return View("Index");
+                var viewModel = new EmployerStartViewModel
+                {
+                    FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+                };
+                var response = await _mediator.Send(new GetFundingRulesQuery());
+                var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
+
+	            if (activeGlobalRule == null)
+	            {
+	                return View("Index");
+	            }
+
+                var rule = activeGlobalRule.RuleType;
+
+                switch (rule)
+                {
+                    case GlobalRuleType.FundingPaused:
+                        return View("EmployerFundingPaused");
+
+                    case GlobalRuleType.ReservationLimit:
+                        return View("ReservationLimitReached");
+                    default:
+                        return View("Index", viewModel);
+                }
             }
-
-            switch (activeGlobalRule.RuleType)
+            catch (ValidationException)
             {
-                case GlobalRuleType.FundingPaused:
-                    return View("EmployerFundingPaused");
-                        
-                case GlobalRuleType.ReservationLimit:
-                    return View("ReservationLimitReached");
-                
-                default: return View("Index");
+                return View("Error");
             }
         }
             

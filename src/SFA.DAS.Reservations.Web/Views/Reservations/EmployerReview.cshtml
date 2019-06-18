@@ -82,7 +82,7 @@
                 </strong>
             </div>
 
-            <form method="post" asp-route="@Model.ConfirmRouteName">
+            <form method="post" asp-route="@Model.ConfirmRouteName" asp-antiforgery="true">
                 <button type="submit" draggable="false" class="govuk-button">
                     Confirm and secure funding
                 </button>
