@@ -40,7 +40,6 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
             DateTime startDate,
-            string courseId,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockConfig,
             ProviderExternalUrlHelper urlHelper)
         {

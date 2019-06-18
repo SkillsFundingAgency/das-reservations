@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
@@ -37,14 +38,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             _mediator = mediator;
             _encodingService = encodingService;
+            
             _config = options.Value;
         }
 
         // GET
         public async Task<IActionResult> Index()
         {
-            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-            
+            var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
             var nextGlobalRuleId = response?.Rule?.Id;
@@ -68,6 +69,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
         public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
         {
@@ -76,7 +78,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.EmployerStart);
             }
 
-            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+            var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+			var viewModel = new EmployerStartViewModel
+            {
+                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+            };
+
+            var globalRules = await _mediator.Send(new GetFundingRulesQuery());
+
+            if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
+            {
+                return View("Index", viewModel);
+            }
 
             var userId = userAccountIdClaim.Value;
 
@@ -109,7 +123,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
 	            if (activeGlobalRule == null)
 	            {
-	                return View("Index");
+	                return View("Index", viewModel);
 	            }
 
                 var rule = activeGlobalRule.RuleType;
@@ -148,6 +162,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
         {
@@ -215,14 +230,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewModel);
         }
 
-        [HttpGet]
-        [Route("{id}/skip-course-selection",Name = RouteNames.EmployerSkipSelectCourse)]
-        public async Task<IActionResult> SkipSelectCourse(ReservationsRouteModel routeModel)
-        {
-            return await PostSelectCourse(routeModel, null);
-        }
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
         {

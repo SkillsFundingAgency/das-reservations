@@ -83,6 +83,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [Route("{ukPrn}/reservations/{id}/apprenticeship-training", Name = RouteNames.ProviderCreateApprenticeshipTraining)]
         [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerCreateApprenticeshipTraining)]
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> PostApprenticeshipTraining(ReservationsRouteModel routeModel, ApprenticeshipTrainingFormModel formModel)
         {
@@ -374,12 +375,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (routeModel.UkPrn.HasValue)
             {
-                var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+                var providerUkPrnClaim = HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
                 userId = providerUkPrnClaim.Value;
             }
             else
             {
-                var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+                var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
                 userId = userAccountIdClaim.Value;
             }
            
@@ -390,14 +391,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
-                if (routeModel.UkPrn.HasValue)
-                {
-                    return RedirectToAction("Start", "ProviderReservations", RouteData?.Values);
-                }
-                else
-                {
-                    return RedirectToAction("Start", "EmployerReservations", RouteData?.Values);
-                }
+                return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderStart : RouteNames.EmployerStart, RouteData?.Values);
             }
 
             var viewModel = new FundingRestrictionNotificationViewModel

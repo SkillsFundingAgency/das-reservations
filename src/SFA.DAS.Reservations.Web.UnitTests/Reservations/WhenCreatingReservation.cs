@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -32,10 +31,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var expectedUkPrnId = "555";
             var claim = new Claim(ProviderClaims.ProviderUkprn, expectedUkPrnId);
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim })); ;
 
             mockMediator.Setup(m => m.Send(
                     It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
@@ -65,10 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var expectedUserId = "12564";
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
 
             routeModel.UkPrn = null;
 
@@ -101,10 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, "123");
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
 
             mockMediator.Setup(m => m.Send(
                     It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
@@ -136,10 +126,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var claim = new Claim(ProviderClaims.ProviderUkprn, "555");
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
 
             mockMediator.Setup(m => m.Send(
                     It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
@@ -161,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillRedirtectToEmployerCreateReservationPageIfGlobalRuleNotFound(
+        public async Task ThenWillRedirectToEmployerCreateReservationPageIfGlobalRuleNotFound(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -170,10 +157,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
 
             mockMediator.Setup(m => m.Send(
                     It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
@@ -181,12 +165,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
 
             //act
-            var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;
+            var redirect = await controller.CreateReservation(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual("EmployerReservations", redirect.ControllerName);
-            Assert.AreEqual("Start", redirect.ActionName);
+            Assert.AreEqual(RouteNames.EmployerStart, redirect.RouteName);
         }
 
         [Test, MoqAutoData]
@@ -198,10 +181,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //arrange           
             var claim = new Claim(ProviderClaims.ProviderUkprn, "444");
 
-            controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
 
             mockMediator.Setup(m => m.Send(
                     It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(),
@@ -209,12 +189,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(() => new GetNextUnreadGlobalFundingRuleResult());
 
             //act
-            var redirect = await controller.CreateReservation(routeModel) as RedirectToActionResult;
+            var redirect = await controller.CreateReservation(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual("ProviderReservations", redirect.ControllerName);
-            Assert.AreEqual("Start", redirect.ActionName);
+            Assert.AreEqual(RouteNames.ProviderStart, redirect.RouteName);
         }
     }
 }

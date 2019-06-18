@@ -7,130 +7,139 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
     public class WhenViewingTheIndexPage
     {
-        private EmployerReservationsController _controller;
-        private Mock<IMediator> _mockMediator;
-        private Mock<IEncodingService> _mockEncodingService;
-        private GlobalRule _expectedRule;
-        private ReservationsWebConfiguration _employerConfig;
-        private string ExpectedUserId = "123";
-
-        [SetUp]
-        public void Arrange()
+       
+        [Test, MoqAutoData]
+        public async Task ThenChecksIfRelatedUnreadRulesExists(
+            string expectedUserId,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
-            _expectedRule = new GlobalRule
+            //Arrange
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
-                Id = 2, 
-                ActiveFrom = DateTime.Now.AddDays(2)
-            };
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            mockMediator.Setup(x =>
+                    x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
 
-           var result = new GetNextUnreadGlobalFundingRuleResult {Rule = _expectedRule};
-
-            _mockMediator = new Mock<IMediator>();
-            _mockEncodingService = new Mock<IEncodingService>();
-            _employerConfig = new ReservationsWebConfiguration()
-            {
-                EmployerDashboardUrl = "test.com/test"
-            };
-
-            var options = new Mock<IOptions<ReservationsWebConfiguration>>();
-
-            options.Setup(o => o.Value).Returns(_employerConfig);
-
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
-
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(result);
-
-            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, ExpectedUserId);
-
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
-        }
-
-        [Test]
-        public async Task ThenChecksIfRelatedUnreadRulesExists()
-        {
             //act 
-            await _controller.Index();
+            await controller.Index();
 
             //assert
-            _mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
-                q => q.Id.Equals(ExpectedUserId)),It.IsAny<CancellationToken>()));
+            mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
+                q => q.Id.Equals(expectedUserId, StringComparison.CurrentCultureIgnoreCase)),It.IsAny<CancellationToken>()),Times.Once);
         }
 
-        [Test]
-        public async Task ThenRedirectToStartIfNoFundingRulesExist()
+        [Test, MoqAutoData]
+        public async Task ThenRedirectToStartIfNoFundingRulesExist(
+            string expectedUserId,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
             //arrange
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
         }
 
-        [Test]
-        public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
+        [Test, MoqAutoData]
+        public async Task ThenRedirectToFundingPausedIfFundingRulesExist(
+            string expectedUserId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> config,
+            EmployerReservationsController controller)
         {
-            //act 
-            var view = await _controller.Index() as ViewResult;
+            //Arrange
+            var expectedRule = new GlobalRule
+            {
+                Id = 2,
+                ActiveFrom = DateTime.Now.AddDays(2)
+            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            var result = new GetNextUnreadGlobalFundingRuleResult { Rule = expectedRule };
+            mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(result);
 
-            var viewModel = view?.Model as FundingRestrictionNotificationViewModel;
+            //act 
+            var view = await controller.Index() as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
+            var viewModel = view?.Model as FundingRestrictionNotificationViewModel;
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(view.ViewName, "FundingRestrictionNotification");
-            Assert.AreEqual(_expectedRule.Id, viewModel.RuleId);
+            Assert.AreEqual(expectedRule.Id, viewModel.RuleId);
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
-            Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
-            Assert.AreEqual(_employerConfig.EmployerDashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
+            Assert.AreEqual(config.Object.Value.EmployerDashboardUrl, viewModel.BackLink);
         }
 
-        [Test]
-        public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule()
+        [Test, MoqAutoData]
+        public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule(
+            string expectedUserId,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
             //arrange
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
         }
 
-        [Test]
-        public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule()
+        [Test, MoqAutoData]
+        public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule(
+            string expectedUserId,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
             //arrange
-            _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);

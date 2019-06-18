@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
@@ -30,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Commands
                 .ReturnsAsync(() => new ValidationResult());
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public async Task ThenWillSendCommandToMarkRuleAsRead(MarkRuleAsReadCommand command)
         {
             //Act
@@ -40,7 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Commands
             _service.Verify(s => s.MarkRuleAsRead(command.Id, command.RuleId, command.TypeOfRule), Times.Once);
         }
 
-        [Test, MoqAutoData]
+        [Test, AutoData]
         public void ThenWillThrowExceptionIfValidationFails(MarkRuleAsReadCommand command)
         {
             //Arrange

@@ -27,7 +27,7 @@
         public const string EmployerManageCreate = "employer-manage-create";
         public const string EmployerDelete = "employer-delete";
         public const string EmployerDeleteCompleted = "employer-delete-completed";
-        public const string EmployerError = "employer-error";
+		public const string EmployerError = "employer-error";
         public const string EmployerCreateApprenticeshipTraining = "employer-create-apprenticeship-training";
         public const string EmployerApprenticeshipTraining = "employer-apprenticeship-training";
         public const string EmployerReview = "employer-review";
@@ -36,7 +36,6 @@
         public const string EmployerPostCompleted = "employer-post-completed";
         public const string EmployerSignOut = "employer-signout";
         public const string EmployerSelectCourse = "employer-select-course";
-        public const string EmployerSkipSelectCourse = "employer-skip-select-course";
         public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";

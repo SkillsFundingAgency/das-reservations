@@ -1,6 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture.NUnit3;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -8,10 +11,14 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -39,8 +46,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
         }
 
-        [Test]
-        public async Task ThenSendsCorrectCommand()
+        [Test, MoqAutoData]
+        public async Task ThenSendsCorrectCommand(
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
             //arrange
             var expectedRuleId = 12L;
@@ -48,17 +57,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var expectedUserId = "123";
 
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
-
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
-            };
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
+            mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
+                {
+                    GlobalRules = new List<GlobalRule>
+                    {
+                        new GlobalRule
+                        {
+                            Id = expectedRuleId,
+                            RuleType = GlobalRuleType.ReservationLimit,
+                            ActiveFrom = DateTime.UtcNow.AddDays(-2)
+                        }
+                    }
+                });
 
             //act
-            await _controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule, true);
+            await controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule, true);
 
             //assert
-            _mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c => 
+            mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c => 
                 c.Id.Equals(expectedUserId) &&
                 c.RuleId.Equals(expectedRuleId) &&
                 c.TypeOfRule.Equals(expectedTypeOfRule)), It.IsAny<CancellationToken>()));

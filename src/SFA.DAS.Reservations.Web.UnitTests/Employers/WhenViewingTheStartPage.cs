@@ -7,13 +7,13 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
+using AutoFixture;
 using Microsoft.Extensions.Options;
 using AutoFixture.NUnit3;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -22,25 +22,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private EmployerReservationsController _controller;
         private Mock<IMediator> _mockMediator;
         private Mock<IEncodingService> _mockEncodingService;
+        private Mock<IOptions<ReservationsWebConfiguration>> _mockOptions;
 
-        
         [SetUp]
         public void Arrange()
         {
-            var options = new Mock<IOptions<ReservationsWebConfiguration>>();
-            options.SetupGet(o => o.Value).Returns(new ReservationsWebConfiguration
-                {
-                    FindApprenticeshipTrainingUrl = "test", 
-                    ApprenticeshipFundingRulesUrl = "test"
-                });
-
+            var fixture = new Fixture();
+            var config = fixture.Create<ReservationsWebConfiguration>();
+            _mockOptions = new Mock<IOptions<ReservationsWebConfiguration>>();
+            _mockOptions.SetupGet(options => options.Value)
+                .Returns(config);
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
+
+            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object);
         }
 
-        [Test, MoqAutoData]
-        public async Task ThenRedirectToIndexIfNoFundingRulesExist([Frozen] long accountId)
+        [Test]
+        public async Task ThenRedirectToIndexIfNoFundingRulesExist()
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
@@ -86,11 +85,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(view.ViewName, "EmployerFundingPaused");
         }
 
-        [Test,MoqAutoData]
-        public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage(
-            [Frozen] Mock<IMediator> mediatorMock,
-            [Frozen] long accountId, 
-            IOptions<ReservationsWebConfiguration> options)
+        [Test]
+        public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage()
         {
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
@@ -108,7 +104,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     }
                 });
 
-            var controller = new EmployerReservationsController(mediatorMock.Object, _mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
             //act
             var result = await _controller.Start() as ViewResult;
 
