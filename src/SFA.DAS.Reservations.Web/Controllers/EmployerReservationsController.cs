@@ -79,19 +79,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-			var viewModel = new EmployerStartViewModel
-            {
-                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
-            };
-
-            var globalRules = await _mediator.Send(new GetFundingRulesQuery());
-
-            if (!(globalRules?.ActiveGlobalRules.Any() ?? false))
-            {
-                return View("Index", viewModel);
-            }
-
+			
             var userId = userAccountIdClaim.Value;
 
             var command = new MarkRuleAsReadCommand

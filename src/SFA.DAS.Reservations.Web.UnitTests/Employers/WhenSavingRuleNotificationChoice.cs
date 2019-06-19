@@ -58,20 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
-            mockMediator.Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetFundingRulesResult
-                {
-                    GlobalRules = new List<GlobalRule>
-                    {
-                        new GlobalRule
-                        {
-                            Id = expectedRuleId,
-                            RuleType = GlobalRuleType.ReservationLimit,
-                            ActiveFrom = DateTime.UtcNow.AddDays(-2)
-                        }
-                    }
-                });
-
+            
             //act
             await controller.SaveRuleNotificationChoice(expectedRuleId, expectedTypeOfRule, true);
 
