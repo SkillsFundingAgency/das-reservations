@@ -525,6 +525,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Redirect(dashboardUrl);
         }
 
+        public async Task<IActionResult> SelectReservation(ReservationsRouteModel routeModel,
+            SelectReservationModel model)
+        {
+            await _mediator.Send(new GetReservationsQuery {AccountId = 1});
+            return null;
+        }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
