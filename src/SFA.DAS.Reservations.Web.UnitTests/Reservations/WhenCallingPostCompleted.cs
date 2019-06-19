@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(model.UkPrn, routeModel.Id.Value, routeModel.AccountLegalEntityPublicHashedId, model.StartDate, model.CourseId))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl("", "accounts", "", "", "", ""))
+                .Setup(helper => helper.GenerateUrl("", "account", "", "", "", ""))
                 .Returns(homeUrl);
             var controller = _fixture.Create<ReservationsController>();
             

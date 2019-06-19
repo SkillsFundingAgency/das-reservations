@@ -305,7 +305,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 default:
                     var homeUrl = routeModel.UkPrn.HasValue ?
-                        _urlHelper.GenerateUrl(controller:"accounts") :
+                        _urlHelper.GenerateUrl(controller:"account") :
                         _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
                     return Redirect(homeUrl);
             }
