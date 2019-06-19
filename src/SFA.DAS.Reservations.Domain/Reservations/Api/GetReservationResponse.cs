@@ -6,6 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
     public class GetReservationResponse
     {
         public Guid Id { get; set; }
+        public DateTime CreatedDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public Course Course { get; set; }

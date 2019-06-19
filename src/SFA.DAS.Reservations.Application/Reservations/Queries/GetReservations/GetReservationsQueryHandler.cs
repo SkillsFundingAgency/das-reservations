@@ -45,6 +45,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations
                     Id = apiReservation.Id,
                     AccountLegalEntityName = apiReservation.AccountLegalEntityName,
                     AccountLegalEntityId = apiReservation.AccountLegalEntityId,
+                    CreatedDate = apiReservation.CreatedDate,
                     StartDate = apiReservation.StartDate,
                     ExpiryDate = apiReservation.ExpiryDate,
                     Course = apiReservation.Course,
