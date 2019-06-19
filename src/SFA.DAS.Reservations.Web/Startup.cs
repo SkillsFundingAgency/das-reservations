@@ -148,6 +148,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddSingleton<IEncodingService, EncodingService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
             services.AddTransient<ICourseService, CourseService>();
+            services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
             services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();

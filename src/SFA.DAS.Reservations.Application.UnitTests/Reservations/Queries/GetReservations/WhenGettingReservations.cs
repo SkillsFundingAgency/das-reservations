@@ -6,15 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Reservations.Api;
-using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
@@ -28,7 +25,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
             long accountId,
             string propertyName,
             ValidationResult validationResult,
-            List<GetReservationResponse> apiReservations,
             [Frozen] Mock<IValidator<GetReservationsQuery>> mockValidator,
             GetReservationsQueryHandler handler)
         {
@@ -45,12 +41,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Gets_Reservations_From_Api(
+        public async Task Then_Gets_Reservations_From_Service(
             long accountId,
-            List<GetReservationResponse> apiReservations,
             [Frozen] ValidationResult validationResult,
-            [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
-            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IReservationService> mockService,
             GetReservationsQueryHandler handler)
         {
             var query = new GetReservationsQuery {AccountId = accountId};
@@ -58,30 +52,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
 
             await handler.Handle(query, CancellationToken.None);
 
-            mockApiClient.Verify(client => client.GetAll<GetReservationResponse>(
-                It.Is<IGetAllApiRequest>(request => 
-                    request.GetAllUrl.StartsWith(mockOptions.Object.Value.Url) && 
-                    request.GetAllUrl.Contains(query.AccountId.ToString()))), 
+            mockService.Verify(client => client.GetReservations(accountId), 
                 Times.Once);
         }
 
         [Test, MoqAutoData]
         public async Task Then_Returns_Mapped_Reservations(
             long accountId,
-            List<GetReservationResponse> apiReservations,
+            List<Reservation> serviceReservations,
             [Frozen] ValidationResult validationResult,
-            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IReservationService> mockService,
             GetReservationsQueryHandler handler)
         {
             var query = new GetReservationsQuery { AccountId = accountId };
             validationResult.ValidationDictionary.Clear();
-            mockApiClient
-                .Setup(client => client.GetAll<GetReservationResponse>(It.IsAny<IGetAllApiRequest>()))
-                .ReturnsAsync(apiReservations);
+            mockService
+                .Setup(client => client.GetReservations(accountId))
+                .ReturnsAsync(serviceReservations);
 
             var result = await handler.Handle(query, CancellationToken.None);
 
-            result.Reservations.Should().BeEquivalentTo(apiReservations);
+            result.Reservations.Should().BeEquivalentTo(serviceReservations);
         }
     }
 }
