@@ -25,7 +25,7 @@
 
             </dl>
 
-            <form action="@Url.Action("ConfirmEmployer")" method="POST">
+            <form asp-route="@RouteNames.ProviderConfirmEmployer" method="POST">
 
                 @Html.HiddenFor(model => model.AccountLegalEntityName)
                 @Html.HiddenFor(model => model.AccountLegalEntityId)
