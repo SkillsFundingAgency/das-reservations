@@ -25,6 +25,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
@@ -142,6 +143,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<GetAvailableReservationsQuery>), typeof(GetAvailableReservationsQueryValidator));
             services.AddScoped(typeof(IValidator<MarkRuleAsReadCommand>), typeof(MarkRuleAsReadCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
 
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
