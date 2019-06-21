@@ -10,7 +10,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
@@ -24,15 +23,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
         public void And_Invalid_Then_Throws_ValidationException(
             long accountId,
             string propertyName,
-            ValidationResult validationResult,
-            [Frozen] Mock<IValidator<GetAvailableReservationsQuery>> mockValidator,
+            [Frozen] ValidationResult validationResult,
             GetAvailableReservationsQueryHandler handler)
         {
             var query = new GetAvailableReservationsQuery { AccountId = accountId };
             validationResult.AddError(propertyName);
-            mockValidator
-                .Setup(validator => validator.ValidateAsync(It.IsAny<GetAvailableReservationsQuery>()))
-                .ReturnsAsync(validationResult);
 
             Func<Task> act = async () => { await handler.Handle(query, CancellationToken.None); };
 

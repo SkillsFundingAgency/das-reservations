@@ -6,6 +6,7 @@
         public const string ProviderStart = "provider-start";
 		public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
         public const string ProviderManage = "provider-manage";
+        public const string ProviderSelect = "provider-select";
         public const string ProviderManageCreate = "provider-manage-create";
         public const string ProviderDelete = "provider-delete";
         public const string ProviderDeleteCompleted = "provider-delete-completed";
@@ -24,6 +25,7 @@
         public const string EmployerStart = "employer-start";
 		public const string EmployerSaveRuleNotificationChoice = "employer-save-rule-notification-choice";
         public const string EmployerManage = "employer-manage";
+        public const string EmployerSelect = "employer-select";
         public const string EmployerManageCreate = "employer-manage-create";
         public const string EmployerDelete = "employer-delete";
         public const string EmployerDeleteCompleted = "employer-delete-completed";

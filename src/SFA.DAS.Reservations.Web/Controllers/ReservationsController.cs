@@ -16,6 +16,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -525,11 +526,39 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Redirect(dashboardUrl);
         }
 
+        [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
+        [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> SelectReservation(ReservationsRouteModel routeModel,
-            SelectReservationModel model)
+            SelectReservationViewModel viewModel)
         {
-            await _mediator.Send(new GetReservationsQuery {AccountId = 1});
-            return null;
+            string viewName = ViewNames.EmployerSelect;
+            long accountId = 0;
+            if (routeModel.UkPrn.HasValue)
+            {
+                var accounts = await _mediator.Send(
+                    new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+                var matchedAccount = accounts.Employers.SingleOrDefault(employer => 
+                    employer.AccountLegalEntityPublicHashedId == routeModel.AccountLegalEntityPublicHashedId);
+
+                if (matchedAccount == null)
+                {
+                    return RedirectToRoute(RouteNames.ProviderError);
+                }
+
+                accountId = matchedAccount.AccountId;
+                viewName = ViewNames.ProviderSelect;
+            }
+
+            var availableReservationsResult = await _mediator.Send(
+                new GetAvailableReservationsQuery {AccountId = accountId});
+
+            var model = new SelectReservationViewModel
+            {
+                AvailableReservations = availableReservationsResult.Reservations
+                        .Select(reservation => new AvailableReservationViewModel(reservation))
+            };
+
+            return View(viewName, model);
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
