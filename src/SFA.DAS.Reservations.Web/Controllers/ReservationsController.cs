@@ -545,7 +545,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     if (matchedAccount == null)
                     {
-                        return RedirectToRoute(RouteNames.ProviderError);
+                        return RedirectToRoute(RouteNames.Error500);
                     }
 
                     accountId = matchedAccount.AccountId;
@@ -575,12 +575,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ValidationException e)
             {
                 _logger.LogWarning(e, "Validation error trying to render select reservation.");
-                return RedirectToRoute(RouteNames.ProviderError);
+                return RedirectToRoute(RouteNames.Error500);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error trying to render select reservation.");
-                return RedirectToRoute(RouteNames.ProviderError);
+                return RedirectToRoute(RouteNames.Error500);
             }
         }
 
