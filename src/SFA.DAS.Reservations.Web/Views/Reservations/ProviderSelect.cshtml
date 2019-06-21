@@ -1,0 +1,49 @@
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model SelectReservationViewModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <partial name="_PageErrorsOverview"/>
+
+            <h1 class="govuk-heading-xl">Choose a Reservation</h1>
+
+            <form method="post" asp-route="@RouteNames.ProviderDelete">
+                <input type="hidden" id="CohortReference" name="CohortReference" value="@Model.CohortReference"/>
+
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Which reservation would you like to use?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("SelectedReservationId"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["SelectedReservationId"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <!--foreach here-->
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="SelectedReservationId" name="SelectedReservationId" type="radio" value="SelectedReservationId">
+                                <label class="govuk-label govuk-radios__label" for="SelectedReservationId">
+                                    SelectedReservation
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <button type="submit" draggable="false" class="govuk-button">
+                    Save and continue
+                </button>
+            </form>
+        </div>
+    </div>
+</main>

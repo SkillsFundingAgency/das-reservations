@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -6,6 +7,7 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public string CohortReference { get; set; }
         public string TransferSenderId { get; set; }
+        public Guid? SelectedReservationId { get; set; }
         public IEnumerable<AvailableReservationViewModel> AvailableReservations { get; set; }
     }
 }
