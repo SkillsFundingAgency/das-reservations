@@ -531,34 +531,57 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> SelectReservation(ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            string viewName = ViewNames.EmployerSelect;
-            long accountId = 0;
-            if (routeModel.UkPrn.HasValue)
+            try
             {
-                var accounts = await _mediator.Send(
-                    new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
-                var matchedAccount = accounts.Employers.SingleOrDefault(employer => 
-                    employer.AccountLegalEntityPublicHashedId == routeModel.AccountLegalEntityPublicHashedId);
-
-                if (matchedAccount == null)
+                string viewName = ViewNames.EmployerSelect;
+                long accountId = 0;
+                if (routeModel.UkPrn.HasValue)
                 {
-                    return RedirectToRoute(RouteNames.ProviderError);
+                    var accounts = await _mediator.Send(
+                        new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+                    var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
+                        employer.AccountLegalEntityPublicHashedId ==
+                        routeModel.AccountLegalEntityPublicHashedId);
+
+                    if (matchedAccount == null)
+                    {
+                        return RedirectToRoute(RouteNames.ProviderError);
+                    }
+
+                    accountId = matchedAccount.AccountId;
+                    viewName = ViewNames.ProviderSelect;
                 }
 
-                accountId = matchedAccount.AccountId;
-                viewName = ViewNames.ProviderSelect;
+                //todo: check account reservation status here.
+
+                var availableReservationsResult = await _mediator.Send(
+                    new GetAvailableReservationsQuery {AccountId = accountId});
+
+                if (availableReservationsResult.Reservations != null &&
+                    availableReservationsResult.Reservations.Any())
+                {
+                    var model = new SelectReservationViewModel
+                    {
+                        AvailableReservations = availableReservationsResult.Reservations
+                            .Select(reservation => new AvailableReservationViewModel(reservation))
+                    };
+
+                    return View(viewName, model);
+                }
+
+                //todo: redirect to start reservation create and store cohort ref in redis
+                return null;
             }
-
-            var availableReservationsResult = await _mediator.Send(
-                new GetAvailableReservationsQuery {AccountId = accountId});
-
-            var model = new SelectReservationViewModel
+            catch (ValidationException e)
             {
-                AvailableReservations = availableReservationsResult.Reservations
-                        .Select(reservation => new AvailableReservationViewModel(reservation))
-            };
-
-            return View(viewName, model);
+                _logger.LogWarning(e, "Validation error trying to render select reservation.");
+                return RedirectToRoute(RouteNames.ProviderError);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error trying to render select reservation.");
+                return RedirectToRoute(RouteNames.ProviderError);
+            }
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(

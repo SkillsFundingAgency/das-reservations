@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -46,6 +48,50 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Verify(mediator => mediator.Send(
                 It.Is<GetTrustedEmployersQuery>(query => query.UkPrn == routeModel.UkPrn), 
                 It.IsAny<CancellationToken>()));
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_ValidationException_Then_Redirect_To_ProviderError(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetTrustedEmployersResponse employersResponse,
+            ValidationException validationException,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(), 
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(validationException);
+
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderError);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_Exception_Then_Redirect_To_ProviderError(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetTrustedEmployersResponse employersResponse,
+            Exception exception,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(), 
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderError);
         }
 
         [Test, MoqAutoData]
@@ -97,7 +143,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_Has_Ukprn_And_Has_Reservations_Then_Adds_Reservations_To_Model(
+        public async Task And_Has_Ukprn_And_Has_Reservations_Then_Shows_ProviderSelect_View(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
