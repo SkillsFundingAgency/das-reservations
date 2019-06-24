@@ -169,6 +169,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be(ViewNames.ProviderSelect);
             var actualModel = result.Model as SelectReservationViewModel;
             actualModel.Should().NotBeNull();
+            actualModel.CohortReference.Should().Be(viewModel.CohortReference);
+            actualModel.TransferSenderId.Should().Be(viewModel.TransferSenderId);
             actualModel.AvailableReservations.Should().BeEquivalentTo(
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));

@@ -560,13 +560,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (availableReservationsResult.Reservations != null &&
                     availableReservationsResult.Reservations.Any())
                 {
-                    var model = new SelectReservationViewModel
-                    {
-                        AvailableReservations = availableReservationsResult.Reservations
-                            .Select(reservation => new AvailableReservationViewModel(reservation))
-                    };
-
-                    return View(viewName, model);
+                    viewModel.AvailableReservations = availableReservationsResult.Reservations
+                        .Select(reservation => new AvailableReservationViewModel(reservation));
+                    
+                    return View(viewName, viewModel);
                 }
 
                 //todo: redirect to start reservation create and store cohort ref in redis
