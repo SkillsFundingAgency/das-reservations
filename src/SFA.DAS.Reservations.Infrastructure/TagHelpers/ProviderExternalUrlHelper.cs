@@ -20,11 +20,38 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
         public string GenerateUrl(UrlParameters urlParameters)
         {
-            var urlString = new StringBuilder();
-
             var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
                 ? _options.EmployerDashboardUrl
                 : _options.DashboardUrl;
+
+            return FormatUrl(baseUrl, urlParameters);
+        }
+
+        public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
+        {
+            var baseUrl = _options.ApprenticeUrl;
+
+            var queryString =
+                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
+
+            if (!string.IsNullOrWhiteSpace(courseId))
+            {
+                queryString += $"&courseCode={courseId}";
+            }
+
+            var urlParams = new UrlParameters
+            {
+                Id = ukPrn.ToString(), 
+                Controller = "unapproved",
+                Action = "add-apprentice",
+                QueryString = queryString
+            };
+            return FormatUrl(baseUrl, urlParams);
+        }
+
+        private static string FormatUrl(string baseUrl, UrlParameters urlParameters)
+        {
+            var urlString = new StringBuilder();
 
             urlString.Append(FormatBaseUrl(baseUrl, urlParameters.SubDomain, urlParameters.Folder));
 
@@ -49,18 +76,6 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             }
 
             return urlString.ToString().TrimEnd('/');
-        }
-
-        public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
-        {
-            //var aasdfasdf = GenerateUrl(ukPrn.ToString(), "unapproved", "add-apprentice", "", "", $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}");
-            var apprenticeUrl = $"{_options.ApprenticeUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                apprenticeUrl += $"&courseCode={courseId}";
-            }
-
-            return apprenticeUrl;
         }
 
         private static string FormatBaseUrl(string url, string subDomain = "", string folder = "")
