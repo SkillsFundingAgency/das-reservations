@@ -70,13 +70,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(routeModel.UkPrn.ToString(), "", "", "recruit", "", ""))
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters => 
+                        parameters.Id == routeModel.UkPrn.ToString() && 
+                        parameters.SubDomain == "recruit")))
                 .Returns(providerRecruitUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(model.UkPrn, routeModel.Id.Value, routeModel.AccountLegalEntityPublicHashedId, model.StartDate, model.CourseId))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl("", "account", "", "", "", ""))
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters => parameters.Controller == "account")))
                 .Returns(homeUrl);
             var controller = _fixture.Create<ReservationsController>();
             
@@ -125,14 +129,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
             mockUrlHelper
-                .Setup(helper =>
-                    helper.GenerateUrl(routeModel.EmployerAccountId, "", "", "recruit", "accounts", ""))
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters => 
+                        parameters.Id == routeModel.EmployerAccountId &&
+                        parameters.SubDomain == "recruit" &&
+                        parameters.Folder == "accounts")))
                 .Returns(employerRecruitUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(model.UkPrn, routeModel.Id.Value, routeModel.AccountLegalEntityPublicHashedId, model.StartDate, model.CourseId))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(routeModel.EmployerAccountId, "teams", "", "", "accounts", ""))
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters => 
+                        parameters.Id == routeModel.EmployerAccountId &&
+                        parameters.Controller == "teams" &&
+                        parameters.Folder == "accounts")))
                 .Returns(homeUrl);
             var controller = _fixture.Create<ReservationsController>();
             

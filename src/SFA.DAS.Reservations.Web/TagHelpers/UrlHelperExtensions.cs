@@ -28,7 +28,16 @@ namespace SFA.DAS.Reservations.Web.TagHelpers
         {
             base.Process(context,output);
 
-            output.Attributes.SetAttribute("href",_helper.GenerateUrl(ExternalId, ExternalController, ExternalAction, ExternalSubDomain, ExternalFolder, QueryString));
+            var urlParams = new UrlParameters
+            {
+                Id = ExternalId,
+                Controller = ExternalController,
+                Action = ExternalAction,
+                SubDomain = ExternalSubDomain,
+                Folder = ExternalFolder,
+                QueryString = QueryString
+            };
+            output.Attributes.SetAttribute("href",_helper.GenerateUrl(urlParams));
         }
 
         public ExtendedAnchorTagHelper(IHtmlGenerator generator,IExternalUrlHelper helper) : base(generator)

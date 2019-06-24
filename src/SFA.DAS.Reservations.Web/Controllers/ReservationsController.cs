@@ -288,9 +288,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             switch (model.WhatsNext)
             {
                 case CompletedReservationWhatsNext.RecruitAnApprentice:
-                    var recruitUrl = routeModel.UkPrn.HasValue ?
-                        _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString()) :
-                        _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId);
+                    var recruitUrl = routeModel.UkPrn.HasValue
+                        ? _urlHelper.GenerateUrl(new UrlParameters {
+                            SubDomain = "recruit", 
+                            Id = routeModel.UkPrn.ToString()
+                        })
+                        : _urlHelper.GenerateUrl(new UrlParameters {
+                            SubDomain = "recruit", 
+                            Folder = "accounts",
+                            Id = routeModel.EmployerAccountId
+                        });
+                        
                     return Redirect(recruitUrl);
 
                 case CompletedReservationWhatsNext.FindApprenticeshipTraining:
@@ -305,9 +313,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(addApprenticeUrl);
 
                 default:
-                    var homeUrl = routeModel.UkPrn.HasValue ?
-                        _urlHelper.GenerateUrl(controller:"account") :
-                        _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
+                    var homeUrl = routeModel.UkPrn.HasValue
+                        ? _urlHelper.GenerateUrl(new UrlParameters {Controller = "account"})
+                        : _urlHelper.GenerateUrl(new UrlParameters {
+                            Folder = "accounts",
+                            Controller = "teams",
+                            Id = routeModel.EmployerAccountId
+                        });
                     return Redirect(homeUrl);
             }
         }
@@ -362,9 +374,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel
             {
                 Reservations = reservations,
-                BackLink = routeModel.UkPrn.HasValue ?
-                    _urlHelper.GenerateUrl(controller: "Account") :
-                    _urlHelper.GenerateUrl(controller: "teams", subDomain: "accounts", folder: "accounts",id: routeModel.EmployerAccountId)
+                BackLink = routeModel.UkPrn.HasValue
+                    ? _urlHelper.GenerateUrl(new UrlParameters{ Controller = "Account"})
+                    : _urlHelper.GenerateUrl( new UrlParameters {
+                        Controller = "teams", 
+                        SubDomain = "accounts", 
+                        Folder = "accounts", 
+                        Id = routeModel.EmployerAccountId
+                    })
             });
         }
         
@@ -511,7 +528,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
             var dashboardUrl = isProvider ? 
                 _configuration.DashboardUrl : 
-                _urlHelper.GenerateUrl(routeModel.EmployerAccountId, "teams", null, "accounts", "accounts", null);
+                _urlHelper.GenerateUrl(
+                    new UrlParameters
+                    {
+                        Id = routeModel.EmployerAccountId,
+                        Controller = "teams",
+                        Folder = "accounts",
+                        SubDomain = "accounts"
+                    });
             
             if (!ModelState.IsValid)
             {
@@ -528,7 +552,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
-        public async Task<IActionResult> SelectReservation(ReservationsRouteModel routeModel,
+        public async Task<IActionResult> SelectReservation(
+            ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
             try

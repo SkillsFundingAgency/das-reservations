@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
-        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "", string folder="", string queryString="")
+        public string GenerateUrl(UrlParameters urlParameters)
         {
             var urlString = new StringBuilder();
 
@@ -26,26 +26,26 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 ? _options.EmployerDashboardUrl
                 : _options.DashboardUrl;
 
-            urlString.Append(FormatBaseUrl(baseUrl, subDomain, folder));
+            urlString.Append(FormatBaseUrl(baseUrl, urlParameters.SubDomain, urlParameters.Folder));
 
-            if (!string.IsNullOrEmpty(id))
+            if (!string.IsNullOrEmpty(urlParameters.Id))
             {
-                urlString.Append($"{id}/");
+                urlString.Append($"{urlParameters.Id}/");
             }
 
-            if (!string.IsNullOrEmpty(controller))
+            if (!string.IsNullOrEmpty(urlParameters.Controller))
             {
-                urlString.Append($"{controller}/");
+                urlString.Append($"{urlParameters.Controller}/");
             }
 
-            if (!string.IsNullOrEmpty(action))
+            if (!string.IsNullOrEmpty(urlParameters.Action))
             {
-                urlString.Append($"{action}/");
+                urlString.Append($"{urlParameters.Action}/");
             }
 
-            if (!string.IsNullOrEmpty(queryString))
+            if (!string.IsNullOrEmpty(urlParameters.QueryString))
             {
-                return $"{urlString.ToString().TrimEnd('/')}{queryString}";
+                return $"{urlString.ToString().TrimEnd('/')}{urlParameters.QueryString}";
             }
 
             return urlString.ToString().TrimEnd('/');
@@ -53,6 +53,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
         public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
         {
+            //var aasdfasdf = GenerateUrl(ukPrn.ToString(), "unapproved", "add-apprentice", "", "", $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}");
             var apprenticeUrl = $"{_options.ApprenticeUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
             if (!string.IsNullOrWhiteSpace(courseId))
             {
