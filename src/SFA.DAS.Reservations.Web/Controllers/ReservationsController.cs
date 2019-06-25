@@ -624,7 +624,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             SelectReservationViewModel viewModel)
         {
             if (!viewModel.SelectedReservationId.HasValue && !viewModel.CreateNew.HasValue)
-                return RedirectToRoute(RouteNames.Error400);
+            {
+                _logger.LogInformation($"Attempt made to view select reservation but viewModel not valid, SelectedReservation:[{viewModel.SelectedReservationId}], CreateNew:[{viewModel.CreateNew}].");
+                return RedirectToRoute(RouteNames.Error500);
+            }
 
             var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
             {

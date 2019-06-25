@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public void And_No_Create_And_No_ReservationId_Then_Returns_BadRequest(
+        public void And_No_Create_And_No_ReservationId_Then_Returns_Error500(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             ReservationsController controller)
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             var result = controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
-            result.RouteName.Should().Be(RouteNames.Error400);
+            result.RouteName.Should().Be(RouteNames.Error500);
         }
     }
 }
