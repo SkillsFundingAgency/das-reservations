@@ -305,11 +305,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
-                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
-                        model.UkPrn, 
-                        routeModel.Id.Value,
-                        routeModel.AccountLegalEntityPublicHashedId, 
-                        model.StartDate, model.CourseId);
+                    var queryString = $"?reservationId={routeModel.Id.Value}&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}&startMonthYear={model.StartDate:MMyyyy}";
+                    if (!string.IsNullOrWhiteSpace(model.CourseId))
+                    {
+                        queryString += $"&courseCode={model.CourseId}";
+                    }
+                    
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                    {
+                        Id = model.UkPrn.ToString(),
+                        Controller = "unapproved",
+                        Action = "add-apprentice",
+                        QueryString = queryString
+                    });
+
                     return Redirect(addApprenticeUrl);
 
                 default:
@@ -508,15 +517,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
-        public IActionResult DeleteCompleted(ReservationsRouteModel routeModel)
-        {
-            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
-
-            return View(viewName);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
@@ -604,6 +604,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogError(e, "Error trying to render select reservation.");
                 return RedirectToRoute(RouteNames.Error500);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
+        [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
+        public IActionResult PostSelectReservation(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel)
+        {
+            return null;
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(

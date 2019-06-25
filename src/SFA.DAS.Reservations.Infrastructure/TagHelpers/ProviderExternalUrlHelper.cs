@@ -27,26 +27,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
+        public string GenerateAddApprenticeUrl(UrlParameters urlParameters)
         {
             var baseUrl = _options.ApprenticeUrl;
 
-            var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
-
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                queryString += $"&courseCode={courseId}";
-            }
-
-            var urlParams = new UrlParameters
-            {
-                Id = ukPrn.ToString(), 
-                Controller = "unapproved",
-                Action = "add-apprentice",
-                QueryString = queryString
-            };
-            return FormatUrl(baseUrl, urlParams);
+            return FormatUrl(baseUrl, urlParameters);
         }
 
         private static string FormatUrl(string baseUrl, UrlParameters urlParameters)
