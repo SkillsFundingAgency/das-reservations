@@ -567,8 +567,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             try
             {
-                string viewName = ViewNames.EmployerSelect;
-                long accountId = 0;
+                var viewName = ViewNames.EmployerSelect;
+                var accountId = 0L;
                 if (routeModel.UkPrn.HasValue)
                 {
                     var accounts = await _mediator.Send(
