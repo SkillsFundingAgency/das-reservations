@@ -1,5 +1,4 @@
 ﻿using AutoFixture.NUnit3;
-using Castle.Core.Logging;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
