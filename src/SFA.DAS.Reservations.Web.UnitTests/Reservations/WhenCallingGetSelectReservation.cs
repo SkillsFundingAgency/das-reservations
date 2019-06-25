@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -175,5 +176,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));
         }
+        /*
+        [Test, MoqAutoData]
+        public async void AndCohortHasLevyPayingEmployer_ThenReservationsFunctionalitySkipped(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetTrustedEmployersResponse employersResponse,
+            GetAvailableReservationsResult reservationsResult,
+            GetAccountReservationStatusQuery accountStatusQuery,
+            GetAccountReservationStatusResponse accountStatusResponse,
+            [Frozen]Mock<IMediator> _mediator,
+            ReservationsController controller
+            )
+        {
+            //Arrange
+            
+
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel);
+
+
+            //Assert
+        }
+        */
     }
 }
