@@ -615,6 +615,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
+        [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
+        public IActionResult PostSelectReservation(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel)
+        {
+            if (!viewModel.SelectedReservationId.HasValue && !viewModel.CreateNew.HasValue)
+                return RedirectToRoute(RouteNames.Error400);
+
+            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+            {
+                Folder = routeModel.UkPrn.ToString(),
+                Id = "unapproved",
+                Controller = viewModel.CohortReference,
+                Action = "add-apprentice",
+                QueryString = $"?reservationId={viewModel.SelectedReservationId}"
+            });
+            return Redirect(addApprenticeUrl);
+        }
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,

@@ -42,6 +42,7 @@
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";
 
+        public const string Error400 = "400";
         public const string Error403 = "403";
         public const string Error404 = "404";
         public const string Error500 = "500";
