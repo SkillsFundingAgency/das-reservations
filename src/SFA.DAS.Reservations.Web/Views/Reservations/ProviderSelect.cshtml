@@ -16,7 +16,6 @@
 
             <form method="post" asp-route="@RouteNames.ProviderDelete">
                 <input type="hidden" id="CohortReference" name="CohortReference" value="@Model.CohortReference"/>
-                <input type="hidden" id="TransferSenderId" name="TransferSenderId" value="@Model.TransferSenderId"/>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
