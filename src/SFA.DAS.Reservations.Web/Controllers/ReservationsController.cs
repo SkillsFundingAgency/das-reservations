@@ -634,7 +634,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Folder = routeModel.UkPrn.ToString(),
                 Id = "unapproved",
                 Controller = viewModel.CohortReference,
-                Action = "add-apprentice",
+                Action = "apprentices/add",
                 QueryString = $"?reservationId={viewModel.SelectedReservationId}"
             });
             return Redirect(addApprenticeUrl);

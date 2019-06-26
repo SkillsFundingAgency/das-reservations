@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         parameters.Folder == routeModel.UkPrn.ToString() &&
                         parameters.Id == "unapproved" &&
                         parameters.Controller == viewModel.CohortReference &&
-                        parameters.Action == "add-apprentice" &&
+                        parameters.Action == "apprentices/add" &&
                         parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}")))
                 .Returns(addApprenticeUrl);
             
