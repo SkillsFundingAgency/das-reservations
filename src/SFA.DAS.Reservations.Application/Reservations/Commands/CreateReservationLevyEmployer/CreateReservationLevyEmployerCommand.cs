@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using MediatR;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer
 {
-    public class CreateReservationLevyEmployerCommand : IRequest<Unit>
+    public class CreateReservationLevyEmployerCommand : IRequest<CreateReservationLevyEmployerResult>
     {
-        public Guid Id { get; set; }
         public long AccountId { get; set; }
-        public uint UkPrn { get; set; }
-        public bool IsLevy { get; set; }
+        public long AccountLegalEntityId { get; set; }
     }
 }

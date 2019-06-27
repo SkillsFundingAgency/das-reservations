@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
@@ -10,7 +9,19 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         public Task<ValidationResult> ValidateAsync(CreateReservationLevyEmployerCommand query)
         {
-            throw new NotImplementedException();
+            var validationResult = new ValidationResult();
+            
+            if (query.AccountId < 1)
+            {
+                validationResult.AddError(nameof(query.AccountId));
+            }
+
+            if (query.AccountLegalEntityId < 1)
+            {
+                validationResult.AddError(nameof(query.AccountLegalEntityId));
+            }
+            
+            return Task.FromResult(validationResult);
         }
     }
 }

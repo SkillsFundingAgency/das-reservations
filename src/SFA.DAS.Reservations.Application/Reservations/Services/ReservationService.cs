@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -22,8 +23,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
 
         public async Task<IEnumerable<Reservation>> GetReservations(long accountId)
         {
-            var apiReservations = await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, accountId));
-            
+            var apiReservations =
+                await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, accountId));
+
             var result = apiReservations.Select(apiReservation => new Reservation
             {
                 Id = apiReservation.Id,
@@ -33,11 +35,22 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
                 StartDate = apiReservation.StartDate,
                 ExpiryDate = apiReservation.ExpiryDate,
                 Course = apiReservation.Course,
-                Status = (ReservationStatus)apiReservation.Status,
+                Status = (ReservationStatus) apiReservation.Status,
                 ProviderId = apiReservation.ProviderId
             });
 
             return result;
+        }
+
+        public async Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId, long accountId, long accountLegalEntityId)
+        {
+            return await _apiClient.Create<CreateReservationResponse>(new ReservationApiRequest(
+                _config.Url,
+                reservationId,
+                accountId,
+                accountLegalEntityId,
+                true
+                ));
         }
     }
 }
