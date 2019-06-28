@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -10,8 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
+using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -176,12 +182,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));
         }
-        /*
+        
         [Test, MoqAutoData]
-        public async void AndCohortHasLevyPayingEmployer_ThenReservationsFunctionalitySkipped(
+        public async Task ThenChecksEmployerLevyStatus(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
+            [Frozen] GetTrustedEmployersResponse employersResponse,
             GetAvailableReservationsResult reservationsResult,
             GetAccountReservationStatusQuery accountStatusQuery,
             GetAccountReservationStatusResponse accountStatusResponse,
@@ -190,7 +196,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             )
         {
             //Arrange
-            
+            employersResponse = new GetTrustedEmployersResponse()
+            {
+                Employers = new List<Employer>()
+                {
+                    new Employer() {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
+                }
+            };
+            accountStatusResponse = new GetAccountReservationStatusResponse()
+            {
+                CanAutoCreateReservations = true
+            };
+            _mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
+                .ReturnsAsync(employersResponse);
+            _mediator.Setup(x => x.Send(accountStatusQuery, CancellationToken.None))
+                .ReturnsAsync(accountStatusResponse);
 
 
             //Act
@@ -198,7 +218,107 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
 
             //Assert
+            _mediator.Verify(x =>
+                x.Send(It.IsAny<GetAccountReservationStatusQuery>(),CancellationToken.None),Times.Once());
+
         }
-        */
+
+        [Test, MoqAutoData]
+        public async Task AndHasLevyPayingEmployer_ThenCreatesReservationInTheBackground(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetAvailableReservationsResult reservationsResult,
+            CreateReservationLevyEmployerResult CreateReservationLevyResult,
+            [Frozen]Mock<IMediator> _mediator,
+            ReservationsController controller
+        )
+        {
+            //Arrange
+            var employersResponse = new GetTrustedEmployersResponse()
+            {
+                Employers = new List<Employer>()
+                {
+                    new Employer() {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
+                }
+            };
+            var accountStatusResponse = new GetAccountReservationStatusResponse()
+            {
+                CanAutoCreateReservations = true
+            };
+            var createReservationLevyResult = new CreateReservationLevyEmployerResult()
+            {
+                ReservationId = Guid.NewGuid()
+            };
+            _mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
+                .ReturnsAsync(employersResponse);
+            _mediator.Setup(x => x.Send(It.IsAny<GetAccountReservationStatusQuery>(), CancellationToken.None))
+                .ReturnsAsync(accountStatusResponse);
+            _mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationLevyResult);
+
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel);
+
+
+            //Assert
+            _mediator.Verify(x =>
+                x.Send(It.Is<CreateReservationLevyEmployerCommand>(query => query.AccountId == employersResponse.Employers.First().AccountId), CancellationToken.None), Times.Once());
+
+        }
+
+        [Test, MoqAutoData]
+        public async Task AndHasLevyPayingEmployerAndReservationCreated_ThenRedirectsToAddAnApprentice(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetAvailableReservationsResult reservationsResult,
+            CreateReservationLevyEmployerResult CreateReservationLevyResult,
+            [Frozen]Mock<IMediator> _mediator,
+            [Frozen]Mock<IExternalUrlHelper> urlHelper,
+            string addApprenticeUrl,
+            ReservationsController controller
+        )
+        {
+            //Arrange
+            var employersResponse = new GetTrustedEmployersResponse()
+            {
+                Employers = new List<Employer>()
+                {
+                    new Employer() {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
+                }
+            };
+            var accountStatusResponse = new GetAccountReservationStatusResponse()
+            {
+                CanAutoCreateReservations = true
+            };
+            var createReservationLevyResult = new CreateReservationLevyEmployerResult()
+            {
+                ReservationId = Guid.NewGuid()
+            };
+            _mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
+                .ReturnsAsync(employersResponse);
+            _mediator.Setup(x => x.Send(It.IsAny<GetAccountReservationStatusQuery>(), CancellationToken.None))
+                .ReturnsAsync(accountStatusResponse);
+            _mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationLevyResult);
+
+            viewModel.CreateNew = null;
+            urlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Folder == routeModel.UkPrn.ToString() &&
+                        parameters.Id == "unapproved" &&
+                        parameters.Controller == viewModel.CohortReference &&
+                        parameters.Action == "apprentices/add" &&
+                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}")))
+                .Returns(addApprenticeUrl);
+
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectResult;
+            Assert.IsNotNull(result);
+            result?.Url.Should().Be(addApprenticeUrl);
+        }
+
+
+
     }
 }

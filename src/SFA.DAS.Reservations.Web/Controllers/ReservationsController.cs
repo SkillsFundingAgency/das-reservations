@@ -15,7 +15,9 @@ using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalF
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
@@ -585,6 +587,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     accountId = matchedAccount.AccountId;
                     viewName = ViewNames.ProviderSelect;
+
+                    var autoReserveStatus = await _mediator.Send(new GetAccountReservationStatusQuery { AccountId = accountId });
+                    if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
+                    {
+                        var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
+                        {
+                            AccountId = accountId,
+                            AccountLegalEntityId = _encodingService.Decode(
+                                matchedAccount.AccountLegalEntityPublicHashedId,
+                                EncodingType.PublicAccountLegalEntityId)
+                        });
+
+                        var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                        {
+                            Folder = routeModel.UkPrn.ToString(),
+                            Id = "unapproved",
+                            Controller = viewModel.CohortReference,
+                            Action = "apprentices/add",
+                            QueryString = $"?reservationId={createdReservation.ReservationId}"
+                        });
+                        return Redirect(addApprenticeUrl);
+                    }
                 }
 
                 //todo: check account reservation status here.
