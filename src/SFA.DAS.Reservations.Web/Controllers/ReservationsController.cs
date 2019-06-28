@@ -596,6 +596,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     
                     if (cacheReservationEmployerCommand == null)
                     {
+                        _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
                         return RedirectToRoute(RouteNames.Error500);
                     }
                 }
@@ -667,7 +668,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (legalEntity == null)
             {
-                return null;//RedirectToRoute(RouteNames.Error500);
+                return null;
             }
 
             return new CacheReservationEmployerCommand
