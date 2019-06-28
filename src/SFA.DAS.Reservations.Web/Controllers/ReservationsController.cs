@@ -579,6 +579,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     if (matchedAccount == null)
                     {
+                        _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
                         return RedirectToRoute(RouteNames.Error500);
                     }
 
