@@ -41,13 +41,15 @@
                                     </span>
                                 </div>
                             }
-                            <div class="govuk-radios__divider">or</div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="CreateNew" name="CreateNew" type="radio" value="true">
-                                <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
-                                    Create a new reservation
-                                </label> 
-                            </div>
+                            @if(!Model.ReservationLimitReached){
+                                <div class="govuk-radios__divider">or</div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="CreateNew" name="CreateNew" type="radio" value="true">
+                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
+                                        Create a new reservation
+                                    </label> 
+                                </div>
+                            }
                         </div>
                     </fieldset>
                 </div>

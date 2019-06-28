@@ -600,6 +600,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         return RedirectToRoute(RouteNames.Error500);
                     }
                 }
+                //todo: check reservation limit not breached for this employer, non-levy only
+                viewModel.ReservationLimitReached = false;
 
                 //todo: check account reservation status here.
 

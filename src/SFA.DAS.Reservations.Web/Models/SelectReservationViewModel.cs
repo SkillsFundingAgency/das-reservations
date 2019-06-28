@@ -9,6 +9,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string TransferSenderId { get; set; }
         public Guid? SelectedReservationId { get; set; }
         public bool? CreateNew { get; set; }
+        public bool ReservationLimitReached { get; set; }
         public IEnumerable<AvailableReservationViewModel> AvailableReservations { get; set; }
     }
 }
