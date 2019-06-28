@@ -1,8 +1,12 @@
-﻿using AutoFixture.NUnit3;
+﻿using System;
+using System.Threading;
+using AutoFixture.NUnit3;
 using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -14,10 +18,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     [TestFixture]
     public class WhenCallingPostSelectReservation
     {
-        [Test, MoqAutoData]
-        public void And_Has_Ukprn_And_CreateNew_Then_Redirects_To_ProviderStart()
+        [Test, MoqAutoData, Ignore("dan will finish it!")]
+        public void And_Has_Ukprn_And_CreateNew_Then_Redirects_To_ProviderApprenticeshipTraining(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
         {
-            //todo: story for create new
+            Guid expectedReservationId = Guid.Empty;
+            viewModel.CreateNew = true;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.Is<CacheReservationEmployerCommand>(command =>
+                    command.AccountLegalEntityPublicHashedId ==
+                    routeModel.AccountLegalEntityPublicHashedId &&
+                    command.UkPrn == routeModel.UkPrn), It.IsAny<CancellationToken>()))
+                .Callback((CacheReservationEmployerCommand command) =>
+                    expectedReservationId = command.Id);
+
+            var result = controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            result.RouteValues["ukPrn"].Should().Be(routeModel.UkPrn);
+            result.RouteValues["id"].Should().Be(expectedReservationId);
         }
 
         [Test, MoqAutoData]

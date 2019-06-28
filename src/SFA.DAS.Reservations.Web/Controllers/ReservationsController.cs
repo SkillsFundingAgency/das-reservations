@@ -650,15 +650,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.Error500);
             }
 
-            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+            if (viewModel.CreateNew == null || !viewModel.CreateNew.Value)
             {
-                Folder = routeModel.UkPrn.ToString(),
-                Id = "unapproved",
-                Controller = viewModel.CohortReference,
-                Action = "apprentices/add",
-                QueryString = $"?reservationId={viewModel.SelectedReservationId}"
-            });
-            return Redirect(addApprenticeUrl);
+                var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                {
+                    Folder = routeModel.UkPrn.ToString(),
+                    Id = "unapproved",
+                    Controller = viewModel.CohortReference,
+                    Action = "apprentices/add",
+                    QueryString = $"?reservationId={viewModel.SelectedReservationId}"
+                });
+                return Redirect(addApprenticeUrl);
+            }
+
+            return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, routeModel);
+
         }
 
         private async Task<CacheReservationEmployerCommand> BuildEmployerReservationCacheCommand(string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef)
