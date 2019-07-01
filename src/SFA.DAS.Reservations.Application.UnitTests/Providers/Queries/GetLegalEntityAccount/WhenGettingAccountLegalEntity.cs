@@ -14,7 +14,7 @@ using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationR
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalEntityAccount
 {
-    public class WhenGettingLegalEntityAccount
+    public class WhenGettingAccountLegalEntity
     {
         private GetAccountLegalEntityQuery _query;
         private Mock<IValidator<GetAccountLegalEntityQuery>> _validator;
