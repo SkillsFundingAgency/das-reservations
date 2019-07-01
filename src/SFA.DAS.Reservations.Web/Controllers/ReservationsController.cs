@@ -569,10 +569,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var viewName = ViewNames.EmployerSelect;
                 var accountId = 0L;
+                
                 if (routeModel.UkPrn.HasValue)
                 {
-                    var accounts = await _mediator.Send(
-                        new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+                    var accounts = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+
                     var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
                         employer.AccountLegalEntityPublicHashedId ==
                         routeModel.AccountLegalEntityPublicHashedId);
