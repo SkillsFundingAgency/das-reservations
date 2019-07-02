@@ -594,9 +594,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                             }
                             else
                             {
-                                _logger.LogWarning($"Account legal entity Account Id cannot be parsed to a long for " +
+                                _logger.LogWarning("Account legal entity Account Id cannot be parsed to a long for " +
                                                     $"Legal entity Id [{routeModel.AccountLegalEntityPublicHashedId}].");
-                                return RedirectToRoute(RouteNames.Error404);
+                                return RedirectToRoute(RouteNames.Error500);
                             }
                         }
                         else

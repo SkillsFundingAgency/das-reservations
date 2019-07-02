@@ -203,7 +203,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
-            result.RouteName.Should().Be(RouteNames.Error404);
+            result.RouteName.Should().Be(RouteNames.Error500);
 
             mockMediator
                 .Verify(mediator => mediator.Send(
