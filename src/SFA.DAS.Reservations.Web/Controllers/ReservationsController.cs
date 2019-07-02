@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
+using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -580,11 +581,35 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     if (matchedAccount == null)
                     {
-                        _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
-                        return RedirectToRoute(RouteNames.Error500);
-                    }
+                        var result = await _mediator.Send(new GetAccountLegalEntityQuery
+                        {
+                            AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId
+                        });
 
-                    accountId = matchedAccount.AccountId;
+                        if (result?.LegalEntity?.AccountId != null)
+                        {
+                            if (long.TryParse(result.LegalEntity.AccountId, out var legalEntityAccountId))
+                            {
+                                accountId = legalEntityAccountId;
+                            }
+                            else
+                            {
+                                _logger.LogWarning($"Account legal entity Account Id cannot be parsed to a long for " +
+                                                    $"Legal entity Id [{routeModel.AccountLegalEntityPublicHashedId}].");
+                                return RedirectToRoute(RouteNames.Error404);
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
+                            return RedirectToRoute(RouteNames.Error404);
+                        }
+                    }
+                    else
+                    {
+                        accountId = matchedAccount.AccountId;
+                    }
+                   
                     viewName = ViewNames.ProviderSelect;
                 }
 
