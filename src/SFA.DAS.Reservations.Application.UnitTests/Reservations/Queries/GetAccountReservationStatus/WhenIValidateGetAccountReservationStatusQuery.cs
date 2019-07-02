@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             var result = await _validator.ValidateAsync(query);
 
             //Assert
-            Assert.AreEqual(true,result.IsValid());
+            Assert.True(result.IsValid());
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             var result = await _validator.ValidateAsync(query);
 
             //Assert
-            Assert.AreEqual(false, result.IsValid());
+            Assert.False(result.IsValid());
         }
     }
 }

@@ -188,39 +188,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             [Frozen] GetTrustedEmployersResponse employersResponse,
+            Employer employer,
             GetAvailableReservationsResult reservationsResult,
-            GetAccountReservationStatusQuery accountStatusQuery,
             GetAccountReservationStatusResponse accountStatusResponse,
-            [Frozen]Mock<IMediator> _mediator,
+            [Frozen]Mock<IMediator> mediator,
             ReservationsController controller
             )
         {
             //Arrange
-            employersResponse = new GetTrustedEmployersResponse()
-            {
-                Employers = new List<Employer>()
-                {
-                    new Employer() {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
-                }
-            };
-            accountStatusResponse = new GetAccountReservationStatusResponse()
-            {
-                CanAutoCreateReservations = true
-            };
-            _mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
+            routeModel.UkPrn = 2442;
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            accountStatusResponse.CanAutoCreateReservations = true;
+            employersResponse.Employers = new List<Employer>() {employer};
+            mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
                 .ReturnsAsync(employersResponse);
-            _mediator.Setup(x => x.Send(accountStatusQuery, CancellationToken.None))
+            mediator.Setup(x => x.Send(It.IsAny<GetAccountReservationStatusQuery>(), CancellationToken.None))
                 .ReturnsAsync(accountStatusResponse);
 
-
             //Act
-            var result = await controller.SelectReservation(routeModel, viewModel);
-
+            await controller.SelectReservation(routeModel, viewModel);
 
             //Assert
-            _mediator.Verify(x =>
-                x.Send(It.IsAny<GetAccountReservationStatusQuery>(),CancellationToken.None),Times.Once());
-
+            mediator.Verify(x =>
+                x.Send(It.Is<GetAccountReservationStatusQuery>(query => query.AccountId == employer.AccountId),CancellationToken.None),Times.Once());
         }
 
         [Test, MoqAutoData]

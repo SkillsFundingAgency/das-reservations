@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             //Arrange
             var apiResponse = new AccountReservationStatusResponse()
             {
-                CanAutoCreateReservations = It.IsAny<bool>()
+                CanAutoCreateReservations = true
             };
             _apiClient
                 .Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
@@ -64,13 +64,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
         public void AndTheQueryIsNotValid_ThenValidationErrorThrown()
         {
             //Arrange
-            var apiResponse = new AccountReservationStatusResponse()
-            {
-                CanAutoCreateReservations = It.IsAny<bool>()
-            };
             _apiClient
                 .Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
-                .ReturnsAsync(apiResponse);
+                .ReturnsAsync(new AccountReservationStatusResponse());
             var query = new GetAccountReservationStatusQuery() { AccountId = default(long) };
             _validator
                 .Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationStatusQuery>()))
@@ -80,10 +76,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
                 } });
 
             //Act + Assert
-            Assert.ThrowsAsync<ValidationException>(async() =>
-            {
-                await _handler.Handle(query, CancellationToken.None);
-            });
+            Assert.ThrowsAsync<ValidationException>(() =>
+            
+                _handler.Handle(query, CancellationToken.None)
+            );
         }
     }
 }

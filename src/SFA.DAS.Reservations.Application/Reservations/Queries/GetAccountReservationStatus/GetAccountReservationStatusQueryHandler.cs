@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
                 await _apiClient.Get<AccountReservationStatusResponse>(
                     new AccountReservationStatusRequest(_config.Url, request.AccountId));
 
-            return new GetAccountReservationStatusResponse(){CanAutoCreateReservations = response.CanAutoCreateReservations};
+            return new GetAccountReservationStatusResponse{CanAutoCreateReservations = response.CanAutoCreateReservations};
 
         }
     }

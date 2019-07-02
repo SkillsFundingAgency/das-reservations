@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             validator.Setup(x => x.ValidateAsync(It.IsAny<CreateReservationLevyEmployerCommand>()))
                 .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string> {{"", ""}}});
             //Act
-            Assert.ThrowsAsync<ValidationException>(async() => await handler.Handle(request, CancellationToken.None));
+            Assert.ThrowsAsync<ValidationException>(() =>  handler.Handle(request, CancellationToken.None));
 
             //Assert
             validator.Verify(x => x.ValidateAsync(request), Times.Once());
@@ -39,6 +39,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         [Test, MoqAutoData]
         public async Task ThenCallsReservationServiceToCreateReservation(
             [Frozen]CreateReservationLevyEmployerCommand request,
+            Guid id,
             [Frozen] Mock<IValidator<CreateReservationLevyEmployerCommand>> validator,
             [Frozen] Mock<IReservationService> service,
             CreateReservationLevyEmployerCommandHandler handler)
@@ -49,38 +50,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             service.Setup(x =>
                     x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId))
-                .ReturnsAsync(new CreateReservationResponse());
+                .ReturnsAsync(new CreateReservationResponse(){Id = id});
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
             
             //Assert
             service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId));
-
-        }
-
-        [Test, MoqAutoData]
-        public async Task ThenReturnsCorrectResult(
-            [Frozen] Guid id,
-            [Frozen]CreateReservationLevyEmployerCommand request,
-            [Frozen] Mock<IValidator<CreateReservationLevyEmployerCommand>> validator,
-            [Frozen] Mock<IReservationService> service,
-            CreateReservationLevyEmployerCommandHandler handler)
-        {
-            //Arrange
-            validator.Setup(x => x.ValidateAsync(request))
-                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
-
-            service.Setup(x =>
-                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId))
-                .ReturnsAsync(new CreateReservationResponse(){Id = id});
-
-            //Act
-            var result = await handler.Handle(request, CancellationToken.None);
-
-            //Assert
-            Assert.AreEqual(id,result.ReservationId);
-
+            Assert.AreEqual(id, result.ReservationId);
         }
 
     }

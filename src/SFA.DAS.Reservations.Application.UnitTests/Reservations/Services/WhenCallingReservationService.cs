@@ -29,9 +29,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             await service.GetReservations(accountId);
 
             mockApiClient.Verify(client => client.GetAll<GetReservationResponse>(
-                    It.Is<IGetAllApiRequest>(request => 
-                        request.GetAllUrl.StartsWith(mockOptions.Object.Value.Url) && 
-                        request.GetAllUrl.Contains(accountId.ToString()))), 
+                    It.Is<IGetAllApiRequest>(request =>
+                        request.GetAllUrl.StartsWith(mockOptions.Object.Value.Url) &&
+                        request.GetAllUrl.Contains(accountId.ToString()))),
                 Times.Once);
         }
 
@@ -64,16 +64,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         {
             //Arrange
             mockApiClient.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
-                .ReturnsAsync(new CreateReservationResponse() {Id = id});
+                .ReturnsAsync(new CreateReservationResponse() { Id = id });
             //Act
-            await service.CreateReservationLevyEmployer(id,accountId,accountLegalEntityId);
+            await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId);
 
             //Assert
             mockApiClient.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
                 request => request.Id == id &&
                            request.AccountId == accountId &&
-                           request.AccountLegalEntityId == accountLegalEntityId &&
-                           request.IsLevyAccount == true)));
+                           request.AccountLegalEntityId == accountLegalEntityId)));
         }
 
 
