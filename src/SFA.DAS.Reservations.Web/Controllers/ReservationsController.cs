@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -626,6 +627,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogWarning(e, "Validation error trying to render select reservation.");
                 return RedirectToRoute(RouteNames.Error500);
             }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached");
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error trying to render select reservation.");
@@ -681,7 +686,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     viewModel.CohortReference);
             }
 
-            await _mediator.Send(cacheReservationEmployerCommand);
+            try
+            {
+                await _mediator.Send(cacheReservationEmployerCommand);
+            }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached");
+            }
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
 
