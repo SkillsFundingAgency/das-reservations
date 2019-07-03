@@ -1,4 +1,5 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@using Microsoft.AspNetCore.Routing
+@using SFA.DAS.Reservations.Web.Infrastructure
 
 @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
 {
@@ -6,7 +7,7 @@
     {
         <nav class="das-navigation">
             <div class="govuk-width-container">
-                <ul class="das-navigation__list ">
+                <ul class="das-navigation__list">
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="Account" class="das-navigation__link">Home</a>
                     </li>
@@ -23,7 +24,14 @@
                         <a asp-external-controller="Agreements" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Organisations and agreements</a>
                     </li>
                     <li class="das-navigation__list-item">
-                        <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage funding</a>
+                        @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
+                        }
+                        else
+                        {
+                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage funding</a>
+                    }
                     </li>
                 </ul>
             </div>
