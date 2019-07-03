@@ -85,14 +85,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             var response = await _apiClient.Create<CreateReservationResponse>(apiRequest);
 
-            var accountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId;
-
             await _cacheStorageService.DeleteFromCache(command.Id.ToString());
 
             return new CreateReservationResult
             {
                 Id = response.Id,
-                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
+                AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId,
+                CohortRef = cachedReservation.CohortRef
             };
         }
     }
