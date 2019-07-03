@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +10,6 @@ using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAccountReservationStatus
@@ -25,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
         private GetAccountReservationStatusQueryHandler _handler;
         private Mock<IValidator<GetAccountReservationStatusQuery>> _validator;
         private Mock<IOptions<ReservationsApiConfiguration>> _configOptions;
-        
+
 
         [SetUp]
         public void SetUp()
@@ -34,7 +30,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             _configOptions = new Mock<IOptions<ReservationsApiConfiguration>>();
             _configOptions.Setup(x => x.Value.Url).Returns("test/test");
             _validator = new Mock<IValidator<GetAccountReservationStatusQuery>>();
-            _handler = new GetAccountReservationStatusQueryHandler(_apiClient.Object,_validator.Object,_configOptions.Object);
+            _handler = new GetAccountReservationStatusQueryHandler(_apiClient.Object, _validator.Object,
+                _configOptions.Object);
         }
 
         [Test]
@@ -48,16 +45,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             _apiClient
                 .Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
                 .ReturnsAsync(apiResponse);
-            var query = new GetAccountReservationStatusQuery() {AccountId = 123456};
+            var query = new GetAccountReservationStatusQuery {AccountId = 123456};
             _validator
                 .Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationStatusQuery>()))
-                .ReturnsAsync(new ValidationResult(){ValidationDictionary = new Dictionary<string, string>()});
+                .ReturnsAsync(new ValidationResult() {ValidationDictionary = new Dictionary<string, string>()});
 
             //Act
-            var result = await _handler.Handle(query,CancellationToken.None);
+            var result = await _handler.Handle(query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(apiResponse.CanAutoCreateReservations,result.CanAutoCreateReservations);
+            Assert.AreEqual(apiResponse.CanAutoCreateReservations, result.CanAutoCreateReservations);
         }
 
         [Test]
@@ -67,17 +64,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             _apiClient
                 .Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
                 .ReturnsAsync(new AccountReservationStatusResponse());
-            var query = new GetAccountReservationStatusQuery() { AccountId = default(long) };
+            var query = new GetAccountReservationStatusQuery {AccountId = default(long)};
             _validator
                 .Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationStatusQuery>()))
-                .ReturnsAsync(new ValidationResult() { ValidationDictionary = new Dictionary<string, string>()
+                .ReturnsAsync(new ValidationResult
                 {
-                    {"test","test132" }
-                } });
+                    ValidationDictionary = new Dictionary<string, string>()
+                    {
+                        {"test", "test132"}
+                    }
+                });
 
             //Act + Assert
             Assert.ThrowsAsync<ValidationException>(() =>
-            
                 _handler.Handle(query, CancellationToken.None)
             );
         }

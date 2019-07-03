@@ -72,7 +72,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             mockApiClient.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
                 request => request.Id == id &&
                            request.AccountId == accountId &&
-                           request.AccountLegalEntityId == accountLegalEntityId)));
+                           request.AccountLegalEntityId == accountLegalEntityId 
+                           && request.IsLevyAccount)));
         }
 
 
