@@ -619,7 +619,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                return View("ReservationLimitReached");
+                var backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                {
+                    Id = routeModel.UkPrn.Value.ToString(),
+                    Controller = $"apprentices/{viewModel.CohortReference}",
+                    Action = "details"
+                });
+                return View("ReservationLimitReached", backUrl);
             }
             catch (Exception e)
             {
@@ -682,7 +688,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                return View("ReservationLimitReached");
+                var backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                {
+                    Id = routeModel.UkPrn.Value.ToString(),
+                    Controller = $"apprentices/{viewModel.CohortReference}",
+                    Action = "details"
+                });
+
+                return View("ReservationLimitReached", backUrl);
             }
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
