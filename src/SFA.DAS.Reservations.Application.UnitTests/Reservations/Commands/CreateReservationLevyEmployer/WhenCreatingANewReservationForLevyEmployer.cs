@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -50,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             service.Setup(x =>
                     x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId))
-                .ReturnsAsync(new CreateReservationResponse(){Id = id});
+                .ReturnsAsync(new CreateReservationResponse {Id = id});
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
