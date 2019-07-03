@@ -9,4 +9,8 @@
     <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Employers\Api\" />
+  </ItemGroup>
+
 </Project>
