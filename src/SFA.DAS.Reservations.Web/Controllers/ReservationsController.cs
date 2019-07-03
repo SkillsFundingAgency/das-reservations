@@ -226,6 +226,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
+                routeModel.CohortRef = result.CohortRef;
             }
             catch (ValidationException ex)
             {
@@ -270,7 +271,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CourseDescription = queryResult.Course.CourseDescription,
                 StartDate = queryResult.StartDate,
                 CourseId = queryResult.Course?.Id,
-                UkPrn = queryResult.UkPrn.GetValueOrDefault()
+                UkPrn = queryResult.UkPrn.GetValueOrDefault(),
+                CohortRef = routeModel.CohortRef
             };
 
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
@@ -309,7 +311,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
-                    var addApprenticeUrl = GenerateAddApprenticeUrl(routeModel.Id.Value,routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,model.StartDate);
+                    var addApprenticeUrl = GenerateAddApprenticeUrl(routeModel.Id.Value,routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,model.StartDate, model.CohortRef);
 
                     return Redirect(addApprenticeUrl);
 
