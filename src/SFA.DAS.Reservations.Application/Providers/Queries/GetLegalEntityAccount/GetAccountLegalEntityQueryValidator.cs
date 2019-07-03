@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccou
 
             if (string.IsNullOrEmpty(query.AccountLegalEntityPublicHashedId))
             {
-                validationResult.AddError(nameof(query.AccountLegalEntityPublicHashedId), $"{nameof(query.AccountLegalEntityPublicHashedId)} has not been supplied");
+                validationResult.AddError(nameof(query.AccountLegalEntityPublicHashedId));
             }
 
             return Task.FromResult(validationResult);

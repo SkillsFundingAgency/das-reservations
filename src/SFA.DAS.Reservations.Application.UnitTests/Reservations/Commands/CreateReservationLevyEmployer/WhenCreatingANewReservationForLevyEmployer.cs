@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
         [Test, MoqAutoData]
         public async Task ThenCallsReservationServiceToCreateReservation(
-            [Frozen]CreateReservationLevyEmployerCommand request,
+            CreateReservationLevyEmployerCommand request,
             Guid id,
             [Frozen] Mock<IValidator<CreateReservationLevyEmployerCommand>> validator,
             [Frozen] Mock<IReservationService> service,
