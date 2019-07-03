@@ -699,16 +699,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var controller = "unapproved";
+            var action = "add-apprentice";
             if (!string.IsNullOrEmpty(cohortRef))
             {
                 controller += $"/{cohortRef}";
+                action = "apprentices/add";
             }
 
             var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
             {
                 Id = ukPrn.ToString(),
                 Controller = controller,
-                Action = "add-apprentice",
+                Action = action,
                 QueryString = queryString
             });
             return addApprenticeUrl;

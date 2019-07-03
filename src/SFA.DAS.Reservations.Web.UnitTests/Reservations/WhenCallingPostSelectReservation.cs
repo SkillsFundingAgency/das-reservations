@@ -109,7 +109,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.Is<UrlParameters>(parameters => 
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "add-apprentice" &&
+                        parameters.Action == "apprentices/add" &&
                         parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}" +
                         $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
                         $"&startMonthYear={reservationResult.StartDate:MMyyyy}" +
