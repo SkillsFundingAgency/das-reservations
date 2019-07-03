@@ -13,6 +13,7 @@ using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -84,28 +85,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             //Act
             var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
-
+                
             //Assert
             result.ViewName.Should().Be("ReservationLimitReached");
         }
 
 
         [Test, MoqAutoData]
-        public async Task And_Has_Ukprn_And_ReservationId_Then_Redirects_To_AddApprentice(
+        public async Task And_Has_Ukprn_And_ReservationId_Then_Redirects_To_AddApprentice_With_Reservation_Details(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
+            GetReservationResult reservationResult,
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationResult);
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters => 
-                        parameters.Folder == routeModel.UkPrn.ToString() &&
-                        parameters.Id == "unapproved" &&
-                        parameters.Controller == viewModel.CohortReference &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}")))
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
+                        parameters.Action == "add-apprentice" &&
+                        parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}" +
+                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
+                        $"&startMonthYear={reservationResult.StartDate:MMyyyy}" +
+                        $"&courseCode={reservationResult.Course.Id}")))
                 .Returns(addApprenticeUrl);
             
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
