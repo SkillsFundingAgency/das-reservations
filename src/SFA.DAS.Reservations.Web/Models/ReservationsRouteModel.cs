@@ -11,5 +11,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public Guid? Id { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public bool? FromReview { get; set; }
+        [FromQuery]
+        public string CohortRef { get; set; }
     }
 }
