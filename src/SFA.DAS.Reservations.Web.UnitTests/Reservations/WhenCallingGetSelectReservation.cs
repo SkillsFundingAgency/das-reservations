@@ -413,7 +413,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationLevyResult);
 
-            viewModel.CreateNew = null;
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters =>
