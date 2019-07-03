@@ -6,5 +6,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         public Guid Id { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
+        public string CohortRef { get; set; }
     }
 }

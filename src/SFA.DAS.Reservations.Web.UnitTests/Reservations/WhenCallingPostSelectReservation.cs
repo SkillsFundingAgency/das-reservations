@@ -64,10 +64,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_Reservation_Limit_Has_Been_Reached_Then_ReservationLimit_Reached_View_Is_Shown(
+        public async Task And_Reservation_Limit_Has_Been_Reached_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
+                string cohortDetailsUrl,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
                 ReservationsController controller)
         {
@@ -82,12 +84,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(employersResponse);
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
+            mockUrlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details" )))
+                .Returns(cohortDetailsUrl);
 
             //Act
             var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
                 
             //Assert
             result.ViewName.Should().Be("ReservationLimitReached");
+            result.Model.Should().Be(cohortDetailsUrl);
         }
 
 
@@ -109,7 +119,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.Is<UrlParameters>(parameters => 
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "add-apprentice" &&
+                        parameters.Action == "apprentices/add" &&
                         parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}" +
                         $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
                         $"&startMonthYear={reservationResult.StartDate:MMyyyy}" +

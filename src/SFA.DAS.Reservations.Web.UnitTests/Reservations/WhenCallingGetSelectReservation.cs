@@ -537,23 +537,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task Then_If_The_Reservation_Limit_Has_Been_Reached_The_Reservation_Limit_View_Is_Returned(
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
-                GetLegalEntitiesResponse employersResponse,
+                GetTrustedEmployersResponse employersResponse,
                 GetAvailableReservationsResult reservationsResult,
                 [Frozen] Mock<IMediator> mockMediator,
                 long expectedAccountId,
                 long expectedAccountLegalEntityId,
+                string cohortDetailsUrl,
                 [Frozen] Mock<IEncodingService> encodingService,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 ReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
-            routeModel.UkPrn = null;
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
-            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<GetTrustedEmployersQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(employersResponse);
             mockMediator
@@ -563,12 +564,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(new GetAvailableReservationsResult {Reservations = new List<Reservation>()});
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(expectedAccountId));
+            mockUrlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
 
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
 
             //Assert
+            Assert.IsNotNull(result);
             result.ViewName.Should().Be("ReservationLimitReached");
+            result.Model.Should().Be(cohortDetailsUrl);
         }
     }
 }
