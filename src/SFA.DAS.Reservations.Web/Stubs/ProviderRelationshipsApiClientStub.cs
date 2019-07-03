@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Types.Dtos;
 
@@ -8,6 +9,13 @@ namespace SFA.DAS.Reservations.Web.Stubs
 {
     public class ProviderRelationshipsApiClientStub : IProviderRelationshipsApiClient
     {
+        private readonly IEncodingService _encodingService;
+
+        public ProviderRelationshipsApiClientStub(IEncodingService encodingService)
+        {
+            _encodingService = encodingService;
+        }
+
         public Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetAccountProviderLegalEntitiesWithPermission(
             GetAccountProviderLegalEntitiesWithPermissionRequest withPermissionRequest,
             CancellationToken cancellationToken = new CancellationToken())
@@ -19,30 +27,30 @@ namespace SFA.DAS.Reservations.Web.Stubs
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "LDMVWV",
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
                         AccountName = "Account 1",
                         AccountLegalEntityId = 11,
-                        AccountLegalEntityPublicHashedId = "DJWWDJ",//123
+                        AccountLegalEntityPublicHashedId =_encodingService.Encode(123, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 1",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "LDMVWV",
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
                         AccountName = "Account 1",
                         AccountLegalEntityId = 22,
-                        AccountLegalEntityPublicHashedId = "JBPN4J",//456
+                        AccountLegalEntityPublicHashedId = _encodingService.Encode(456, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 2",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = "LDMVWV",
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
                         AccountName = "Account 1",
                         AccountLegalEntityId = 33,
-                        AccountLegalEntityPublicHashedId = "JKW37J",//789
+                        AccountLegalEntityPublicHashedId = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 3",
                         AccountProviderId = withPermissionRequest.Ukprn
                     }

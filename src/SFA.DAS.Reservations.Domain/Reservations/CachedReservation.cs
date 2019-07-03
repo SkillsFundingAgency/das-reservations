@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public string CourseDescription { get; set; }
         public uint UkPrn { get; set; }
         public string AccountName { get; set; }
+        public string CohortRef { get; set; }
     }
 }

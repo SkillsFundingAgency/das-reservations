@@ -2,6 +2,12 @@
 @model SelectReservationViewModel
 @{
     ViewData["Title"] = "Reservations";
+
+    var firstReservationId = Model.AvailableReservations.FirstOrDefault()?.ReservationId;
+
+    var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
+
+    ViewData["CustomErrorKeys"] = customErrorKeys;
 }
 
 <a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
@@ -16,6 +22,8 @@
 
             <form method="post" asp-route="@RouteNames.ProviderDelete">
                 <input type="hidden" id="CohortReference" name="CohortReference" value="@Model.CohortReference"/>
+                <input type="hidden" id="AccountId" name="AccountId" value="@Model.AccountId"/>
+                <input type="hidden" id="TransferSenderId" name="TransferSenderId" value="@Model.TransferSenderId"/>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
@@ -28,27 +36,31 @@
                                 <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["SelectedReservationId"].Errors.First().ErrorMessage
                             </span>
                         }
-                        <div class="govuk-radios">
-                            @foreach (var availableReservation in Model.AvailableReservations)
-                            {
+                            <div class="govuk-radios">
+                                @foreach (var availableReservation in Model.AvailableReservations)
+                                {
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="SelectedReservationId-@availableReservation.ReservationId" name="SelectedReservationId" type="radio" value="@availableReservation.ReservationId">
+                                        <label class="govuk-label govuk-radios__label govuk-label--s" for="SelectedReservationId-@availableReservation.ReservationId">
+                                            @availableReservation.CourseDescription starting between @availableReservation.TrainingDateDescription
+                                        </label>
+                                        <span class="govuk-hint govuk-radios__hint">
+                                            Created in @availableReservation.CreatedDateDescription
+                                        </span>
+                                    </div>
+
+                                }
+                                
+                                <div class="govuk-radios__divider">or</div>
+                                
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="SelectedReservationId-@availableReservation.ReservationId" name="SelectedReservationId" type="radio" value="@availableReservation.ReservationId">
-                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="SelectedReservationId-@availableReservation.ReservationId">
-                                        @availableReservation.CourseDescription starting between @availableReservation.TrainingDateDescription
+                                    <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0","9")">
+                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
+                                        Create a new reservation
                                     </label>
-                                    <span class="govuk-hint govuk-radios__hint">
-                                        Created in @availableReservation.CreatedDateDescription
-                                    </span>
                                 </div>
-                            }
-                            <div class="govuk-radios__divider">or</div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="CreateNew" name="CreateNew" type="radio" value="true">
-                                <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
-                                    Create a new reservation
-                                </label> 
+
                             </div>
-                        </div>
                     </fieldset>
                 </div>
 

@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public Guid? SelectedReservationId { get; set; }
         public bool? CreateNew { get; set; }
         public IEnumerable<AvailableReservationViewModel> AvailableReservations { get; set; }
+        public long AccountId { get; set; }
     }
 }
