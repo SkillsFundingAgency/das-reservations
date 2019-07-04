@@ -558,7 +558,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(expectedAccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateAddApprenticeUrl(
+                .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&

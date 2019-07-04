@@ -12,7 +12,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -85,7 +84,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateAddApprenticeUrl(
+                .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&

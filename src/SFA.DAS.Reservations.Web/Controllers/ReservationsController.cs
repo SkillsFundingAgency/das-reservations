@@ -655,7 +655,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                var backUrl = _urlHelper.GenerateUrl(new UrlParameters
                 {
                     Id = routeModel.UkPrn.Value.ToString(),
                     Controller = $"apprentices/{viewModel.CohortReference}",
@@ -725,7 +725,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                var backUrl = _urlHelper.GenerateUrl(new UrlParameters
                 {
                     Id = routeModel.UkPrn.Value.ToString(),
                     Controller = $"apprentices/{viewModel.CohortReference}",
