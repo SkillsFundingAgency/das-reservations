@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Routing
-@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
 
 @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
 {
@@ -31,7 +30,7 @@
                         else
                         {
                             <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage funding</a>
-                    }
+                        }
                     </li>
                 </ul>
             </div>
