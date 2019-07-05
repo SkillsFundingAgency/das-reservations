@@ -648,6 +648,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogWarning(e, "Validation error trying to render select reservation.");
                 return RedirectToRoute(RouteNames.Error500);
             }
+            catch (ProviderNotAuthorisedException e)
+            {
+                _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
+                return View("NoPermissions");
+            }
             catch (ReservationLimitReachedException)
             {
                 var backUrl = _urlHelper.GenerateUrl(new UrlParameters
@@ -728,6 +733,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 });
 
                 return View("ReservationLimitReached", backUrl);
+            }
+            catch (ProviderNotAuthorisedException e)
+            {
+                _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
+                return View("NoPermissions");
             }
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
