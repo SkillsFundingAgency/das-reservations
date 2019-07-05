@@ -50,8 +50,8 @@
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
 
                 <input id="accountLegalEntityPublicHashedId" name="accountLegalEntityPublicHashedId" type="hidden" value="@Model.AccountLegalEntityPublicHashedId" />
-                <input id="cohortRef" name="cohortRef" type="hidden" value="@Model.CohortRef" />
-                <input id="fromReview" name="fromReview" type="hidden" value="@Model.FromReview" />
+                <input id="cohortRef" name="CohortRef" type="hidden" value="@Model.CohortRef" />
+                <input id="fromReview" name="FromReview" type="hidden" value="@(Model.FromReview.HasValue ? Model.FromReview.Value.ToString() : "false")" />
 
                 @if (Model.IsProvider)
                 {

@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedReservation?.AccountLegalEntityPublicHashedId, 
                 cachedReservation?.CourseId, 
                 cachedReservation?.TrainingDate, 
-                routeModel.FromReview,
+                routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
                 routeModel.UkPrn);
 

@@ -10,6 +10,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string SelectedCourseId { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string CohortRef { get; set; }
-        public bool FromReview { get; set; }
+        public bool? FromReview { get; set; }
     }
 }
