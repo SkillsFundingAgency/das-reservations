@@ -604,14 +604,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                                 EncodingType.PublicAccountLegalEntityId)
                         });
 
-                        var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
-                        {
-                            Folder = routeModel.UkPrn.ToString(),
-                            Id = "unapproved",
-                            Controller = viewModel.CohortReference,
-                            Action = "apprentices/add",
-                            QueryString = $"?reservationId={createdReservation.ReservationId}"
-                        });
+                        var addApprenticeUrl = GenerateAddApprenticeUrl(createdReservation.ReservationId,
+                            routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value, null, viewModel.CohortReference);
+                        
                         return Redirect(addApprenticeUrl);
                     }
                 }
@@ -741,10 +736,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         }
 
-        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime startDate, string cohortRef = "")
+        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef = "")
         {
             var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
+                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+
+            if (startDate.HasValue)
+            {
+                queryString += $"&startMonthYear={startDate:MMyyyy}";
+            }
+
             if (!string.IsNullOrWhiteSpace(courseId))
             {
                 queryString += $"&courseCode={courseId}";

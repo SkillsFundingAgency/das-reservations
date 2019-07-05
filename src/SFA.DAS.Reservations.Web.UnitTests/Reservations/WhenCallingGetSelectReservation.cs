@@ -416,14 +416,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters =>
-                        parameters.Folder == routeModel.UkPrn.ToString() &&
-                        parameters.Id == "unapproved" &&
-                        parameters.Controller == viewModel.CohortReference &&
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
                         parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}")))
+                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}" +
+                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" 
+                        )))
                 .Returns(addApprenticeUrl);
 
+            //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectResult;
+
+            //Assert
             Assert.IsNotNull(result);
             result?.Url.Should().Be(addApprenticeUrl);
         }
