@@ -677,6 +677,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+
             if (viewModel.SelectedReservationId == Guid.Empty)
             {
                 var availableReservationsResult = await _mediator.Send(
@@ -686,6 +687,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     .Select(reservation => new AvailableReservationViewModel(reservation));
 
                 ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select an option");
+
+                viewModel.BackLink = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Id = routeModel.UkPrn.Value.ToString(),
+                    Controller = $"apprentices/{viewModel.CohortReference}",
+                    Action = "details"
+                });
 
                 return View("ProviderSelect", viewModel);
             }
