@@ -563,14 +563,23 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+            var backUrl = string.Empty;
+
             try
-            {
+            {   
                 var viewName = ViewNames.EmployerSelect;
                 var apprenticeshipTrainingRouteName = RouteNames.EmployerApprenticeshipTraining;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
 
                 if (routeModel.UkPrn.HasValue)
                 {
+                    backUrl = _urlHelper.GenerateUrl(new UrlParameters
+                    {
+                        Id = routeModel.UkPrn.Value.ToString(),
+                        Controller = $"apprentices/{viewModel.CohortReference}",
+                        Action = "details"
+                    });
+
                     try
                     {
                         cacheReservationEmployerCommand = await BuildProviderReservationCacheCommand(
@@ -651,16 +660,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ProviderNotAuthorisedException e)
             {
                 _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
-                return View("NoPermissions");
+                return View("NoPermissions", backUrl);
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.UkPrn.Value.ToString(),
-                    Controller = $"apprentices/{viewModel.CohortReference}",
-                    Action = "details"
-                });
                 return View("ReservationLimitReached", backUrl);
             }
             catch (Exception e)
@@ -678,6 +681,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+            var backUrl = string.Empty;
+
             if (viewModel.SelectedReservationId == Guid.Empty)
             {
                 var availableReservationsResult = await _mediator.Send(
@@ -709,6 +714,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             CacheReservationEmployerCommand cacheReservationEmployerCommand;
             if (routeModel.UkPrn.HasValue)
             {
+                backUrl = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Id = routeModel.UkPrn.Value.ToString(),
+                    Controller = $"apprentices/{viewModel.CohortReference}",
+                    Action = "details"
+                });
+
                 cacheReservationEmployerCommand = await BuildProviderReservationCacheCommand(routeModel.UkPrn.Value,
                     routeModel.AccountLegalEntityPublicHashedId, viewModel.CohortReference);
             }
@@ -725,19 +737,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.UkPrn.Value.ToString(),
-                    Controller = $"apprentices/{viewModel.CohortReference}",
-                    Action = "details"
-                });
-
                 return View("ReservationLimitReached", backUrl);
             }
             catch (ProviderNotAuthorisedException e)
             {
                 _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
-                return View("NoPermissions");
+                return View("NoPermissions", backUrl);
             }
 
             routeModel.Id = cacheReservationEmployerCommand.Id;

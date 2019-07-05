@@ -577,5 +577,53 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be("ReservationLimitReached");
             result.Model.Should().Be(cohortDetailsUrl);
         }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Provider_Has_No_Create_Permission_The_NoPermissions_View_Is_Returned(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetTrustedEmployersResponse employersResponse,
+                GetAvailableReservationsResult reservationsResult,
+                [Frozen] Mock<IMediator> mockMediator,
+                long expectedAccountId,
+                long expectedAccountLegalEntityId,
+                string cohortDetailsUrl,
+                [Frozen] Mock<IEncodingService> encodingService,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                ReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ProviderNotAuthorisedException(expectedAccountId, routeModel.UkPrn.Value));
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            result.ViewName.Should().Be("NoPermissions");
+            result.Model.Should().Be(cohortDetailsUrl);
+        }
     }
 }

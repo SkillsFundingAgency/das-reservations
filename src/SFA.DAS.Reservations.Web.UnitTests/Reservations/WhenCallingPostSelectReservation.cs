@@ -99,6 +99,42 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Model.Should().Be(cohortDetailsUrl);
         }
 
+        [Test, MoqAutoData]
+        public async Task And_Provider_Has_No_Create_Permission_Then_NoPermissions_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetTrustedEmployersResponse employersResponse,
+                string cohortDetailsUrl,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                [Frozen] Mock<IMediator> mockMediator,
+                ReservationsController controller)
+        {
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId,routeModel.UkPrn.Value));
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be("NoPermissions");
+            result.Model.Should().Be(cohortDetailsUrl);
+        }
 
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_ReservationId_Then_Redirects_To_AddApprentice_With_Reservation_Details(
