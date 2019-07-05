@@ -263,6 +263,57 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, AutoData]
+        public async Task Then_If_There_Is_An_Error_The_Model_Is_Correctly_Built_And_Returned_To_The_View(
+            string cohortDetailsUrl,
+            ReservationsRouteModel routeModel,
+            TrainingDateModel trainingDateModel,
+            ApprenticeshipTrainingFormModel formModel)
+        {
+            formModel.FromReview = false;
+            _urlHelper.Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{formModel.CohortRef}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+            formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            _controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
+
+            var actualViewResult = result as ViewResult;
+            Assert.IsNotNull(actualViewResult);
+            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
+            var actualModel = actualViewResult.Model as ApprenticeshipTrainingViewModel;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual(cohortDetailsUrl, actualModel.BackLink);
+        }
+
+
+        [Test, AutoData]
+        public async Task Then_If_There_Is_An_Error_The_Model_Is_Correctly_Built_And_Returned_To_The_View_And_The_Back_Link_Is_Correct(
+            string cohortDetailsUrl,
+            ReservationsRouteModel routeModel,
+            TrainingDateModel trainingDateModel,
+            ApprenticeshipTrainingFormModel formModel)
+        {
+            formModel.FromReview = true;
+            formModel.CohortRef = string.Empty;
+            formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            _controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
+
+            var actualViewResult = result as ViewResult;
+            Assert.IsNotNull(actualViewResult);
+            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
+            var actualModel = actualViewResult.Model as ApprenticeshipTrainingViewModel;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual(RouteNames.ProviderReview, actualModel.BackLink);
+        }
+
+
+        [Test, AutoData]
         public async Task And_CachedReservationNotFoundException_And_Has_Ukprn_Then_Redirect_To_ProviderIndex(
             ReservationsRouteModel routeModel,
             TrainingDateModel trainingDateModel,

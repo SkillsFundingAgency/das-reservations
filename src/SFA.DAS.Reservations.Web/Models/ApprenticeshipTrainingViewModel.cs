@@ -9,5 +9,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool IsProvider { get; set; }
         public string BackLink { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
+        public string CohortRef { get; set; }
+        public bool? FromReview { get; set; }
     }
 }

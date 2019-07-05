@@ -5,16 +5,16 @@
 
     var firstStartDate = Model.PossibleStartDates.FirstOrDefault()?.Id;
 
-    var customErrorKeys = new Dictionary<string, string> {{"StartDate", $"StartDate-{firstStartDate}"}};
+    var customErrorKeys = new Dictionary<string, string> { { "StartDate", $"StartDate-{firstStartDate}" } };
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
 
-    var courseInvalid = !ViewData.ModelState.IsValid && 
+    var courseInvalid = !ViewData.ModelState.IsValid &&
                         ViewData.ModelState.ContainsKey("CourseId") &&
                         ViewData.ModelState["CourseId"].Errors != null &&
                         ViewData.ModelState["CourseId"].Errors.Any();
 
-    var startDateInvalid = !ViewData.ModelState.IsValid 
+    var startDateInvalid = !ViewData.ModelState.IsValid
                            && ViewData.ModelState.ContainsKey("StartDate") &&
                            ViewData.ModelState["StartDate"].Errors != null &&
                            ViewData.ModelState["StartDate"].Errors.Any();
@@ -22,96 +22,107 @@
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
 {
-    <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+    if (string.IsNullOrEmpty(Model.CohortRef))
+    {
+        <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+    }
+    else
+    {
+        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+    }
 }
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            
-        <partial name="_PageErrorsOverview"/>
 
-        @if (Model.IsProvider)
-        {
-            <h1 class="govuk-heading-xl">Apprenticeship training</h1>
-        }
-        else
-        {
-            <h1 class="govuk-heading-xl">When will the apprentice start their apprenticeship training?</h1>
-        }
+            <partial name="_PageErrorsOverview" />
 
-        <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
-            <input id="accountLegalEntityPublicHashedId" name="accountLegalEntityPublicHashedId" type="hidden" value="@Model.AccountLegalEntityPublicHashedId"/>
             @if (Model.IsProvider)
             {
-                <div class="govuk-form-group @(courseInvalid ? "govuk-form-group--error" : "")">
-                    <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take?</h2>
-
-                    @if (courseInvalid)
-                    {
-                        <span id="Course" class="govuk-error-message">
-                           Select a course from the list.
-                        </span>
-                    }
-
-                    <label class="govuk-label" for="course-search">
-                        Search for a course
-                    </label>
-                    <partial name="_CourseSearch" />
-                    <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
-                        This information can be changed later.
-                    </span>
-                </div>
+                <h1 class="govuk-heading-xl">Apprenticeship training</h1>
             }
-            <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
-                <fieldset class="govuk-fieldset">
-                    @if (Model.IsProvider)
-                    {
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                            <h2 class="govuk-fieldset__heading">
-                                When will the apprenticeship training start?
-                            </h2>
-                        </legend>
-                        <span id="choose-start-date-hint" class="govuk-hint">
-                            The apprenticeship training can start anytime in the month you choose or the following 2 months. 
-                        </span>
-                    }
-                    else
-                    {
-                        <span id="choose-start-date-hint" class="govuk-hint">
-                            The apprentice can start their apprenticeship training anytime in the month you choose, or the following 2 months.
-                        </span>
-                    }
-                    
-                    @if (startDateInvalid)
-                    {
-                        var startDateModelState = @ViewData.ModelState["StartDate"];
+            else
+            {
+                <h1 class="govuk-heading-xl">When will the apprentice start their apprenticeship training?</h1>
+            }
 
-                        if (startDateModelState.Errors != null && startDateModelState.Errors.Any())
+            <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
+
+                <input id="accountLegalEntityPublicHashedId" name="accountLegalEntityPublicHashedId" type="hidden" value="@Model.AccountLegalEntityPublicHashedId" />
+                <input id="cohortRef" name="cohortRef" type="hidden" value="@Model.CohortRef" />
+                <input id="fromReview" name="fromReview" type="hidden" value="@Model.FromReview" />
+
+                @if (Model.IsProvider)
+                {
+                    <div class="govuk-form-group @(courseInvalid ? "govuk-form-group--error" : "")">
+                        <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take?</h2>
+
+                        @if (courseInvalid)
                         {
-                            <span id="StartDate" class="govuk-error-message">
-                                @startDateModelState.Errors.First().ErrorMessage
+                            <span id="Course" class="govuk-error-message">
+                                Select a course from the list.
                             </span>
                         }
-                    }
 
-                    <div class="govuk-radios" data-validation-message="You must select a start date" data-validation-summary-message="Select a start date">
-                        @foreach (var possibleStartDate in Model.PossibleStartDates)
-                        {
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.SerializedModel" checked="@possibleStartDate.Checked" required>
-                                <label class="govuk-label govuk-radios__label" for="StartDate-@possibleStartDate.Id">
-                                    @possibleStartDate.StartDate.GetGDSLongDateString()
-                                </label>
-                            </div>
-                        }
+                        <label class="govuk-label" for="course-search">
+                            Search for a course
+                        </label>
+                        <partial name="_CourseSearch" />
+                        <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
+                            This information can be changed later.
+                        </span>
                     </div>
-                </fieldset>
-            </div>
-            <button type="submit" class="govuk-button">
-                Save and continue
-            </button>
-        </form>
+                }
+                <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
+                    <fieldset class="govuk-fieldset">
+                        @if (Model.IsProvider)
+                        {
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h2 class="govuk-fieldset__heading">
+                                    When will the apprenticeship training start?
+                                </h2>
+                            </legend>
+                            <span id="choose-start-date-hint" class="govuk-hint">
+                                The apprenticeship training can start anytime in the month you choose or the following 2 months.
+                            </span>
+                        }
+                        else
+                        {
+                            <span id="choose-start-date-hint" class="govuk-hint">
+                                The apprentice can start their apprenticeship training anytime in the month you choose, or the following 2 months.
+                            </span>
+                        }
+
+                        @if (startDateInvalid)
+                        {
+                            var startDateModelState = @ViewData.ModelState["StartDate"];
+
+                            if (startDateModelState.Errors != null && startDateModelState.Errors.Any())
+                            {
+                                <span id="StartDate" class="govuk-error-message">
+                                    @startDateModelState.Errors.First().ErrorMessage
+                                </span>
+                            }
+                        }
+
+                        <div class="govuk-radios" data-validation-message="You must select a start date" data-validation-summary-message="Select a start date">
+                            @foreach (var possibleStartDate in Model.PossibleStartDates)
+                            {
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.SerializedModel" checked="@possibleStartDate.Checked" required>
+                                    <label class="govuk-label govuk-radios__label" for="StartDate-@possibleStartDate.Id">
+                                        @possibleStartDate.StartDate.GetGDSLongDateString()
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+                <button type="submit" class="govuk-button">
+                    Save and continue
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 </main>
