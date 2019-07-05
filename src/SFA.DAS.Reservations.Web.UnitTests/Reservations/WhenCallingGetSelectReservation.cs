@@ -274,35 +274,46 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_Has_Reservations_Then_Shows_ProviderSelect_View(
+            string cohortDetailsUrl,
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
             GetAvailableReservationsResult reservationsResult,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            //Arrange
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(), 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(employersResponse);
-           
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetAvailableReservationsQuery>(), 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(reservationsResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
 
+            //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
 
+            //Assert
             result.ViewName.Should().Be(ViewNames.ProviderSelect);
             var actualModel = result.Model as SelectReservationViewModel;
             actualModel.Should().NotBeNull();
             actualModel.CohortReference.Should().Be(viewModel.CohortReference);
             actualModel.TransferSenderId.Should().Be(viewModel.TransferSenderId);
+            actualModel.BackLink.Should().Be(cohortDetailsUrl);
             actualModel.AvailableReservations.Should().BeEquivalentTo(
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));

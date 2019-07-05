@@ -563,6 +563,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+            var backUrl = string.Empty;
+
             try
             {
                 var viewName = ViewNames.EmployerSelect;
@@ -571,6 +573,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (routeModel.UkPrn.HasValue)
                 {
+                    backUrl = _urlHelper.GenerateUrl(new UrlParameters
+                    {
+                        Id = routeModel.UkPrn.Value.ToString(),
+                        Controller = $"apprentices/{viewModel.CohortReference}",
+                        Action = "details"
+                    });
+
                     try
                     {
                         cacheReservationEmployerCommand = await BuildProviderReservationCacheCommand(
@@ -632,7 +641,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     viewModel.AvailableReservations = availableReservationsResult.Reservations
                         .Select(reservation => new AvailableReservationViewModel(reservation));
                     viewModel.AccountId = cacheReservationEmployerCommand.AccountId;
-
+                    viewModel.BackLink = backUrl;
                     return View(viewName, viewModel);
                 }
 
@@ -650,12 +659,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.UkPrn.Value.ToString(),
-                    Controller = $"apprentices/{viewModel.CohortReference}",
-                    Action = "details"
-                });
+                
                 return View("ReservationLimitReached", backUrl);
             }
             catch (Exception e)
