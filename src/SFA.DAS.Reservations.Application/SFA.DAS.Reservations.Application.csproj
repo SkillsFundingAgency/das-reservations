@@ -20,4 +20,8 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Employers\Queries\GetTransferConnections\" />
+  </ItemGroup>
+
 </Project>
