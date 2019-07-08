@@ -59,6 +59,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            cachedReservationResult.CohortRef = string.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
@@ -101,6 +102,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            cachedReservationResult.CohortRef = string.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
@@ -119,6 +121,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
 
         [Test, MoqAutoData]
+        public async Task Then_It_Sets_The_Back_Link_Correctly_Coming_From_The_SelectReservation_Screen(
+            ReservationsRouteModel routeModel,
+            GetCoursesResult getCoursesResult,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            cachedReservationResult.CohortRef = "ABC123";
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getCoursesResult);
+            routeModel.FromReview = true;
+
+            var result = await controller.ApprenticeshipTraining(routeModel);
+
+            var viewModel = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
+                .Subject;
+            viewModel.BackLink.Should().BeEmpty();
+        }
+
+
+
+
+        [Test, MoqAutoData]
         public async Task And_Has_Previous_Reservation_Then_Loads_Existing_Reservation_To_ViewModel(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
@@ -130,22 +160,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 It.Is<GetCachedReservationQuery>(query => query.Id == routeModel.Id), 
                 It.IsAny<CancellationToken>()), 
                 Times.Once);
-        }
-
-        [Test, MoqAutoData]//todo: this scenario can't happen any longer.
-        public async Task And_No_Previous_Reservation_Then_Not_Load_Existing_Reservation(
-            ReservationsRouteModel routeModel,
-            [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
-        {
-            routeModel.Id = null;
-
-            await controller.ApprenticeshipTraining(routeModel);
-
-            mockMediator.Verify(mediator => mediator.Send(
-                It.IsAny<GetCachedReservationQuery>(), 
-                It.IsAny<CancellationToken>()), 
-                Times.Never);
         }
 
         [Test, MoqAutoData]

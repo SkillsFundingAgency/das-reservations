@@ -97,7 +97,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             viewModel.Manage = false;
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(routeModel.EmployerAccountId, "teams", null, "accounts", "accounts", null))
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters => 
+                        parameters.Id == routeModel.EmployerAccountId &&
+                        parameters.Controller == "teams" &&
+                        parameters.Folder == "accounts" &&
+                        parameters.SubDomain == "accounts")))
                 .Returns(expectedUrl);
             
             var result = controller.PostDeleteCompleted(routeModel, viewModel) as RedirectResult;

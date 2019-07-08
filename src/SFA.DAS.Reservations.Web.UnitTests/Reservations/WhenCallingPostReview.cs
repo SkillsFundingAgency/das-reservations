@@ -76,6 +76,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
             result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId")
                 .WhichValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
+            result.RouteValues.Should().ContainKey("cohortRef")
+                .WhichValue.Should().Be(createReservationResult.CohortRef);
         }
 
         [Test, MoqAutoData]

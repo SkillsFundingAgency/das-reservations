@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Delet
         }
 
         [Test, MoqAutoData]
-        public async Task And_Command_Not_Valid_Then_Throws_ValidationException(
+        public void And_Command_Not_Valid_Then_Throws_ValidationException(
             DeleteReservationCommand command,
             string propertyName,
             ValidationResult validationResult,

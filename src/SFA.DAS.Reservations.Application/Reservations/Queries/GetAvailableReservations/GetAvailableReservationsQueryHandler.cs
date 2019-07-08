@@ -1,25 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Reservations;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations
 {
-    public class GetReservationsQueryHandler : IRequestHandler<GetReservationsQuery, GetReservationsResult>
+    public class GetAvailableReservationsQueryHandler : IRequestHandler<GetAvailableReservationsQuery, GetAvailableReservationsResult>
     {
-        private readonly IValidator<GetReservationsQuery> _validator;
+        private readonly IValidator<GetAvailableReservationsQuery> _validator;
         private readonly IReservationService _reservationService;
 
-        public GetReservationsQueryHandler(IValidator<GetReservationsQuery> validator, IReservationService reservationService)
+        public GetAvailableReservationsQueryHandler(IValidator<GetAvailableReservationsQuery> validator, IReservationService reservationService)
         {
             _validator = validator;
             _reservationService = reservationService;
         }
 
-        public async Task<GetReservationsResult> Handle(GetReservationsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAvailableReservationsResult> Handle(GetAvailableReservationsQuery request, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(request);
 
@@ -31,9 +33,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations
 
             var reservations = await _reservationService.GetReservations(request.AccountId);
             
-            var result = new GetReservationsResult
+            var result = new GetAvailableReservationsResult
             {
                 Reservations = reservations
+                    .Where(reservation => reservation.Status == ReservationStatus.Pending)
             };
 
             return result;

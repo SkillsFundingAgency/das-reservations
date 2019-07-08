@@ -1,10 +1,18 @@
 ﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@model string
 
 @{
     ViewData["Title"] = "ReservationLimitReached";
 }
+@if (string.IsNullOrEmpty(Model))
+{
+    <a asp-route="@RouteNames.ProviderChooseEmployer" tabindex="2" class="govuk-back-link">Back</a>
+}
+else
+{
+    <a href="@Model" tabindex="2" class="govuk-back-link">Back</a>
+}
 
-<a asp-route="@RouteNames.ProviderChooseEmployer" tabindex="2" class="govuk-back-link">Back</a>
 <main class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

@@ -9,7 +9,7 @@ using SFA.DAS.Testing.AutoFixture;
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
     [TestFixture]
-    public class WhenCallingDeleteCompleted
+    public class WhenCallingGetDeleteCompleted
     {
         [Test, MoqAutoData]
         public void And_Has_Ukprn_Then_Returns_Provider_Delete_Completed_View(

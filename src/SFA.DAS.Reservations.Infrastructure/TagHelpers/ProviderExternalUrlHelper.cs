@@ -18,48 +18,49 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
-        public string GenerateUrl(string id="", string controller="", string action = "", string subDomain = "", string folder="", string queryString="")
+        public string GenerateUrl(UrlParameters urlParameters)
         {
-            var urlString = new StringBuilder();
-
             var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
                 ? _options.EmployerDashboardUrl
                 : _options.DashboardUrl;
 
-            urlString.Append(FormatBaseUrl(baseUrl, subDomain, folder));
+            return FormatUrl(baseUrl, urlParameters);
+        }
 
-            if (!string.IsNullOrEmpty(id))
+        public string GenerateAddApprenticeUrl(UrlParameters urlParameters)
+        {
+            var baseUrl = _options.ApprenticeUrl;
+
+            return FormatUrl(baseUrl, urlParameters);
+        }
+
+        private static string FormatUrl(string baseUrl, UrlParameters urlParameters)
+        {
+            var urlString = new StringBuilder();
+
+            urlString.Append(FormatBaseUrl(baseUrl, urlParameters.SubDomain, urlParameters.Folder));
+
+            if (!string.IsNullOrEmpty(urlParameters.Id))
             {
-                urlString.Append($"{id}/");
+                urlString.Append($"{urlParameters.Id}/");
             }
 
-            if (!string.IsNullOrEmpty(controller))
+            if (!string.IsNullOrEmpty(urlParameters.Controller))
             {
-                urlString.Append($"{controller}/");
+                urlString.Append($"{urlParameters.Controller}/");
             }
 
-            if (!string.IsNullOrEmpty(action))
+            if (!string.IsNullOrEmpty(urlParameters.Action))
             {
-                urlString.Append($"{action}/");
+                urlString.Append($"{urlParameters.Action}/");
             }
 
-            if (!string.IsNullOrEmpty(queryString))
+            if (!string.IsNullOrEmpty(urlParameters.QueryString))
             {
-                return $"{urlString.ToString().TrimEnd('/')}{queryString}";
+                return $"{urlString.ToString().TrimEnd('/')}{urlParameters.QueryString}";
             }
 
             return urlString.ToString().TrimEnd('/');
-        }
-
-        public string GenerateAddApprenticeUrl(uint? ukPrn, Guid reservationId, string accountLegalEntityPublicHashedId, DateTime startDate, string courseId)
-        {
-            var apprenticeUrl = $"{_options.ApprenticeUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                apprenticeUrl += $"&courseCode={courseId}";
-            }
-
-            return apprenticeUrl;
         }
 
         private static string FormatBaseUrl(string url, string subDomain = "", string folder = "")
