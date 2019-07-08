@@ -208,6 +208,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             result.Id.Should().Be(_apiResponse.Id);
             result.AccountLegalEntityPublicHashedId.Should()
                 .Be(_cachedReservation.AccountLegalEntityPublicHashedId);
+            result.CohortRef.Should().Be(_cachedReservation.CohortRef);
         }
     }
 }

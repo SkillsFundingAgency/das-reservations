@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="microsoft.extensions.options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
     <PackageReference Include="SFA.DAS.Encoding" Version="1.0.11" />
     <PackageReference Include="SFA.DAS.ProviderRelationships.Api.Client" Version="2.0.1" />
     <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />

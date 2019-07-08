@@ -48,7 +48,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 AccountLegalEntityPublicHashedId = command.AccountLegalEntityPublicHashedId,
                 AccountLegalEntityName = command.AccountLegalEntityName,
                 UkPrn = command.UkPrn,
-                AccountName = command.AccountName
+                AccountName = command.AccountName,
+                CohortRef = command.CohortRef
             };
 
             await _cacheStorageService.SaveToCache(reservation.Id.ToString(), reservation, 1);
