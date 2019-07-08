@@ -16,6 +16,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -287,26 +288,47 @@ namespace SFA.DAS.Reservations.Web.Controllers
             switch (model.WhatsNext)
             {
                 case CompletedReservationWhatsNext.RecruitAnApprentice:
-                    var recruitUrl = routeModel.UkPrn.HasValue ?
-                        _urlHelper.GenerateUrl(subDomain: "recruit", id: routeModel.UkPrn.ToString()) :
-                        _urlHelper.GenerateUrl(subDomain: "recruit", folder:"accounts",id: routeModel.EmployerAccountId);
+                    var recruitUrl = routeModel.UkPrn.HasValue
+                        ? _urlHelper.GenerateUrl(new UrlParameters {
+                            SubDomain = "recruit", 
+                            Id = routeModel.UkPrn.ToString()
+                        })
+                        : _urlHelper.GenerateUrl(new UrlParameters {
+                            SubDomain = "recruit", 
+                            Folder = "accounts",
+                            Id = routeModel.EmployerAccountId
+                        });
+                        
                     return Redirect(recruitUrl);
 
                 case CompletedReservationWhatsNext.FindApprenticeshipTraining:
                     return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
-                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
-                        model.UkPrn, 
-                        routeModel.Id.Value,
-                        routeModel.AccountLegalEntityPublicHashedId, 
-                        model.StartDate, model.CourseId);
+                    var queryString = $"?reservationId={routeModel.Id.Value}&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}&startMonthYear={model.StartDate:MMyyyy}";
+                    if (!string.IsNullOrWhiteSpace(model.CourseId))
+                    {
+                        queryString += $"&courseCode={model.CourseId}";
+                    }
+                    
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                    {
+                        Id = model.UkPrn.ToString(),
+                        Controller = "unapproved",
+                        Action = "add-apprentice",
+                        QueryString = queryString
+                    });
+
                     return Redirect(addApprenticeUrl);
 
                 default:
-                    var homeUrl = routeModel.UkPrn.HasValue ?
-                        _urlHelper.GenerateUrl(controller:"account") :
-                        _urlHelper.GenerateUrl(folder:"accounts", controller:"teams", id: routeModel.EmployerAccountId);
+                    var homeUrl = routeModel.UkPrn.HasValue
+                        ? _urlHelper.GenerateUrl(new UrlParameters {Controller = "account"})
+                        : _urlHelper.GenerateUrl(new UrlParameters {
+                            Folder = "accounts",
+                            Controller = "teams",
+                            Id = routeModel.EmployerAccountId
+                        });
                     return Redirect(homeUrl);
             }
         }
@@ -361,9 +383,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel
             {
                 Reservations = reservations,
-                BackLink = routeModel.UkPrn.HasValue ?
-                    _urlHelper.GenerateUrl(controller: "Account") :
-                    _urlHelper.GenerateUrl(controller: "teams", subDomain: "accounts", folder: "accounts",id: routeModel.EmployerAccountId)
+                BackLink = routeModel.UkPrn.HasValue
+                    ? _urlHelper.GenerateUrl(new UrlParameters{ Controller = "Account"})
+                    : _urlHelper.GenerateUrl( new UrlParameters {
+                        Controller = "teams", 
+                        SubDomain = "accounts", 
+                        Folder = "accounts", 
+                        Id = routeModel.EmployerAccountId
+                    })
             });
         }
         
@@ -510,7 +537,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
             var dashboardUrl = isProvider ? 
                 _configuration.DashboardUrl : 
-                _urlHelper.GenerateUrl(routeModel.EmployerAccountId, "teams", null, "accounts", "accounts", null);
+                _urlHelper.GenerateUrl(
+                    new UrlParameters
+                    {
+                        Id = routeModel.EmployerAccountId,
+                        Controller = "teams",
+                        Folder = "accounts",
+                        SubDomain = "accounts"
+                    });
             
             if (!ModelState.IsValid)
             {
@@ -523,6 +557,88 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             return Redirect(dashboardUrl);
+        }
+
+        [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
+        [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
+        public async Task<IActionResult> SelectReservation(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel)
+        {
+            try
+            {
+                var viewName = ViewNames.EmployerSelect;
+                var accountId = 0L;
+                if (routeModel.UkPrn.HasValue)
+                {
+                    var accounts = await _mediator.Send(
+                        new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+                    var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
+                        employer.AccountLegalEntityPublicHashedId ==
+                        routeModel.AccountLegalEntityPublicHashedId);
+
+                    if (matchedAccount == null)
+                    {
+                        _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
+                        return RedirectToRoute(RouteNames.Error500);
+                    }
+
+                    accountId = matchedAccount.AccountId;
+                    viewName = ViewNames.ProviderSelect;
+                }
+
+                //todo: check account reservation status here.
+
+                var availableReservationsResult = await _mediator.Send(
+                    new GetAvailableReservationsQuery {AccountId = accountId});
+
+                if (availableReservationsResult.Reservations != null &&
+                    availableReservationsResult.Reservations.Any())
+                {
+                    viewModel.AvailableReservations = availableReservationsResult.Reservations
+                        .Select(reservation => new AvailableReservationViewModel(reservation));
+                    
+                    return View(viewName, viewModel);
+                }
+
+                //todo: redirect to start reservation create and store cohort ref in redis
+                return null;
+            }
+            catch (ValidationException e)
+            {
+                _logger.LogWarning(e, "Validation error trying to render select reservation.");
+                return RedirectToRoute(RouteNames.Error500);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error trying to render select reservation.");
+                return RedirectToRoute(RouteNames.Error500);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
+        [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
+        public IActionResult PostSelectReservation(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel)
+        {
+            if (!viewModel.SelectedReservationId.HasValue && !viewModel.CreateNew.HasValue)
+            {
+                _logger.LogInformation($"Attempt made to view select reservation but viewModel not valid, SelectedReservation:[{viewModel.SelectedReservationId}], CreateNew:[{viewModel.CreateNew}].");
+                return RedirectToRoute(RouteNames.Error500);
+            }
+
+            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+            {
+                Folder = routeModel.UkPrn.ToString(),
+                Id = "unapproved",
+                Controller = viewModel.CohortReference,
+                Action = "apprentices/add",
+                QueryString = $"?reservationId={viewModel.SelectedReservationId}"
+            });
+            return Redirect(addApprenticeUrl);
         }
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(

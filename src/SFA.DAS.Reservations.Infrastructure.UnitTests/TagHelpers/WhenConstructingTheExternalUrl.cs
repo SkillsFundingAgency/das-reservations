@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 
@@ -32,7 +33,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var controller = "test-controller";
 
             //Act
-            var actual = _helper.GenerateUrl("123", controller, action);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Id = "123", 
+                Controller = controller, 
+                Action = action
+            });
 
             //Assert
             Assert.IsNotNull(actual);
@@ -48,7 +53,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var id = "ABC123";
 
             //Act
-            var actual = _helper.GenerateUrl(id, controller, action);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Id = id, 
+                Controller = controller, 
+                Action = action
+            });
 
             //Assert
             Assert.IsNotNull(actual);
@@ -63,7 +72,10 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var id = "ABC123";
 
             //Act
-            var actual = _helper.GenerateUrl(id, controller);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Id = id, 
+                Controller = controller
+            });
 
             //Assert
             Assert.IsNotNull(actual);
@@ -77,7 +89,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var controller = "test-controller";
 
             //Act
-            var actual = _helper.GenerateUrl("", controller);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Controller = controller
+            });
 
             //Assert
             Assert.IsNotNull(actual);
@@ -92,7 +106,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var subDomain = "testDomain";
 
             //Act
-            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Controller = controller, 
+                SubDomain = subDomain
+            });
+
             //Assert
             Assert.IsNotNull(actual);
             Assert.AreEqual($"https://{subDomain}.test.local/{controller}", actual);
@@ -113,7 +131,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             _helper = new ProviderExternalUrlHelper(_reservationsConfig.Object, _config.Object);
 
             //Act
-            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain, folder:folder);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Controller = controller, 
+                SubDomain = subDomain,
+                Folder = folder
+            });
 
             //Assert
             Assert.IsNotNull(actual);
@@ -129,7 +151,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var queryString = "?test=12345";
 
             //Act
-            var actual = _helper.GenerateUrl(controller: controller, subDomain: subDomain, queryString:queryString);
+            var actual = _helper.GenerateUrl(new UrlParameters{
+                Controller = controller, 
+                SubDomain = subDomain,
+                QueryString = queryString
+            });
+
             //Assert
             Assert.IsNotNull(actual);
             Assert.AreEqual($"https://{subDomain}.test.local/{controller}?test=12345", actual);
