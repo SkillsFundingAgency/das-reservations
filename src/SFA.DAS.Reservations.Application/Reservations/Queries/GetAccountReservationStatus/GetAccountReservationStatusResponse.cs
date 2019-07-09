@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
     public class GetAccountReservationStatusResponse
     {
         public bool CanAutoCreateReservations { get; set; }
+        public long TransferAccountId { get; set; }
     }
 }

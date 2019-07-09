@@ -63,6 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
 
             //Assert
             Assert.AreEqual(apiResponse.CanAutoCreateReservations, result.CanAutoCreateReservations);
+            Assert.AreEqual(0, result.TransferAccountId);
             _apiClient.Verify(x => x.GetAll<EmployerTransferConnection>(It.IsAny<GetEmployerTransferConnectionsRequest>()), Times.Never);
         }
 
@@ -90,6 +91,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
         public async Task Then_If_The_TransferSenderId_Is_Included_And_An_Allowed_Connection_And_The_Employer_Reservation_Status_Is_Not_AutoCreate_A_Can_Auto_Create_Reservation_Status_Is_Returned()
         {
             //Arrange
+            var expectedTransferAccountId = 10;
             var query = new GetAccountReservationStatusQuery { AccountId = 123456, HashedEmployerAccountId = "TGB32", TransferSenderAccountId = "423EDC" };
             var apiResponse = new AccountReservationStatusResponse
             {
@@ -102,7 +104,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
                     x.GetTransferConnections(query.HashedEmployerAccountId))
                 .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
                 {
-                    FundingEmployerAccountId = 1,
+                    FundingEmployerAccountId = expectedTransferAccountId,
                     FundingEmployerAccountName = "Test",
                     FundingEmployerHashedAccountId = "123EDC",
                     FundingEmployerPublicHashedAccountId = "423EDC"
@@ -112,6 +114,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             var result = await _handler.Handle(query, CancellationToken.None);
 
             //Assert
+            Assert.AreEqual(expectedTransferAccountId,result.TransferAccountId);
             Assert.IsTrue(result.CanAutoCreateReservations);
             _apiClient.Verify(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()), Times.Never);
         }

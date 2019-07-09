@@ -615,7 +615,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                             var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
                             {
                                 AccountId = cacheReservationEmployerCommand.AccountId,
-                                TransferSenderId = string.IsNullOrEmpty(viewModel.TransferSenderId) ? (long?)null : _encodingService.Decode(viewModel.TransferSenderId, EncodingType.PublicAccountId),
+                                TransferSenderId = autoReserveStatus.TransferAccountId == 0 ? (long?)null : autoReserveStatus.TransferAccountId,
                                 AccountLegalEntityId = _encodingService.Decode(
                                     cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                                     EncodingType.PublicAccountLegalEntityId)

@@ -49,11 +49,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
             {
                 var transferSenderResponse = await _accountsService.GetTransferConnections(request.HashedEmployerAccountId);
 
-                if (transferSenderResponse.ToList().Find(c =>
-                        c.FundingEmployerPublicHashedAccountId.Equals(request.TransferSenderAccountId,
-                            StringComparison.CurrentCultureIgnoreCase)) != null)
+                var employerTransferConnection = transferSenderResponse.ToList().Find(c =>
+                    c.FundingEmployerPublicHashedAccountId.Equals(request.TransferSenderAccountId,
+                        StringComparison.CurrentCultureIgnoreCase));
+                if (employerTransferConnection != null)
                 {
-                    return new GetAccountReservationStatusResponse{CanAutoCreateReservations = true};
+                    return new GetAccountReservationStatusResponse
+                    {
+                        CanAutoCreateReservations = true,
+                        TransferAccountId = employerTransferConnection.FundingEmployerAccountId
+
+                    };
                 }
 
                 throw new TransferSendNotAllowedException(request.AccountId, request.TransferSenderAccountId);

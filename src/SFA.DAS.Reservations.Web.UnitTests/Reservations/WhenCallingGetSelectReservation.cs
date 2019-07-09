@@ -468,7 +468,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             long expectedAccountId,
-            long? expectedTransferAccountId,
+            long expectedTransferAccountId,
             long expectedAccountLegalEntityId,
             string expectedAccountPublicHashedId,
             string expectedAccountLegalEntityPublicHashedId,
@@ -495,8 +495,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 }
             };
 
-            mockEncodingService.Setup(x => x.Decode(viewModel.TransferSenderId, EncodingType.PublicAccountId))
-                .Returns(expectedTransferAccountId.Value);
             mockEncodingService.Setup(x => x.Encode(expectedAccountId, EncodingType.AccountId))
                 .Returns(expectedAccountPublicHashedId);
             mockEncodingService.Setup(x => x.Decode(routeModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
@@ -512,7 +510,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     c.TransferSenderAccountId.Equals(viewModel.TransferSenderId)), CancellationToken.None))
                 .ReturnsAsync(new GetAccountReservationStatusResponse
                 {
-                    CanAutoCreateReservations = true
+                    CanAutoCreateReservations = true,
+                    TransferAccountId = expectedTransferAccountId
                 });
             mockMediator.Setup(x => x.Send(It.Is<CreateReservationLevyEmployerCommand>(c=>
                     c.AccountId.Equals(expectedAccountId) &&
@@ -547,7 +546,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             long expectedAccountId,
-            long? expectedTransferAccountId,
+            long expectedTransferAccountId,
             long expectedAccountLegalEntityId,
             string expectedAccountPublicHashedId,
             string expectedAccountLegalEntityPublicHashedId,
@@ -560,7 +559,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //Arrange
             viewModel.TransferSenderId = null;
-            expectedTransferAccountId = null;
             routeModel.AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId;
             var employersResponse = new GetTrustedEmployersResponse
             {
@@ -595,7 +593,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 });
             mockMediator.Setup(x => x.Send(It.Is<CreateReservationLevyEmployerCommand>(c =>
                     c.AccountId.Equals(expectedAccountId) &&
-                    c.TransferSenderId.Equals(expectedTransferAccountId) &&
+                    c.TransferSenderId.Equals(null) &&
                     c.AccountLegalEntityId.Equals(expectedAccountLegalEntityId)), CancellationToken.None))
                 .ReturnsAsync(createReservationLevyResult);
 
