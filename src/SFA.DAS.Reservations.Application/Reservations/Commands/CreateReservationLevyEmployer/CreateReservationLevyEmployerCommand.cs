@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
+        public long? TransferSenderId { get; set; }
     }
 }

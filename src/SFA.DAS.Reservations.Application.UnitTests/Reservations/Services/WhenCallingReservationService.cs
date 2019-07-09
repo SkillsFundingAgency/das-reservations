@@ -59,6 +59,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             DateTime startDate,
             long accountLegalEntityId,
             string accountLegalEntityName,
+            long? transferSenderAccountId,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
@@ -66,14 +67,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             mockApiClient.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(new CreateReservationResponse() { Id = id });
             //Act
-            await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId);
+            await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, transferSenderAccountId);
 
             //Assert
             mockApiClient.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
                 request => request.Id == id &&
                            request.AccountId == accountId &&
-                           request.AccountLegalEntityId == accountLegalEntityId 
-                           && request.IsLevyAccount)));
+                           request.AccountLegalEntityId == accountLegalEntityId && 
+                           request.TransferSenderAccountId == transferSenderAccountId && 
+                           request.IsLevyAccount)));
         }
 
 
@@ -89,7 +91,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             mockApiClient.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(new CreateReservationResponse() { Id = id });
             //Act
-            var result = await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId);
+            var result = await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, null);
 
             //Assert
             Assert.AreEqual(id, result.Id);
