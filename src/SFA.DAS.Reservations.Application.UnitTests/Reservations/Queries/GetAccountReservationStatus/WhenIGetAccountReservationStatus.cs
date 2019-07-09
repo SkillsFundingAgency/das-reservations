@@ -10,6 +10,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservatio
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -24,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
         private GetAccountReservationStatusQueryHandler _handler;
         private Mock<IValidator<GetAccountReservationStatusQuery>> _validator;
         private Mock<IOptions<ReservationsApiConfiguration>> _configOptions;
-        private Mock<IOptions<AccountApiConfiguration>> _employerConfigOptions;
+        private Mock<IEmployerAccountService> _employerAccountService;
 
 
         [SetUp]
@@ -34,13 +35,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             _configOptions = new Mock<IOptions<ReservationsApiConfiguration>>();
             _configOptions.Setup(x => x.Value.Url).Returns("test/test");
 
-            _employerConfigOptions = new Mock<IOptions<AccountApiConfiguration>>();
-            _employerConfigOptions.Setup(x => x.Value.ApiBaseUrl).Returns("/api/test");
+            _employerAccountService = new Mock<IEmployerAccountService>();
+
             _validator = new Mock<IValidator<GetAccountReservationStatusQuery>>();
             _validator
                 .Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationStatusQuery>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
-            _handler = new GetAccountReservationStatusQueryHandler(_apiClient.Object, _validator.Object,_configOptions.Object, _employerConfigOptions.Object);
+            _handler = new GetAccountReservationStatusQueryHandler(_apiClient.Object, _validator.Object,_configOptions.Object, _employerAccountService.Object);
         }
 
         [Test]
@@ -70,9 +71,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
         {
             //Arrange
             var query = new GetAccountReservationStatusQuery { AccountId = 123456, HashedEmployerAccountId = "TGB32", TransferSenderAccountId = "423EDC" };
-            _apiClient = new Mock<IApiClient>();
-            _apiClient.Setup(x =>
-                x.GetAll<EmployerTransferConnection>(It.Is<GetEmployerTransferConnectionsRequest>(c=>c.HashedAccountId.Equals(query.HashedEmployerAccountId))))
+            
+            _employerAccountService.Setup(x =>
+                x.GetTransferConnections(query.HashedEmployerAccountId))
                 .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
                 {
                     FundingEmployerAccountId = 1,
@@ -97,8 +98,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
             _apiClient
                 .Setup(x => x.Get<AccountReservationStatusResponse>(It.Is<AccountReservationStatusRequest>(c=>c.AccountId.Equals(query.AccountId))))
                 .ReturnsAsync(apiResponse);
-            _apiClient.Setup(x =>
-                    x.GetAll<EmployerTransferConnection>(It.Is<GetEmployerTransferConnectionsRequest>(c => c.HashedAccountId.Equals(query.HashedEmployerAccountId))))
+            _employerAccountService.Setup(x =>
+                    x.GetTransferConnections(query.HashedEmployerAccountId))
                 .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
                 {
                     FundingEmployerAccountId = 1,

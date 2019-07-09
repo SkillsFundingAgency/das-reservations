@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Validation;
-using SFA.DAS.Reservations.Domain.Employers;
-using SFA.DAS.Reservations.Domain.Employers.Api;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -22,17 +19,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
     {
         private readonly IApiClient _apiClient;
         private readonly IValidator<GetAccountReservationStatusQuery> _validator;
-        private readonly AccountApiConfiguration _accountApiConfiguration;
+        private readonly IEmployerAccountService _accountsService;
         private readonly ReservationsApiConfiguration _config;
 
 
         public GetAccountReservationStatusQueryHandler(IApiClient apiClient,
             IValidator<GetAccountReservationStatusQuery> validator,
-            IOptions<ReservationsApiConfiguration> configOptions, IOptions<AccountApiConfiguration> accountApiConfiguration)
+            IOptions<ReservationsApiConfiguration> configOptions, IEmployerAccountService accountsService)
         {
             _apiClient = apiClient;
             _validator = validator;
-            _accountApiConfiguration = accountApiConfiguration.Value;
+            _accountsService = accountsService;
             _config = configOptions.Value;
         }
 
@@ -50,8 +47,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
             if (!string.IsNullOrEmpty(request.TransferSenderAccountId) &&
                 !string.IsNullOrEmpty(request.HashedEmployerAccountId))
             {
-                var transferSenderResponse = await _apiClient.GetAll<EmployerTransferConnection>(
-                    new GetEmployerTransferConnectionsRequest(_accountApiConfiguration.ApiBaseUrl,request.HashedEmployerAccountId));
+                var transferSenderResponse = await _accountsService.GetTransferConnections(request.HashedEmployerAccountId);
 
                 if (transferSenderResponse.ToList().Find(c =>
                         c.FundingEmployerPublicHashedAccountId.Equals(request.TransferSenderAccountId,
