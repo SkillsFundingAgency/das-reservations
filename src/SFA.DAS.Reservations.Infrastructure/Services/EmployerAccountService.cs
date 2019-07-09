@@ -78,15 +78,24 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 
         public async Task<IEnumerable<EmployerTransferConnection>> GetTransferConnections(string accountId)
         {
-            var transferConnections = await _accountApiClient.GetTransferConnections(accountId);
-
-            return transferConnections.Select(acc => new EmployerTransferConnection
+            try
             {
-                FundingEmployerPublicHashedAccountId = acc.FundingEmployerPublicHashedAccountId,
-                FundingEmployerAccountName = acc.FundingEmployerAccountName,
-                FundingEmployerHashedAccountId = acc.FundingEmployerHashedAccountId,
-                FundingEmployerAccountId = acc.FundingEmployerAccountId
-            });
+                var transferConnections = await _accountApiClient.GetTransferConnections(accountId);
+                return transferConnections.Select(acc => new EmployerTransferConnection
+                {
+                    FundingEmployerPublicHashedAccountId = acc.FundingEmployerPublicHashedAccountId,
+                    FundingEmployerAccountName = acc.FundingEmployerAccountName,
+                    FundingEmployerHashedAccountId = acc.FundingEmployerHashedAccountId,
+                    FundingEmployerAccountId = acc.FundingEmployerAccountId
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+            
         }
     }
 }

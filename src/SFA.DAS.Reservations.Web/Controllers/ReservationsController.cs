@@ -607,7 +607,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                             {
                                 AccountId = cacheReservationEmployerCommand.AccountId,
                                 TransferSenderAccountId = viewModel.TransferSenderId ?? "",
-                                HashedEmployerAccountId = _encodingService.Encode(cacheReservationEmployerCommand.AccountId, EncodingType.PublicAccountId)
+                                HashedEmployerAccountId = _encodingService.Encode(cacheReservationEmployerCommand.AccountId, EncodingType.AccountId)
                             });
 
                         if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)

@@ -497,7 +497,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             mockEncodingService.Setup(x => x.Decode(viewModel.TransferSenderId, EncodingType.PublicAccountId))
                 .Returns(expectedTransferAccountId.Value);
-            mockEncodingService.Setup(x => x.Encode(expectedAccountId, EncodingType.PublicAccountId))
+            mockEncodingService.Setup(x => x.Encode(expectedAccountId, EncodingType.AccountId))
                 .Returns(expectedAccountPublicHashedId);
             mockEncodingService.Setup(x => x.Decode(routeModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
                 .Returns(expectedAccountLegalEntityId);
@@ -576,7 +576,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 }
             };
 
-            mockEncodingService.Setup(x => x.Encode(expectedAccountId, EncodingType.PublicAccountId))
+            mockEncodingService.Setup(x => x.Encode(expectedAccountId, EncodingType.AccountId))
                 .Returns(expectedAccountPublicHashedId);
             mockEncodingService.Setup(x => x.Decode(routeModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
                 .Returns(expectedAccountLegalEntityId);
