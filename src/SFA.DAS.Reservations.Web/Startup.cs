@@ -11,7 +11,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Authorization.Caching;
+using SFA.DAS.Authorization.CommitmentPermissions.Caching;
+using SFA.DAS.Authorization.CommitmentPermissions.Client;
+using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
+using SFA.DAS.Authorization.CommitmentPermissions.Handlers;
+using SFA.DAS.Authorization.Context;
 using SFA.DAS.Authorization.DependencyResolution;
+using SFA.DAS.Authorization.Handlers;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
@@ -112,6 +119,7 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
+            services.AddCommitmentPermissionsAuthorization();
 
             if (isEmployerAuth)
             {

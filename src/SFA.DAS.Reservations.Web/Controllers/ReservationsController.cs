@@ -692,6 +692,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [DasAuthorize(CommitmentOperation.AccessCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> PostSelectReservation(

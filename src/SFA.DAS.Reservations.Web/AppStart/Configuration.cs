@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -47,6 +48,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
+
+            services.Configure<CommitmentPermissionsApiClientConfiguration>(configuration.GetSection("CommitmentPermissionsClientApi"));
+            services.AddSingleton(config => config.GetService<IOptions<CommitmentPermissionsApiClientConfiguration>>().Value);
 
             services.AddSingleton<IAccountApiConfiguration, AccountApiConfiguration>(cfg => cfg.GetService<IOptions<AccountApiConfiguration>>().Value);
             services.AddTransient<IAccountApiClient, AccountApiClient>();

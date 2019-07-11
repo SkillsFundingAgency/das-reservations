@@ -57,6 +57,11 @@ namespace SFA.DAS.Reservations.Web.Authorization
                 return null;
             }
 
+            if (!cohortReferenceObj.Any())
+            {
+                return null;
+            }
+
             if (!_encodingService.TryDecode(cohortReferenceObj.First(), EncodingType.CohortReference, out var cohortReference))
             {
                 throw new UnauthorizedAccessException();
