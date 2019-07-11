@@ -14,7 +14,7 @@ variables:
   buildPlatform: 'anycpu'
 
 pool:
-  name: 'DAS -Continuous Integration'
+  name: 'DAS - Continuous Integration'
 
 steps:
 - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
