@@ -44,18 +44,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             CreateReservationLevyEmployerCommandHandler handler)
         {
             //Arrange
+            request.TransferSenderId = null;
             validator.Setup(x => x.ValidateAsync(request))
                 .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string>()});
 
             service.Setup(x =>
-                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId))
+                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId))
                 .ReturnsAsync(new CreateReservationResponse {Id = id});
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
             
             //Assert
-            service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId));
+            service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId));
             Assert.AreEqual(id, result.ReservationId);
         }
 

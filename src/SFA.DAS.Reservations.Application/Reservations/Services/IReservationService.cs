@@ -12,6 +12,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
         Task<CreateReservationResponse> CreateReservationLevyEmployer(
             Guid reservationId,
             long accountId,
-            long accountLegalEntityId);
+            long accountLegalEntityId,
+            long? transferSenderAccountId);
     }
 }

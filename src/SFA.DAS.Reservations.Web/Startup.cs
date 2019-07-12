@@ -11,6 +11,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Authorization.Caching;
+using SFA.DAS.Authorization.CommitmentPermissions.Caching;
+using SFA.DAS.Authorization.CommitmentPermissions.Client;
+using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
+using SFA.DAS.Authorization.CommitmentPermissions.Handlers;
+using SFA.DAS.Authorization.Context;
+using SFA.DAS.Authorization.DependencyResolution;
+using SFA.DAS.Authorization.Handlers;
+using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.Http;
@@ -45,6 +54,7 @@ using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using SFA.DAS.Reservations.Web.Stubs;
@@ -108,6 +118,8 @@ namespace SFA.DAS.Reservations.Web
             var serviceProvider = services.BuildServiceProvider();
 
             services.AddAuthorizationService();
+            services.AddAuthorization<AuthorizationContextProvider>();
+            services.AddCommitmentPermissionsAuthorization();
 
             if (isEmployerAuth)
             {
@@ -128,6 +140,7 @@ namespace SFA.DAS.Reservations.Web
                     {
                         options.Filters.Add(new AuthorizeFilter());
                         options.Filters.Add(new FeatureToggleActionFilter(_configuration));
+                        options.AddAuthorization();
                     })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()

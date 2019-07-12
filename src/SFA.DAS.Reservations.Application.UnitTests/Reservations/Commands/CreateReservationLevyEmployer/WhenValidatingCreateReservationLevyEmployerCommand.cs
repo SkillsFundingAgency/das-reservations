@@ -1,30 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Castle.Core.Internal;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.CreateReservationLevyEmployer
 {
     [TestFixture]
     public class WhenValidatingCreateReservationLevyEmployerCommand
     {
+        private CreateReservationLevyEmployerCommandValidator _validator;
+        
+        [SetUp]
+        public void Arrange()
+        {
+            _validator = new CreateReservationLevyEmployerCommandValidator();
+        }
+
         [Test]
         public async Task AndTheCommandIsInvalid_ThenAddsError()
         {
             //Arrange
-            var accountId = -234;
-            var accountLegalEntityId = -3;
-            var command = new CreateReservationLevyEmployerCommand();
-            var validator = new CreateReservationLevyEmployerCommandValidator();
-            command.AccountId = accountId;
-            command.AccountLegalEntityId = accountLegalEntityId;
+            var command = new CreateReservationLevyEmployerCommand
+            {
+                AccountId = -234,
+                AccountLegalEntityId = -3
+            };
 
             //Act
-            var result = await validator.ValidateAsync(command);
+            var result = await _validator.ValidateAsync(command);
 
             //Assert
             Assert.False(result.IsValid());
@@ -36,15 +38,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         public async Task AndTheCommandIsValid_ThenNoErrorsAdded()
         {
             //Arrange
-            var accountId = 334;
-            var accountLegalEntityId = 324234;
-            var command = new CreateReservationLevyEmployerCommand();
-            var validator = new CreateReservationLevyEmployerCommandValidator();
-            command.AccountId = accountId;
-            command.AccountLegalEntityId = accountLegalEntityId;
+            var command = new CreateReservationLevyEmployerCommand
+            {
+                AccountId = 334,
+                AccountLegalEntityId = 324234
+            };
 
             //Act
-            var result = await validator.ValidateAsync(command);
+            var result = await _validator.ValidateAsync(command);
 
             //Assert
             Assert.True(result.IsValid());
@@ -54,15 +55,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         public async Task AndOnlyAccountIdInvalid_ThenAddsError()
         {
             //Arrange
-            var accountId = -234;
-            var accountLegalEntityId = 5131;
-            var command = new CreateReservationLevyEmployerCommand();
-            var validator = new CreateReservationLevyEmployerCommandValidator();
-            command.AccountId = accountId;
-            command.AccountLegalEntityId = accountLegalEntityId;
+            var command = new CreateReservationLevyEmployerCommand
+            {
+                AccountId = -234,
+                AccountLegalEntityId = 5131
+            };
 
             //Act
-            var result = await validator.ValidateAsync(command);
+            var result = await _validator.ValidateAsync(command);
 
             //Assert
             Assert.False(result.IsValid());
@@ -74,15 +74,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         public async Task AndOnlyAccountLegalEntityIdInvalid_ThenAddsError()
         {
             //Arrange
-            var accountId = 34;
-            var accountLegalEntityId = -234;
-            var command = new CreateReservationLevyEmployerCommand();
-            var validator = new CreateReservationLevyEmployerCommandValidator();
-            command.AccountId = accountId;
-            command.AccountLegalEntityId = accountLegalEntityId;
+            var command = new CreateReservationLevyEmployerCommand
+            {
+                AccountId = 34,
+                AccountLegalEntityId = -234
+            };
 
             //Act
-            var result = await validator.ValidateAsync(command);
+            var result = await _validator.ValidateAsync(command);
 
             //Assert
             Assert.False(result.IsValid());

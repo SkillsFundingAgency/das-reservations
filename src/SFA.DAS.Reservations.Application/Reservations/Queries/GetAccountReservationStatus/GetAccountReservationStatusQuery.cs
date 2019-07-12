@@ -8,5 +8,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
     public class GetAccountReservationStatusQuery : IRequest<GetAccountReservationStatusResponse>
     {
         public long AccountId { get; set; }
+        public string TransferSenderAccountId { get; set; }
+        public string HashedEmployerAccountId { get; set; }
     }
 }
