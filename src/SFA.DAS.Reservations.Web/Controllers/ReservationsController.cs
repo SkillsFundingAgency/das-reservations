@@ -86,8 +86,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedReservation?.AccountLegalEntityPublicHashedId, 
                 cachedReservation?.CourseId, 
                 cachedReservation?.TrainingDate, 
-                routeModel.FromReview,
-                cachedReservation.CohortRef);
+                routeModel.FromReview ?? false,
+                cachedReservation?.CohortRef,
+                routeModel.UkPrn);
 
             return View(viewModel);
         }
@@ -113,7 +114,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         isProvider, 
                         formModel.AccountLegalEntityPublicHashedId, 
                         formModel.SelectedCourseId, 
-                        trainingDateModel);
+                        trainingDateModel,
+                        formModel.FromReview,
+                        formModel.CohortRef,
+                        routeModel.UkPrn);
                        
                     return View("ApprenticeshipTraining", model);
                 }
@@ -890,7 +894,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             string courseId = null, 
             TrainingDateModel selectedTrainingDate = null, 
             bool? routeModelFromReview = false,
-            string cohortRef = "")
+            string cohortRef = "",
+            uint? ukPrn = null)
 
         {
             var accountLegalEntityId = _encodingService.Decode(
@@ -908,20 +913,27 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CourseId = courseId,
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
                 IsProvider = isProvider,
+                CohortRef = cohortRef,
+                FromReview = routeModelFromReview,
                 BackLink = isProvider ?
-                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef) 
+                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn) 
                     : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse 
             };
         }
 
-        private static string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef)
+        private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn)
         {
             if (string.IsNullOrEmpty(cohortRef))
             {
                 return routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer;
             }
 
-            return string.Empty;
+            return _urlHelper.GenerateUrl(new UrlParameters
+            {
+                Id = ukPrn.ToString(),
+                Controller = $"apprentices/{cohortRef}",
+                Action = "details"
+            }); ;
         }
     }
 }

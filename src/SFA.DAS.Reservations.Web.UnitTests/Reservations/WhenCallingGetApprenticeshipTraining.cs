@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -125,6 +126,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
+            string cohortDetailsUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -136,13 +139,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(mediator => mediator.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getCoursesResult);
             routeModel.FromReview = true;
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{cachedReservationResult.CohortRef}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
 
             var result = await controller.ApprenticeshipTraining(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
                 .Subject;
-            viewModel.BackLink.Should().BeEmpty();
+            viewModel.CohortRef.Should().Be(cachedReservationResult.CohortRef);
+            viewModel.BackLink.Should().Be(cohortDetailsUrl);
         }
 
 
