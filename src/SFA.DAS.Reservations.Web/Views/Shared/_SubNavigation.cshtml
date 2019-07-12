@@ -56,6 +56,16 @@ else
                         <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Recruitment</a>
                     </li>
                     <li class="das-navigation__list-item">
+                        @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--current">Your funding reservations</a>
+                        }
+                        else
+                        {
+                            <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your funding reservations</a>
+                        }
+                    </li>
+                    <li class="das-navigation__list-item">
                         <a asp-external-controller="apprentices" asp-external-folder="commitments/accounts" asp-external-action="home" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
                     </li>
                     <li class="das-navigation__list-item">
