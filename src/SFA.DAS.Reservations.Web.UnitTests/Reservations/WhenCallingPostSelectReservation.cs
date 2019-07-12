@@ -171,6 +171,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetAvailableReservationsResult availableReservationsResult,
             SelectReservationViewModel viewModel,
+            string cohortDetailsUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
@@ -178,7 +180,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(x => x.Send(It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(viewModel.AccountId)),
                     It.IsAny<CancellationToken>())).ReturnsAsync(availableReservationsResult);
-            
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+
             var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
             result.ViewName.Should().Be("ProviderSelect");

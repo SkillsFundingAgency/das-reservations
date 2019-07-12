@@ -662,7 +662,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     viewModel.AvailableReservations = availableReservationsResult.Reservations
                         .Select(reservation => new AvailableReservationViewModel(reservation));
                     viewModel.AccountId = cacheReservationEmployerCommand.AccountId;
-
+                    viewModel.BackLink = backUrl;
                     return View(viewName, viewModel);
                 }
 
@@ -703,6 +703,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+
             var backUrl = string.Empty;
 
             if (viewModel.SelectedReservationId == Guid.Empty)
@@ -714,6 +715,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     .Select(reservation => new AvailableReservationViewModel(reservation));
 
                 ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select an option");
+
+                viewModel.BackLink = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Id = routeModel.UkPrn.Value.ToString(),
+                    Controller = $"apprentices/{viewModel.CohortReference}",
+                    Action = "details"
+                });
 
                 return View("ProviderSelect", viewModel);
             }
