@@ -1,16 +1,27 @@
-﻿
+﻿@using SFA.DAS.Reservations.Web.Infrastructure
+
 @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
 {
     if (ViewContext.RouteData.Values["UkPrn"] != null && !string.IsNullOrEmpty(ViewContext.RouteData.Values["UkPrn"].ToString()))
     {
         <nav class="das-navigation">
             <div class="govuk-width-container">
-                <ul class="das-navigation__list ">
+                <ul class="das-navigation__list">
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="Account" class="das-navigation__link">Home</a>
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-action="Cohorts" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Your cohorts</a>
+                    </li>
+                    <li class="das-navigation__list-item">
+                        @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
+                        }
+                        else
+                        {
+                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage funding</a>
+                        }
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-action="manage/all" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage your apprentices</a>
@@ -21,6 +32,7 @@
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="Agreements" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Organisations and agreements</a>
                     </li>
+                   
                 </ul>
             </div>
         </nav>
@@ -42,6 +54,16 @@ else
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Recruitment</a>
+                    </li>
+                    <li class="das-navigation__list-item">
+                        @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--current">Your funding reservations</a>
+                        }
+                        else
+                        {
+                            <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your funding reservations</a>
+                        }
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="apprentices" asp-external-folder="commitments/accounts" asp-external-action="home" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
