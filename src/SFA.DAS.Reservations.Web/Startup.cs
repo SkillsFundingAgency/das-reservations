@@ -118,8 +118,8 @@ namespace SFA.DAS.Reservations.Web
             var serviceProvider = services.BuildServiceProvider();
 
             services.AddAuthorizationService();
-            services.AddAuthorization<AuthorizationContextProvider>();
-            services.AddCommitmentPermissionsAuthorization();
+            //services.AddAuthorization<AuthorizationContextProvider>();
+            //services.AddCommitmentPermissionsAuthorization();
 
             if (isEmployerAuth)
             {
@@ -140,7 +140,7 @@ namespace SFA.DAS.Reservations.Web
                     {
                         options.Filters.Add(new AuthorizeFilter());
                         options.Filters.Add(new FeatureToggleActionFilter(_configuration));
-                        options.AddAuthorization();
+                       // options.AddAuthorization();
                     })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
