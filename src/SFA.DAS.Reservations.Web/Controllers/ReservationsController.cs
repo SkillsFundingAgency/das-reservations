@@ -563,7 +563,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Redirect(dashboardUrl);
         }
 
-      //  [DasAuthorize(CommitmentOperation.AccessCohort)]
+        [DasAuthorize(CommitmentOperation.AccessCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> SelectReservation(
@@ -696,7 +696,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-     //   [DasAuthorize(CommitmentOperation.AccessCohort)]
+        [DasAuthorize(CommitmentOperation.AccessCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> PostSelectReservation(
