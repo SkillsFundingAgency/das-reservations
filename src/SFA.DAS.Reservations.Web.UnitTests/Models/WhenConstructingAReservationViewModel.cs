@@ -13,9 +13,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_Id(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             viewModel.Id.Should().Be(reservation.Id);
         }
@@ -24,9 +25,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_StartDateDescription(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             viewModel.TrainingDate.StartDate.Should().Be(reservation.StartDate);
             viewModel.TrainingDate.EndDate.Should().Be(reservation.ExpiryDate);
@@ -36,10 +38,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_Status(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
             reservation.Status = ReservationStatus.Deleted;
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             ((int)viewModel.Status).Should().Be((int)reservation.Status);
         }
@@ -48,9 +51,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_CourseDescription(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             viewModel.CourseName.Should().Be(reservation.Course.CourseDescription);
         }
@@ -59,11 +63,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void And_Course_Is_Null_Then_Sets_CourseDescription_To_Unknown(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
             reservation.Course = null;
 
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             viewModel.CourseName.Should().Be("Unknown");
         }
@@ -72,9 +77,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_AccountLegalEntityName(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             viewModel.LegalEntityName.Should().Be(reservation.AccountLegalEntityName);
         }
@@ -87,14 +93,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
-        public void Then_If_The_ApprenticeUrl_Is_Available_The_Url_Is_Created_If_Supplied(
+        public void And_Has_Ukprn_And_ApprenticeUrl_Then_Provider_Url_Is_Created(
             Reservation reservation,
             string url,
+            string accountHashedId,
             string alephid)
         {
-            var viewModel = new ReservationViewModel(reservation, url, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
 
             Assert.AreEqual($"{url}/{reservation.ProviderId}/unapproved/add-apprentice?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={alephid}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", viewModel.ApprenticeUrl);
+        }
+
+        [Test, AutoData]
+        public void And_No_Ukprn_And_Has_ApprenticeUrl_Then_Employer_Url_Is_Created(
+            Reservation reservation,
+            string url,
+            string accountHashedId,
+            string alephid)
+        {
+            reservation.ProviderId = null;
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+
+            Assert.AreEqual($"{url}/{accountHashedId}/unapproved/add?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={alephid}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", viewModel.ApprenticeUrl);
         }
     }
 }

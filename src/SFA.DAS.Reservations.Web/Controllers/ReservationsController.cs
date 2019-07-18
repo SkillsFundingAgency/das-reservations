@@ -368,7 +368,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var viewModel = new ReservationViewModel(
                         reservation, 
                         _configuration.ApprenticeUrl, 
-                        //routeModel.EmployerAccountId,
+                        routeModel.EmployerAccountId,
                         _encodingService.Encode(reservation.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId));
 
                     reservations.Add(viewModel);

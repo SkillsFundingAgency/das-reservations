@@ -9,11 +9,13 @@ namespace SFA.DAS.Reservations.Web.Models
         public ReservationViewModel(
             Reservation reservation, 
             string apprenticeUrl, 
+            string accountHashedId,
             string accountLegalEntityPublicHashedId) 
             : base(
                 apprenticeUrl, 
                 reservation.ProviderId, 
                 reservation.Id, 
+                accountHashedId,
                 accountLegalEntityPublicHashedId, 
                 reservation.StartDate, 
                 reservation.Course)
