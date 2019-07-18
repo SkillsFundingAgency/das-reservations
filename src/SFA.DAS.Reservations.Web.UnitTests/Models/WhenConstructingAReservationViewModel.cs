@@ -14,9 +14,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             viewModel.Id.Should().Be(reservation.Id);
         }
@@ -26,9 +26,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             viewModel.TrainingDate.StartDate.Should().Be(reservation.StartDate);
             viewModel.TrainingDate.EndDate.Should().Be(reservation.ExpiryDate);
@@ -39,10 +39,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
             reservation.Status = ReservationStatus.Deleted;
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             ((int)viewModel.Status).Should().Be((int)reservation.Status);
         }
@@ -52,9 +52,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             viewModel.CourseName.Should().Be(reservation.Course.CourseDescription);
         }
@@ -64,11 +64,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
             reservation.Course = null;
 
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             viewModel.CourseName.Should().Be("Unknown");
         }
@@ -78,9 +78,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
             viewModel.LegalEntityName.Should().Be(reservation.AccountLegalEntityName);
         }
@@ -97,11 +97,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
-            Assert.AreEqual($"{url}/{reservation.ProviderId}/unapproved/add-apprentice?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={alephid}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", viewModel.ApprenticeUrl);
+            Assert.AreEqual(
+                $"{url}/{reservation.ProviderId}/unapproved/add-apprentice?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", 
+                viewModel.ApprenticeUrl);
         }
 
         [Test, AutoData]
@@ -109,12 +111,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             Reservation reservation,
             string url,
             string accountHashedId,
-            string alephid)
+            string accountLegalEntityPublicHashedId)
         {
             reservation.ProviderId = null;
-            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, alephid);
+            var viewModel = new ReservationViewModel(reservation, url, accountHashedId, accountLegalEntityPublicHashedId);
 
-            Assert.AreEqual($"{url}/{accountHashedId}/unapproved/add?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={alephid}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", viewModel.ApprenticeUrl);
+            Assert.AreEqual(
+                $"{url}/{accountHashedId}/unapproved/add?reservationId={reservation.Id}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={reservation.StartDate:MMyyyy}&courseCode={reservation.Course.Id}", 
+                viewModel.ApprenticeUrl);
         }
     }
 }
