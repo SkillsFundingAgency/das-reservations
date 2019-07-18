@@ -18,6 +18,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
+        /// <summary>
+        /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
+        /// </summary>
+        /// <param name="urlParameters"></param>
+        /// <returns></returns>
         public string GenerateUrl(UrlParameters urlParameters)
         {
             var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
@@ -27,6 +32,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
+        /// <summary>
+        /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
+        /// </summary>
+        /// <param name="urlParameters"></param>
+        /// <returns></returns>
         public string GenerateAddApprenticeUrl(UrlParameters urlParameters)
         {
             var baseUrl = _options.ApprenticeUrl;

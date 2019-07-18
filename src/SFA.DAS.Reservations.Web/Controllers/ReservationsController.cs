@@ -311,7 +311,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
-                    var addApprenticeUrl = GenerateAddApprenticeUrl(routeModel.Id.Value,routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,model.StartDate, model.CohortRef);
+                    var addApprenticeUrl = GenerateAddApprenticeUrl(
+                        routeModel.Id.Value, 
+                        routeModel.EmployerAccountId, 
+                        routeModel.AccountLegalEntityPublicHashedId, 
+                        model.CourseId, 
+                        model.UkPrn,
+                        model.StartDate, 
+                        model.CohortRef);
 
                     return Redirect(addApprenticeUrl);
 
@@ -661,8 +668,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var reservation = await _mediator.Send(new GetReservationQuery {Id = viewModel.SelectedReservationId});
 
-                var url = GenerateAddApprenticeUrl(viewModel.SelectedReservationId,
-                    routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn.Value, reservation.StartDate,
+                var url = GenerateAddApprenticeUrl(
+                    viewModel.SelectedReservationId,
+                    routeModel.EmployerAccountId,
+                    routeModel.AccountLegalEntityPublicHashedId, 
+                    reservation.Course.Id, 
+                    routeModel.UkPrn, 
+                    reservation.StartDate,
                     viewModel.CohortReference);
 
                 var addApprenticeUrl = url;
@@ -689,12 +701,26 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                var backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                string backUrl;
+                if (routeModel.UkPrn.HasValue)
                 {
-                    Id = routeModel.UkPrn.Value.ToString(),
-                    Controller = $"apprentices/{viewModel.CohortReference}",
-                    Action = "details"
-                });
+                    backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                    {
+                        Id = routeModel.UkPrn.Value.ToString(),
+                        Controller = $"apprentices/{viewModel.CohortReference}",
+                        Action = "details"
+                    });
+                }
+                else
+                {
+                    // todo: employer select
+                    backUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
+                    {
+                        Id = routeModel.EmployerAccountId,
+                        Controller = "todo",
+                        Action = "todo"
+                    });
+                }
 
                 return View("ReservationLimitReached", backUrl);
             }
@@ -705,7 +731,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         }
 
-        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime startDate, string cohortRef = "")
+        private string GenerateAddApprenticeUrl(
+            Guid reservationId, 
+            string accountHashedId, 
+            string accountLegalEntityPublicHashedId, 
+            string courseId, 
+            uint? ukPrn, 
+            DateTime startDate, 
+            string cohortRef = "")
         {
             var queryString =
                 $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
@@ -714,8 +747,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 queryString += $"&courseCode={courseId}";
             }
 
-            var controller = "unapproved";
-            var action = "add-apprentice";
+            string controller, action, id;
+            if (ukPrn.HasValue)
+            {
+                controller = "unapproved";
+                action = "add-apprentice";
+                id = ukPrn.ToString();
+            }
+            else
+            {
+                controller = "unapproved";
+                action = "add";
+                id = accountHashedId;
+            }
+            
             if (!string.IsNullOrEmpty(cohortRef))
             {
                 controller += $"/{cohortRef}";
@@ -724,7 +769,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
             {
-                Id = ukPrn.ToString(),
+                Id = id,
                 Controller = controller,
                 Action = action,
                 QueryString = queryString

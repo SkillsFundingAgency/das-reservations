@@ -128,6 +128,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var routeModel = _fixture.Create<ReservationsRouteModel>();
             routeModel.UkPrn = null;
             model.CohortRef = string.Empty;
+            model.UkPrn = null;
             var config = _fixture.Freeze<IOptions<ReservationsWebConfiguration>>();
             var employerRecruitUrl = _fixture.Create<string>();
             var addApprenticeUrl = _fixture.Create<string>();
@@ -143,9 +144,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters => 
-                        parameters.Id == model.UkPrn.ToString() &&
+                        parameters.Id == routeModel.EmployerAccountId &&
                         parameters.Controller == "unapproved" &&
-                        parameters.Action == "add-apprentice" &&
+                        parameters.Action == "add" &&
                         parameters.QueryString == $"?reservationId={routeModel.Id.Value}&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}&startMonthYear={model.StartDate:MMyyyy}&courseCode={model.CourseId}")))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
