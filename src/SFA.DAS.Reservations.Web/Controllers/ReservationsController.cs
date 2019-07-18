@@ -131,7 +131,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 	                {
 	                    Id = cachedReservation.Id,
 	                    CourseId = course?.Id,
-	                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
+	                    UkPrn = routeModel.UkPrn
 	                };
 
 	                await _mediator.Send(courseCommand);
@@ -141,7 +141,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Id = cachedReservation.Id,
                     TrainingDate = trainingDateModel,
-                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
+                    UkPrn = routeModel.UkPrn
                 };
 
                 await _mediator.Send(startDateCommand);
@@ -221,7 +221,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var command = new CreateReservationCommand
                 {
                     Id = routeModel.Id.GetValueOrDefault(),
-                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
+                    UkPrn = routeModel.UkPrn
                 };
 
                 var result = await _mediator.Send(command);
@@ -271,7 +271,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CourseDescription = queryResult.Course.CourseDescription,
                 StartDate = queryResult.StartDate,
                 CourseId = queryResult.Course?.Id,
-                UkPrn = queryResult.UkPrn.GetValueOrDefault(),
+                UkPrn = queryResult.UkPrn,
                 CohortRef = routeModel.CohortRef
             };
 
@@ -368,6 +368,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var viewModel = new ReservationViewModel(
                         reservation, 
                         _configuration.ApprenticeUrl, 
+                        //routeModel.EmployerAccountId,
                         _encodingService.Encode(reservation.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId));
 
                     reservations.Add(viewModel);
@@ -704,7 +705,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         }
 
-        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime startDate, string cohortRef = "")
+        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime startDate, string cohortRef = "")
         {
             var queryString =
                 $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";

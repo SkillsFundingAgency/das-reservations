@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Allows_Access_If_UkPrn_Matches()
         {
            //Arrange
-            var providerUkPrn = _reservation.UkPrn;
+            var providerUkPrn = _reservation.UkPrn.Value;
 
             //Act
             var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Denies_Access_If_UkPrn_Doesnt_Matches()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn + 10;
+            var providerUkPrn = _reservation.UkPrn.Value + 10;
 
             //Act
             var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Exception_Thrown_If_Reservation_Is_Null()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn;
+            var providerUkPrn = _reservation.UkPrn.Value;
 
             //Act + Assert
             var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(providerUkPrn, (CachedReservation) null));
@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         public void Then_Exception_Thrown_If_Reservation_UkPrn_Not_Set()
         {
             //Arrange
-            var providerUkPrn = _reservation.UkPrn;
+            var providerUkPrn = _reservation.UkPrn.Value;
             _reservation.UkPrn = default(uint);
 
             //Act + Assert

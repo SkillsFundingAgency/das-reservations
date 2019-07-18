@@ -8,6 +8,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         public Guid Id { get; set; }
         public TrainingDateModel TrainingDate { get; set; }
-        public uint UkPrn { get; set; }
+        public uint? UkPrn { get; set; }
     }
 }
