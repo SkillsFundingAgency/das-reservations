@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,10 +28,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
             GetProviderCacheReservationCommandQuery request, 
             CancellationToken cancellationToken)
         {
-             var accounts = await _mediator.Send(
+            var validationResult = await _validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid())
+            {
+                throw new ValidationException(
+                    new System.ComponentModel.DataAnnotations.ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+            }
+
+            var accounts = await _mediator.Send(
                 new GetTrustedEmployersQuery { UkPrn = request.UkPrn }, cancellationToken);
             
-             var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
+            var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
                 employer.AccountLegalEntityPublicHashedId == request.AccountLegalEntityPublicHashedId);
 
             if (matchedAccount != null)

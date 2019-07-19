@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Moq;
@@ -9,6 +11,7 @@ using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Employers;
+using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetProviderCacheReservationCommand
 {
@@ -76,6 +79,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                             It.IsAny<GetAccountLegalEntityQuery>(),
                             It.IsAny<CancellationToken>()))
                     .ReturnsAsync(_getAccountLegalEntityResponse);
+
+            _validator.Setup(v => v.ValidateAsync(_query))
+                .ReturnsAsync(new ValidationResult(){ValidationDictionary = new Dictionary<string, string>()});
         }
 
         [Test]
@@ -187,6 +193,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             //Act + Assert
             Assert.ThrowsAsync<AccountLegalEntityInvalidException>(() => _handler.Handle(_query, CancellationToken.None));
+        }
+
+        [Test]
+        public void ThenIfValidationFailsAnExceptionIsThrown()
+        {
+            //Arrange
+            _validator.Setup(v => v.ValidateAsync(_query))
+                .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"Error", "Test Error"}}});
+
+            //Act + Assert
+            Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(_query, CancellationToken.None));
         }
     }
 }
