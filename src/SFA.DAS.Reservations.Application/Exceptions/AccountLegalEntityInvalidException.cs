@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Web.Exceptions
+namespace SFA.DAS.Reservations.Application.Exceptions
 {
     public class AccountLegalEntityInvalidException : Exception
     {

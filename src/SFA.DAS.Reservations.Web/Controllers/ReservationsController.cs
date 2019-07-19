@@ -27,6 +27,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservatio
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -35,7 +36,6 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
-using SFA.DAS.Reservations.Web.Exceptions;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -589,9 +589,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     try
                     {
-                        cacheReservationEmployerCommand = await BuildProviderReservationCacheCommand(
-                            routeModel.UkPrn.Value,
-                            routeModel.AccountLegalEntityPublicHashedId, viewModel.CohortReference);
+                        var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
+                        {
+                            AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
+                            CohortRef = viewModel.CohortReference,
+                            UkPrn = routeModel.UkPrn.Value
+                        });
+
+                        cacheReservationEmployerCommand = response.Command;
+
                     }
                     catch (AccountLegalEntityNotFoundException e)
                     {
@@ -751,8 +757,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Action = "details"
                 });
 
-                cacheReservationEmployerCommand = await BuildProviderReservationCacheCommand(routeModel.UkPrn.Value,
-                    routeModel.AccountLegalEntityPublicHashedId, viewModel.CohortReference);
+                var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
+                {
+                    AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
+                    CohortRef = viewModel.CohortReference,
+                    UkPrn = routeModel.UkPrn.Value
+                });
+
+                cacheReservationEmployerCommand = response.Command;
             }
             else
             {
@@ -837,64 +849,64 @@ namespace SFA.DAS.Reservations.Web.Controllers
             };
         }
 
-        private async Task<CacheReservationEmployerCommand> BuildProviderReservationCacheCommand(uint ukPrn, string accountLegalEntityPublicHashedId, string cohortRef)
-        {
-            var accounts = await _mediator.Send(
-                new GetTrustedEmployersQuery { UkPrn = ukPrn });
-            var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
-                employer.AccountLegalEntityPublicHashedId == accountLegalEntityPublicHashedId);
+        //private async Task<CacheReservationEmployerCommand> BuildProviderReservationCacheCommand(uint ukPrn, string accountLegalEntityPublicHashedId, string cohortRef)
+        //{
+        //    var accounts = await _mediator.Send(
+        //        new GetTrustedEmployersQuery { UkPrn = ukPrn });
+        //    var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
+        //        employer.AccountLegalEntityPublicHashedId == accountLegalEntityPublicHashedId);
 
-            if (matchedAccount != null)
-            {
-                return new CacheReservationEmployerCommand
-                {
-                    AccountLegalEntityName = matchedAccount.AccountLegalEntityName,
-                    AccountLegalEntityPublicHashedId = matchedAccount.AccountLegalEntityPublicHashedId,
-                    UkPrn = ukPrn,
-                    AccountLegalEntityId = matchedAccount.AccountLegalEntityId,
-                    Id = Guid.NewGuid(),
-                    CohortRef = cohortRef,
-                    AccountId = matchedAccount.AccountId,
-                    AccountName = matchedAccount.AccountName
-                };
-            }
+        //    if (matchedAccount != null)
+        //    {
+        //        return new CacheReservationEmployerCommand
+        //        {
+        //            AccountLegalEntityName = matchedAccount.AccountLegalEntityName,
+        //            AccountLegalEntityPublicHashedId = matchedAccount.AccountLegalEntityPublicHashedId,
+        //            UkPrn = ukPrn,
+        //            AccountLegalEntityId = matchedAccount.AccountLegalEntityId,
+        //            Id = Guid.NewGuid(),
+        //            CohortRef = cohortRef,
+        //            AccountId = matchedAccount.AccountId,
+        //            AccountName = matchedAccount.AccountName
+        //        };
+        //    }
            
-            var result = await _mediator.Send(new GetAccountLegalEntityQuery
-            {
-                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
-            });
+        //    var result = await _mediator.Send(new GetAccountLegalEntityQuery
+        //    {
+        //        AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
+        //    });
 
-            var legalEntity = result?.LegalEntity;
+        //    var legalEntity = result?.LegalEntity;
 
-            if (legalEntity == null)
-            {
-                throw new AccountLegalEntityNotFoundException(accountLegalEntityPublicHashedId);
-            }
+        //    if (legalEntity == null)
+        //    {
+        //        throw new AccountLegalEntityNotFoundException(accountLegalEntityPublicHashedId);
+        //    }
 
-            long accountId;
+        //    long accountId;
            
-            if (long.TryParse(legalEntity.AccountId, out var legalEntityAccountId))
-            {
-                accountId = legalEntityAccountId;
-            }
-            else
-            {
-                throw new AccountLegalEntityInvalidException(
-                    "Account legal entity Account Id cannot be parsed to a long for " +
-                    $"Legal entity Id [{accountLegalEntityPublicHashedId}].");
-            }
+        //    if (long.TryParse(legalEntity.AccountId, out var legalEntityAccountId))
+        //    {
+        //        accountId = legalEntityAccountId;
+        //    }
+        //    else
+        //    {
+        //        throw new AccountLegalEntityInvalidException(
+        //            "Account legal entity Account Id cannot be parsed to a long for " +
+        //            $"Legal entity Id [{accountLegalEntityPublicHashedId}].");
+        //    }
 
-            return new CacheReservationEmployerCommand
-            {
-                AccountLegalEntityName = legalEntity.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
-                UkPrn = ukPrn,
-                AccountLegalEntityId = legalEntity.AccountLegalEntityId,
-                Id = Guid.NewGuid(),
-                CohortRef = cohortRef,
-                AccountId = accountId
-            };
-        }
+        //    return new CacheReservationEmployerCommand
+        //    {
+        //        AccountLegalEntityName = legalEntity.AccountLegalEntityName,
+        //        AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
+        //        UkPrn = ukPrn,
+        //        AccountLegalEntityId = legalEntity.AccountLegalEntityId,
+        //        Id = Guid.NewGuid(),
+        //        CohortRef = cohortRef,
+        //        AccountId = accountId
+        //    };
+        //}
 
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,

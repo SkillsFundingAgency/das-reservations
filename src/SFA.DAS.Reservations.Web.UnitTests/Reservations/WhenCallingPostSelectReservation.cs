@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -36,11 +37,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0","9"));
             routeModel.Id = Guid.Empty;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
+           
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = matchedEmployer.AccountId,
+                        AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = matchedEmployer.AccountLegalEntityId,
+                        AccountLegalEntityName = matchedEmployer.AccountLegalEntityName,
+                        AccountName = matchedEmployer.AccountName,
+                        CohortRef = viewModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
