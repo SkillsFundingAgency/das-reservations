@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Validation;
+using SFA.DAS.Reservations.Domain.Commitments;
 using SFA.DAS.Reservations.Domain.Employers;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
@@ -25,6 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
         private GetAccountLegalEntityResult _getAccountLegalEntityResponse;
         private Employer _expectedEmployer;
         private AccountLegalEntity _expectedAccountLegalEntity;
+        private Cohort _expectedCohort;
 
         [SetUp]
         public void Arrange()
@@ -60,7 +64,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                 ReservationLimit = 3
             };
 
-            _getTrustedEmployersResponse = new GetTrustedEmployersResponse
+            _expectedCohort = new Cohort()
+            {
+                CohortId = 123,
+                LegalEntityId = _expectedAccountLegalEntity.LegalEntityId.ToString(),
+                LegalEntityName = _expectedAccountLegalEntity.AccountLegalEntityName,
+                ProviderName = "Test Provider",
+                IsFundedByTransfer = false,
+                WithParty = CohortParty.Provider
+            };
+
+        _getTrustedEmployersResponse = new GetTrustedEmployersResponse
             {
                 Employers = new [] { _expectedEmployer }
             };
@@ -80,8 +94,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                             It.IsAny<CancellationToken>()))
                     .ReturnsAsync(_getAccountLegalEntityResponse);
 
+            _mediator.Setup(m => m.Send(
+                    It.IsAny<GetCohortQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCohortResponse {Cohort = _expectedCohort});
+
             _validator.Setup(v => v.ValidateAsync(_query))
-                .ReturnsAsync(new ValidationResult(){ValidationDictionary = new Dictionary<string, string>()});
+                .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>()});
         }
 
         [Test]
@@ -204,6 +223,38 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             //Act + Assert
             Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(_query, CancellationToken.None));
+        }
+
+        [Test]
+        public async Task ThenIfUsingLegalEntityWillCheckItMatchesCohortDetails()
+        {
+            //Arrange
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new Employer[0]});
+
+            //Act
+            await _handler.Handle(_query, CancellationToken.None);
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<GetCohortQuery>(q => q.CohortId.ToString().Equals(_query.CohortRef)), 
+                It.IsAny<CancellationToken>()),Times.Once);
+        }
+
+        [Test]
+        public void ThenIfLegalEntityDoesNotMatchCohortDetailsThrownProviderNotAuthorisedException()
+        {
+            //Arrange
+            _expectedCohort.LegalEntityId = "1111";
+
+            _mediator.Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetTrustedEmployersResponse(){Employers = new Employer[0]});
+
+            //Act + Assert
+            Assert.ThrowsAsync<ProviderNotAuthorisedException>(() => _handler.Handle(_query, CancellationToken.None));
         }
     }
 }

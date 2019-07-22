@@ -37,13 +37,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_ValidationException_Then_Redirect_To_ProviderError(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
+            Employer employer,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(), 
@@ -59,13 +59,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_Exception_Then_Redirect_To_ProviderError(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
+            Employer employer,
             Exception exception,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(), 
@@ -81,7 +81,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_Employer_And_Legal_Entity_Not_Found_Then_Redirect_To_Error(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller,
             [Frozen]AccountLegalEntity accountLegalEntity,
@@ -107,7 +106,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_EmployerNot_Found_And_Legal_Entity_Id_Invalid_Then_Redirect_To_Error(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller,
             [Frozen]AccountLegalEntity accountLegalEntity,
@@ -154,13 +152,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_Then_Gets_Reservations_For_Employer_Account(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
+            Employer employer,
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
 
             mockMediator.Setup(m =>
                     m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
@@ -169,11 +167,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     Command = new CacheReservationEmployerCommand
                     {
                         Id = Guid.NewGuid(),
-                        AccountId = matchedEmployer.AccountId,
-                        AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId,
-                        AccountLegalEntityId = matchedEmployer.AccountLegalEntityId,
-                        AccountLegalEntityName = matchedEmployer.AccountLegalEntityName,
-                        AccountName = matchedEmployer.AccountName,
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
                         CohortRef = routeModel.CohortRef,
                         UkPrn = routeModel.UkPrn.Value
                     }
@@ -188,7 +186,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             await controller.SelectReservation(routeModel, viewModel);
 
             mockMediator.Verify(mediator => mediator.Send(
-                It.Is<GetAvailableReservationsQuery>(query => query.AccountId == matchedEmployer.AccountId),
+                It.Is<GetAvailableReservationsQuery>(query => query.AccountId == employer.AccountId),
                 It.IsAny<CancellationToken>()));
         }
 
@@ -197,15 +195,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string cohortDetailsUrl,
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetTrustedEmployersResponse employersResponse,
+            Employer employer,
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             //Arrange
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
            
             mockMediator.Setup(m =>
                     m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
@@ -214,11 +212,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     Command = new CacheReservationEmployerCommand
                     {
                         Id = Guid.NewGuid(),
-                        AccountId = matchedEmployer.AccountId,
-                        AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId,
-                        AccountLegalEntityId = matchedEmployer.AccountLegalEntityId,
-                        AccountLegalEntityName = matchedEmployer.AccountLegalEntityName,
-                        AccountName = matchedEmployer.AccountName,
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
                         CohortRef = routeModel.CohortRef,
                         UkPrn = routeModel.UkPrn.Value
                     }

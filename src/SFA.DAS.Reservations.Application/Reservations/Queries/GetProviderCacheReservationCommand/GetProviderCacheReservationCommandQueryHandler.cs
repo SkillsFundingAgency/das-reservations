@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
@@ -25,10 +26,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
         }
 
         public async Task<GetProviderCacheReservationCommandResponse> Handle(
-            GetProviderCacheReservationCommandQuery request, 
+            GetProviderCacheReservationCommandQuery query, 
             CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await _validator.ValidateAsync(query);
 
             if (!validationResult.IsValid())
             {
@@ -37,10 +38,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
             }
 
             var accounts = await _mediator.Send(
-                new GetTrustedEmployersQuery { UkPrn = request.UkPrn }, cancellationToken);
+                new GetTrustedEmployersQuery { UkPrn = query.UkPrn }, cancellationToken);
             
             var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
-                employer.AccountLegalEntityPublicHashedId == request.AccountLegalEntityPublicHashedId);
+                employer.AccountLegalEntityPublicHashedId == query.AccountLegalEntityPublicHashedId);
 
             if (matchedAccount != null)
             {
@@ -50,10 +51,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                     {
                         AccountLegalEntityName = matchedAccount.AccountLegalEntityName,
                         AccountLegalEntityPublicHashedId = matchedAccount.AccountLegalEntityPublicHashedId,
-                        UkPrn = request.UkPrn,
+                        UkPrn = query.UkPrn,
                         AccountLegalEntityId = matchedAccount.AccountLegalEntityId,
                         Id = Guid.NewGuid(),
-                        CohortRef = request.CohortRef,
+                        CohortRef = query.CohortRef,
                         AccountId = matchedAccount.AccountId,
                         AccountName = matchedAccount.AccountName
                     }
@@ -62,14 +63,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
            
             var result = await _mediator.Send(new GetAccountLegalEntityQuery
             {
-                AccountLegalEntityPublicHashedId = request.AccountLegalEntityPublicHashedId
+                AccountLegalEntityPublicHashedId = query.AccountLegalEntityPublicHashedId
             }, cancellationToken);
 
             var legalEntity = result?.LegalEntity;
 
             if (legalEntity == null)
             {
-                throw new AccountLegalEntityNotFoundException(request.AccountLegalEntityPublicHashedId);
+                throw new AccountLegalEntityNotFoundException(query.AccountLegalEntityPublicHashedId);
             }
 
             long accountId;
@@ -82,7 +83,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
             {
                 throw new AccountLegalEntityInvalidException(
                     "Account legal entity Account Id cannot be parsed to a long for " +
-                    $"Legal entity Id [{request.AccountLegalEntityPublicHashedId}].");
+                    $"Legal entity Id [{query.AccountLegalEntityPublicHashedId}].");
+            }
+
+            var cohort = await _mediator.Send(new GetCohortQuery {CohortId = long.Parse(query.CohortRef)}, cancellationToken);
+
+            if (!cohort.Cohort.LegalEntityId.Equals(legalEntity.LegalEntityId.ToString()))
+            {
+                throw new ProviderNotAuthorisedException(accountId, query.UkPrn);
             }
 
             return new GetProviderCacheReservationCommandResponse
@@ -90,11 +98,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                 Command = new CacheReservationEmployerCommand
                 {
                     AccountLegalEntityName = legalEntity.AccountLegalEntityName,
-                    AccountLegalEntityPublicHashedId = request.AccountLegalEntityPublicHashedId,
-                    UkPrn = request.UkPrn,
+                    AccountLegalEntityPublicHashedId = query.AccountLegalEntityPublicHashedId,
+                    UkPrn = query.UkPrn,
                     AccountLegalEntityId = legalEntity.AccountLegalEntityId,
                     Id = Guid.NewGuid(),
-                    CohortRef = request.CohortRef,
+                    CohortRef = query.CohortRef,
                     AccountId = accountId
                 }
             };

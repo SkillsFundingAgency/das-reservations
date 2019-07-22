@@ -849,65 +849,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             };
         }
 
-        //private async Task<CacheReservationEmployerCommand> BuildProviderReservationCacheCommand(uint ukPrn, string accountLegalEntityPublicHashedId, string cohortRef)
-        //{
-        //    var accounts = await _mediator.Send(
-        //        new GetTrustedEmployersQuery { UkPrn = ukPrn });
-        //    var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
-        //        employer.AccountLegalEntityPublicHashedId == accountLegalEntityPublicHashedId);
-
-        //    if (matchedAccount != null)
-        //    {
-        //        return new CacheReservationEmployerCommand
-        //        {
-        //            AccountLegalEntityName = matchedAccount.AccountLegalEntityName,
-        //            AccountLegalEntityPublicHashedId = matchedAccount.AccountLegalEntityPublicHashedId,
-        //            UkPrn = ukPrn,
-        //            AccountLegalEntityId = matchedAccount.AccountLegalEntityId,
-        //            Id = Guid.NewGuid(),
-        //            CohortRef = cohortRef,
-        //            AccountId = matchedAccount.AccountId,
-        //            AccountName = matchedAccount.AccountName
-        //        };
-        //    }
-           
-        //    var result = await _mediator.Send(new GetAccountLegalEntityQuery
-        //    {
-        //        AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId
-        //    });
-
-        //    var legalEntity = result?.LegalEntity;
-
-        //    if (legalEntity == null)
-        //    {
-        //        throw new AccountLegalEntityNotFoundException(accountLegalEntityPublicHashedId);
-        //    }
-
-        //    long accountId;
-           
-        //    if (long.TryParse(legalEntity.AccountId, out var legalEntityAccountId))
-        //    {
-        //        accountId = legalEntityAccountId;
-        //    }
-        //    else
-        //    {
-        //        throw new AccountLegalEntityInvalidException(
-        //            "Account legal entity Account Id cannot be parsed to a long for " +
-        //            $"Legal entity Id [{accountLegalEntityPublicHashedId}].");
-        //    }
-
-        //    return new CacheReservationEmployerCommand
-        //    {
-        //        AccountLegalEntityName = legalEntity.AccountLegalEntityName,
-        //        AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
-        //        UkPrn = ukPrn,
-        //        AccountLegalEntityId = legalEntity.AccountLegalEntityId,
-        //        Id = Guid.NewGuid(),
-        //        CohortRef = cohortRef,
-        //        AccountId = accountId
-        //    };
-        //}
-
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
