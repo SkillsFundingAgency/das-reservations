@@ -62,12 +62,19 @@ namespace SFA.DAS.Reservations.Web.Authorization
                 return null;
             }
 
-            if (!_encodingService.TryDecode(cohortReferenceObj.First(), EncodingType.CohortReference, out var cohortReference))
+            var cohortReference = cohortReferenceObj.First();
+
+            if (string.IsNullOrEmpty(cohortReference))
+            {
+                return null;
+            }
+
+            if (!_encodingService.TryDecode(cohortReference, EncodingType.CohortReference, out var cohortId))
             {
                 throw new UnauthorizedAccessException();
             }
 
-            return cohortReference;
+            return cohortId;
         }
     }
 }

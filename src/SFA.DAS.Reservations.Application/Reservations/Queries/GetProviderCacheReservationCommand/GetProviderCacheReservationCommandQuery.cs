@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
         public uint UkPrn { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string CohortRef { get; set; }
+        public long CohortId { get; set; }
     }
 }

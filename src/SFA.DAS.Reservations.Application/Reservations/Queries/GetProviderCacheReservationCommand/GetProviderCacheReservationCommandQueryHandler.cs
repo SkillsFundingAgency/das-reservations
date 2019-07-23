@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                     $"Legal entity Id [{query.AccountLegalEntityPublicHashedId}].");
             }
 
-            var cohort = await _mediator.Send(new GetCohortQuery {CohortId = long.Parse(query.CohortRef)}, cancellationToken);
+            var cohort = await _mediator.Send(new GetCohortQuery {CohortId = query.CohortId}, cancellationToken);
 
             if (!cohort.Cohort.LegalEntityId.Equals(legalEntity.LegalEntityId.ToString()))
             {

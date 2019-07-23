@@ -78,6 +78,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
         }
 
         [Test]
+        public void ThenIfAnEmptyCohortIsAvailableItWillNotBeCollected()
+        {
+            //Arrange
+            var queryParams = new Dictionary<string, StringValues>
+            {
+                {"cohortRef", new StringValues("")}
+            };
+
+            var queryCollection = new QueryCollection(queryParams);
+            _httpContextAccessor.Setup(c => c.HttpContext.Request.Query).Returns(queryCollection);
+
+            //Act
+            var context = _contextProvider.GetAuthorizationContext();
+
+            //Assert
+            _encodingService.Verify(x => 
+                x.TryDecode(It.IsAny<string>(), EncodingType.CohortReference, out It.Ref<long>.IsAny), Times.Never);
+
+            Assert.IsFalse(context.TryGet<long>("CohortId", out var actualCohortId));
+        }
+
+        [Test]
         public void ThenThrowsUnauthorizedExceptionIfCohortIsNotValid()
         {
             //Arrange

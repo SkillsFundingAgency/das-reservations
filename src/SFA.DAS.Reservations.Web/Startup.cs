@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -20,6 +21,8 @@ using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
+using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
+using SFA.DAS.Reservations.Application.Commitments.Services;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Providers.Services;
@@ -33,6 +36,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -156,12 +160,14 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<GetAccountLegalEntityQuery>), typeof(GetAccountLegalEntityQueryValidator));
             services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
             services.AddScoped(typeof(IValidator<CreateReservationLevyEmployerCommand>), typeof(CreateReservationLevyEmployerCommandValidator));
+            services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
+            services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
-
-
+          
             services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
+            services.AddSingleton<CommitmentsApiClient>();
             services.AddSingleton<IEncodingService, EncodingService>();
             services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
@@ -170,6 +176,11 @@ namespace SFA.DAS.Reservations.Web
             services.AddTransient<ICacheStorageService, CacheStorageService>();
             services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
+            
+            services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
+                provider.GetService<CommitmentsApiClient>(), 
+                provider.GetService<IOptions<CommitmentsApiConfiguration>>()) );
+            
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
 
 

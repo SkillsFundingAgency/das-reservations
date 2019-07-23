@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
         [Test, MoqAutoData]
         public async Task ThenWillGetCohortFromCommitmentsApi(
             [Frozen] Mock<IApiClient> mockApiClient,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
+            [Frozen] Mock<IOptions<CommitmentsApiConfiguration>> mockOptions,
             CommitmentService service,
             long cohortId )
         {
@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
             //Assert
             mockApiClient.Verify(client => client.Get<Cohort>(
                     It.Is<IGetApiRequest>(request =>
-                        request.GetUrl.StartsWith(mockOptions.Object.Value.CommitmentPermissionsClientApi.ApiBaseUrl) &&
+                        request.GetUrl.StartsWith(mockOptions.Object.Value.ApiBaseUrl) &&
                         request.GetUrl.Contains(cohortId.ToString()))),
                 Times.Once);
         }

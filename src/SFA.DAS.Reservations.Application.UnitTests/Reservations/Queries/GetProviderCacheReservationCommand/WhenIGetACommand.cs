@@ -238,7 +238,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            _mediator.Verify(m => m.Send(It.Is<GetCohortQuery>(q => q.CohortId.ToString().Equals(_query.CohortRef)), 
+            _mediator.Verify(m => m.Send(It.Is<GetCohortQuery>(q => q.CohortId.Equals(_query.CohortId)), 
                 It.IsAny<CancellationToken>()),Times.Once);
         }
 
@@ -251,7 +251,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse(){Employers = new Employer[0]});
+                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new Employer[0]});
 
             //Act + Assert
             Assert.ThrowsAsync<ProviderNotAuthorisedException>(() => _handler.Handle(_query, CancellationToken.None));

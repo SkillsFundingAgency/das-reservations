@@ -10,9 +10,9 @@ namespace SFA.DAS.Reservations.Application.Commitments.Services
     public class CommitmentService : ICommitmentService
     {
         private readonly IApiClient _apiClient;
-        private readonly ReservationsWebConfiguration _config;
+        private readonly CommitmentsApiConfiguration _config;
 
-        public CommitmentService(IApiClient apiClient, IOptions<ReservationsWebConfiguration> options)
+        public CommitmentService(IApiClient apiClient, IOptions<CommitmentsApiConfiguration> options)
         {
             _apiClient = apiClient;
             _config = options.Value;
@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.Commitments.Services
 
         public async Task<Cohort> GetCohort(long cohortId)
         {
-            var request = new GetCohortRequest(_config.CommitmentPermissionsClientApi.ApiBaseUrl, cohortId);
+            var request = new GetCohortRequest(_config.ApiBaseUrl, cohortId);
 
             var cohort = await _apiClient.Get<Cohort>(request);
 
