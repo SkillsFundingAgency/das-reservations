@@ -39,7 +39,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         /// <returns></returns>
         public string GenerateAddApprenticeUrl(UrlParameters urlParameters)
         {
-            var baseUrl = _options.ApprenticeUrl;
+            var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
+                ? _options.EmployerApprenticeUrl
+                : _options.ApprenticeUrl;
 
             return FormatUrl(baseUrl, urlParameters);
         }
