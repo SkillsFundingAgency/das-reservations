@@ -5,9 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Exceptions\**" />
     <Compile Remove="Pages\**" />
+    <Content Remove="Exceptions\**" />
     <Content Remove="Pages\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
     <EmbeddedResource Remove="Pages\**" />
+    <None Remove="Exceptions\**" />
     <None Remove="Pages\**" />
   </ItemGroup>
 
@@ -28,7 +32,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.0" />
     <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
-    <PackageReference Include="SFA.DAS.Encoding" Version="1.0.11" />
+    <PackageReference Include="SFA.DAS.Authorization.CommitmentPermissions" Version="5.4.5" />
+    <PackageReference Include="SFA.DAS.Authorization.Mvc" Version="5.4.5" />
+    <PackageReference Include="SFA.DAS.Encoding" Version="1.1.57" />
+    <PackageReference Include="SFA.DAS.Http" Version="3.1.1" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.1.5" />
     <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
     <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.16" />

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
+using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -10,10 +12,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     public class CacheReservationEmployerCommandValidator : IValidator<CacheReservationEmployerCommand>
     {
         private IFundingRulesService _rulesService;
+        private readonly IMediator _mediator;
 
-        public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService)
+        public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService, IMediator mediator)
         {
             _rulesService = rulesService;
+            _mediator = mediator;
         }
 
         public async Task<ValidationResult> ValidateAsync(CacheReservationEmployerCommand command)
@@ -52,6 +56,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             if (string.IsNullOrWhiteSpace(command.AccountLegalEntityPublicHashedId))
             {
                 result.AddError(nameof(command.AccountLegalEntityPublicHashedId));
+            }
+
+            if (command.UkPrn != default(uint))
+            {
+                var accounts = await _mediator.Send(
+                    new GetTrustedEmployersQuery { UkPrn = command.UkPrn });
+                
+                var matchedAccount = accounts?.Employers?.SingleOrDefault(employer =>
+                    employer.AccountLegalEntityPublicHashedId == command.AccountLegalEntityPublicHashedId);
+
+                result.FailedAuthorisationValidation = matchedAccount == null;
             }
 
             return result;
