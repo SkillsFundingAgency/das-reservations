@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -32,6 +33,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     };
                 }).AddCookie(options =>
                 {
+                    options.CookieManager = new ChunkingCookieManager{ChunkSize = 3000};
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.ReturnUrlParameter = "/{ukprn}/reservations";
                     options.AccessDeniedPath = "/error/403";
                 }); ;
