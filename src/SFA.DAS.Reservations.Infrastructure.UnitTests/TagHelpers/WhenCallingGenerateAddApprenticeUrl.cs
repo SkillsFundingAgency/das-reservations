@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoFixture.NUnit3;
-using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
