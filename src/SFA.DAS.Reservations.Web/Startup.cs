@@ -143,8 +143,8 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<MarkRuleAsReadCommand>), typeof(MarkRuleAsReadCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
-
-            services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
+          
+            services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<IEncodingService, EncodingService>();

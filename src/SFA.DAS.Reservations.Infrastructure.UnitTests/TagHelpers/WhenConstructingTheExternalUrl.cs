@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
     public class WhenConstructingTheExternalUrl
     {
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfig;
-        private ProviderExternalUrlHelper _helper;
+        private ExternalUrlHelper _helper;
         private Mock<IConfiguration> _config;
 
         [SetUp]
@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             _reservationsConfig.Setup(x => x.Value.DashboardUrl).Returns("https://test.local");
             _config = new Mock<IConfiguration>();
             _config.Setup(x => x["AuthType"]).Returns("provider");
-            _helper = new ProviderExternalUrlHelper(_reservationsConfig.Object, _config.Object);
+            _helper = new ExternalUrlHelper(_reservationsConfig.Object, _config.Object);
         }
 
         [TestCase("https://test.local")]
@@ -128,7 +128,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             _reservationsConfig.Setup(x => x.Value.EmployerDashboardUrl).Returns("https://test.local.dashboard/");
             _config = new Mock<IConfiguration>();
             _config.Setup(x => x["AuthType"]).Returns("employer");
-            _helper = new ProviderExternalUrlHelper(_reservationsConfig.Object, _config.Object);
+            _helper = new ExternalUrlHelper(_reservationsConfig.Object, _config.Object);
 
             //Act
             var actual = _helper.GenerateUrl(new UrlParameters{

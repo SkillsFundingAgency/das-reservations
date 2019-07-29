@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             UrlParameters urlParameters,
             [Frozen] ReservationsWebConfiguration webConfig,
             [Frozen] Mock<IConfiguration> config,
-            ProviderExternalUrlHelper urlHelper)
+            ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("provider");
 
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             UrlParameters urlParameters,
             [Frozen] ReservationsWebConfiguration webConfig,
             [Frozen] Mock<IConfiguration> config,
-            ProviderExternalUrlHelper urlHelper)
+            ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
 
