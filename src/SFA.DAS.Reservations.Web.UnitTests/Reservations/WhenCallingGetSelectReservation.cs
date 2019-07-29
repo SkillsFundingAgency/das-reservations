@@ -503,16 +503,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationLevyResult);
 
             urlHelper
-                .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" 
-                        )))
+                .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId,
+                    routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value,
+                    null, viewModel.CohortReference))
                 .Returns(addApprenticeUrl);
-
+           
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectResult;
 
@@ -594,16 +589,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(createReservationLevyResult);
 
             urlHelper
-                .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}"
-                        )))
+                .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId, 
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    "", 
+                    routeModel.UkPrn.Value,
+                    null, 
+                    viewModel.CohortReference))
                 .Returns(addApprenticeUrl);
-
+            
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectResult;
 

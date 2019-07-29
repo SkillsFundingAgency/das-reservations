@@ -164,15 +164,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(reservationResult);
             mockUrlHelper
-                .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                        $"&startMonthYear={reservationResult.StartDate:MMyyyy}" +
-                        $"&courseCode={reservationResult.Course.Id}")))
+                .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
+                    routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
+                    reservationResult.StartDate, viewModel.CohortReference))
                 .Returns(addApprenticeUrl);
             
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;

@@ -311,7 +311,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
                 case CompletedReservationWhatsNext.AddAnApprentice:
-                    var addApprenticeUrl = GenerateAddApprenticeUrl(routeModel.Id.Value,routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,model.StartDate, model.CohortRef);
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
+                        routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
+                        model.CohortRef);
 
                     return Redirect(addApprenticeUrl);
 
@@ -552,40 +554,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return Redirect(dashboardUrl);
         }
-
-        private string GenerateAddApprenticeUrl(Guid reservationId,string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef = "")
-        {
-            var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
-
-            if (startDate.HasValue)
-            {
-                queryString += $"&startMonthYear={startDate:MMyyyy}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                queryString += $"&courseCode={courseId}";
-            }
-
-            var controller = "unapproved";
-            var action = "add-apprentice";
-            if (!string.IsNullOrEmpty(cohortRef))
-            {
-                controller += $"/{cohortRef}";
-                action = "apprentices/add";
-            }
-
-            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
-            {
-                Id = ukPrn.ToString(),
-                Controller = controller,
-                Action = action,
-                QueryString = queryString
-            });
-            return addApprenticeUrl;
-        }
-
         
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,

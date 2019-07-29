@@ -114,9 +114,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                                     cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                                     EncodingType.PublicAccountLegalEntityId)
                             });
-
-                            var addApprenticeUrl = GenerateAddApprenticeUrl(createdReservation.ReservationId,
-                                routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value, null, viewModel.CohortReference);
+                            
+                            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
+                                routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value, null,
+                                viewModel.CohortReference);
 
                             return Redirect(addApprenticeUrl);
                         }
@@ -219,7 +220,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var reservation = await _mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
 
-                var url = GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
+                var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn.Value, reservation.StartDate,
                     viewModel.CohortReference);
 
@@ -297,40 +298,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CohortRef = cohortRef
             };
         }
-
-        private string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef = "")
-        {
-            var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
-
-            if (startDate.HasValue)
-            {
-                queryString += $"&startMonthYear={startDate:MMyyyy}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                queryString += $"&courseCode={courseId}";
-            }
-
-            var controller = "unapproved";
-            var action = "add-apprentice";
-            if (!string.IsNullOrEmpty(cohortRef))
-            {
-                controller += $"/{cohortRef}";
-                action = "apprentices/add";
-            }
-
-            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(new UrlParameters
-            {
-                Id = ukPrn.ToString(),
-                Controller = controller,
-                Action = action,
-                QueryString = queryString
-            });
-            return addApprenticeUrl;
-        }
-
 
     }
 
