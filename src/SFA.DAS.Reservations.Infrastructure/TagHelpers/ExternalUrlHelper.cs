@@ -31,6 +31,40 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
             return FormatUrl(baseUrl, urlParameters);
         }
+        
+        public object GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef)
+        {
+            var queryString =
+                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+
+            if (startDate.HasValue)
+            {
+                queryString += $"&startMonthYear={startDate:MMyyyy}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(courseId))
+            {
+                queryString += $"&courseCode={courseId}";
+            }
+
+            var controller = "unapproved";
+            var action = "add-apprentice";
+            if (!string.IsNullOrEmpty(cohortRef))
+            {
+                controller += $"/{cohortRef}";
+                action = "apprentices/add";
+            }
+
+            var urlParameters = new UrlParameters
+            {
+                Id = ukPrn.ToString(),
+                Controller = controller,
+                Action = action,
+                QueryString = queryString
+            };
+
+            return GenerateAddApprenticeUrl(urlParameters);
+        }
 
         /// <summary>
         /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
@@ -74,6 +108,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
             return urlString.ToString().TrimEnd('/');
         }
+
 
         private static string FormatBaseUrl(string url, string subDomain = "", string folder = "")
         {
