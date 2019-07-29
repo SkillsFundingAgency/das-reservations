@@ -740,12 +740,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
             DateTime startDate, 
             string cohortRef = "")
         {
-            var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}";
-            if (!string.IsNullOrWhiteSpace(courseId))
-            {
-                queryString += $"&courseCode={courseId}";
-            }
+            var queryString = $"?reservationId={reservationId}" +
+                              $"&EmployerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
+                              $"&courseCode={courseId}" +
+                              $"&startMonthYear={startDate:MMyyyy}";
+           
 
             string controller, action, id;
             if (ukPrn.HasValue)

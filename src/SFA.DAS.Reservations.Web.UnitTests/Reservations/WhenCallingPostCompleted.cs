@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -69,30 +70,37 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var addApprenticeUrl = _fixture.Create<string>();
             var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters => 
                         parameters.Id == routeModel.UkPrn.ToString() && 
                         parameters.SubDomain == "recruit")))
                 .Returns(providerRecruitUrl);
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters => 
                         parameters.Id == model.UkPrn.ToString() &&
                         parameters.Controller == "unapproved" &&
                         parameters.Action == "add-apprentice" &&
-                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}&startMonthYear={model.StartDate:MMyyyy}&courseCode={model.CourseId}")))
+                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
+                                                  $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
+                                                  $"&courseCode={model.CourseId}&startMonthYear={model.StartDate:MMyyyy}")))
                 .Returns(addApprenticeUrl);
+           
             mockUrlHelper
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters => parameters.Controller == "account")))
                 .Returns(homeUrl);
+            
             var controller = _fixture.Create<ReservationsController>();
             
             var actual = controller.PostCompleted(routeModel, model);
 
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);
+            
             switch (selection)
             {
                 case (CompletedReservationWhatsNext.RecruitAnApprentice):
@@ -134,6 +142,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var addApprenticeUrl = _fixture.Create<string>();
             var homeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters => 
@@ -141,14 +150,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         parameters.SubDomain == "recruit" &&
                         parameters.Folder == "accounts")))
                 .Returns(employerRecruitUrl);
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters => 
                         parameters.Id == routeModel.EmployerAccountId &&
                         parameters.Controller == "unapproved" &&
                         parameters.Action == "add" &&
-                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}&startMonthYear={model.StartDate:MMyyyy}&courseCode={model.CourseId}")))
+                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
+                                                  $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
+                                                  $"&courseCode={model.CourseId}&startMonthYear={model.StartDate:MMyyyy}")))
                 .Returns(addApprenticeUrl);
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters => 
@@ -156,12 +169,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         parameters.Controller == "teams" &&
                         parameters.Folder == "accounts")))
                 .Returns(homeUrl);
+            
             var controller = _fixture.Create<ReservationsController>();
             
             var actual = controller.PostCompleted(routeModel, model);
 
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);
+            
             switch (selection)
             {
                 case (CompletedReservationWhatsNext.RecruitAnApprentice):
@@ -195,6 +210,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var routeModel = _fixture.Create<ReservationsRouteModel>();
             var addApprenticeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
                     It.Is<UrlParameters>(parameters =>
@@ -202,10 +218,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         parameters.Controller == $"unapproved/{model.CohortRef}" &&
                         parameters.Action == "apprentices/add" &&
                         parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                        $"&startMonthYear={model.StartDate:MMyyyy}" +
-                        $"&courseCode={model.CourseId}")))
+                        $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
+                        $"&courseCode={model.CourseId}" + 
+                        $"&startMonthYear={model.StartDate:MMyyyy}")))
                 .Returns(addApprenticeUrl);
+            
             var controller = _fixture.Create<ReservationsController>();
 
             //Act
