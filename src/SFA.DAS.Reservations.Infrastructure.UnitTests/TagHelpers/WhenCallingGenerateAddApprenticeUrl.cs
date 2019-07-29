@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         public void Then_Uses_ApprenticeUrl_And_Params_To_Build_Url(
             UrlParameters urlParameters,
             [Frozen] ReservationsWebConfiguration config,
-            ProviderExternalUrlHelper urlHelper)
+            ExternalUrlHelper urlHelper)
         {
             var originalConfigUrl = config.ApprenticeUrl;
             config.ApprenticeUrl = $"https://{config.ApprenticeUrl}";

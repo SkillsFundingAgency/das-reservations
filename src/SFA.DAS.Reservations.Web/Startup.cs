@@ -164,7 +164,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
           
-            services.AddScoped<IExternalUrlHelper, ProviderExternalUrlHelper>();
+            services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<CommitmentsApiClient>();

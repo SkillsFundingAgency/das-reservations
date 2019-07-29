@@ -7,12 +7,12 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 {
-    public class ProviderExternalUrlHelper : IExternalUrlHelper
+    public class ExternalUrlHelper : IExternalUrlHelper
     {
         private readonly IConfiguration _configuration;
         private readonly ReservationsWebConfiguration _options;
 
-        public ProviderExternalUrlHelper(IOptions<ReservationsWebConfiguration> options, IConfiguration configuration)
+        public ExternalUrlHelper(IOptions<ReservationsWebConfiguration> options, IConfiguration configuration)
         {
             _configuration = configuration;
             _options = options.Value;
