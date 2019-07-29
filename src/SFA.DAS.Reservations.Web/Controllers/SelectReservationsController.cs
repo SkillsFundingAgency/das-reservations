@@ -94,38 +94,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     viewName = ViewNames.ProviderSelect;
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
-                    try
-                    {
-                        var autoReserveStatus = await _mediator.Send(
-                            new GetAccountReservationStatusQuery
-                            {
-                                AccountId = cacheReservationEmployerCommand.AccountId,
-                                TransferSenderAccountId = viewModel.TransferSenderId ?? "",
-                                HashedEmployerAccountId = _encodingService.Encode(cacheReservationEmployerCommand.AccountId, EncodingType.AccountId)
-                            });
 
-                        if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
+                    var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
+                        viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
+                        routeModel.UkPrn, viewModel.CohortReference);
+                    if (!string.IsNullOrEmpty(redirectResult))
+                    {
+                        if (redirectResult == RouteNames.Error500)
                         {
-                            var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
-                            {
-                                AccountId = cacheReservationEmployerCommand.AccountId,
-                                TransferSenderId = autoReserveStatus.TransferAccountId == 0 ? (long?)null : autoReserveStatus.TransferAccountId,
-                                AccountLegalEntityId = _encodingService.Decode(
-                                    cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                                    EncodingType.PublicAccountLegalEntityId)
-                            });
-                            
-                            var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
-                                routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value, null,
-                                viewModel.CohortReference);
-
-                            return Redirect(addApprenticeUrl);
+                            return RedirectToRoute(redirectResult);
                         }
-                    }
-                    catch (TransferSendNotAllowedException e)
-                    {
-                        _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
-                        return RedirectToRoute(RouteNames.Error500);
+
+                        return Redirect(redirectResult);
                     }
                 }
                 else
@@ -274,6 +254,45 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, routeModel);
+        }
+
+        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef)
+        {
+            try
+            {
+                var autoReserveStatus = await _mediator.Send(
+                    new GetAccountReservationStatusQuery
+                    {
+                        AccountId = accountId,
+                        TransferSenderAccountId = transferSenderId ?? "",
+                        HashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId)
+                    });
+
+                if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
+                {
+                    var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
+                    {
+                        AccountId = accountId,
+                        TransferSenderId = autoReserveStatus.TransferAccountId == 0 ? (long?)null : autoReserveStatus.TransferAccountId,
+                        AccountLegalEntityId = _encodingService.Decode(
+                            accountLegalEntityPublicHashedId,
+                            EncodingType.PublicAccountLegalEntityId)
+                    });
+
+                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
+                        accountLegalEntityPublicHashedId, "", ukPrn.Value, null,
+                        cohortRef);
+
+                    return addApprenticeUrl;
+                }
+            }
+            catch (TransferSendNotAllowedException e)
+            {
+                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+                return RouteNames.Error500;
+            }
+
+            return string.Empty;
         }
 
         private async Task<CacheReservationEmployerCommand> BuildEmployerReservationCacheCommand(string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef)
