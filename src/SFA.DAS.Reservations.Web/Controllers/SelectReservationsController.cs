@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             try
             {
                 var viewName = ViewNames.EmployerSelect;
-                var apprenticeshipTrainingRouteName = RouteNames.EmployerApprenticeshipTraining;
+                var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourse;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
 
                 if (routeModel.UkPrn.HasValue)
@@ -116,13 +116,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     if (cacheReservationEmployerCommand == null)
                     {
-                        _logger.LogWarning($"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
+                        _logger.LogWarning(
+                            $"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
                         return RedirectToRoute(RouteNames.Error500);
                     }
                 }
 
                 var availableReservationsResult = await _mediator.Send(
-                    new GetAvailableReservationsQuery { AccountId = cacheReservationEmployerCommand.AccountId });
+                    new GetAvailableReservationsQuery {AccountId = cacheReservationEmployerCommand.AccountId});
 
                 if (availableReservationsResult.Reservations != null &&
                     availableReservationsResult.Reservations.Any())
@@ -148,12 +149,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ProviderNotAuthorisedException e)
             {
-                _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
+                _logger.LogWarning(e,
+                    $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
                 return View("NoPermissions", backUrl);
             }
             catch (ReservationLimitReachedException)
             {
                 return View("ReservationLimitReached", backUrl);
+            }
+            catch (GlobalReservationRuleException)
+            {
+                if (routeModel.UkPrn.HasValue)
+                {
+                    return View("ProviderFundingPaused");
+                }
+                return View("EmployerFundingPaused");
             }
             catch (Exception e)
             {
