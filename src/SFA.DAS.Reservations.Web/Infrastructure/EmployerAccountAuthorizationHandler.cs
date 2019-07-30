@@ -47,11 +47,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (employerAccountClaim == null)
                 return false;
 
+            EmployerIdentifier employerIdentifier = null;
+
             if (employerAccounts != null)
             {
-                var employerIdentifier = employerAccounts[accountIdFromUrl];
-
-                if (!CheckUserRoleForAccess(employerIdentifier)) return false;
+                employerIdentifier = employerAccounts[accountIdFromUrl];
             }
 
             if (employerAccounts == null || !employerAccounts.ContainsKey(accountIdFromUrl))
@@ -75,9 +75,12 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                     return false;
                 }
 
-                var employerIdentifier = updatedEmployerAccounts[accountIdFromUrl];
+                employerIdentifier = updatedEmployerAccounts[accountIdFromUrl];
+            }
 
-                if (!CheckUserRoleForAccess(employerIdentifier)) return false;
+            if (!CheckUserRoleForAccess(employerIdentifier)) 
+            {
+                return false;
             }
 
             if (!mvcContext.HttpContext.Items.ContainsKey(ContextItemKeys.EmployerIdentifier))
@@ -95,7 +98,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 return false;
             }
 
-            return userRole != EmployerUserRole.Viewer && userRole != EmployerUserRole.None;
+            return userRole == EmployerUserRole.Owner || userRole == EmployerUserRole.Transactor;
         }
     }
 }
