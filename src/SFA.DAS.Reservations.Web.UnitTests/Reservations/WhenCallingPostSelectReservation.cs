@@ -8,7 +8,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
@@ -111,6 +113,68 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             result.ViewName.Should().Be("ReservationLimitReached");
             result.Model.Should().Be(cohortDetailsUrl);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_GlobalRule_Is_In_Place_Then_The_Funding_Paused_View_Is_Shown_For_Provider(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetTrustedEmployersResponse employersResponse,
+                string cohortDetailsUrl,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                [Frozen] Mock<IMediator> mockMediator,
+                SelectReservationsController controller)
+        {
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetTrustedEmployersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new GlobalReservationRuleException(viewModel.AccountId));
+            
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be("ProviderFundingPaused");
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_GlobalRule_Is_In_Place_Then_The_Funding_Paused_View_Is_Shown_For_Employer(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            string cohortDetailsUrl,
+            long expectedAccountId,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
+            SelectReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new GlobalReservationRuleException(viewModel.AccountId));
+
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be("EmployerFundingPaused");
         }
 
         [Test, MoqAutoData]

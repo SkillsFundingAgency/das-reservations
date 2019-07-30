@@ -263,6 +263,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("NoPermissions", backUrl);
             }
 
+            catch (GlobalReservationRuleException)
+            {
+                if (routeModel.UkPrn.HasValue)
+                {
+                    return View("ProviderFundingPaused");
+                }
+                return View("EmployerFundingPaused");
+            }
             return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, routeModel);
         }
 
