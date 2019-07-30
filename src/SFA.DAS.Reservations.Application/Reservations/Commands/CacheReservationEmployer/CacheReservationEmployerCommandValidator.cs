@@ -35,11 +35,18 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             }
             else
             {
-                var globalRules = await _rulesService.GetAccountFundingRules(command.AccountId);
-                if (globalRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
-                    globalRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
+                var accountFundingRulesApiResponse = await _rulesService.GetAccountFundingRules(command.AccountId);
+                if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
+                    accountFundingRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
                 {
                     result.FailedRuleValidation = true;
+                }
+
+                var globalRulesApiResponse = await _rulesService.GetFundingRules();
+                if (globalRulesApiResponse.GlobalRules.Any(c => c.RuleType == GlobalRuleType.FundingPaused) &&
+                    globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused) > 0)
+                {
+                    result.FailedGlobalRuleValidation = true;
                 }
             }
 
