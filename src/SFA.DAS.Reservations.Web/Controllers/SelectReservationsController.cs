@@ -54,7 +54,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var viewName = ViewNames.EmployerSelect;
                 var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourse;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
 
@@ -91,8 +90,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         return RedirectToRoute(RouteNames.Error500);
                     }
 
-
-                    viewName = ViewNames.ProviderSelect;
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
 
                     var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
@@ -132,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         .Select(reservation => new AvailableReservationViewModel(reservation));
                     viewModel.AccountId = cacheReservationEmployerCommand.AccountId;
                     viewModel.BackLink = backUrl;
-                    return View(viewName, viewModel);
+                    return View(ViewNames.Select, viewModel);
                 }
 
 
@@ -201,7 +198,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Action = "details"
                 });
 
-                return View("ProviderSelect", viewModel);
+                return View(ViewNames.Select, viewModel);
             }
 
             if (viewModel.SelectedReservationId.HasValue &&
@@ -262,7 +259,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
                 return View("NoPermissions", backUrl);
             }
-
             catch (GlobalReservationRuleException)
             {
                 if (routeModel.UkPrn.HasValue)
@@ -271,7 +267,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
                 return View("EmployerFundingPaused");
             }
-            return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, routeModel);
+            var routeName = RouteNames.ProviderApprenticeshipTraining;
+            if (!routeModel.UkPrn.HasValue)
+            {
+                routeName = RouteNames.EmployerSelectCourse;
+            }
+            
+            return RedirectToRoute(routeName, routeModel);
         }
 
         private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef)

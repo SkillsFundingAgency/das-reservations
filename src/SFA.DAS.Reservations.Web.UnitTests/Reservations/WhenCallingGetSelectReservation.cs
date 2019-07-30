@@ -239,7 +239,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
 
             //Assert
-            result.ViewName.Should().Be(ViewNames.ProviderSelect);
+            result.ViewName.Should().Be(ViewNames.Select);
             var actualModel = result.Model as SelectReservationViewModel;
             actualModel.Should().NotBeNull();
             actualModel.CohortReference.Should().Be(viewModel.CohortReference);

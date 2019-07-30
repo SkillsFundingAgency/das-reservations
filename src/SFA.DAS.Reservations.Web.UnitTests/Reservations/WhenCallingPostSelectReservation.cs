@@ -79,6 +79,48 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task And_Is_An_Employer_And_New_Reservation_Then_Redirects_To_EmployerApprenticeshipTraining_And_The_Cached_Reservation_Is_Created(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            long expectedAccountId,
+            GetLegalEntitiesResponse employersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
+            SelectReservationsController controller)
+        {
+            
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            result?.RouteName.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
+            result.RouteValues["EmployerAccountId"].Should().Be(routeModel.EmployerAccountId);
+            result.RouteValues["id"].Should().NotBe(Guid.Empty);
+            mockMediator.Verify(x =>
+                x.Send(It.Is<CacheReservationEmployerCommand>(
+                        c =>
+                            c.CohortRef.Equals(viewModel.CohortReference) &&
+                            c.AccountId.Equals(expectedAccountId) &&
+                            c.AccountLegalEntityName.Equals(matchedEmployer.AccountLegalEntityName) &&
+                            c.AccountLegalEntityPublicHashedId.Equals(matchedEmployer.AccountLegalEntityPublicHashedId) &&
+                            !c.Id.Equals(Guid.Empty) &&
+                            c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
+                    , It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_Reservation_Limit_Has_Been_Reached_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
@@ -262,7 +304,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
-            result.ViewName.Should().Be("ProviderSelect");
+            result.ViewName.Should().Be("Select");
             var actualModel = result.Model as SelectReservationViewModel;
             actualModel.Should().NotBeNull();
             actualModel.AvailableReservations.Should().BeEquivalentTo(availableReservationsResult.Reservations.Select(c=>new AvailableReservationViewModel(c)));
