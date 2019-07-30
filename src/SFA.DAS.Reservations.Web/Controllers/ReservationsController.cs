@@ -314,7 +314,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
                         routeModel.Id.Value, 
                         routeModel.AccountLegalEntityPublicHashedId, model.CourseId, 
-                        model.UkPrn,
+                        routeModel.UkPrn,
                         model.StartDate, 
                         model.CohortRef,
                         routeModel.EmployerAccountId);
@@ -380,7 +380,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         reservation.Course.Id,
                         routeModel.UkPrn,
                         reservation.StartDate,
-                        "",
+                        routeModel.CohortRef,
                         routeModel.EmployerAccountId);
 
                     var viewModel = new ReservationViewModel(reservation, apprenticeUrl);

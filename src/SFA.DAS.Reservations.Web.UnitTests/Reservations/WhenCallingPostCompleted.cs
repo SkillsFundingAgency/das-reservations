@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId,
                         model.CourseId,
-                        model.UkPrn,
+                        routeModel.UkPrn,
                         model.StartDate,
                         "",
                         routeModel.EmployerAccountId))
@@ -217,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId,
                     model.CourseId,
-                    model.UkPrn,
+                    routeModel.UkPrn,
                     model.StartDate,
                     model.CohortRef,
                     routeModel.EmployerAccountId))
