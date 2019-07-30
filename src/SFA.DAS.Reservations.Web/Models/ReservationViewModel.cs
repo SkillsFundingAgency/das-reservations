@@ -6,19 +6,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReservationViewModel : AddApprenticeViewModel
     {
-        public ReservationViewModel(
-            Reservation reservation, 
-            string apprenticeUrl, 
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId) 
-            : base(
-                apprenticeUrl, 
-                reservation.ProviderId, 
-                reservation.Id, 
-                accountHashedId,
-                accountLegalEntityPublicHashedId, 
-                reservation.StartDate, 
-                reservation.Course)
+        public ReservationViewModel(Reservation reservation, string apprenticeUrl) : base(apprenticeUrl)
         {
             Id = reservation.Id;
             TrainingDate = new TrainingDateModel

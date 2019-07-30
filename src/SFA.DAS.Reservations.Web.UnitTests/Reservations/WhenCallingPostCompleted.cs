@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
@@ -77,16 +78,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         parameters.Id == routeModel.UkPrn.ToString() && 
                         parameters.SubDomain == "recruit")))
                 .Returns(providerRecruitUrl);
-            
+
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == model.UkPrn.ToString() &&
-                        parameters.Controller == "unapproved" &&
-                        parameters.Action == "add-apprentice" &&
-                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
-                                                  $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                                                  $"&courseCode={model.CourseId}&startMonthYear={model.StartDate:MMyyyy}")))
+                        routeModel.Id.Value,
+                        routeModel.AccountLegalEntityPublicHashedId,
+                        model.CourseId,
+                        model.UkPrn,
+                        model.StartDate,
+                        "",
+                        routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
            
             mockUrlHelper
@@ -153,13 +154,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == routeModel.EmployerAccountId &&
-                        parameters.Controller == "unapproved" &&
-                        parameters.Action == "add" &&
-                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
-                                                  $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                                                  $"&courseCode={model.CourseId}&startMonthYear={model.StartDate:MMyyyy}")))
+                    routeModel.Id.Value,
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    model.CourseId,
+                    model.UkPrn,
+                    model.StartDate,
+                    "",
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             
             mockUrlHelper
@@ -213,14 +214,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == model.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{model.CohortRef}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={routeModel.Id.Value}" +
-                        $"&EmployerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                        $"&courseCode={model.CourseId}" + 
-                        $"&startMonthYear={model.StartDate:MMyyyy}")))
+                    routeModel.Id.Value,
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    model.CourseId,
+                    model.UkPrn,
+                    model.StartDate,
+                    model.CohortRef,
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             
             var controller = _fixture.Create<ReservationsController>();

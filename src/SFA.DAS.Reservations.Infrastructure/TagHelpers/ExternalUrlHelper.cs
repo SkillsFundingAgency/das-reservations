@@ -32,10 +32,10 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
         
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef)
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId)
         {
             var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+                $"?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}";
 
             if (startDate.HasValue)
             {
@@ -47,17 +47,32 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
-            var controller = "unapproved";
-            var action = "add-apprentice";
+            string controller, action, id;
+            
+            if (ukPrn.HasValue)
+            {
+                controller = "unapproved";
+                action = "add-apprentice";
+                id = ukPrn.ToString();
+            }
+            else
+            {
+                controller = "unapproved";
+                action = "add";
+                id = accountHashedId;
+            }
+
             if (!string.IsNullOrEmpty(cohortRef))
             {
                 controller += $"/{cohortRef}";
                 action = "apprentices/add";
             }
 
+           
+
             var urlParameters = new UrlParameters
             {
-                Id = ukPrn.ToString(),
+                Id = id,
                 Controller = controller,
                 Action = action,
                 QueryString = queryString

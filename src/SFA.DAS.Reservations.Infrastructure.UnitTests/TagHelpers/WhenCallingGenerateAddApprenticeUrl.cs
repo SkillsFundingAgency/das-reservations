@@ -1,4 +1,5 @@
-﻿using AutoFixture.NUnit3;
+﻿using System;
+using AutoFixture.NUnit3;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -58,21 +59,25 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             uint ukPrn,
             DateTime startDate,
             string cohortRef,
-            [Frozen] ReservationsWebConfiguration config,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
         {
-            var originalConfigUrl = config.ApprenticeUrl;
-            config.ApprenticeUrl = $"https://{config.ApprenticeUrl}";
+            config.Setup(x => x["AuthType"]).Returns("provider");
+
+            var originalConfigUrl = webConfig.ApprenticeUrl;
+            webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
                 accountLegalEntityPublicHashedId,
                 courseId,
                 ukPrn,
                 startDate,
-                cohortRef);
+                cohortRef,
+                "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
                 actualUrl);
         }
 
@@ -84,21 +89,25 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             string courseId,
             uint ukPrn,
             DateTime startDate,
-            [Frozen] ReservationsWebConfiguration config,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
         {
-            var originalConfigUrl = config.ApprenticeUrl;
-            config.ApprenticeUrl = $"https://{config.ApprenticeUrl}";
+            config.Setup(x => x["AuthType"]).Returns("provider");
+
+            var originalConfigUrl = webConfig.ApprenticeUrl;
+            webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
                 accountLegalEntityPublicHashedId,
                 courseId,
                 ukPrn,
                 startDate,
+                "",
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
                 actualUrl);
         }
 
@@ -109,21 +118,25 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
             uint ukPrn,
-            [Frozen] ReservationsWebConfiguration config,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
         {
-            var originalConfigUrl = config.ApprenticeUrl;
-            config.ApprenticeUrl = $"https://{config.ApprenticeUrl}";
+            config.Setup(x => x["AuthType"]).Returns("provider");
+
+            var originalConfigUrl = webConfig.ApprenticeUrl;
+            webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
                 accountLegalEntityPublicHashedId,
                 "",
                 ukPrn,
                 null,
+                "",
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}",
                 actualUrl);
         }
 
