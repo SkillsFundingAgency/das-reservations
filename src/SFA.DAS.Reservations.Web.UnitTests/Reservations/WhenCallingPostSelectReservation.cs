@@ -145,8 +145,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
-                        parameters.Action == "details" )))
+                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
+                        parameters.Action == "details" &&
+                        parameters.Folder == "")))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -186,9 +187,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.EmployerAccountId &&
-                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
-                        parameters.Action == "details" )))
+                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
+                        parameters.Action == "details" &&
+                        parameters.Folder == "commitments/accounts")))
                 .Returns(cohortDetailsUrl);
+
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            var actualModel = result.Model as string;
+            Assert.IsNotNull(actualModel);
+            Assert.AreEqual(cohortDetailsUrl, actualModel);
         }
 
         [Test, MoqAutoData]
@@ -278,8 +289,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
-                        parameters.Action == "details")))
+                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
+                        parameters.Action == "details" &&
+                        parameters.Folder == "")))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -306,7 +318,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
-                    reservationResult.StartDate, viewModel.CohortReference))
+                    reservationResult.StartDate, routeModel.CohortReference, routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;

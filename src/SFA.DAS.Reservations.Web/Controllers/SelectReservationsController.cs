@@ -54,7 +54,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
                 Controller = $"apprentices/{viewModel.CohortReference}",
-                Action = "details"
+                Action = "details",
+                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
             });
 
             try
@@ -70,8 +71,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                         {
                             AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                            CohortRef = routeModel.CohortRef,
-                            CohortId = _encodingService.Decode(routeModel.CohortRef, EncodingType.CohortReference),
+                            CohortRef = routeModel.CohortReference,
+                            CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
                             UkPrn = routeModel.UkPrn.Value
                         });
 
@@ -91,18 +92,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
 
-                    var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
-                        viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                        routeModel.UkPrn, viewModel.CohortReference);
-                    if (!string.IsNullOrEmpty(redirectResult))
-                    {
-                        if (redirectResult == RouteNames.Error500)
-                        {
-                            return RedirectToRoute(redirectResult);
-                        }
-
-                        return Redirect(redirectResult);
-                    }
+                    
                 }
                 else
                 {
@@ -116,6 +106,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                             $"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
                         return RedirectToRoute(RouteNames.Error500);
                     }
+                }
+
+                var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
+                    viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
+                    routeModel.UkPrn, viewModel.CohortReference, routeModel.EmployerAccountId);
+                if (!string.IsNullOrEmpty(redirectResult))
+                {
+                    if (redirectResult == RouteNames.Error500)
+                    {
+                        return RedirectToRoute(redirectResult);
+                    }
+
+                    return Redirect(redirectResult);
                 }
 
                 var availableReservationsResult = await _mediator.Send(
@@ -181,8 +184,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var backUrl = _urlHelper.GenerateUrl(new UrlParameters
             {
                 Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
-                Controller = $"apprentices/{viewModel.CohortReference}",
-                Action = "details"
+                Controller = $"apprentices/{routeModel.CohortReference}",
+                Action = "details",
+                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
             });
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
@@ -206,8 +210,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var reservation = await _mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
 
                 var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
-                    routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn.Value, reservation.StartDate,
-                    viewModel.CohortReference);
+                    routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn, reservation.StartDate,
+                    viewModel.CohortReference, routeModel.EmployerAccountId);
 
                 var addApprenticeUrl = url;
 
@@ -223,8 +227,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                        CohortRef = routeModel.CohortRef,
-                        CohortId = _encodingService.Decode(routeModel.CohortRef, EncodingType.CohortReference),
+                        CohortRef = routeModel.CohortReference,
+                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
@@ -267,16 +271,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef)
+        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId)
         {
             try
             {
+                var hashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId);
                 var autoReserveStatus = await _mediator.Send(
                     new GetAccountReservationStatusQuery
                     {
                         AccountId = accountId,
                         TransferSenderAccountId = transferSenderId ?? "",
-                        HashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId)
+                        HashedEmployerAccountId = hashedEmployerAccountId
                     });
 
                 if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
@@ -291,8 +296,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     });
 
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
-                        accountLegalEntityPublicHashedId, "", ukPrn.Value, null,
-                        cohortRef);
+                        accountLegalEntityPublicHashedId, "", ukPrn, null,
+                        cohortRef, hashedAccountId);
 
                     return addApprenticeUrl;
                 }

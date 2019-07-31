@@ -172,7 +172,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -217,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -286,7 +286,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.EmployerAccountId &&
                         parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
-                        parameters.Action == "details")))
+                        parameters.Action == "details" &&
+                        parameters.Folder == "commitments/accounts")))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -334,7 +335,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -384,7 +385,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -559,7 +560,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId,
                     routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value,
-                    null, viewModel.CohortReference))
+                    null, viewModel.CohortReference, routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
            
             //Act
@@ -622,7 +623,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -648,7 +649,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     "", 
                     routeModel.UkPrn.Value,
                     null, 
-                    viewModel.CohortReference))
+                    viewModel.CohortReference, 
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             
             //Act

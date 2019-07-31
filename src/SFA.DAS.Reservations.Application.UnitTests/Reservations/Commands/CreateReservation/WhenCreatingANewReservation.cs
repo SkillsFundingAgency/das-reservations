@@ -117,14 +117,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             await _commandHandler.Handle(command, CancellationToken.None);
 
-            _mockCacheRepository.Verify(service => service.GetProviderReservation(command.Id, command.UkPrn), Times.Once);
+            _mockCacheRepository.Verify(service => service.GetProviderReservation(command.Id, command.UkPrn.Value), Times.Once);
             _mockCacheRepository.Verify(service => service.GetEmployerReservation(It.IsAny<Guid>()), Times.Never);
         }
 
         [Test, AutoData]
         public async Task Then_Gets_Employer_Reservation_From_The_Cache(CreateReservationCommand command)
         {
-            command.UkPrn = default(uint);
+            command.UkPrn = null;
 
             _mockCacheRepository.Setup(r => r.GetEmployerReservation(It.IsAny<Guid>()))
                 .ReturnsAsync(_cachedReservation);

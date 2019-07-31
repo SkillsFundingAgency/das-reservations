@@ -18,6 +18,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
+        /// <summary>
+        /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
+        /// </summary>
+        /// <param name="urlParameters"></param>
+        /// <returns></returns>
         public string GenerateUrl(UrlParameters urlParameters)
         {
             var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
@@ -27,10 +32,10 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
         
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint ukPrn, DateTime? startDate, string cohortRef)
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId)
         {
             var queryString =
-                $"?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+                $"?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}";
 
             if (startDate.HasValue)
             {
@@ -42,8 +47,19 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
-            var controller = "unapproved";
-            var action = "add-apprentice";
+            string controller = "unapproved", action, id;
+            
+            if (ukPrn.HasValue)
+            {
+                action = "add-apprentice";
+                id = ukPrn.ToString();
+            }
+            else
+            {
+                action = "add";
+                id = accountHashedId;
+            }
+
             if (!string.IsNullOrEmpty(cohortRef))
             {
                 controller += $"/{cohortRef}";
@@ -52,7 +68,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
             var urlParameters = new UrlParameters
             {
-                Id = ukPrn.ToString(),
+                Id = id,
                 Controller = controller,
                 Action = action,
                 QueryString = queryString
@@ -61,9 +77,16 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return GenerateAddApprenticeUrl(urlParameters);
         }
 
+        /// <summary>
+        /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
+        /// </summary>
+        /// <param name="urlParameters"></param>
+        /// <returns></returns>
         public string GenerateAddApprenticeUrl(UrlParameters urlParameters)
         {
-            var baseUrl = _options.ApprenticeUrl;
+            var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
+                ? _options.EmployerApprenticeUrl
+                : _options.ApprenticeUrl;
 
             return FormatUrl(baseUrl, urlParameters);
         }

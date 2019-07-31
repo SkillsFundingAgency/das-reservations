@@ -143,7 +143,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             await _commandHandler.Handle(command, CancellationToken.None);
 
             //Assert
-            _mockCacheRepository.Verify(service => service.GetProviderReservation(command.Id, command.UkPrn), Times.Once);
+            _mockCacheRepository.Verify(service => service.GetProviderReservation(command.Id, command.UkPrn.Value), Times.Once);
             _mockCacheRepository.Verify(service => service.GetEmployerReservation(It.IsAny<Guid>()), Times.Never);
         }
 
@@ -151,7 +151,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         public async Task Then_Gets_Employer_Cached_Reservation(CacheReservationCourseCommand command)
         {
             //Arrange
-            command.UkPrn = default(uint);
+            command.UkPrn = null;
 
             //Act
             await _commandHandler.Handle(command, CancellationToken.None);

@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (validationResult.FailedAuthorisationValidation)
             {
-                throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn);
+                throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn.Value);
             }
 
             if (validationResult.FailedGlobalRuleValidation)
@@ -53,9 +53,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 AccountLegalEntityId = command.AccountLegalEntityId,
                 AccountLegalEntityPublicHashedId = command.AccountLegalEntityPublicHashedId,
                 AccountLegalEntityName = command.AccountLegalEntityName,
-                UkPrn = command.UkPrn,
                 AccountName = command.AccountName,
-                CohortRef = command.CohortRef
+                CohortRef = command.CohortRef,
+                UkPrn = command.UkPrn
             };
 
             await _cacheStorageService.SaveToCache(reservation.Id.ToString(), reservation, 1);

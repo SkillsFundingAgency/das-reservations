@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -13,6 +14,7 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -87,11 +89,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation =>
-                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+                new ReservationViewModel(reservation, config.ApprenticeUrl)));
             expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation =>
-                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+                new ReservationViewModel(reservation, config.ApprenticeUrl)));
             expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation =>
-                new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+                new ReservationViewModel(reservation, config.ApprenticeUrl)));
 
             var result = await controller.Manage(routeModel) as ViewResult;
 
@@ -116,6 +118,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
+
             mockEncodingService
                 .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(decodedAccountId);
@@ -127,6 +130,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         It.IsAny<GetTrustedEmployersQuery>(),
                         It.IsAny<CancellationToken>()),
                 Times.Never);
+            
             mockMediator.Verify(mediator =>
                     mediator.Send(
                         It.Is<GetReservationsQuery>(query => query.AccountId == decodedAccountId),
@@ -139,23 +143,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationsResult getReservationsResult,
             string hashedId,
+            string expectedUrl,
             [Frozen] ReservationsWebConfiguration config,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
+            
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
+            
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
+            mockExternalUrlHelper.Setup(h => h.GenerateAddApprenticeUrl(
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<uint?>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<string>(),
+                It.IsAny<string>())).Returns(expectedUrl);
+
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(
                 getReservationsResult.Reservations.Select(
-                    reservation => new ReservationViewModel(reservation, config.ApprenticeUrl, hashedId)));
+                    reservation => new ReservationViewModel(reservation, expectedUrl)));
 
             var result = await controller.Manage(routeModel) as ViewResult;
 
@@ -168,15 +185,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task UkPrn_Will_Be_Populated_From_RouteModel_For_Each_Reservation(
-             ReservationsRouteModel routeModel,
+        public async Task UkPrn_Will_Be_Populated_From_RouteModel_Reservation(
+            ReservationsRouteModel routeModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             Reservation reservation,
-             Reservation reservationTwo,
             string hashedId,
+            string expectedUrl,
             [Frozen] ReservationsWebConfiguration config,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             ReservationsController controller)
         {
             mockMediator
@@ -190,20 +208,30 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetReservationsResult
                 {
-                    Reservations = new []{reservation, reservationTwo }
+                    Reservations = new []{ reservation }
                 });
 
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
+
+            mockUrlHelper.Setup(h => h.GenerateAddApprenticeUrl(
+                reservation.Id,
+                hashedId,
+                reservation.Course.Id,
+                routeModel.UkPrn,
+                reservation.StartDate,
+                routeModel.CohortReference,
+                routeModel.EmployerAccountId))
+                .Returns(expectedUrl);
+                
             
             var result = await controller.Manage(routeModel) as ViewResult;
             
             var viewModel = result?.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
 
-            Assert.IsTrue(viewModel.Reservations.All(c=>c.ApprenticeUrl.StartsWith($"{config.ApprenticeUrl}/{routeModel.UkPrn}/")));
-
+            Assert.IsTrue(viewModel.Reservations.All(c=>c.ApprenticeUrl.Equals(expectedUrl)));
         }
 
         [Test, MoqAutoData]

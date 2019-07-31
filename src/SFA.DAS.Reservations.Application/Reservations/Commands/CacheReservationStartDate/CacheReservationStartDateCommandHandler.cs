@@ -38,13 +38,13 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             CachedReservation cachedReservation;
 
-            if (command.UkPrn == default(uint))
+            if (!command.UkPrn.HasValue)
             {
                 cachedReservation = await _cachedReservationRepository.GetEmployerReservation(command.Id);
             }
             else
             {
-                cachedReservation = await _cachedReservationRepository.GetProviderReservation(command.Id, command.UkPrn);
+                cachedReservation = await _cachedReservationRepository.GetProviderReservation(command.Id, command.UkPrn.Value);
             }
 
             if (cachedReservation == null)
