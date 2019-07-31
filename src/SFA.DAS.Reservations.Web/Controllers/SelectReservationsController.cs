@@ -181,7 +181,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var backUrl = string.Empty;
 
-            if (viewModel.SelectedReservationId == Guid.Empty)
+            if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {
                 var availableReservationsResult = await _mediator.Send(
                     new GetAvailableReservationsQuery { AccountId = viewModel.AccountId });

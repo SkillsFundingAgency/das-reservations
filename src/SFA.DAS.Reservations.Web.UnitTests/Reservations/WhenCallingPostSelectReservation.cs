@@ -309,5 +309,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actualModel.Should().NotBeNull();
             actualModel.AvailableReservations.Should().BeEquivalentTo(availableReservationsResult.Reservations.Select(c=>new AvailableReservationViewModel(c)));
         }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Option_Has_Been_Selected_And_ReservationId_Is_Null_Then_The_Validation_Errors_Are_Returned_To_The_User_And_ViewModel_Recreated(
+            ReservationsRouteModel routeModel,
+            GetAvailableReservationsResult availableReservationsResult,
+            SelectReservationViewModel viewModel,
+            string cohortDetailsUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            SelectReservationsController controller)
+        {
+            viewModel.SelectedReservationId = null;
+            mockMediator
+                .Setup(x => x.Send(It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(viewModel.AccountId)),
+                    It.IsAny<CancellationToken>())).ReturnsAsync(availableReservationsResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.UkPrn.ToString() &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+
+            result.ViewName.Should().Be("Select");
+            var actualModel = result.Model as SelectReservationViewModel;
+            actualModel.Should().NotBeNull();
+            actualModel.AvailableReservations.Should().BeEquivalentTo(availableReservationsResult.Reservations.Select(c => new AvailableReservationViewModel(c)));
+        }
     }
 }
