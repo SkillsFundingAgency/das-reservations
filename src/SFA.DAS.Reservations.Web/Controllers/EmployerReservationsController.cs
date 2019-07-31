@@ -214,21 +214,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
-                BackLink = GenerateBackLink(routeModel),
-                CohortReference = routeModel.CohortReference
+                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef),
+                CohortReference = cachedReservation.CohortRef
             };
 
             return View(viewModel);
         }
 
-        private string GenerateBackLink(ReservationsRouteModel routeModel)
+        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef)
         {
             if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
                 return _urlHelper.GenerateUrl(new UrlParameters
                 {
                     Id = routeModel.EmployerAccountId,
-                    Controller = $"apprentices/{routeModel.CohortReference}",
+                    Controller = $"apprentices/{cohortRef}",
                     Action = "details",
                     Folder = "commitments/accounts"
                 });
@@ -255,6 +255,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Id = routeModel.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
+                    CohortReference = routeModel.CohortReference
                 });
             }
             catch (ValidationException e)
@@ -277,7 +278,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     ReservationId = routeModel.Id.Value,
                     Courses = courseViewModels,
-                    BackLink = GenerateBackLink(routeModel),
+                    BackLink = GenerateBackLink(routeModel, routeModel.CohortReference),
                     CohortReference = routeModel.CohortReference
                 };
 

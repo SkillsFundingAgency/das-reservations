@@ -135,6 +135,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
+            GetCachedReservationResult cachedReservationResult,
             string cohortUrl,
             EmployerReservationsController controller
             )
@@ -146,10 +147,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 {
                     Courses = courses
                 });
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
             externalUrlHelper.Setup(x => x.GenerateUrl(
                 It.Is<UrlParameters>(c => c.Id.ToString() == routeModel.EmployerAccountId.ToString()
                                           && c.Action == "details"
-                                          && c.Controller == $"apprentices/{routeModel.CohortReference}"
+                                          && c.Controller == $"apprentices/{cachedReservationResult.CohortRef}"
                                           && c.Folder == "commitments/accounts"
                                           )))
                 .Returns(cohortUrl);
@@ -161,7 +165,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(cohortUrl,viewModel.BackLink);
-            Assert.AreEqual(routeModel.CohortReference,viewModel.CohortReference);
+            Assert.AreEqual(cachedReservationResult.CohortRef,viewModel.CohortReference);
         }
 
         [Test, MoqAutoData]
