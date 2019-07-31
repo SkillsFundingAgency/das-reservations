@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -43,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             options.Setup(o => o.Value).Returns(_employerConfig);
 
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object);
+            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object, Mock.Of<IExternalUrlHelper>());
         }
 
         [Test, MoqAutoData]

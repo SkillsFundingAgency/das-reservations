@@ -17,6 +17,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -32,13 +33,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
+        private readonly IExternalUrlHelper _urlHelper;
         private readonly ReservationsWebConfiguration _config;
 
-        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
+        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options, IExternalUrlHelper urlHelper)
         {
             _mediator = mediator;
             _encodingService = encodingService;
-            
+            _urlHelper = urlHelper;
             _config = options.Value;
         }
 
@@ -212,11 +214,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
-                BackLink = routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity 
+                BackLink = GenerateBackLink(routeModel),
+                CohortReference = routeModel.CohortReference
             };
 
             return View(viewModel);
         }
+
+        private string GenerateBackLink(ReservationsRouteModel routeModel)
+        {
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
+            {
+                return _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Id = routeModel.EmployerAccountId,
+                    Controller = $"apprentices/{routeModel.CohortReference}",
+                    Action = "details",
+                    Folder = "commitments/accounts"
+                });
+            }
+            return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
+        }
+        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -228,7 +247,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 await _mediator.Send(new CacheReservationCourseCommand
                 {
                     Id = routeModel.Id.Value,
-                    CourseId = selectedCourseId
+                    CourseId = selectedCourseId,
+
                 });
 
                 return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
@@ -256,7 +276,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var viewModel = new EmployerSelectCourseViewModel
                 {
                     ReservationId = routeModel.Id.Value,
-                    Courses = courseViewModels
+                    Courses = courseViewModels,
+                    BackLink = GenerateBackLink(routeModel),
+                    CohortReference = routeModel.CohortReference
                 };
 
                 return View("SelectCourse", viewModel);

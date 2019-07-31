@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,9 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
@@ -124,6 +127,92 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(routeModel.Id, viewModel.ReservationId);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_CohortDetails_If_There_Is_A_Cohort_Ref(
+            ICollection<Course> courses,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            string cohortUrl,
+            EmployerReservationsController controller
+            )
+        {
+            //Arrange
+            routeModel.CohortReference = "ABC123";
+            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult
+                {
+                    Courses = courses
+                });
+            externalUrlHelper.Setup(x => x.GenerateUrl(
+                It.Is<UrlParameters>(c => c.Id.ToString() == routeModel.EmployerAccountId.ToString()
+                                          && c.Action == "details"
+                                          && c.Controller == $"apprentices/{routeModel.CohortReference}"
+                                          && c.Folder == "commitments/accounts"
+                                          )))
+                .Returns(cohortUrl);
+
+            //Act
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
+
+            //Assert
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(cohortUrl,viewModel.BackLink);
+            Assert.AreEqual(routeModel.CohortReference,viewModel.CohortReference);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_ReviewPage_If_There_Is_FromReview_Flag(
+            ICollection<Course> courses,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            routeModel.FromReview = true;
+            routeModel.CohortReference = string.Empty;
+            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult
+                {
+                    Courses = courses
+                });
+
+            //Act
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
+
+            //Assert
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(RouteNames.EmployerReview, viewModel.BackLink);
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView(
+            ICollection<Course> courses,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            routeModel.FromReview = false;
+            routeModel.CohortReference = string.Empty;
+            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult
+                {
+                    Courses = courses
+                });
+
+            //Act
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
+
+            //Assert
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(RouteNames.EmployerSelectLegalEntity, viewModel.BackLink);
         }
     }
 }

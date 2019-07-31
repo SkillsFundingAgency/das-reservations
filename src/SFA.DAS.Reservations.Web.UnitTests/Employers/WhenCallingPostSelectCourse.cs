@@ -16,8 +16,10 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
@@ -30,6 +32,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IMediator> _mediator;
         private Mock<IEncodingService> _encodingService;
         private EmployerReservationsController _controller;
+        private Mock<IExternalUrlHelper> _externalUrlHelper;
 
         [SetUp]
         public void Arrange()
@@ -39,9 +42,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _course = new Course("1-4-5", "test", 1);
             _cachedReservationResult = fixture.Create<GetCachedReservationResult>();
             _encodingService = new Mock<IEncodingService>();
+            _externalUrlHelper = new Mock<IExternalUrlHelper>();
 
             _mediator = new Mock<IMediator>();
-            _controller = new EmployerReservationsController(_mediator.Object,_encodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            _controller = new EmployerReservationsController(_mediator.Object,_encodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>(), _externalUrlHelper.Object);
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
@@ -127,6 +131,84 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(actualViewResult);
             Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
             Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("Course"));
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_CohortDetails_From_ValidationError_If_There_Is_A_Cohort_Ref(
+            ReservationsRouteModel routeModel,
+            string cohortUrl
+            )
+        {
+            //Arrange
+            routeModel.CohortReference = "ABC123";
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+            var selectedCourse = _course.Id;
+            _externalUrlHelper.Setup(x => x.GenerateUrl(
+                    It.Is<UrlParameters>(c => c.Id.ToString() == routeModel.EmployerAccountId.ToString()
+                                              && c.Action == "details"
+                                              && c.Controller == $"apprentices/{routeModel.CohortReference}"
+                                              && c.Folder == "commitments/accounts"
+                    )))
+                .Returns(cohortUrl);
+
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as ViewResult;
+
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(cohortUrl, viewModel.BackLink);
+            Assert.AreEqual(routeModel.CohortReference, viewModel.CohortReference);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_ReviewPage_If_There_Is_FromReview_Flag(
+            ICollection<Course> courses,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            routeModel.CohortReference = "";
+            routeModel.FromReview = true;
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+            var selectedCourse = _course.Id;
+
+
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as ViewResult;
+
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(RouteNames.EmployerReview, viewModel.BackLink);
+            Assert.AreEqual(routeModel.CohortReference, viewModel.CohortReference);
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView(
+            ICollection<Course> courses,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            routeModel.CohortReference = "";
+            routeModel.FromReview = false;
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+            var selectedCourse = _course.Id;
+            
+
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, selectedCourse) as ViewResult;
+
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(RouteNames.EmployerSelectLegalEntity, viewModel.BackLink);
+            Assert.AreEqual(routeModel.CohortReference, viewModel.CohortReference);
         }
     }
 }

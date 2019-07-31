@@ -211,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn, reservation.StartDate,
-                    viewModel.CohortReference, routeModel.EmployerAccountId);
+                    routeModel.CohortReference, routeModel.EmployerAccountId);
 
                 var addApprenticeUrl = url;
 
