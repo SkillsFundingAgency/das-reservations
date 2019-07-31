@@ -38,6 +38,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 throw new ReservationLimitReachedException(command.AccountId);
             }
 
+            if (validationResult.FailedAuthorisationValidation)
+            {
+                throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn.Value);
+            }
+
             var reservation = new CachedReservation
             {
                 Id = command.Id,

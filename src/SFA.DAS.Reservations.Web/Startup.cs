@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -11,21 +12,31 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
+using SFA.DAS.Authorization.DependencyResolution;
+using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.ProviderRelationships.Api.Client;
+using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
+using SFA.DAS.Reservations.Application.Commitments.Services;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
+using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -41,6 +52,7 @@ using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using SFA.DAS.Reservations.Web.Stubs;
@@ -104,6 +116,8 @@ namespace SFA.DAS.Reservations.Web
             var serviceProvider = services.BuildServiceProvider();
 
             services.AddAuthorizationService();
+            services.AddAuthorization<AuthorizationContextProvider>();
+            services.AddCommitmentPermissionsAuthorization();
 
             if (isEmployerAuth)
             {
@@ -124,6 +138,7 @@ namespace SFA.DAS.Reservations.Web
                     {
                         options.Filters.Add(new AuthorizeFilter());
                         options.Filters.Add(new FeatureToggleActionFilter(_configuration));
+                        options.AddAuthorization();
                     })
                 .AddControllersAsServices()
                 .AddSessionStateTempDataProvider()
@@ -142,18 +157,30 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<GetAvailableReservationsQuery>), typeof(GetAvailableReservationsQueryValidator));
             services.AddScoped(typeof(IValidator<MarkRuleAsReadCommand>), typeof(MarkRuleAsReadCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<GetAccountLegalEntityQuery>), typeof(GetAccountLegalEntityQueryValidator));
+            services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
+            services.AddScoped(typeof(IValidator<CreateReservationLevyEmployerCommand>), typeof(CreateReservationLevyEmployerCommandValidator));
+            services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
+            services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
           
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
 
             services.AddSingleton<IApiClient,ApiClient>();
+            services.AddSingleton<CommitmentsApiClient>();
             services.AddSingleton<IEncodingService, EncodingService>();
+            services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
             services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
+            
+            services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
+                provider.GetService<CommitmentsApiClient>(), 
+                provider.GetService<IOptions<CommitmentsApiConfiguration>>()) );
+            
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
 
 

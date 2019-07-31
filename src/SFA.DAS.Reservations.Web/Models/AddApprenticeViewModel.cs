@@ -12,4 +12,5 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public string ApprenticeUrl { get; }
     }
+
 }
