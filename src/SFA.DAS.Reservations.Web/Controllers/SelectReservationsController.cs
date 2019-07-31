@@ -50,7 +50,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = string.Empty;
+            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
+            {
+                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
+                Controller = $"apprentices/{viewModel.CohortReference}",
+                Action = "details"
+            });
 
             try
             {
@@ -59,13 +64,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (routeModel.UkPrn.HasValue)
                 {
-                    backUrl = _urlHelper.GenerateUrl(new UrlParameters
-                    {
-                        Id = routeModel.UkPrn.Value.ToString(),
-                        Controller = $"apprentices/{viewModel.CohortReference}",
-                        Action = "details"
-                    });
-
+                    
                     try
                     {
                         var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
@@ -179,7 +178,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             SelectReservationViewModel viewModel)
         {
 
-            var backUrl = string.Empty;
+            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
+            {
+                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
+                Controller = $"apprentices/{viewModel.CohortReference}",
+                Action = "details"
+            });
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {
@@ -191,18 +195,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select an option");
 
-                viewModel.BackLink = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.UkPrn.Value.ToString(),
-                    Controller = $"apprentices/{viewModel.CohortReference}",
-                    Action = "details"
-                });
+                viewModel.BackLink = backUrl;
 
                 return View(ViewNames.Select, viewModel);
             }
 
-            if (viewModel.SelectedReservationId.HasValue &&
-                viewModel.SelectedReservationId != Guid.Empty &&
+            if (viewModel.SelectedReservationId != Guid.Empty &&
                 viewModel.SelectedReservationId != Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
             {
                 var reservation = await _mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
@@ -222,13 +220,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (routeModel.UkPrn.HasValue)
                 {
-                    backUrl = _urlHelper.GenerateUrl(new UrlParameters
-                    {
-                        Id = routeModel.UkPrn.Value.ToString(),
-                        Controller = $"apprentices/{viewModel.CohortReference}",
-                        Action = "details"
-                    });
-
                     var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,

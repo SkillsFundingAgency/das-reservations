@@ -191,7 +191,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_Has_Ukprn_And_Has_Reservations_Then_Shows_ProviderSelect_View(
+        public async Task And_Has_Ukprn_And_Has_Reservations_Then_Shows_Select_View_With_Back_Link(
             string cohortDetailsUrl,
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
@@ -249,7 +249,61 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));
         }
-        
+
+
+        [Test, MoqAutoData]
+        public async Task And_Has_EmployerAccountId_And_Has_Reservations_Then_Shows_Select_View_With_Back_Link(
+            string cohortDetailsUrl,
+            long expectedAccountId,
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            Employer employer,
+            GetAvailableReservationsResult reservationsResult,
+            GetLegalEntitiesResponse employersResponse,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            routeModel.UkPrn = null;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c=>c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationsResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.EmployerAccountId &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details")))
+                .Returns(cohortDetailsUrl);
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be(ViewNames.Select);
+            var actualModel = result.Model as SelectReservationViewModel;
+            actualModel.Should().NotBeNull();
+            actualModel.CohortReference.Should().Be(viewModel.CohortReference);
+            actualModel.TransferSenderId.Should().Be(viewModel.TransferSenderId);
+            actualModel.BackLink.Should().Be(cohortDetailsUrl);
+            actualModel.AvailableReservations.Should().BeEquivalentTo(
+                reservationsResult.Reservations
+                    .Select(reservation => new AvailableReservationViewModel(reservation)));
+        }
+
         [Test, MoqAutoData]
         public async Task ThenChecksEmployerLevyStatus(
             ReservationsRouteModel routeModel,

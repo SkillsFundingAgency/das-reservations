@@ -121,7 +121,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_Reservation_Limit_Has_Been_Reached_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
+        public async Task And_Reservation_Limit_Has_Been_Reached_For_Provider_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
@@ -155,6 +155,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             result.ViewName.Should().Be("ReservationLimitReached");
             result.Model.Should().Be(cohortDetailsUrl);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Reservation_Limit_Has_Been_Reached_For_Employer_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetLegalEntitiesResponse employersResponse,
+                string cohortDetailsUrl,
+                long expectedAccountId,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                [Frozen] Mock<IMediator> mockMediator,
+                [Frozen] Mock<IEncodingService> encodingService,
+                SelectReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Id == routeModel.EmployerAccountId &&
+                        parameters.Controller == $"apprentices/{viewModel.CohortReference}" &&
+                        parameters.Action == "details" )))
+                .Returns(cohortDetailsUrl);
         }
 
         [Test, MoqAutoData]
