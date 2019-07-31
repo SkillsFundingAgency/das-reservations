@@ -4,7 +4,7 @@ using SFA.DAS.Authorization.ModelBinding;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class ReservationsRouteModel : IAuthorizationContextModel
+    public class ReservationsRouteModel 
     {
         [FromRoute]
         public uint? UkPrn { get; set; }
@@ -14,6 +14,5 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool? FromReview { get; set; }
         [FromQuery]
         public string CohortReference { get; set; }
-        public long CohortId { get; set; }
     }
 }
