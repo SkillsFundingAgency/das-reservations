@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             GetReservationsResult getReservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] ReservationsWebConfiguration config,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
@@ -113,7 +113,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             long decodedAccountId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             foreach (var accountLegalEntity in getLegalEntitiesResponse.AccountLegalEntities)
@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             foreach (var accountLegalEntity in getLegalEntitiesResponse.AccountLegalEntities)
@@ -212,7 +212,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
@@ -255,7 +255,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_The_Provider_Has_No_TrustedEmployers_Then_A_NoPermissions_View_Is_Returned(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
@@ -275,7 +275,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             foreach (var accountLegalEntity in getLegalEntitiesResponse.AccountLegalEntities)
