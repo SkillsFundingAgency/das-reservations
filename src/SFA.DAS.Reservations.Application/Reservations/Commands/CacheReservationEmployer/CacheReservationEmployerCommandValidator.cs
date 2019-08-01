@@ -48,6 +48,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 {
                     result.FailedGlobalRuleValidation = true;
                 }
+
+                // todo: eoi check, throw exception if fails
             }
 
             if (command.AccountLegalEntityId == default(long))
