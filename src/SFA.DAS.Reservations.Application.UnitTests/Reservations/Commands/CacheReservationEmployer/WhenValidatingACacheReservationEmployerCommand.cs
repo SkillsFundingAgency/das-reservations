@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using MediatR;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -162,6 +166,48 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId))
                 .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId)} has not been supplied");
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Provider_Is_Not_Trusted_For_Account_Legal_Entity_Then_Mark_As_Not_Authorised(
+            CacheReservationEmployerCommand command,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IMediator> mediator,
+            [Frozen]GetTrustedEmployersResponse response,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedAuthorisationValidation.Should().BeTrue();
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Provider_Is__Trusted_For_Account_Legal_Entity_Then_Mark_As_Authorised(
+            CacheReservationEmployerCommand command,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IMediator> mediator,
+            [Frozen]GetTrustedEmployersResponse response,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            response.Employers = new[]
+            {
+                new Employer()
+                {
+                    AccountLegalEntityPublicHashedId = command.AccountLegalEntityPublicHashedId
+                }
+            };
+
+            mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedAuthorisationValidation.Should().BeFalse();
         }
 
         [Test, MoqAutoData]

@@ -15,9 +15,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 
         }
         public virtual string ApprenticeUrl { get; set; }
+        public virtual string EmployerApprenticeUrl { get; set; }
         public virtual string DashboardUrl { get; set; }
         public virtual string EmployerDashboardUrl { get; set; }
         public virtual string FindApprenticeshipTrainingUrl { get; set; }
         public virtual string ApprenticeshipFundingRulesUrl { get; set; }
+        public virtual CommitmentsApiConfiguration CommitmentPermissionsClientApi { get; set; }
     }
 }

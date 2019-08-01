@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     public class CreateReservationCommand : IRequest<CreateReservationResult>
     {
         public Guid Id { get; set; }
-        public uint UkPrn { get; set; }
+        public uint? UkPrn { get; set; }
     }
 }

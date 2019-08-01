@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Reservations.Domain.Authentication;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services
@@ -73,6 +74,28 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
             var associatedAccountsClaim = new Claim(claimType, accountsAsJson, JsonClaimValueTypes.Json);
             return associatedAccountsClaim;
+        }
+
+        public async Task<IEnumerable<EmployerTransferConnection>> GetTransferConnections(string accountId)
+        {
+            try
+            {
+                var transferConnections = await _accountApiClient.GetTransferConnections(accountId);
+                return transferConnections.Select(acc => new EmployerTransferConnection
+                {
+                    FundingEmployerPublicHashedAccountId = acc.FundingEmployerPublicHashedAccountId,
+                    FundingEmployerAccountName = acc.FundingEmployerAccountName,
+                    FundingEmployerHashedAccountId = acc.FundingEmployerHashedAccountId,
+                    FundingEmployerAccountId = acc.FundingEmployerAccountId
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+            
         }
     }
 }

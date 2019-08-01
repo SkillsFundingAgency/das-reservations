@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Domain.Reservations.Api
+namespace SFA.DAS.Reservations.Domain.Employers.Api
 {
     public class GetAccountLegalEntitiesRequest : IGetAllApiRequest
     {

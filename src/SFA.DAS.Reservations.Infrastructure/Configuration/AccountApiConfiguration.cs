@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 {
     public class AccountApiConfiguration : IAccountApiConfiguration
     {
-        public string ApiBaseUrl { get; set; }
+        public virtual string ApiBaseUrl { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string IdentifierUri { get; set; }

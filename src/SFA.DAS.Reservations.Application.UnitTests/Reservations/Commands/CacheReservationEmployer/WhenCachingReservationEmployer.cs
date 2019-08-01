@@ -98,6 +98,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             Assert.ThrowsAsync<ReservationLimitReachedException>( () => _commandHandler.Handle(command, CancellationToken.None));
 
         }
+
+        [Test, AutoData]
+        public void And_Provider_Is_Not_Trusted_With_Legal_Entity_Then_Throws_Provider_Not_Authorised_Exception(
+            CacheReservationEmployerCommand command)
+        {
+            //Arrange
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(new ValidationResult{FailedAuthorisationValidation = true,ValidationDictionary = new Dictionary<string, string>()});
+
+            //Act + Assert
+            var exception = Assert.ThrowsAsync<ProviderNotAuthorisedException>( () => _commandHandler.Handle(command, CancellationToken.None));
+            
+            Assert.AreEqual(command.AccountId, exception.AccountId);
+            Assert.AreEqual(command.UkPrn, exception.UkPrn);
+        }
         
         [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Does_Not_Cache_Reservation(
@@ -126,6 +142,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             {
                 GlobalRules = new List<GlobalRule>()
             };
+
+            command.UkPrn = null;
 
             _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
                 .ReturnsAsync(response);
