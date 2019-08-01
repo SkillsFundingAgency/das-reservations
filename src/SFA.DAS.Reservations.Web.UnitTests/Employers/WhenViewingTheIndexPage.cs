@@ -24,6 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
        
         [Test, MoqAutoData]
         public async Task ThenChecksIfRelatedUnreadRulesExists(
+            string accountId,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -38,7 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
 
             //act 
-            await controller.Index();
+            await controller.Index(accountId);
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
@@ -47,6 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToStartIfNoFundingRulesExist(
+            string accountId,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -60,7 +62,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(accountId) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
@@ -69,6 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToFundingPausedIfFundingRulesExist(
+            string accountId,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> config,
@@ -89,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(result);
 
             //act 
-            var view = await controller.Index() as ViewResult;
+            var view = await controller.Index(accountId) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -104,6 +107,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule(
+            string accountId,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -117,7 +121,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(accountId) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
@@ -126,6 +130,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule(
+            string accountId,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
@@ -139,7 +144,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(accountId) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
