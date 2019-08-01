@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Commitments\Queries\" />
-    <Folder Include="Employers\Queries\GetTransferConnections\" />
   </ItemGroup>
 
 </Project>
