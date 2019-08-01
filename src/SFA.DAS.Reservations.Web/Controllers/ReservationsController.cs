@@ -354,7 +354,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             else
             {
                 var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
-
                 var result = await _mediator.Send(new GetLegalEntitiesQuery
                     {
                         AccountId = decodedAccountId
