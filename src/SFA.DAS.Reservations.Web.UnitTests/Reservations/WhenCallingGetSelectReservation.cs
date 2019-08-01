@@ -568,7 +568,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             //Assert
             Assert.IsNotNull(result);
-            result?.Url.Should().Be(addApprenticeUrl);
+            result.Url.Should().Be(addApprenticeUrl);
         }
 
 
@@ -637,6 +637,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 {
                     CanAutoCreateReservations = true
                 });
+
             mockMediator.Setup(x => x.Send(It.Is<CreateReservationLevyEmployerCommand>(c =>
                     c.AccountId.Equals(expectedAccountId) &&
                     c.TransferSenderId.Equals(null) &&
