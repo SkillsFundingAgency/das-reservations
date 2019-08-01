@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using AutoFixture.NUnit3;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
@@ -23,6 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IMediator> _mockMediator;
         private Mock<IEncodingService> _mockEncodingService;
         private Mock<IOptions<ReservationsWebConfiguration>> _mockOptions;
+        private Mock<IExternalUrlHelper> _externalUrlHelper;
 
         [SetUp]
         public void Arrange()
@@ -34,8 +36,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .Returns(config);
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
+            _externalUrlHelper = new Mock<IExternalUrlHelper>();
 
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object);
+            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object, _externalUrlHelper.Object);
         }
 
         [Test]

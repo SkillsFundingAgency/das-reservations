@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Reservations.Domain.Employers
+﻿using SFA.DAS.Common.Domain.Types;
+
+namespace SFA.DAS.Reservations.Domain.Employers
 {
     public class AccountLegalEntity
     {
@@ -8,5 +10,7 @@
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public int ReservationLimit { get; set; }
+        public bool IsLevy { get; set; }
+        public AgreementType AgreementType { get; set; }
     }
 }

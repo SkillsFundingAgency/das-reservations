@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -17,6 +17,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -32,19 +33,44 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
+        private readonly IExternalUrlHelper _urlHelper;
         private readonly ReservationsWebConfiguration _config;
 
-        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options)
+        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options, IExternalUrlHelper urlHelper)
         {
             _mediator = mediator;
             _encodingService = encodingService;
-            
+            _urlHelper = urlHelper;
             _config = options.Value;
         }
 
         // GET
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string employerAccountId)
         {
+            var decodedAccountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
+            var result = await _mediator.Send(new GetLegalEntitiesQuery
+            {
+                AccountId = decodedAccountId
+            });
+            if (result.AccountLegalEntities.Any(entity =>
+                !entity.IsLevy && 
+                entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+            {
+                var homeLink = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Controller = "teams",
+                    SubDomain = "accounts",
+                    Folder = "accounts",
+                    Id = employerAccountId
+                });
+
+                return View("NonEoiHolding", new NonEoiHoldingViewModel
+                {
+                    BackLink = homeLink,
+                    HomeLink = homeLink
+                });
+            }
+
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
@@ -212,11 +238,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
-                BackLink = routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity 
+                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef),
+                CohortReference = cachedReservation.CohortRef
             };
 
             return View(viewModel);
         }
+
+        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef)
+        {
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
+            {
+                return _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Id = routeModel.EmployerAccountId,
+                    Controller = $"apprentices/{cohortRef}",
+                    Action = "details",
+                    Folder = "commitments/accounts"
+                });
+            }
+            return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
+        }
+        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -229,12 +272,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Id = routeModel.Id.Value,
                     CourseId = selectedCourseId
+
                 });
 
                 return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
                 {
                     Id = routeModel.Id,
                     EmployerAccountId = routeModel.EmployerAccountId,
+                    CohortReference = routeModel.CohortReference
                 });
             }
             catch (ValidationException e)
@@ -256,7 +301,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var viewModel = new EmployerSelectCourseViewModel
                 {
                     ReservationId = routeModel.Id.Value,
-                    Courses = courseViewModels
+                    Courses = courseViewModels,
+                    BackLink = GenerateBackLink(routeModel, routeModel.CohortReference),
+                    CohortReference = routeModel.CohortReference
                 };
 
                 return View("SelectCourse", viewModel);

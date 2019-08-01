@@ -47,17 +47,15 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
-            string controller, action, id;
+            string controller = "unapproved", action, id;
             
             if (ukPrn.HasValue)
             {
-                controller = "unapproved";
                 action = "add-apprentice";
                 id = ukPrn.ToString();
             }
             else
             {
-                controller = "unapproved";
                 action = "add";
                 id = accountHashedId;
             }
@@ -67,8 +65,6 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 controller += $"/{cohortRef}";
                 action = "apprentices/add";
             }
-
-           
 
             var urlParameters = new UrlParameters
             {

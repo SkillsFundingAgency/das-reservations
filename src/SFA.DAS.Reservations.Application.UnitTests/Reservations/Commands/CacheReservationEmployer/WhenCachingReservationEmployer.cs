@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, AutoData]
         public async Task Then_It_Validates_The_Command(CacheReservationEmployerCommand command)
         {
-            GetAccountFundingRulesApiResponse response = new GetAccountFundingRulesApiResponse()
+            var response = new GetAccountFundingRulesApiResponse()
             {
                 GlobalRules = new List<GlobalRule>()
             };
@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, AutoData]
-        public void And_If_There_Are_Global_Funding_Rules_Then_Throws_ReservationLimitReached_Exception(
+        public void And_If_There_Are_Reservation_Rules_Then_Throws_ReservationLimitReached_Exception(
             CacheReservationEmployerCommand command)
         {
             //Arrange
@@ -96,6 +96,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             //Act + Assert
             Assert.ThrowsAsync<ReservationLimitReachedException>( () => _commandHandler.Handle(command, CancellationToken.None));
+
+        }
+
+        [Test, AutoData]
+        public void And_If_There_Are_Global_Rules_Then_Throws_GlobalReservationRule_Exception(
+            CacheReservationEmployerCommand command)
+        {
+            //Arrange
+            _mockValidator
+                .Setup(validator => validator.ValidateAsync(command))
+                .ReturnsAsync(new ValidationResult { FailedGlobalRuleValidation = true, ValidationDictionary = new Dictionary<string, string>() });
+
+            //Act + Assert
+            Assert.ThrowsAsync<GlobalReservationRuleException>(() => _commandHandler.Handle(command, CancellationToken.None));
 
         }
 

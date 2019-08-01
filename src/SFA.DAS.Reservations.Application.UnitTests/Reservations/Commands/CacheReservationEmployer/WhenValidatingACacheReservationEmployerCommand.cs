@@ -61,6 +61,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, MoqAutoData]
+        public async Task Then_The_GlobalRules_Are_Checked_And_An_Error_Returned_If_Not_Valid(
+            CacheReservationEmployerCommand command,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            rulesService.Setup(x => x.GetFundingRules()).ReturnsAsync(new GetFundingRulesApiResponse
+            {
+                GlobalRules = new List<GlobalRule>
+                {
+                    new GlobalRule
+                    {
+                        Restriction = AccountRestriction.NonLevy,
+                        RuleType = GlobalRuleType.FundingPaused
+                    }
+                }
+            });
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedGlobalRuleValidation.Should().BeTrue();
+        }
+
+        [Test, MoqAutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
             CacheReservationEmployerCommand command, 
             [Frozen]Mock<IFundingRulesService> rulesService,

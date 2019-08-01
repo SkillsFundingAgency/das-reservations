@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -7,7 +6,6 @@ using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer
@@ -41,6 +39,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             if (validationResult.FailedAuthorisationValidation)
             {
                 throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn.Value);
+            }
+
+            if (validationResult.FailedGlobalRuleValidation)
+            {
+                throw new GlobalReservationRuleException(command.AccountId);
             }
 
             var reservation = new CachedReservation
