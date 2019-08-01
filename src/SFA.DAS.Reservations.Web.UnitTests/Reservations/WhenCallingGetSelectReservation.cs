@@ -504,13 +504,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" 
-                        )))
+                    createReservationLevyResult.ReservationId,
+                    routeModel.AccountLegalEntityPublicHashedId, 
+                    "", 
+                    routeModel.UkPrn.Value, 
+                    null, 
+                    viewModel.CohortReference,
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
 
             //Act
@@ -518,7 +518,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             //Assert
             Assert.IsNotNull(result);
-            result?.Url.Should().Be(addApprenticeUrl);
+            result.Url.Should().Be(addApprenticeUrl);
         }
 
 
@@ -587,6 +587,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 {
                     CanAutoCreateReservations = true
                 });
+
             mockMediator.Setup(x => x.Send(It.Is<CreateReservationLevyEmployerCommand>(c =>
                     c.AccountId.Equals(expectedAccountId) &&
                     c.TransferSenderId.Equals(null) &&
@@ -595,13 +596,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={createReservationLevyResult.ReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}"
-                        )))
+                    createReservationLevyResult.ReservationId,
+                    routeModel.AccountLegalEntityPublicHashedId, 
+                    "", 
+                    routeModel.UkPrn.Value, 
+                    null, 
+                    viewModel.CohortReference,
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
 
             //Act

@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityName { get; set; }
         public DateTime StartDate { get; set; }
         public string CourseId { get; set; }
-        public uint UkPrn { get; set; }
+        public uint? UkPrn { get; set; }
         public string CohortRef { get; set; }
     }
 

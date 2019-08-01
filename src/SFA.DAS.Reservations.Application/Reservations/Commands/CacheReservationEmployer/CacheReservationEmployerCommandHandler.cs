@@ -16,13 +16,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
     {
         private readonly IValidator<CacheReservationEmployerCommand> _validator;
         private readonly ICacheStorageService _cacheStorageService;
-        private readonly IFundingRulesService _rulesService;
 
-        public CacheReservationEmployerCommandHandler(IValidator<CacheReservationEmployerCommand> validator, ICacheStorageService cacheStorageService, IFundingRulesService fundingRulesService)
+        public CacheReservationEmployerCommandHandler(IValidator<CacheReservationEmployerCommand> validator, ICacheStorageService cacheStorageService)
         {
             _validator = validator;
             _cacheStorageService = cacheStorageService;
-            _rulesService = fundingRulesService;
         }
 
         public async Task<Unit> Handle(CacheReservationEmployerCommand command, CancellationToken cancellationToken)
@@ -42,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
             if (validationResult.FailedAuthorisationValidation)
             {
-                throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn);
+                throw new ProviderNotAuthorisedException(command.AccountId, command.UkPrn.Value);
             }
 
             var reservation = new CachedReservation
@@ -52,9 +50,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 AccountLegalEntityId = command.AccountLegalEntityId,
                 AccountLegalEntityPublicHashedId = command.AccountLegalEntityPublicHashedId,
                 AccountLegalEntityName = command.AccountLegalEntityName,
-                UkPrn = command.UkPrn,
                 AccountName = command.AccountName,
-                CohortRef = command.CohortRef
+                CohortRef = command.CohortRef,
+                UkPrn = command.UkPrn
             };
 
             await _cacheStorageService.SaveToCache(reservation.Id.ToString(), reservation, 1);

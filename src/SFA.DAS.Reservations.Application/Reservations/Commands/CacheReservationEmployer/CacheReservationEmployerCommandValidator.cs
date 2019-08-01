@@ -58,10 +58,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 result.AddError(nameof(command.AccountLegalEntityPublicHashedId));
             }
 
-            if (command.UkPrn != default(uint))
+            if (command.UkPrn.HasValue)
             {
                 var accounts = await _mediator.Send(
-                    new GetTrustedEmployersQuery { UkPrn = command.UkPrn });
+                    new GetTrustedEmployersQuery { UkPrn = command.UkPrn.Value });
                 
                 var matchedAccount = accounts?.Employers?.SingleOrDefault(employer =>
                     employer.AccountLegalEntityPublicHashedId == command.AccountLegalEntityPublicHashedId);

@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public ReservationApiRequest(
             string baseUrl,
             long accountId, 
-            uint providerId,
+            uint? providerId,
             DateTime startDate, 
             Guid id, 
             long legalEntityAccountId,
@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public Guid Id { get; }
 
         public long AccountId { get; }
-        public uint ProviderId { get; }
+        public uint? ProviderId { get; }
 
         public string StartDate { get; }
 

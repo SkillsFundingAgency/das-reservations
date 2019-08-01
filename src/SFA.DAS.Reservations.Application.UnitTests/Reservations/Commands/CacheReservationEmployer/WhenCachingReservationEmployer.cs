@@ -143,6 +143,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                 GlobalRules = new List<GlobalRule>()
             };
 
+            command.UkPrn = null;
+
             _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
                 .ReturnsAsync(response);
 

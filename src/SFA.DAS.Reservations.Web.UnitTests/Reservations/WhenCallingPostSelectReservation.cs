@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -158,21 +159,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
             ReservationsController controller)
         {
             mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(reservationResult);
+
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"unapproved/{viewModel.CohortReference}" &&
-                        parameters.Action == "apprentices/add" &&
-                        parameters.QueryString == $"?reservationId={viewModel.SelectedReservationId}" +
-                        $"&employerAccountLegalEntityPublicHashedId={routeModel.AccountLegalEntityPublicHashedId}" +
-                        $"&startMonthYear={reservationResult.StartDate:MMyyyy}" +
-                        $"&courseCode={reservationResult.Course.Id}")))
+                    viewModel.SelectedReservationId.Value,
+                    routeModel.AccountLegalEntityPublicHashedId,
+                    reservationResult.Course.Id,
+                    routeModel.UkPrn,
+                    reservationResult.StartDate,
+                    viewModel.CohortReference,
+                    routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
