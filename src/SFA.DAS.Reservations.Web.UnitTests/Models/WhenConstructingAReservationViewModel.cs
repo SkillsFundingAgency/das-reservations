@@ -12,9 +12,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_Id(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             var viewModel = new ReservationViewModel(reservation, url);
 
@@ -24,9 +22,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_StartDateDescription(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             var viewModel = new ReservationViewModel(reservation, url);
 
@@ -37,9 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_Status(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             reservation.Status = ReservationStatus.Deleted;
             var viewModel = new ReservationViewModel(reservation, url);
@@ -50,9 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_CourseDescription(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             var viewModel = new ReservationViewModel(reservation, url);
 
@@ -62,9 +54,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void And_Course_Is_Null_Then_Sets_CourseDescription_To_Unknown(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             reservation.Course = null;
 
@@ -76,9 +66,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void Then_Sets_AccountLegalEntityName(
             Reservation reservation,
-            string url,
-            string accountHashedId,
-            string accountLegalEntityPublicHashedId)
+            string url)
         {
             var viewModel = new ReservationViewModel(reservation, url);
 
