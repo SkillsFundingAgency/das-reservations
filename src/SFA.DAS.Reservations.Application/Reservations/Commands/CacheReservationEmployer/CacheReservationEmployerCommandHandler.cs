@@ -45,11 +45,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             {
                 throw new GlobalReservationRuleException(command.AccountId);
             }
-            //eoi
-            if (validationResult.FailedEoiValidation)
-            {
-                throw new FailedExpressionOfInterestValidationException(command.AccountId);
-            }
 
             var reservation = new CachedReservation
             {

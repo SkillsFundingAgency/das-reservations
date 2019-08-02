@@ -178,24 +178,5 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     c.UkPrn.Equals(command.UkPrn)), 
                 1));
         }
-
-        //eoi
-        [Test, AutoData]
-        public void And_FailedEoiValidation_Then_Throws_FailedExpressionOfInterestValidationException(
-            CacheReservationEmployerCommand command)
-        {
-            _mockValidator
-                .Setup(validator => validator.ValidateAsync(command))
-                .ReturnsAsync(new ValidationResult
-                {
-                    FailedEoiValidation = true, 
-                    ValidationDictionary = new Dictionary<string, string>()
-                });
-
-            var exception = Assert.ThrowsAsync<FailedExpressionOfInterestValidationException>( () =>
-                _commandHandler.Handle(command, CancellationToken.None));
-            
-            Assert.AreEqual(command.AccountId, exception.AccountId);
-        }
     }
 }

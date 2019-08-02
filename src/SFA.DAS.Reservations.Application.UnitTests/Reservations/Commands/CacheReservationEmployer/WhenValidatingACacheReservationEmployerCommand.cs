@@ -290,7 +290,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             var result = await validator.ValidateAsync(command);
 
-            result.FailedEoiValidation.Should().BeTrue();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary
+                .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountId))
+                .WhichValue.Should().Be("Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
         }
 
         // eoi
@@ -306,7 +309,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             var result = await validator.ValidateAsync(command);
 
-            result.FailedEoiValidation.Should().BeFalse();
+            result.IsValid().Should().BeTrue();
         }
 
         private void SetupAccountLegalEntityAsEoi(Mock<IMediator> mockMediator)

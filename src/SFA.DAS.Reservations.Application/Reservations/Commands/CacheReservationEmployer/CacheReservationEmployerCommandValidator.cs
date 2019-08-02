@@ -60,7 +60,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     !entity.IsLevy && 
                     entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
                 {
-                    result.FailedEoiValidation = true;
+                    result.AddError(nameof(command.AccountId), 
+                        "Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
                 }
             }
 
