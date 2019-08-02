@@ -35,19 +35,32 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     PolicyNames.HasProviderOrEmployerAccount, policy =>
                     {
                         policy.RequireAuthenticatedUser();
-                        policy.RequireAssertion(context =>
-                        {
-                            var hasUkprn = context.User.HasClaim(claim =>
-                                claim.Type.Equals(ProviderClaims.ProviderUkprn));
-                            var hasDaa = context.User.HasClaim(claim =>
-                                claim.Type.Equals(ProviderClaims.Service) &&
-                                claim.Value.Equals(ProviderDaa));
-                            var hasEmployerAccountId = context.User.HasClaim(claim =>
-                                claim.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
-                            return hasUkprn && hasDaa || hasEmployerAccountId;
-                        });
+                        ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
                     });
+                options.AddPolicy(
+                    PolicyNames.HasEmployerViewerUserRoleOrIsProvider
+                    , policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        ProviderOrEmployerAssertion(policy);
+                        policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
+                    });
+            });
+        }
+
+        private static void ProviderOrEmployerAssertion(AuthorizationPolicyBuilder policy)
+        {
+            policy.RequireAssertion(context =>
+            {
+                var hasUkprn = context.User.HasClaim(claim =>
+                    claim.Type.Equals(ProviderClaims.ProviderUkprn));
+                var hasDaa = context.User.HasClaim(claim =>
+                    claim.Type.Equals(ProviderClaims.Service) &&
+                    claim.Value.Equals(ProviderDaa));
+                var hasEmployerAccountId = context.User.HasClaim(claim =>
+                    claim.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+                return hasUkprn && hasDaa || hasEmployerAccountId;
             });
         }
     }
