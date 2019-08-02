@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
@@ -14,6 +15,7 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
+    [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
     public class ManageReservationsController : Controller
     {
         private readonly IMediator _mediator;

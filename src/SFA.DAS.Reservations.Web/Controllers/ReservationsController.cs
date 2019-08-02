@@ -36,6 +36,7 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
+    //[Authorize(Policy = nameof(PolicyNames.HasTransactorOrOwnerUserRole))]
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;

@@ -48,6 +48,15 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         });
                         policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
                     });
+                options.AddPolicy(
+                    PolicyNames
+                        .HasTransactorOrOwnerUserRole
+                    , policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
+                        policy.Requirements.Add(new HasTransactorOrOwnerUserRoleRequirement());
+                    });
             });
         }
     }
