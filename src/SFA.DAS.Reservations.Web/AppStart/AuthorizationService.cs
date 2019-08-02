@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.AppStart
@@ -49,13 +48,12 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
                     });
                 options.AddPolicy(
-                    PolicyNames
-                        .HasTransactorOrOwnerUserRole
+                    PolicyNames.HasEmployerViewerUserRole
                     , policy =>
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
-                        policy.Requirements.Add(new HasTransactorOrOwnerUserRoleRequirement());
+                        policy.Requirements.Add(new HasEmployerViewerUserRoleRequirement());
                     });
             });
         }

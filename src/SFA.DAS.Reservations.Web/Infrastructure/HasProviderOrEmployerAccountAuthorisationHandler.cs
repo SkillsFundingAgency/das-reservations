@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (context.Resource is AuthorizationFilterContext employerContext &&
                 employerContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId))
             {
-                if (!_employerAccountAuthorizationHandler.IsEmployerAuthorised(context))
+                if (!_employerAccountAuthorizationHandler.IsEmployerAuthorised(context, false))
                 {
                     return Task.CompletedTask;
                 }

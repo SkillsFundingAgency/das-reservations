@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
-    public class HasTransactorOrOwnerUserRoleRequirement : IAuthorizationRequirement
+    public class HasEmployerViewerUserRoleRequirement : IAuthorizationRequirement
     {
     }
 }

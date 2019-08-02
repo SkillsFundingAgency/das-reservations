@@ -5,6 +5,6 @@
         public static string HasEmployerAccount => nameof(HasEmployerAccount);
         public static string HasProviderAccount => nameof(HasProviderAccount);
         public static string HasProviderOrEmployerAccount => nameof(HasProviderOrEmployerAccount);
-        public static string HasTransactorOrOwnerUserRole => nameof(HasTransactorOrOwnerUserRole);
+        public static string HasEmployerViewerUserRole => nameof(HasEmployerViewerUserRole);
     }
 }

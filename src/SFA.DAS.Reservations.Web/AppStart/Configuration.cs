@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IAuthorizationHandler, HasProviderOrEmployerAccountAuthorisationHandler>();
             services.AddSingleton<IProviderAuthorisationHandler, ProviderAuthorizationHandler>();
             services.AddSingleton<IEmployerAccountAuthorisationHandler, EmployerAccountAuthorizationHandler>();
-            services.AddSingleton<IAuthorizationHandler, HasTransactorOrOwnerUserRoleAuthorisationHandler>();
+            services.AddSingleton<IAuthorizationHandler, HasEmployerViewerUserRole>();
 
         }
     }
