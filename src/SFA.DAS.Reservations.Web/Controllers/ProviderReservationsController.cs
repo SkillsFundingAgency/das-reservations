@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -6,7 +7,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
@@ -114,11 +117,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
             }
 
-            var employers = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+            var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+            
+            // eoi filter
+            var eoiEmployers = new List<Domain.Employers.Employer>();
+            foreach (var employer in getTrustedEmployersResponse.Employers)
+            {
+                var getLegalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery{AccountId = employer.AccountId});
+                if (getLegalEntitiesResponse.AccountLegalEntities.All(entity =>
+                    !entity.IsLevy
+                    && entity.AgreementType == AgreementType.NonLevyExpressionOfInterest))
+                {
+                    eoiEmployers.Add(employer);
+                }
+            }
 
             var viewModel = new ChooseEmployerViewModel
             {
-                Employers = employers.Employers
+                Employers = eoiEmployers
             };
 
             return View(viewModel);

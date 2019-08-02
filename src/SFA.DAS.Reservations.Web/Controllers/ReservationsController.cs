@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
@@ -352,6 +354,29 @@ namespace SFA.DAS.Reservations.Web.Controllers
             else
             {
                 var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+                var result = await _mediator.Send(new GetLegalEntitiesQuery
+                    {
+                        AccountId = decodedAccountId
+                    });
+                if (result.AccountLegalEntities.Any(entity =>
+                    !entity.IsLevy && 
+                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+                {
+                    var homeLink = _urlHelper.GenerateUrl(new UrlParameters
+                    {
+                        Controller = "teams",
+                        SubDomain = "accounts",
+                        Folder = "accounts",
+                        Id = routeModel.EmployerAccountId
+                    });
+
+                    return View("NonEoiHolding", new NonEoiHoldingViewModel
+                    {
+                        BackLink = homeLink,
+                        HomeLink = homeLink
+                    });
+                }
+
                 employerAccountIds.Add(decodedAccountId);
                 viewName = ViewNames.EmployerManage;
             }

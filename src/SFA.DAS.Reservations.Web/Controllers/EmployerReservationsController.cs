@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -45,8 +45,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string employerAccountId)
         {
+            var decodedAccountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
+            var result = await _mediator.Send(new GetLegalEntitiesQuery
+            {
+                AccountId = decodedAccountId
+            });
+            if (result.AccountLegalEntities.Any(entity =>
+                !entity.IsLevy && 
+                entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+            {
+                var homeLink = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    Controller = "teams",
+                    SubDomain = "accounts",
+                    Folder = "accounts",
+                    Id = employerAccountId
+                });
+
+                return View("NonEoiHolding", new NonEoiHoldingViewModel
+                {
+                    BackLink = homeLink,
+                    HomeLink = homeLink
+                });
+            }
+
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 

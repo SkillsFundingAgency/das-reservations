@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -23,9 +26,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_No_Id_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.Id = Guid.Empty;
 
@@ -41,9 +46,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task Then_The_Account_Is_Checked_Against_The_AccountRules_And_An_Error_Returned_If_Not_Valid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             rulesService.Setup(x => x.GetAccountFundingRules(command.AccountId)).ReturnsAsync(
                 new GetAccountFundingRulesApiResponse
                 {
@@ -63,9 +70,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task Then_The_GlobalRules_Are_Checked_And_An_Error_Returned_If_Not_Valid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             rulesService.Setup(x => x.GetFundingRules()).ReturnsAsync(new GetFundingRulesApiResponse
             {
                 GlobalRules = new List<GlobalRule>
@@ -105,9 +114,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityId_Less_Than_One_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.AccountLegalEntityId = default(long);
 
@@ -123,9 +134,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityName_Null_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.AccountLegalEntityName = null;
 
@@ -141,9 +154,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityName_Whitespace_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.AccountLegalEntityName = " ";
 
@@ -159,9 +174,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityPublicHashedId_Null_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.AccountLegalEntityPublicHashedId = null;
 
@@ -177,9 +194,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityPublicHashedId_Whitespace_Then_Invalid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mockMediator);
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
             command.AccountLegalEntityPublicHashedId = " ";
 
@@ -195,11 +214,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_Provider_Is_Not_Trusted_For_Account_Legal_Entity_Then_Mark_As_Not_Authorised(
             CacheReservationEmployerCommand command,
-            [Frozen]Mock<IFundingRulesService> rulesService,
             [Frozen] Mock<IMediator> mediator,
             [Frozen]GetTrustedEmployersResponse response,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mediator);
             mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
@@ -210,13 +229,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, MoqAutoData]
-        public async Task And_Provider_Is__Trusted_For_Account_Legal_Entity_Then_Mark_As_Authorised(
+        public async Task And_Provider_Is_Trusted_For_Account_Legal_Entity_Then_Mark_As_Authorised(
             CacheReservationEmployerCommand command,
-            [Frozen]Mock<IFundingRulesService> rulesService,
             [Frozen] Mock<IMediator> mediator,
             [Frozen]GetTrustedEmployersResponse response,
             CacheReservationEmployerCommandValidator validator)
         {
+            SetupAccountLegalEntityAsEoi(mediator);
             response.Employers = new[]
             {
                 new Employer()
@@ -237,14 +256,73 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test, MoqAutoData]
         public async Task And_All_Properties_Ok_Then_Valid(
             CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
+            SetupAccountLegalEntityAsEoi(mockMediator);
+
             var result = await validator.ValidateAsync(command);
 
             result.IsValid().Should().BeTrue();
             result.FailedRuleValidation.Should().BeFalse();
+        }
+
+        // eoi
+        [Test, MoqAutoData]
+        public async Task And_NonLevy_And_Not_Eoi_Then_Not_Valid(
+            CacheReservationEmployerCommand command,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IMediator> mockMediator,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            ConfigureRulesServiceWithNoGlobalRules(rulesService);
+            foreach (var accountLegalEntity in getLegalEntitiesResponse.AccountLegalEntities)
+            {
+                accountLegalEntity.IsLevy = false;
+                accountLegalEntity.AgreementType = AgreementType.Levy;
+            }
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary
+                .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountId))
+                .WhichValue.Should().Be("Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
+        }
+
+        // eoi
+        [Test, MoqAutoData]
+        public async Task And_NonLevy_And_Is_Eoi_Then_Is_Valid(
+            CacheReservationEmployerCommand command,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IMediator> mockMediator,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            ConfigureRulesServiceWithNoGlobalRules(rulesService);
+            SetupAccountLegalEntityAsEoi(mockMediator);
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+        }
+
+        private void SetupAccountLegalEntityAsEoi(Mock<IMediator> mockMediator)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<AccountLegalEntity>(composer => composer
+                    .With(entity => entity.IsLevy, false)
+                    .With(entity => entity.AgreementType, AgreementType.NonLevyExpressionOfInterest));
+            var getLegalEntitiesResponse = fixture.Create<GetLegalEntitiesResponse>();
+            
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
         }
 
         private static void ConfigureRulesServiceWithNoGlobalRules(Mock<IFundingRulesService> rulesService)

@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -29,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 result.AddError(nameof(command.Id));
             }
 
-            if (command.AccountId == default(long))
+            if (command.AccountId == default)
             {
                 result.AddError(nameof(command.AccountId));
             }
@@ -48,9 +50,22 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 {
                     result.FailedGlobalRuleValidation = true;
                 }
+
+                // eoi
+                var queryResult = await _mediator.Send(new GetLegalEntitiesQuery
+                {
+                    AccountId = command.AccountId
+                });
+                if (queryResult.AccountLegalEntities.Any(entity =>
+                    !entity.IsLevy && 
+                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+                {
+                    result.AddError(nameof(command.AccountId), 
+                        "Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
+                }
             }
 
-            if (command.AccountLegalEntityId == default(long))
+            if (command.AccountLegalEntityId == default)
             {
                 result.AddError(nameof(command.AccountLegalEntityId));
             }
