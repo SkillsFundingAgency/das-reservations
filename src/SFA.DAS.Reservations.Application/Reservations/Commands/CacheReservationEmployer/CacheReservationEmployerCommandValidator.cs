@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 result.AddError(nameof(command.Id));
             }
 
-            if (command.AccountId == default)
+            if (command.AccountId == default(long))
             {
                 result.AddError(nameof(command.AccountId));
             }
@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 }
             }
 
-            if (command.AccountLegalEntityId == default)
+            if (command.AccountLegalEntityId == default(long))
             {
                 result.AddError(nameof(command.AccountLegalEntityId));
             }
