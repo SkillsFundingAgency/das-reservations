@@ -51,7 +51,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
             if (employerAccounts != null)
             {
-                employerIdentifier = employerAccounts[accountIdFromUrl];
+                employerIdentifier = employerAccounts.ContainsKey(accountIdFromUrl) 
+                    ? employerAccounts[accountIdFromUrl] : null;
             }
 
             if (employerAccounts == null || !employerAccounts.ContainsKey(accountIdFromUrl))
