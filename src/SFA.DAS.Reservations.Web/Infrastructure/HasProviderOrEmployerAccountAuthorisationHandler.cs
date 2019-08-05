@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (context.Resource is AuthorizationFilterContext providerContext &&
                 providerContext.RouteData.Values.ContainsKey(RouteValues.UkPrn))
             {
-                if (_providerAuthorizationHandler.IsProviderAuthorised(context))
+                if (!_providerAuthorizationHandler.IsProviderAuthorised(context))
                 {
                     return Task.CompletedTask;
                 }
