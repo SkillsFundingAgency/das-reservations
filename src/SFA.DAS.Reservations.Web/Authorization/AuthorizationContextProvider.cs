@@ -54,7 +54,10 @@ namespace SFA.DAS.Reservations.Web.Authorization
         {
             if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue("cohortRef", out var cohortReferenceObj))
             {
-                return null;
+                if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue("cohortReference", out cohortReferenceObj))
+                {
+                    return null;
+                }
             }
 
             if (!cohortReferenceObj.Any())
