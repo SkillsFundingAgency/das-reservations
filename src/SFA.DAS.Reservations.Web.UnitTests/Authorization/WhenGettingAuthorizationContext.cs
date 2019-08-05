@@ -43,11 +43,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
                 .Callback(new TryGetCallback((string cohortRef, EncodingType encodingType, ref long val) => val = CohortId))
                 .Returns(new TryGetReturns((string cohortRef, EncodingType encodingType, ref long val) => true));
 
-            _encodingService
-                .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.AccountId, out It.Ref<long>.IsAny))
-                .Callback(new TryGetCallback((string accountId, EncodingType encodingType, ref long val) => val = EmployerAccountId))
-                .Returns(new TryGetReturns((string accountId, EncodingType encodingType, ref long val) => true));
-
             _routingFeature.Setup(f => f.RouteData).Returns(_routeData);
             
             _httpContextAccessor.Setup(c => c.HttpContext.Features[typeof(IRoutingFeature)])
@@ -89,6 +84,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
             //Arrange
             _routeData.Values.Remove("ukprn");
             _routeData.Values.Add("employerAccountId", EmployerAccountId);
+
+            _encodingService
+                .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.AccountId, out It.Ref<long>.IsAny))
+                .Callback(new TryGetCallback((string accountId, EncodingType encodingType, ref long val) => val = EmployerAccountId))
+                .Returns(new TryGetReturns((string accountId, EncodingType encodingType, ref long val) => true));
 
             //Act
             var context = _contextProvider.GetAuthorizationContext();
