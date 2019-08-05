@@ -25,11 +25,23 @@ namespace SFA.DAS.Reservations.Web.Authorization
             var authorizationContext = new AuthorizationContext();
 
             var cohortId = GetCohortId();
+
+            if (!cohortId.HasValue) return authorizationContext;
+
             var ukPrn = GetUkPrn();
 
-            if (cohortId.HasValue && ukPrn.HasValue)
+            if (ukPrn.HasValue)
             {
                 authorizationContext.AddCommitmentPermissionValues(cohortId.Value, Party.Provider, ukPrn.Value);
+            }
+            else
+            {
+                var accountId = GetAccountId();
+
+                if (accountId.HasValue)
+                {
+                    authorizationContext.AddCommitmentPermissionValues(cohortId.Value, Party.Employer, accountId.Value);
+                }
             }
 
             return authorizationContext;
@@ -48,6 +60,21 @@ namespace SFA.DAS.Reservations.Web.Authorization
             }
 
             return ukPrn;
+        }
+
+        private long? GetAccountId()
+        {
+            if (!_httpContextAccessor.HttpContext.GetRouteData().Values.TryGetValue("employerAccountId", out var hashedAccountId))
+            {
+                return null;
+            }
+
+            if (!_encodingService.TryDecode(hashedAccountId.ToString(), EncodingType.AccountId, out var accountId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return accountId;
         }
 
         private long? GetCohortId()

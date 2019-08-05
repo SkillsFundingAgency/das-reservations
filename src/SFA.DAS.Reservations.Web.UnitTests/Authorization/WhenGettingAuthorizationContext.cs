@@ -15,6 +15,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
     {
         private const long CohortId = 12345;
         private const long UkPrn = 4444;
+        private const long EmployerAccountId = 22;
 
         private Mock<IHttpContextAccessor> _httpContextAccessor;
         private Mock<IEncodingService> _encodingService;
@@ -41,6 +42,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
                 .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.CohortReference, out It.Ref<long>.IsAny))
                 .Callback(new TryGetCallback((string cohortRef, EncodingType encodingType, ref long val) => val = CohortId))
                 .Returns(new TryGetReturns((string cohortRef, EncodingType encodingType, ref long val) => true));
+
+            _encodingService
+                .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.AccountId, out It.Ref<long>.IsAny))
+                .Callback(new TryGetCallback((string accountId, EncodingType encodingType, ref long val) => val = EmployerAccountId))
+                .Returns(new TryGetReturns((string accountId, EncodingType encodingType, ref long val) => true));
 
             _routingFeature.Setup(f => f.RouteData).Returns(_routeData);
             
@@ -75,6 +81,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
             //Assert
             Assert.IsTrue(context.TryGet<long>("PartyId", out var actualUkPrn));
             Assert.AreEqual(UkPrn, actualUkPrn);
+        }
+
+        [Test]
+        public void ThenAddsAccountIdToContext()
+        {
+            //Arrange
+            _routeData.Values.Remove("ukprn");
+            _routeData.Values.Add("employerAccountId", EmployerAccountId);
+
+            //Act
+            var context = _contextProvider.GetAuthorizationContext();
+
+            //Assert
+            Assert.IsTrue(context.TryGet<long>("PartyId", out var actualAccountId));
+            Assert.AreEqual(EmployerAccountId, actualAccountId);
         }
 
         [Test]
@@ -125,6 +146,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
             //Arrange
             _routeData.Values.Clear();
             _routeData.Values.Add("ukprn", "Not Valid");
+
+            //Act + Assert
+            Assert.Throws<UnauthorizedAccessException>(() => _contextProvider.GetAuthorizationContext());
+        }
+
+        [Test]
+        public void ThenThrowsUnauthorizedExceptionIfEmployerAccountIdIsNotValid()
+        {
+            //Arrange
+            _routeData.Values.Clear();
+            _routeData.Values.Add("employerAccountId", "Not Valid");
 
             //Act + Assert
             Assert.Throws<UnauthorizedAccessException>(() => _contextProvider.GetAuthorizationContext());
