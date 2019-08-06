@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using MediatR;
@@ -13,6 +14,7 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -257,6 +259,55 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 accountLegalEntity.IsLevy = false;
                 accountLegalEntity.AgreementType = AgreementType.Levy;
             }
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockEncodingService
+                .Setup(service => service.Decode(accountId, EncodingType.AccountId))
+                .Returns(decodedAccountId);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(It.Is<UrlParameters>(parameters => 
+                    parameters.Controller == "teams" &&
+                    parameters.SubDomain == "accounts" &&
+                    parameters.Folder == "accounts" &&
+                    parameters.Id == accountId
+                )))
+                .Returns(homeLink);
+
+            //act 
+            var result = await controller.Index(accountId) as ViewResult;
+
+            //assert
+            Assert.AreEqual("NonEoiHolding", result.ViewName);
+            var model = result.Model as NonEoiHoldingViewModel;
+            Assert.AreEqual(homeLink, model.BackLink);
+            Assert.AreEqual(homeLink, model.HomeLink);
+        }
+
+        [Test, MoqAutoData]
+        // no agreement - no legal entities returned from api
+        public async Task And_No_Agreement_Signed_Then_Returns_NonEoiHolding_View(
+            string accountId,
+            string expectedUserId,
+            string homeLink,
+            long decodedAccountId,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            //arrange
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
+            }));
+            
+            mockMediator
+                .Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
+            //arrange eoi
+            getLegalEntitiesResponse.AccountLegalEntities = new List<AccountLegalEntity>();
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getLegalEntitiesResponse);

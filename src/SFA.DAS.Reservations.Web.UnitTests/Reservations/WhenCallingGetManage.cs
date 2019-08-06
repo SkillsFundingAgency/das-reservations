@@ -305,5 +305,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             model.BackLink.Should().Be(homeLink);
             model.HomeLink.Should().Be(homeLink);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_No_Ukprn_No_Agreement_Signed_Then_Returns_Eoi_View(
+            ReservationsRouteModel routeModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            string homeLink,
+            long decodedAccountId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            ManageReservationsController controller)
+        {
+            routeModel.UkPrn = null;
+            getLegalEntitiesResponse.AccountLegalEntities = new List<AccountLegalEntity>();
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockEncodingService
+                .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
+                .Returns(decodedAccountId);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(It.Is<UrlParameters>(parameters => 
+                    parameters.Controller == "teams" &&
+                    parameters.SubDomain == "accounts" &&
+                    parameters.Folder == "accounts" &&
+                    parameters.Id == routeModel.EmployerAccountId
+                )))
+                .Returns(homeLink);
+
+            var result = await controller.Manage(routeModel) as ViewResult;
+
+            result.ViewName.Should().Be("NonEoiHolding");
+            var model = result.Model as NonEoiHoldingViewModel;
+            model.BackLink.Should().Be(homeLink);
+            model.HomeLink.Should().Be(homeLink);
+        }
     }
 }

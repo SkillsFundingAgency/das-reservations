@@ -61,7 +61,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     });
                 if (result.AccountLegalEntities.Any(entity =>
                     !entity.IsLevy && 
-                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest) || 
+                    !result.AccountLegalEntities.Any())
                 {
                     var homeLink = _urlHelper.GenerateUrl(new UrlParameters
                     {
