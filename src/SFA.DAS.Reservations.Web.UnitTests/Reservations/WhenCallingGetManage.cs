@@ -221,7 +221,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 reservation.Course.Id,
                 routeModel.UkPrn,
                 reservation.StartDate,
-                routeModel.CohortRef,
+                routeModel.CohortReference,
                 routeModel.EmployerAccountId))
                 .Returns(expectedUrl);
                 

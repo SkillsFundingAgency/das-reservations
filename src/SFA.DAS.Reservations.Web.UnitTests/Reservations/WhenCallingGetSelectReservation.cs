@@ -172,7 +172,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -217,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -280,7 +280,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -330,7 +330,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });
@@ -573,7 +573,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         AccountLegalEntityId = employer.AccountLegalEntityId,
                         AccountLegalEntityName = employer.AccountLegalEntityName,
                         AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortRef,
+                        CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
                 });

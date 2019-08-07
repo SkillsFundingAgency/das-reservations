@@ -236,7 +236,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
-                routeModel.CohortRef = result.CohortRef;
+                routeModel.CohortReference = result.CohortRef;
             }
             catch (ValidationException ex)
             {
@@ -282,7 +282,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 StartDate = queryResult.StartDate,
                 CourseId = queryResult.Course?.Id,
                 UkPrn = queryResult.UkPrn,
-                CohortRef = routeModel.CohortRef
+                CohortRef = routeModel.CohortReference
             };
 
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
@@ -390,7 +390,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         reservation.Course.Id,
                         routeModel.UkPrn,
                         reservation.StartDate,
-                        routeModel.CohortRef,
+                        routeModel.CohortReference,
                         routeModel.EmployerAccountId);
 
                     var viewModel = new ReservationViewModel(reservation, apprenticeUrl);
@@ -607,8 +607,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                         {
                             AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                            CohortRef = routeModel.CohortRef,
-                            CohortId = _encodingService.Decode(routeModel.CohortRef, EncodingType.CohortReference),
+                            CohortRef = routeModel.CohortReference,
+                            CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
                             UkPrn = routeModel.UkPrn.Value
                         });
 
@@ -789,8 +789,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                        CohortRef = routeModel.CohortRef,
-                        CohortId = _encodingService.Decode(routeModel.CohortRef, EncodingType.CohortReference),
+                        CohortRef = routeModel.CohortReference,
+                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
