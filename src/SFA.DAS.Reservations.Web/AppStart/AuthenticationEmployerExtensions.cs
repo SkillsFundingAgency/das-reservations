@@ -53,6 +53,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.SlidingExpiration = true;
                     options.Cookie.SameSite = SameSiteMode.None;
+                    options.CookieManager = new ChunkingCookieManager() { ChunkSize = 3000 };
                 });
         }
 
