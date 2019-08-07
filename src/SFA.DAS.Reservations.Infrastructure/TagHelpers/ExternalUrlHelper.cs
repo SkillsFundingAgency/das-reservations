@@ -34,8 +34,16 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         
         public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId)
         {
-            var queryString =
-                $"?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}";
+            var queryString = $"?reservationId={reservationId}";
+
+            if (ukPrn.HasValue)
+            {
+                queryString += $"&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+            }
+            else
+            {
+                queryString += $"&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}";
+            }
 
             if (startDate.HasValue)
             {
