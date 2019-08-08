@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
+            var backUrl = _urlHelper.GenerateCommitmentsUrl(new UrlParameters
             {
                 Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
                 Controller = $"apprentices/{viewModel.CohortReference}",
@@ -181,7 +181,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             SelectReservationViewModel viewModel)
         {
 
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
+            var backUrl = _urlHelper.GenerateCommitmentsUrl(new UrlParameters
             {
                 Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
                 Controller = $"apprentices/{routeModel.CohortReference}",

@@ -142,7 +142,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
+                .Setup(helper => helper.GenerateCommitmentsUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
@@ -184,7 +184,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
+                .Setup(helper => helper.GenerateCommitmentsUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.EmployerAccountId &&
                         parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
@@ -286,7 +286,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId,routeModel.UkPrn.Value));
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
+                .Setup(helper => helper.GenerateCommitmentsUrl(
                     It.Is<UrlParameters>(parameters =>
                         parameters.Id == routeModel.UkPrn.ToString() &&
                         parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&

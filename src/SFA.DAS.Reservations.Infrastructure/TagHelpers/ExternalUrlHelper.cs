@@ -18,6 +18,15 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             _options = options.Value;
         }
 
+        public string GenerateCommitmentsUrl(UrlParameters urlParameters)
+        {
+            var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
+                ? _options.EmployerCommitmentsUrl
+                : _options.DashboardUrl;
+
+            return FormatUrl(baseUrl, urlParameters);
+        }
+
         /// <summary>
         /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
         /// </summary>
