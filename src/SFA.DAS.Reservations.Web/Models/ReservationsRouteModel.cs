@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Authorization.ModelBinding;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class ReservationsRouteModel
+    public class ReservationsRouteModel 
     {
         [FromRoute]
         public uint? UkPrn { get; set; }
@@ -12,6 +13,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get; set; }
         public bool? FromReview { get; set; }
         [FromQuery]
-        public string CohortRef { get; set; }
+        public string CohortReference { get; set; }
     }
 }

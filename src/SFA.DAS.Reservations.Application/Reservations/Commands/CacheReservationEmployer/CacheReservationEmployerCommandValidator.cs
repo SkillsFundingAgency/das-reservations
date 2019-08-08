@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -35,11 +37,31 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             }
             else
             {
-                var globalRules = await _rulesService.GetAccountFundingRules(command.AccountId);
-                if (globalRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
-                    globalRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
+                var accountFundingRulesApiResponse = await _rulesService.GetAccountFundingRules(command.AccountId);
+                if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
+                    accountFundingRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
                 {
                     result.FailedRuleValidation = true;
+                }
+
+                var globalRulesApiResponse = await _rulesService.GetFundingRules();
+                if (globalRulesApiResponse.GlobalRules != null && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) &&
+                    globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused) > 0)
+                {
+                    result.FailedGlobalRuleValidation = true;
+                }
+
+                // eoi
+                var queryResult = await _mediator.Send(new GetLegalEntitiesQuery
+                {
+                    AccountId = command.AccountId
+                });
+                if (queryResult.AccountLegalEntities.Any(entity =>
+                    !entity.IsLevy && 
+                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
+                {
+                    result.AddError(nameof(command.AccountId), 
+                        "Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
                 }
             }
 

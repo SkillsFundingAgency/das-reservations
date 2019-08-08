@@ -15,6 +15,7 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -156,7 +157,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     new ValidationResult("Failed",
                         new List<string> {"AccountId| Account reservation limit has been reached."}), null, null));
 
-            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<IExternalUrlHelper>());
             
             var actual = await controller.PostSelectLegalEntity(routeModel, viewModel);
 
