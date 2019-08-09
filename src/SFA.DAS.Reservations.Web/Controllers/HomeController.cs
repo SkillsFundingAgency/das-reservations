@@ -46,6 +46,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
 
+        [Route("signoutcleanup")]
+        public void SignOutCleanup()
+        {
+            Response.Cookies.Delete("SFA.DAS.Reservations.Web.Auth");
+        }
+
+
         [Route("notAvailable", Name="FeatureNotAvailable")]
         public IActionResult FeatureNotAvailable()
         {
