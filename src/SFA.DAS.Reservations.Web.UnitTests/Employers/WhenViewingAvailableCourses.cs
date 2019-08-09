@@ -165,7 +165,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(cohortUrl,viewModel.BackLink);
-            Assert.AreEqual(cachedReservationResult.CohortRef,viewModel.CohortRef);
+            Assert.AreEqual(cachedReservationResult.CohortRef,viewModel.CohortReference);
         }
 
         [Test, MoqAutoData]
