@@ -7,6 +7,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public Guid ReservationId { get; set; }
         public string RouteName { get; set; }
         public string BackLink { get; set; }
-        public string CohortReference { get; set; }
+        public string CohortRef { get; set; }
     }
 }

@@ -6,7 +6,7 @@
     ViewData["Title"] = "Reservations - Select Course";
 }
 
-@if (string.IsNullOrEmpty(Model.CohortReference))
+@if (string.IsNullOrEmpty(Model.CohortRef))
 {
     <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
 }
@@ -24,7 +24,7 @@ else
             <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take?</h1>
 
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
-                <input asp-for="CohortReference" type="hidden"/>
+                <input asp-for="CohortRef" type="hidden"/>
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
 
 
