@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
 
             var cohort = await _mediator.Send(new GetCohortQuery {CohortId = query.CohortId}, cancellationToken);
 
-            if (!cohort.Cohort.LegalEntityId.Equals(legalEntity.LegalEntityId.ToString()))
+            if (cohort.Cohort.AccountLegalEntityId != legalEntity.AccountLegalEntityId)
             {
                 throw new ProviderNotAuthorisedException(accountId, query.UkPrn);
             }
