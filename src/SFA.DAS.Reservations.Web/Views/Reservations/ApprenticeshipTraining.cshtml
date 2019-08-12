@@ -1,4 +1,5 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+﻿@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using SFA.DAS.Reservations.Web.Extensions
 @model ApprenticeshipTrainingViewModel
 @{
     ViewData["Title"] = "Reservations - Apprenticeship training";
@@ -18,17 +19,29 @@
                            && ViewData.ModelState.ContainsKey("StartDate") &&
                            ViewData.ModelState["StartDate"].Errors != null &&
                            ViewData.ModelState["StartDate"].Errors.Any();
+
+    var routeData = new Dictionary<string, string>
+    {
+        {"CohortReference",Model.CohortRef}
+    };
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
 {
-    if (string.IsNullOrEmpty(Model.CohortRef))
+    if (!Model.IsProvider)
     {
-        <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+        <a asp-route="@Model.BackLink" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
     }
     else
     {
-        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+        if (string.IsNullOrEmpty(Model.CohortRef))
+        {
+            <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+        }
+        else
+        {
+            <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+        }
     }
 }
 
