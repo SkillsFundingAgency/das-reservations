@@ -67,7 +67,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             _expectedCohort = new Cohort()
             {
                 CohortId = 123,
-                LegalEntityId = _expectedAccountLegalEntity.LegalEntityId.ToString(),
+                AccountLegalEntityId = _expectedAccountLegalEntity.AccountLegalEntityId,
                 LegalEntityName = _expectedAccountLegalEntity.AccountLegalEntityName,
                 ProviderName = "Test Provider",
                 IsFundedByTransfer = false,
@@ -246,7 +246,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
         public void ThenIfLegalEntityDoesNotMatchCohortDetailsThrownProviderNotAuthorisedException()
         {
             //Arrange
-            _expectedCohort.LegalEntityId = "1111";
+            _expectedCohort.AccountLegalEntityId = 1111;
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(),

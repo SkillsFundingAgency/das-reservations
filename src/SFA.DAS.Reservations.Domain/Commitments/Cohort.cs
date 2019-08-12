@@ -11,7 +11,7 @@
     public class Cohort
     {
         public long CohortId { get; set; }
-        public string LegalEntityId { get; set; }
+        public long AccountLegalEntityId { get; set; }
         public string LegalEntityName { get; set; }
         public string ProviderName { get; set; }
         public bool IsFundedByTransfer { get; set; }
