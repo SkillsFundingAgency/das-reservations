@@ -280,7 +280,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //assert
             Assert.AreEqual("NonEoiHolding", result.ViewName);
             var model = result.Model as NonEoiHoldingViewModel;
-            Assert.AreEqual(homeLink, model.BackLink);
             Assert.AreEqual(homeLink, model.HomeLink);
         }
 
@@ -329,7 +328,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //assert
             Assert.AreEqual("NonEoiHolding", result.ViewName);
             var model = result.Model as NonEoiHoldingViewModel;
-            Assert.AreEqual(homeLink, model.BackLink);
             Assert.AreEqual(homeLink, model.HomeLink);
         }
     }

@@ -302,7 +302,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.ViewName.Should().Be("NonEoiHolding");
             var model = result.Model as NonEoiHoldingViewModel;
-            model.BackLink.Should().Be(homeLink);
             model.HomeLink.Should().Be(homeLink);
         }
 
@@ -338,7 +337,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.ViewName.Should().Be("NonEoiHolding");
             var model = result.Model as NonEoiHoldingViewModel;
-            model.BackLink.Should().Be(homeLink);
             model.HomeLink.Should().Be(homeLink);
         }
     }

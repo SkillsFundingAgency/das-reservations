@@ -74,7 +74,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     return View("NonEoiHolding", new NonEoiHoldingViewModel
                     {
-                        BackLink = homeLink,
                         HomeLink = homeLink
                     });
                 }
