@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
@@ -14,10 +15,12 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
     public class EmployerAccountAuthorizationHandler : AuthorizationHandler<EmployerAccountRequirement>, IEmployerAccountAuthorisationHandler
     {
         private readonly IEmployerAccountService _accountsService;
+        private readonly ILogger _logger;
 
-        public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService)
+        public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService, ILogger logger)
         {
             _accountsService = accountsService;
+            _logger = logger;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerAccountRequirement requirement)
@@ -37,15 +40,24 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             if (!(context.Resource is AuthorizationFilterContext mvcContext) || !mvcContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId)) 
                 return false;
 
-            if (!context.User.HasClaim(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)))
-                return false;
             
             var accountIdFromUrl = mvcContext.RouteData.Values[RouteValues.EmployerAccountId].ToString().ToUpper();
             var employerAccountClaim = context.User.FindFirst(c=>c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
-            var employerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(employerAccountClaim?.Value);
-            
-            if (employerAccountClaim == null)
+
+            if(employerAccountClaim?.Value == null)
                 return false;
+
+            Dictionary<string, EmployerIdentifier> employerAccounts;
+
+            try
+            {
+                employerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(employerAccountClaim.Value);
+            }
+            catch (JsonReaderException e)
+            {
+                _logger.LogError(e, "Could not deserialize employer account claim for user", employerAccountClaim.Value);
+                return false;
+            }
 
             EmployerIdentifier employerIdentifier = null;
 
