@@ -15,9 +15,9 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
     public class EmployerAccountAuthorizationHandler : AuthorizationHandler<EmployerAccountRequirement>, IEmployerAccountAuthorisationHandler
     {
         private readonly IEmployerAccountService _accountsService;
-        private readonly ILogger _logger;
+        private readonly ILogger<EmployerAccountAuthorizationHandler> _logger;
 
-        public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService, ILogger logger)
+        public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService, ILogger<EmployerAccountAuthorizationHandler> logger)
         {
             _accountsService = accountsService;
             _logger = logger;
