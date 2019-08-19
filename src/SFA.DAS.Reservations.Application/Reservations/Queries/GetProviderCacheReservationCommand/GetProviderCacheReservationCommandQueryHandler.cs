@@ -7,6 +7,7 @@ using MediatR;
 using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Validation;
@@ -33,8 +34,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new System.ComponentModel.DataAnnotations.ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var accounts = await _mediator.Send(

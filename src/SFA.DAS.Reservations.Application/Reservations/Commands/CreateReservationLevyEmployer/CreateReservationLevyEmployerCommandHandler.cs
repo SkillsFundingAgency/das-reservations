@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -29,8 +30,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var result = await _reservationService.CreateReservationLevyEmployer(Guid.NewGuid(), request.AccountId,
