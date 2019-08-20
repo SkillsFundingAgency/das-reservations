@@ -60,33 +60,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (routeModel.UkPrn.HasValue)
                 {
-                    
-                    try
+                    var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                     {
-                        var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
-                        {
-                            AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                            CohortRef = routeModel.CohortReference,
-                            CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
-                            UkPrn = routeModel.UkPrn.Value
-                        });
+                        AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
+                        CohortRef = routeModel.CohortReference,
+                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
+                        UkPrn = routeModel.UkPrn.Value
+                    });
 
-                        cacheReservationEmployerCommand = response.Command;
-
-                    }
-                    catch (AccountLegalEntityNotFoundException e)
-                    {
-                        _logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
-                        return RedirectToRoute(RouteNames.Error404);
-                    }
-                    catch (AccountLegalEntityInvalidException ex)
-                    {
-                        _logger.LogWarning(ex.Message);
-                        return RedirectToRoute(RouteNames.Error500);
-                    }
+                    cacheReservationEmployerCommand = response.Command;
 
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
-
                     
                 }
                 else
@@ -94,13 +78,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
                         viewModel.CohortReference);
-
-                    if (cacheReservationEmployerCommand == null)
-                    {
-                        _logger.LogWarning(
-                            $"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
-                        return RedirectToRoute(RouteNames.Error500);
-                    }
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
@@ -158,6 +135,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return View("ProviderFundingPaused");
                 }
                 return View("EmployerFundingPaused");
+            }
+            catch (AccountLegalEntityNotFoundException e)
+            {
+                _logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
+                return RedirectToRoute(RouteNames.Error404);
+            }
+            catch (AccountLegalEntityInvalidException ex)
+            {
+                _logger.LogWarning(ex.Message);
+                return RedirectToRoute(RouteNames.Error500);
             }
             catch (Exception e)
             {
@@ -309,7 +296,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (legalEntity == null)
             {
-                return null;
+                throw new AccountLegalEntityNotFoundException(accountLegalEntityPublicHashedId);
             }
 
             return new CacheReservationEmployerCommand
