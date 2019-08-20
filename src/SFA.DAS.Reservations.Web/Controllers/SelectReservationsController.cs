@@ -50,13 +50,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
-                Controller = $"apprentices/{viewModel.CohortReference}",
-                Action = "details",
-                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
-            });
+            
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, viewModel.CohortReference);
 
             try
             {
@@ -181,13 +176,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             SelectReservationViewModel viewModel)
         {
 
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
-                Controller = $"apprentices/{routeModel.CohortReference}",
-                Action = "details",
-                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
-            });
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, routeModel.CohortReference);
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {

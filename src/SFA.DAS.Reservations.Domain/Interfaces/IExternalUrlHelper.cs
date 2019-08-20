@@ -18,5 +18,6 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
         /// <returns></returns>
         string GenerateAddApprenticeUrl(UrlParameters urlParameters);
         string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId);
+        string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef);
     }
 }
