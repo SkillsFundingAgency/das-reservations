@@ -104,6 +104,16 @@ namespace SFA.DAS.Reservations.Web
             var isEmployerAuth = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
             var isProviderAuth = _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
 
+            var serviceParameters = new ServiceParameters();
+            if (isEmployerAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            }
+            else if (isProviderAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Provider;
+            }
+
             if (isEmployerAuth)
             {
                 services.AddEmployerConfiguration(_configuration);
@@ -145,6 +155,7 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
+            services.AddSingleton(serviceParameters);
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
             services.AddScoped(typeof(IValidator<CacheReservationCourseCommand>), typeof(CacheReservationCourseCommandValidator));
@@ -163,8 +174,8 @@ namespace SFA.DAS.Reservations.Web
             services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
             services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
             services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
-          
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
+            services.AddScoped<NonEoiNotPermittedFilterAttribute>();
 
             services.AddSingleton<IApiClient,ApiClient>();
             services.AddSingleton<CommitmentsApiClient>();

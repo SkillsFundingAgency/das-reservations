@@ -10,6 +10,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -31,7 +32,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _encodingService = encodingService;
             _urlHelper = urlHelper;
         }
-
+        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
         public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
