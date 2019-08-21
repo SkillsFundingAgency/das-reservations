@@ -13,7 +13,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -146,6 +145,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogWarning(ex.Message);
                 return RedirectToRoute(RouteNames.Error500);
             }
+            catch (TransferSendNotAllowedException e)
+            {
+                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+                return RedirectToRoute(RouteNames.Error500);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error trying to render select reservation.");
@@ -248,42 +252,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId)
-        {
-            try
+        {  
+            var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
             {
-                var hashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId);
-                var autoReserveStatus = await _mediator.Send(
-                    new GetAccountReservationStatusQuery
-                    {
-                        AccountId = accountId,
-                        TransferSenderAccountId = transferSenderId ?? "",
-                        HashedEmployerAccountId = hashedEmployerAccountId
-                    });
+                AccountId = accountId,
+                TransferSenderId = string.IsNullOrEmpty(transferSenderId) ? (long?)null : _encodingService.Decode(transferSenderId, EncodingType.PublicAccountId),
+                TransferSenderEmployerAccountId = transferSenderId,
+                AccountLegalEntityId = _encodingService.Decode(
+                    accountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId)
+            });
 
-                if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
-                {
-                    var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
-                    {
-                        AccountId = accountId,
-                        TransferSenderId = autoReserveStatus.TransferAccountId == 0 ? (long?)null : autoReserveStatus.TransferAccountId,
-                        AccountLegalEntityId = _encodingService.Decode(
-                            accountLegalEntityPublicHashedId,
-                            EncodingType.PublicAccountLegalEntityId)
-                    });
-
-                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
-                        accountLegalEntityPublicHashedId, "", ukPrn, null,
-                        cohortRef, hashedAccountId);
-
-                    return addApprenticeUrl;
-                }
-            }
-            catch (TransferSendNotAllowedException e)
+            if (levyReservation != null)
             {
-                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
-                return RouteNames.Error500;
+                return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
+                    accountLegalEntityPublicHashedId, "", ukPrn, null,
+                    cohortRef, hashedAccountId);
             }
-
+            
             return string.Empty;
         }
 
