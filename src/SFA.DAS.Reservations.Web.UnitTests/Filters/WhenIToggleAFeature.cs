@@ -117,5 +117,23 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             //Assert
             Assert.IsNull(redirect);
         }
+
+        
+        [Test, MoqAutoData]
+        public void Then_Feature_Is_Enabled_If_Toggle_Value_Cannot_Be_Parsed(
+            [Frozen] Mock<IConfiguration> configuration, 
+            ActionExecutedContext context)
+        {
+            //Assign
+            configuration.Setup(c => c["FeatureToggleOn"]).Returns("ABC");
+
+            var filter = new FeatureToggleActionFilter(configuration.Object);
+
+            //Act
+            filter.OnActionExecuted(context);
+
+            //Assert
+            Assert.IsFalse(context.Result.GetType() == typeof(RedirectToActionResult));
+        }
     }
 }
