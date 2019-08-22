@@ -3,12 +3,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Filters
 {
@@ -60,20 +62,29 @@ namespace SFA.DAS.Reservations.Web.Filters
                     entity.AgreementType != AgreementType.NonLevyExpressionOfInterest) || 
                 !result.AccountLegalEntities.Any())
             {
-                /*var homeLink = _urlHelper.GenerateUrl(new UrlParameters
+                var homeLink = _urlHelper.GenerateUrl(new UrlParameters
                 {
                     Controller = "teams",
                     SubDomain = "accounts",
                     Folder = "accounts",
-                    Id = employerAccountId
-                });*/
+                    Id = employerAccountId.ToString()
+                });
 
-                context.Result = new RedirectToRouteResult("eoiRouteName", new {routeValues = ""});
-
-                return /*View("NonEoiHolding", new NonEoiHoldingViewModel
+                var model = new NonEoiHoldingViewModel
                 {
                     HomeLink = homeLink
-                })*/;
+                };
+
+                var viewResult = new ViewResult
+                {
+                    ViewName = "NonEoiHolding", 
+                    ViewData = new ViewDataDictionary(((Controller)context.Controller).ViewData)
+                    {
+                        Model = model
+                    }
+                };
+                context.Result = viewResult;
+                return;
             }
 
             await next();

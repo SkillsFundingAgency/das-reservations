@@ -12,8 +12,11 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Filters
@@ -112,17 +115,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
 
         [Test, MoqAutoData]
         public async Task And_Employer_Agreement_Not_Signed_Then_Show_EOI_Holding_View(
-            ActionExecutingContext context,
+            [ArrangeActionContext] ActionExecutingContext context,
             string employerAccountId,
             long decodedEmployerAccountId,
+            string homeUrl,
             GetLegalEntitiesResponse legalEntitiesResponse,
             Mock<ActionExecutionDelegate> mockNext,
             [Frozen] ServiceParameters serviceParameters,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             NonEoiNotPermittedFilterAttribute filter)
         {
-            context.Result = null;
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             legalEntitiesResponse.AccountLegalEntities = new List<AccountLegalEntity>();
@@ -136,25 +140,38 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
                     It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedEmployerAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Controller == "teams" &&
+                        parameters.SubDomain == "accounts" &&
+                        parameters.Folder == "accounts" &&
+                        parameters.Id == employerAccountId)))
+                .Returns(homeUrl);
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
 
             mockNext.Verify(next => next(), Times.Never());
+            var result = context.Result as ViewResult;
+            result.ViewName.Should().Be("NonEoiHolding");
+            var model = result.Model as NonEoiHoldingViewModel;
+            model.HomeLink.Should().Be(homeUrl);
         }
 
         [Test, MoqAutoData]
         public async Task And_Employer_Is_Non_Levy_And_Not_EOI_Then_Show_EOI_Holding_View(
-            ActionExecutingContext context,
+            [ArrangeActionContext] ActionExecutingContext context,
             string employerAccountId,
             long decodedEmployerAccountId,
+            string homeUrl,
             GetLegalEntitiesResponse legalEntitiesResponse,
             Mock<ActionExecutionDelegate> mockNext,
             [Frozen] ServiceParameters serviceParameters,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             NonEoiNotPermittedFilterAttribute filter)
         {
-            context.Result = null;
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var accountLegalEntity in legalEntitiesResponse.AccountLegalEntities)
@@ -172,13 +189,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
                     It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedEmployerAccountId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateUrl(
+                    It.Is<UrlParameters>(parameters =>
+                        parameters.Controller == "teams" &&
+                        parameters.SubDomain == "accounts" &&
+                        parameters.Folder == "accounts" &&
+                        parameters.Id == employerAccountId)))
+                .Returns(homeUrl);
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
 
             mockNext.Verify(next => next(), Times.Never());
-            //var result = context.Result as RedirectToRouteResult;
-            //result.RouteName.Should().Be("");
-            //result.RouteValues.Should()...
+            var result = context.Result as ViewResult;
+            result.ViewName.Should().Be("NonEoiHolding");
+            var model = result.Model as NonEoiHoldingViewModel;
+            model.HomeLink.Should().Be(homeUrl);
         }
     }
 }
