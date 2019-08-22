@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,48 +13,15 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
 using SFA.DAS.Authorization.DependencyResolution;
 using SFA.DAS.Authorization.Mvc.Extensions;
-using SFA.DAS.Encoding;
-using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
-using SFA.DAS.ProviderRelationships.Api.Client.Http;
-using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.FundingRules.Services;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
-using SFA.DAS.Reservations.Application.Commitments.Services;
-using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
-using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
-using SFA.DAS.Reservations.Application.Providers.Services;
-using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
-using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
-using SFA.DAS.Reservations.Application.Reservations.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
-using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
-using SFA.DAS.Reservations.Web.Services;
-using SFA.DAS.Reservations.Infrastructure.Repositories;
-using SFA.DAS.Reservations.Infrastructure.Services;
-using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
-using SFA.DAS.Reservations.Web.Stubs;
-using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -148,49 +113,18 @@ namespace SFA.DAS.Reservations.Web
                 {
                     options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
                 });
+
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
+
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
-            services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
-            services.AddScoped(typeof(IValidator<CacheReservationCourseCommand>), typeof(CacheReservationCourseCommandValidator));
-            services.AddScoped(typeof(IValidator<CacheReservationStartDateCommand>), typeof(CacheReservationStartDateCommandValidator));
-            services.AddScoped(typeof(IValidator<CacheReservationEmployerCommand>), typeof(CacheReservationEmployerCommandValidator));
-            services.AddScoped(typeof(IValidator<IReservationQuery>), typeof(GetReservationQueryValidator));
-            services.AddScoped(typeof(IValidator<CachedReservation>), typeof(CachedReservationValidator));
-            services.AddScoped(typeof(IValidator<GetTrustedEmployersQuery>), typeof(GetTrustedEmployerQueryValidator));
-            services.AddScoped(typeof(IValidator<GetReservationsQuery>), typeof(GetReservationsQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAvailableReservationsQuery>), typeof(GetAvailableReservationsQueryValidator));
-            services.AddScoped(typeof(IValidator<MarkRuleAsReadCommand>), typeof(MarkRuleAsReadCommandValidator));
-            services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
-            services.AddScoped(typeof(IValidator<GetAccountLegalEntityQuery>), typeof(GetAccountLegalEntityQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
-            services.AddScoped(typeof(IValidator<CreateReservationLevyEmployerCommand>), typeof(CreateReservationLevyEmployerCommandValidator));
-            services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
-            services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
-            services.AddScoped<IProviderPermissionsService,ProviderPermissionsService>();
-          
-            services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
+            services.AddMediatRValidation();
 
-            services.AddSingleton<IApiClient,ApiClient>();
-            services.AddSingleton<CommitmentsApiClient>();
-            services.AddSingleton<IEncodingService, EncodingService>();
-            services.AddSingleton<IProviderService, ProviderService>();
-            services.AddTransient<ITrainingDateService, TrainingDateService>();
-            services.AddTransient<ICourseService, CourseService>();
-            services.AddTransient<IReservationService, ReservationService>();
-            services.AddTransient<ICacheStorageService, CacheStorageService>();
-            services.AddTransient<IFundingRulesService, FundingRulesService>();
-            services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
-            
-            services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
-                provider.GetService<CommitmentsApiClient>(), 
-                provider.GetService<IOptions<CommitmentsApiConfiguration>>()) );
-            
-            services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
+            services.AddServices();
 
+            services.AddProviderRelationsApi(_configuration, _environment);
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-	
-			AddProviderRelationsApi(services, _configuration, _environment);
+			
 
             if (_configuration["Environment"] == "LOCAL")
             {
@@ -257,30 +191,6 @@ namespace SFA.DAS.Reservations.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
-
-        private static void AddProviderRelationsApi(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>();
-            }
-            else
-            {
-                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClient>();
-                services.AddScoped<IRestHttpClient, RestHttpClient>();
-
-                services.AddSingleton<HttpClient>(provider =>
-                    new HttpClientFactory(provider.GetService<ProviderRelationshipsApiClientConfiguration>()
-                        .AzureActiveDirectoryClient).CreateHttpClient());
-
-                services.Configure<AzureActiveDirectoryClientConfiguration>(configuration.GetSection("AzureActiveDirectoryClient"));
-                services.AddSingleton(config => new ProviderRelationshipsApiClientConfiguration
-                {
-                    AzureActiveDirectoryClient = config.GetService<IOptions<AzureActiveDirectoryClientConfiguration>>().Value
-                });
-            }
         }
     }
 }
