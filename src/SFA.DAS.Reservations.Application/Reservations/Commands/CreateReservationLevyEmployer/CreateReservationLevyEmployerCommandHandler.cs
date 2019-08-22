@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (validationResult.FailedTransferReceiverCheck)
             {
-                throw new TransferSendNotAllowedException(request.AccountId, request.TransferSenderEmployerAccountId);
+                throw new TransferSenderNotAllowedException(request.AccountId, request.TransferSenderEmployerAccountId);
             }
 
             if (validationResult.FailedAutoReservationCheck)

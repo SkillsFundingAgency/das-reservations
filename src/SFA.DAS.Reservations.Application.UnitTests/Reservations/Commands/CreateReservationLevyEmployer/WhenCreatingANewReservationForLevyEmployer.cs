@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>( ),FailedTransferReceiverCheck = true});
 
             //Act
-            Assert.ThrowsAsync<TransferSendNotAllowedException>(() => handler.Handle(request, CancellationToken.None));
+            Assert.ThrowsAsync<TransferSenderNotAllowedException>(() => handler.Handle(request, CancellationToken.None));
 
             //Assert
             validator.Verify(x => x.ValidateAsync(request), Times.Once());

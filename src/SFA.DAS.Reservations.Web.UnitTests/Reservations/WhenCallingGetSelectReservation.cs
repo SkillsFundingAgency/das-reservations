@@ -324,7 +324,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
                 .ReturnsAsync(employersResponse);
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
-                .ThrowsAsync(new TransferSendNotAllowedException(1, "1"));
+                .ThrowsAsync(new TransferSenderNotAllowedException(1, "1"));
 
             //Act   
             var result = await controller.SelectReservation(routeModel, viewModel);

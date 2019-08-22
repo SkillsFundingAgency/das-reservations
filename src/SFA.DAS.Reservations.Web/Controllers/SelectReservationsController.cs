@@ -145,7 +145,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogWarning(ex.Message);
                 return RedirectToRoute(RouteNames.Error500);
             }
-            catch (TransferSendNotAllowedException e)
+            catch (TransferSenderNotAllowedException e)
             {
                 _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
                 return RedirectToRoute(RouteNames.Error500);
