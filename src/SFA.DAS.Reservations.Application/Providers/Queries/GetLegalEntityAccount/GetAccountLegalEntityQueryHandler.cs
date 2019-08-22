@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -32,8 +33,7 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccou
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var legalEntityId = _encodingService.Decode(

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -46,8 +47,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (!queryValidationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", queryValidationResult.ErrorList), null, null);
+                throw new ValidationException(queryValidationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             CachedReservation cachedReservation;
@@ -69,8 +69,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             var createValidationResult = await _cachedReservationValidator.ValidateAsync(cachedReservation);
             if (!createValidationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", createValidationResult.ErrorList), null, null);
+                throw new ValidationException(createValidationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var apiRequest = new ReservationApiRequest(

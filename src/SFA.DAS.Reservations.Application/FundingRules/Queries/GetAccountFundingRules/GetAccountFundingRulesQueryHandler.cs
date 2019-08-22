@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -30,8 +31,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundin
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var result = new GetAccountFundingRulesResult();

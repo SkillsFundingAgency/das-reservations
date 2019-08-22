@@ -1,7 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -26,8 +30,7 @@ namespace SFA.DAS.Reservations.Application.Employers.Queries
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             var trustedEmployers = await _providerPermissionsService.GetTrustedEmployers(request.UkPrn);
