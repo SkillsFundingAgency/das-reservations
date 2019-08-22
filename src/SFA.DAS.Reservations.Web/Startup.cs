@@ -144,6 +144,10 @@ namespace SFA.DAS.Reservations.Web
                 .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddHttpsRedirection(options =>
+                {
+                    options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
+                });
             services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddScoped(typeof(IValidator<CreateReservationCommand>), typeof(CreateReservationCommandValidator));
