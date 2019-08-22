@@ -30,8 +30,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (!validationResult.IsValid())
             {
-                throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), null, null);
+                throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
             if (validationResult.FailedTransferReceiverCheck)

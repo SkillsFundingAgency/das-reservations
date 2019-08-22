@@ -25,4 +25,11 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\EmployerAccountAuthorizationHandlerTests\" />
+    <Folder Include="Infrastructure\HasEmployerViewerUserRoleOrIsProviderTests\" />
+    <Folder Include="Infrastructure\HasProviderOrEmployerAccountAuthorisationHandlerTests\" />
+    <Folder Include="Infrastructure\ProviderAuthorizationHandlerTests\" />
+  </ItemGroup>
+
 </Project>

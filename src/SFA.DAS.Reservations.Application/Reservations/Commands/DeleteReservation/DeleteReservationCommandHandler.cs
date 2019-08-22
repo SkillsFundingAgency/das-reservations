@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(
-                    new ValidationResult("The following parameters have failed validation", validationResult.ErrorList), 
+                    validationResult.ConvertToDataAnnotationsValidationResult(),
                     null, 
                     null);
             }

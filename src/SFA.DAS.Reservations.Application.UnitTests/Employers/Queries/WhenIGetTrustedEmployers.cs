@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,7 +76,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
         {
             //Assign
             _validator.Setup(v => v.ValidateAsync(It.IsAny<GetTrustedEmployersQuery>()))
-                .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"Test", "Test error"}}});
+                .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"Test", "Test error"}, {"Test2", "Test error2"}}});
 
             //Act & Assert
             Assert.ThrowsAsync<ValidationException>(() => _handler.Handle(_query, CancellationToken.None));
