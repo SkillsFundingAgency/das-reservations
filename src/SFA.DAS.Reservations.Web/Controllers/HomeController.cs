@@ -51,14 +51,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             Response.Cookies.Delete("SFA.DAS.Reservations.Web.Auth");
         }
-
-
-        [Route("notAvailable", Name="FeatureNotAvailable")]
-        public IActionResult FeatureNotAvailable()
-        {
-            return View();
-        }
-
+        
         [Route("{employerAccountId}/service/password/change", Name =RouteNames.EmployerChangePassword)]
         public IActionResult ChangePassword(ReservationsRouteModel model,bool userCancelled = false)
         {
