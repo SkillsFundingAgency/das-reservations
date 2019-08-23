@@ -22,6 +22,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -45,32 +46,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Index(string employerAccountId)
+        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
+        public async Task<IActionResult> Index()
         {
-            var decodedAccountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
-            var result = await _mediator.Send(new GetLegalEntitiesQuery
-            {
-                AccountId = decodedAccountId
-            });
-            if (result.AccountLegalEntities.Any(entity =>
-                !entity.IsLevy && 
-                entity.AgreementType != AgreementType.NonLevyExpressionOfInterest) || 
-                !result.AccountLegalEntities.Any())
-            {
-                var homeLink = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Controller = "teams",
-                    SubDomain = "accounts",
-                    Folder = "accounts",
-                    Id = employerAccountId
-                });
-
-                return View("NonEoiHolding", new NonEoiHoldingViewModel
-                {
-                    HomeLink = homeLink
-                });
-            }
-
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
