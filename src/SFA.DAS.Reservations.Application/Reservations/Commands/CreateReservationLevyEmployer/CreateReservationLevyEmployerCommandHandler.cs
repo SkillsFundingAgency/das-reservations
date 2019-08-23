@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer
