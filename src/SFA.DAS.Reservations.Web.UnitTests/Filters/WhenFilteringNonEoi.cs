@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
@@ -25,12 +26,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
     {
         [Test, MoqAutoData]
         public async Task And_Is_Provider_Then_Executes_Action(
-            ServiceParameters serviceParameters,
-            ActionExecutingContext context,
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
             Mock<ActionExecutionDelegate> mockNext,
             NonEoiNotPermittedFilterAttribute filter)
         {
-            context.Result = null;
             serviceParameters.AuthenticationType = AuthenticationType.Provider;
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
@@ -40,8 +40,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
         }
 
         [Test, MoqAutoData]
+        public async Task And_No_EmployerId_Then_Redirect_To_Error(
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            Mock<ActionExecutionDelegate> mockNext,
+            NonEoiNotPermittedFilterAttribute filter)
+        {
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+
+            await filter.OnActionExecutionAsync(context, mockNext.Object);
+
+            mockNext.Verify(next => next(), Times.Never());
+            var result = context.Result as RedirectToRouteResult;
+            result.RouteName.Should().Be(RouteNames.Error500);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_Employer_Is_Levy_Then_Executes_Action(
-            ActionExecutingContext context,
+            [ArrangeActionContext] ActionExecutingContext context,
             string employerAccountId,
             long decodedEmployerAccountId,
             GetLegalEntitiesResponse legalEntitiesResponse,
@@ -78,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
 
         [Test, MoqAutoData]
         public async Task And_Employer_Is_Non_Levy_And_Is_EOI_Then_Executes_Action(
-            ActionExecutingContext context,
+            [ArrangeActionContext] ActionExecutingContext context,
             string employerAccountId,
             long decodedEmployerAccountId,
             GetLegalEntitiesResponse legalEntitiesResponse,

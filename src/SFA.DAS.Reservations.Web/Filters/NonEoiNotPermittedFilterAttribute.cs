@@ -10,6 +10,7 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Filters
@@ -48,7 +49,8 @@ namespace SFA.DAS.Reservations.Web.Filters
 
             if (!context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
             {
-                //context.res
+                context.Result = new RedirectToRouteResult(RouteNames.Error500, null);
+                return;
             }
 
             var decodedAccountId = _encodingService.Decode(employerAccountId?.ToString(), EncodingType.AccountId);
