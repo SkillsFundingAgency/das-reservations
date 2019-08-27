@@ -115,14 +115,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel
             {
                 Reservations = reservations,
-                BackLink = routeModel.UkPrn.HasValue
-                    ? _urlHelper.GenerateUrl(new UrlParameters{ Controller = "Account"})
-                    : _urlHelper.GenerateUrl( new UrlParameters {
-                        Controller = "teams", 
-                        SubDomain = "accounts", 
-                        Folder = "accounts", 
-                        Id = routeModel.EmployerAccountId
-                    })
+                BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId)
             });
         }
     }
