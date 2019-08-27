@@ -150,12 +150,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedReservationResult);
-            externalUrlHelper.Setup(x => x.GenerateUrl(
-                It.Is<UrlParameters>(c => c.Id.ToString() == routeModel.EmployerAccountId.ToString()
-                                          && c.Action == "details"
-                                          && c.Controller == $"apprentices/{cachedReservationResult.CohortRef}"
-                                          && c.Folder == "commitments/accounts"
-                                          )))
+            externalUrlHelper.Setup(x => 
+                x.GenerateCohortDetailsUrl(
+                    null, routeModel.EmployerAccountId, cachedReservationResult.CohortRef
+                    ))
                 .Returns(cohortUrl);
 
             //Act

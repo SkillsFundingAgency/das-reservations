@@ -250,13 +250,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
-                return _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.EmployerAccountId,
-                    Controller = $"apprentices/{cohortRef}",
-                    Action = "details",
-                    Folder = "commitments/accounts"
-                });
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
             }
             return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
         }
