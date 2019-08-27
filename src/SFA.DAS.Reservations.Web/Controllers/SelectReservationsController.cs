@@ -13,7 +13,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -51,13 +50,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
-                Controller = $"apprentices/{viewModel.CohortReference}",
-                Action = "details",
-                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
-            });
+            
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, viewModel.CohortReference);
 
             try
             {
@@ -66,33 +60,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (routeModel.UkPrn.HasValue)
                 {
-                    
-                    try
+                    var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
                     {
-                        var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
-                        {
-                            AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
-                            CohortRef = routeModel.CohortReference,
-                            CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
-                            UkPrn = routeModel.UkPrn.Value
-                        });
+                        AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
+                        CohortRef = routeModel.CohortReference,
+                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
+                        UkPrn = routeModel.UkPrn.Value
+                    });
 
-                        cacheReservationEmployerCommand = response.Command;
-
-                    }
-                    catch (AccountLegalEntityNotFoundException e)
-                    {
-                        _logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
-                        return RedirectToRoute(RouteNames.Error404);
-                    }
-                    catch (AccountLegalEntityInvalidException ex)
-                    {
-                        _logger.LogWarning(ex.Message);
-                        return RedirectToRoute(RouteNames.Error500);
-                    }
+                    cacheReservationEmployerCommand = response.Command;
 
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
-
                     
                 }
                 else
@@ -100,13 +78,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
                         viewModel.CohortReference);
-
-                    if (cacheReservationEmployerCommand == null)
-                    {
-                        _logger.LogWarning(
-                            $"Account legal entity not found [{routeModel.AccountLegalEntityPublicHashedId}].");
-                        return RedirectToRoute(RouteNames.Error500);
-                    }
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
@@ -165,6 +136,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
                 return View("EmployerFundingPaused");
             }
+            catch (AccountLegalEntityNotFoundException e)
+            {
+                _logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
+                return RedirectToRoute(RouteNames.Error404);
+            }
+            catch (AccountLegalEntityInvalidException ex)
+            {
+                _logger.LogWarning(ex.Message);
+                return RedirectToRoute(RouteNames.Error500);
+            }
+            catch (TransferSenderNotAllowedException e)
+            {
+                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+                return RedirectToRoute(RouteNames.Error500);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error trying to render select reservation.");
@@ -182,13 +168,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             SelectReservationViewModel viewModel)
         {
 
-            var backUrl = _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = routeModel.UkPrn.HasValue ? routeModel.UkPrn.Value.ToString() : routeModel.EmployerAccountId,
-                Controller = $"apprentices/{routeModel.CohortReference}",
-                Action = "details",
-                Folder = routeModel.UkPrn.HasValue ? "" : "commitments/accounts"
-            });
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, routeModel.CohortReference);
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {
@@ -273,42 +253,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId)
-        {
-            try
+        {  
+            var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
             {
-                var hashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId);
-                var autoReserveStatus = await _mediator.Send(
-                    new GetAccountReservationStatusQuery
-                    {
-                        AccountId = accountId,
-                        TransferSenderAccountId = transferSenderId ?? "",
-                        HashedEmployerAccountId = hashedEmployerAccountId
-                    });
+                AccountId = accountId,
+                TransferSenderId = string.IsNullOrEmpty(transferSenderId) ? (long?)null : _encodingService.Decode(transferSenderId, EncodingType.PublicAccountId),
+                TransferSenderEmployerAccountId = transferSenderId,
+                AccountLegalEntityId = _encodingService.Decode(
+                    accountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId)
+            });
 
-                if (autoReserveStatus != null && autoReserveStatus.CanAutoCreateReservations)
-                {
-                    var createdReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
-                    {
-                        AccountId = accountId,
-                        TransferSenderId = autoReserveStatus.TransferAccountId == 0 ? (long?)null : autoReserveStatus.TransferAccountId,
-                        AccountLegalEntityId = _encodingService.Decode(
-                            accountLegalEntityPublicHashedId,
-                            EncodingType.PublicAccountLegalEntityId)
-                    });
-
-                    var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(createdReservation.ReservationId,
-                        accountLegalEntityPublicHashedId, "", ukPrn, null,
-                        cohortRef, hashedAccountId);
-
-                    return addApprenticeUrl;
-                }
-            }
-            catch (TransferSendNotAllowedException e)
+            if (levyReservation != null)
             {
-                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
-                return RouteNames.Error500;
+                return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
+                    accountLegalEntityPublicHashedId, "", ukPrn, null,
+                    cohortRef, hashedAccountId);
             }
-
+            
             return string.Empty;
         }
 
@@ -321,7 +283,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (legalEntity == null)
             {
-                return null;
+                throw new AccountLegalEntityNotFoundException(accountLegalEntityPublicHashedId);
             }
 
             return new CacheReservationEmployerCommand

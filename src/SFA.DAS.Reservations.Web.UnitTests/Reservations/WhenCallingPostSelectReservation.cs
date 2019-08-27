@@ -142,12 +142,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
-                        parameters.Action == "details" &&
-                        parameters.Folder == "")))
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -156,50 +151,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             result.ViewName.Should().Be("ReservationLimitReached");
             result.Model.Should().Be(cohortDetailsUrl);
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Reservation_Limit_Has_Been_Reached_For_Employer_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
-                ReservationsRouteModel routeModel,
-                SelectReservationViewModel viewModel,
-                GetLegalEntitiesResponse employersResponse,
-                string cohortDetailsUrl,
-                long expectedAccountId,
-                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                [Frozen] Mock<IMediator> mockMediator,
-                [Frozen] Mock<IEncodingService> encodingService,
-                SelectReservationsController controller)
-        {
-            routeModel.UkPrn = null;
-            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
-            routeModel.Id = Guid.Empty;
-            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
-            var matchedEmployer = employersResponse.AccountLegalEntities.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
-            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
-            mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.EmployerAccountId &&
-                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
-                        parameters.Action == "details" &&
-                        parameters.Folder == "commitments/accounts")))
-                .Returns(cohortDetailsUrl);
-
-            //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
-
-            //Assert
-            Assert.IsNotNull(result);
-            var actualModel = result.Model as string;
-            Assert.IsNotNull(actualModel);
-            Assert.AreEqual(cohortDetailsUrl, actualModel);
         }
 
         [Test, MoqAutoData]
@@ -286,12 +237,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId,routeModel.UkPrn.Value));
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"apprentices/{routeModel.CohortReference}" &&
-                        parameters.Action == "details" &&
-                        parameters.Folder == "")))
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference))
                 .Returns(cohortDetailsUrl);
 
             //Act

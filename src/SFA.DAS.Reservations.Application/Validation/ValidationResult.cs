@@ -27,6 +27,8 @@ namespace SFA.DAS.Reservations.Application.Validation
         public bool FailedRuleValidation { get; set; }
         public bool FailedAuthorisationValidation { get; set; }
         public bool FailedGlobalRuleValidation { get; set; }
+        public bool FailedTransferReceiverCheck { get; set; }
+        public bool FailedAutoReservationCheck { get; set; }
 
         public bool IsValid()
         {
@@ -38,4 +40,5 @@ namespace SFA.DAS.Reservations.Application.Validation
             return !ValidationDictionary.Any();
         }
     }
+
 }
