@@ -68,6 +68,16 @@ namespace SFA.DAS.Reservations.Web
             var isEmployerAuth = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
             var isProviderAuth = _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
 
+            var serviceParameters = new ServiceParameters();
+            if (isEmployerAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            }
+            else if (isProviderAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Provider;
+            }
+
             if (isEmployerAuth)
             {
                 services.AddEmployerConfiguration(_configuration);
@@ -117,7 +127,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
 
-            services.AddServices();
+            services.AddServices(serviceParameters);
 
             services.AddProviderRelationsApi(_configuration, _environment);
 
