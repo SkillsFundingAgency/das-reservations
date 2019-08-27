@@ -25,13 +25,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         /// <returns></returns>
         public string GenerateUrl(UrlParameters urlParameters)
         {
-            var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
-                ? _options.EmployerDashboardUrl
-                : _options.DashboardUrl;
+            var baseUrl = GetBaseUrl();
 
             return FormatUrl(baseUrl, urlParameters);
         }
-        
+
         public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId)
         {
             var queryString = $"?reservationId={reservationId}";
@@ -85,6 +83,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return GenerateAddApprenticeUrl(urlParameters);
         }
 
+
         /// <summary>
         /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
         /// </summary>
@@ -95,6 +94,21 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             var baseUrl = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
                 ? _options.EmployerApprenticeUrl
                 : _options.ApprenticeUrl;
+
+            return FormatUrl(baseUrl, urlParameters);
+        }
+
+        public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef)
+        {
+            var urlParameters = new UrlParameters
+            {
+                Id = ukprn.HasValue ? ukprn.Value.ToString() : accountId,
+                Controller = $"apprentices/{cohortRef}",
+                Action = "details",
+                Folder = ukprn.HasValue ? "" : "commitments/accounts"
+            };
+
+            var baseUrl = GetBaseUrl();
 
             return FormatUrl(baseUrl, urlParameters);
         }
@@ -146,6 +160,13 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             }
 
             return returnUrl;
+        }
+
+        private string GetBaseUrl()
+        {
+            return _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
+                ? _options.EmployerDashboardUrl
+                : _options.DashboardUrl;
         }
     }
 }

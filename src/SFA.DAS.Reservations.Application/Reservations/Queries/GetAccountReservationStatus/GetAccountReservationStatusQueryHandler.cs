@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReserv
                     };
                 }
 
-                throw new TransferSendNotAllowedException(request.AccountId, request.TransferSenderAccountId);
+                throw new TransferSenderNotAllowedException(request.AccountId, request.TransferSenderAccountId);
 
             }
 

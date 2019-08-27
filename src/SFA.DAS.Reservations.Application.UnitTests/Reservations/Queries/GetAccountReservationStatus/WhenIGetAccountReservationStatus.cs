@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAcc
                 }});
 
             //Act Assert
-            Assert.ThrowsAsync<TransferSendNotAllowedException>(() => _handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<TransferSenderNotAllowedException>(() => _handler.Handle(query, CancellationToken.None));
         }
 
         [Test]
