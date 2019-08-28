@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -33,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             options.Setup(o => o.Value).Returns(_config);
 
-            _controller = new ProviderReservationsController(_mockMediator.Object, options.Object);
+            _controller = new ProviderReservationsController(_mockMediator.Object, Mock.Of<IExternalUrlHelper>());
         }
 
         [Test]

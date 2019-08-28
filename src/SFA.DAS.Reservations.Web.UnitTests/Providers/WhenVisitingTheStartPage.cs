@@ -4,14 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
@@ -27,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         {
             _mediator = new Mock<IMediator>();
 
-            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>());
+            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IExternalUrlHelper>());
 
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
