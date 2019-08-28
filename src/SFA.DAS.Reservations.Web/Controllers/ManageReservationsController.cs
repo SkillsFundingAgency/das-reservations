@@ -64,11 +64,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 foreach (var reservation in reservationsResult.Reservations)
                 {
-                    if (routeModel.UkPrn.HasValue)
-                    {
-                        reservation.ProviderId = routeModel.UkPrn;
-                    }
-
                     var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
                         EncodingType.PublicAccountLegalEntityId);
 
@@ -81,7 +76,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         routeModel.CohortReference,
                         routeModel.EmployerAccountId);
 
-                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl);
+                    var canDelete = !routeModel.UkPrn.HasValue || routeModel.UkPrn == reservation.ProviderId;
+
+                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, canDelete);
 
                     reservations.Add(viewModel);
                 }
