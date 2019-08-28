@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,9 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
 using SFA.DAS.Authorization.DependencyResolution;
 using SFA.DAS.Authorization.Mvc.Extensions;
+using SFA.DAS.ProviderRelationships.Api.Client;
+using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
+using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
@@ -21,6 +25,8 @@ using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using SFA.DAS.Reservations.Web.Stubs;
+using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -41,7 +47,7 @@ namespace SFA.DAS.Reservations.Web
                     configuration["ConfigNames"].Split(","),
                     configuration["Environment"],
                     configuration["Version"]
-                    )
+                )
                 .Build();
 
             _configuration = config;
@@ -62,11 +68,13 @@ namespace SFA.DAS.Reservations.Web
                     "Reservation Api",
                     failureStatus: HealthStatus.Unhealthy,
                     tags: new[] {"ready"});
-            
+
             services.AddOptions();
 
-            var isEmployerAuth = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
-            var isProviderAuth = _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
+            var isEmployerAuth =
+                _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+            var isProviderAuth =
+                _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
 
             if (isEmployerAuth)
             {
@@ -85,12 +93,15 @@ namespace SFA.DAS.Reservations.Web
 
             if (isEmployerAuth)
             {
-                services.AddAndConfigureEmployerAuthentication(serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(), serviceProvider.GetService<IEmployerAccountService>());
+                services.AddAndConfigureEmployerAuthentication(
+                    serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
+                    serviceProvider.GetService<IEmployerAccountService>());
             }
 
             if (isProviderAuth)
             {
-                services.AddAndConfigureProviderAuthentication(serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>());
+                services.AddAndConfigureProviderAuthentication(serviceProvider
+                    .GetService<IOptions<ProviderIdamsConfiguration>>());
             }
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
@@ -108,22 +119,22 @@ namespace SFA.DAS.Reservations.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddHttpsRedirection(options =>
-                {
-                    options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
-                });
+            {
+                options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
+            });
 
-            services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
+            services.AddSession(options =>
+                options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
 
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
 
             services.AddServices();
 
-            services.AddProviderRelationsApi(_configuration, _environment);
-
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-			
 
+            services.AddProviderRelationsApi(_configuration, _environment);
+            
             if (_configuration["Environment"] == "LOCAL")
             {
                 services.AddDistributedMemoryCache();
@@ -131,9 +142,9 @@ namespace SFA.DAS.Reservations.Web
             else
             {
                 services.AddStackExchangeRedisCache(options =>
-                    {
-                        options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
-                    });
+                {
+                    options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
+                });
             }
         }
 
@@ -190,5 +201,7 @@ namespace SFA.DAS.Reservations.Web
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
+        
     }
 }

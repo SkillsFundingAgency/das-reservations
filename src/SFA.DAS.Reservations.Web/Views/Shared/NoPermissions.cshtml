@@ -11,11 +11,11 @@ else
 {
     @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
     {
-        <a asp-external-controller="Account" role="button" draggable="false" tabindex="1" class="govuk-button">Back</a>
+        <a asp-external-controller="Account" role="button" draggable="false" tabindex="1" class="govuk-back-link">Back</a>
     }
     else
     {
-        <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" tabindex="1" draggable="false" class="govuk-button">Back</a>
+        <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" tabindex="1" draggable="false" class="govuk-back-link">Back</a>
     }
 }
 
