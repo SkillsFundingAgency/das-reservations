@@ -225,7 +225,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task UkPrn_Will_Be_Populated_From_RouteModel_Reservation(
+        public async Task Add_Apprentice_Url_UkPrn_Will_Be_Populated_From_RouteModel_Reservation(
             ReservationsRouteModel routeModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             Reservation reservation,
