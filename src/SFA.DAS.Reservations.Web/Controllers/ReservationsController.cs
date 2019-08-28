@@ -469,16 +469,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var isProvider = routeModel.UkPrn.HasValue;
             var deleteCompletedViewName = isProvider ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
             var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
-            var dashboardUrl = isProvider ? 
-                _configuration.DashboardUrl : 
-                _urlHelper.GenerateUrl(
-                    new UrlParameters
-                    {
-                        Id = routeModel.EmployerAccountId,
-                        Controller = "teams",
-                        Folder = "accounts",
-                        SubDomain = "accounts"
-                    });
+            var dashboardUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
             
             if (!ModelState.IsValid)
             {
