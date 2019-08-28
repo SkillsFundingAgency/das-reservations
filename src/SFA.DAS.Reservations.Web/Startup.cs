@@ -177,6 +177,7 @@ namespace SFA.DAS.Reservations.Web
             app.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = CookieSecurePolicy.Always,
+                CheckConsentNeeded = context=>true,
                 MinimumSameSitePolicy = SameSiteMode.None
             });
 
