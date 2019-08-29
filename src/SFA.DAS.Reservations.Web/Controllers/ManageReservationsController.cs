@@ -76,9 +76,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         routeModel.CohortReference,
                         routeModel.EmployerAccountId);
 
-                    var canDelete = !routeModel.UkPrn.HasValue || routeModel.UkPrn == reservation.ProviderId;
-
-                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, canDelete);
+                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel);
 
                     reservations.Add(viewModel);
                 }

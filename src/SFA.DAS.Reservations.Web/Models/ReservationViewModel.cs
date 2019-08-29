@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReservationViewModel : AddApprenticeViewModel
     {
-        public ReservationViewModel(Reservation reservation, string apprenticeUrl, bool canBeDeleted) : base(apprenticeUrl)
+        public ReservationViewModel(Reservation reservation, string apprenticeUrl, ReservationsRouteModel routeModel) : base(apprenticeUrl)
         {
             Id = reservation.Id;
             TrainingDate = new TrainingDateModel
@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Status = (ReservationStatusViewModel)reservation.Status;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
-            CanBeDeleted = canBeDeleted;
+            CanBeDeleted = !routeModel.UkPrn.HasValue || routeModel.UkPrn == reservation.ProviderId;
         }
 
         public Guid Id { get; }
@@ -26,6 +26,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string LegalEntityName { get; }
         public string CourseName { get; }
         public TrainingDateModel TrainingDate { get; }
-        public bool CanBeDeleted { get; set; }
+        public bool CanBeDeleted { get; }
     }
 }
