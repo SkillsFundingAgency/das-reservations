@@ -125,16 +125,12 @@ namespace SFA.DAS.Reservations.Web
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
-                .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
             });
-
-            services.AddSession(options =>
-                options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
 
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
@@ -174,13 +170,7 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy(new CookiePolicyOptions
-            {
-                Secure = CookieSecurePolicy.Always,
-                CheckConsentNeeded = context=>true,
-                MinimumSameSitePolicy = SameSiteMode.None
-            });
-
+            
             app.Use(async (context, next) =>
             {
                 if (context.Response.Headers.ContainsKey("X-Frame-Options"))
