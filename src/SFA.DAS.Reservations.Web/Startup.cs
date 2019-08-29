@@ -76,6 +76,16 @@ namespace SFA.DAS.Reservations.Web
             var isProviderAuth =
                 _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
 
+            var serviceParameters = new ServiceParameters();
+            if (isEmployerAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            }
+            else if (isProviderAuth)
+            {
+                serviceParameters.AuthenticationType = AuthenticationType.Provider;
+            }
+
             if (isEmployerAuth)
             {
                 services.AddEmployerConfiguration(_configuration);
@@ -115,7 +125,6 @@ namespace SFA.DAS.Reservations.Web
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
-                .AddSessionStateTempDataProvider()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddHttpsRedirection(options =>
@@ -123,13 +132,10 @@ namespace SFA.DAS.Reservations.Web
                 options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
             });
 
-            services.AddSession(options =>
-                options.IdleTimeout = TimeSpan.FromHours(reservationsWebConfig.SessionTimeoutHours));
-
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
 
-            services.AddServices();
+            services.AddServices(serviceParameters);
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
@@ -164,12 +170,7 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy(new CookiePolicyOptions
-            {
-                Secure = CookieSecurePolicy.Always,
-                MinimumSameSitePolicy = SameSiteMode.None
-            });
-
+            
             app.Use(async (context, next) =>
             {
                 if (context.Response.Headers.ContainsKey("X-Frame-Options"))
