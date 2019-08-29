@@ -13,9 +13,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_Id(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.Id.Should().Be(reservation.Id);
         }
@@ -24,9 +24,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_StartDateDescription(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.TrainingDate.StartDate.Should().Be(reservation.StartDate);
             viewModel.TrainingDate.EndDate.Should().Be(reservation.ExpiryDate);
@@ -36,10 +36,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_Status(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
             reservation.Status = ReservationStatus.Deleted;
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             ((int)viewModel.Status).Should().Be((int)reservation.Status);
         }
@@ -48,9 +48,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_CourseDescription(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.CourseName.Should().Be(reservation.Course.CourseDescription);
         }
@@ -59,11 +59,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void And_Course_Is_Null_Then_Sets_CourseDescription_To_Unknown(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
             reservation.Course = null;
 
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.CourseName.Should().Be("Unknown");
         }
@@ -72,9 +72,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_Sets_AccountLegalEntityName(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.LegalEntityName.Should().Be(reservation.AccountLegalEntityName);
         }
@@ -89,12 +89,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void And_No_Ukprn_Then_Sets_CanBeDeleted_True(
             Reservation reservation,
-            string url,
-            ReservationsRouteModel routeModel)
+            string url)
         {
-            routeModel.UkPrn = null;
-
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, null);
 
             viewModel.CanBeDeleted.Should().Be(true);
         }
@@ -102,12 +99,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [Test, AutoData]
         public void And_Has_Ukprn_And_RouteModel_Ukprn_Matches_Reservation_Id_Then_Sets_CanBeDeleted_True(
             Reservation reservation,
-            string url,
-            ReservationsRouteModel routeModel)
+            string url)
         {
-            routeModel.UkPrn = reservation.ProviderId;
+            var loggedInProviderId = reservation.ProviderId;
 
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.CanBeDeleted.Should().Be(true);
         }
@@ -116,9 +112,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void And_Has_Ukprn_And_RouteModel_Ukprn__Not_Match_Reservation_Id_Then_Sets_CanBeDeleted_False(
             Reservation reservation,
             string url,
-            ReservationsRouteModel routeModel)
+            uint? loggedInProviderId)
         {
-            var viewModel = new ReservationViewModel(reservation, url, routeModel);
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.CanBeDeleted.Should().Be(false);
         }

@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         routeModel.CohortReference,
                         routeModel.EmployerAccountId);
 
-                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel);
+                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
 
                     reservations.Add(viewModel);
                 }
