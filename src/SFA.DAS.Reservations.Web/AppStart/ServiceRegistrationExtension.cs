@@ -11,14 +11,17 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class ServiceRegistrationExtension
     {
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters)
         {
+            services.AddSingleton(serviceParameters);
+            services.AddScoped<NonEoiNotPermittedFilterAttribute>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
             services.AddSingleton<IApiClient, ApiClient>();
