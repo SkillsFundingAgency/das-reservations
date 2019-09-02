@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
 
         [Route("start", Name = RouteNames.ProviderStart)]
-        public async Task<IActionResult> Start(uint ukPrn)
+        public async Task<IActionResult> Start(uint ukPrn, bool isFromManage)
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
@@ -106,7 +106,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("NoPermissions");
             }
             
-            return View("Index");
+            var viewModel = new ProviderStartViewModel
+            {
+                IsFromManage = isFromManage
+            };
+            return View("Index", viewModel);
         }
 
         [HttpGet]
