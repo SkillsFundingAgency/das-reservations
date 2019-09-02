@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -25,6 +26,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IEncodingService> _mockEncodingService;
         private Mock<IOptions<ReservationsWebConfiguration>> _mockOptions;
         private Mock<IExternalUrlHelper> _externalUrlHelper;
+        private ReservationsRouteModel _routeModel;
 
         [SetUp]
         public void Arrange()
@@ -37,6 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
             _externalUrlHelper = new Mock<IExternalUrlHelper>();
+            _routeModel = fixture.Create<ReservationsRouteModel>();
 
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object, _externalUrlHelper.Object);
         }
@@ -53,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //act 
-            var view = await _controller.Start() as ViewResult;
+            var view = await _controller.Start(_routeModel) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -81,7 +84,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
 
             //act 
-            var view = await _controller.Start() as ViewResult;
+            var view = await _controller.Start(_routeModel) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -106,13 +109,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                         }
                     }
                 });
+            var expectedBackUrl = "https://test.com";
+
+            _externalUrlHelper.Setup(h => h.GenerateUrl(It.Is<UrlParameters>(p =>
+                p.Id.Equals(_routeModel.EmployerAccountId) &&
+                p.SubDomain.Equals("accounts") &&
+                p.Controller.Equals("teams") &&
+                p.Folder.Equals("accounts")))).Returns(expectedBackUrl);
 
             //act
-            var result = await _controller.Start() as ViewResult;
+            var result = await _controller.Start(_routeModel) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("ReservationLimitReached",result.ViewName);
+            Assert.AreEqual(expectedBackUrl,result.Model);
         }
     }
 }
