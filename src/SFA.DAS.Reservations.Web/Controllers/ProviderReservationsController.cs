@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _config = options.Value;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool isFromManage)
         {
             var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
             
@@ -47,6 +47,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
             {
+                RouteData.Values.Add(nameof(isFromManage), isFromManage);
                 return RedirectToAction("Start", RouteData?.Values);
             }
 

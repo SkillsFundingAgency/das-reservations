@@ -2,6 +2,8 @@
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,27 +31,27 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [SetUp]
         public void Arrange()
         {
+            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+
             _expectedRule = new GlobalRule {Id = 2, ActiveFrom = DateTime.Now.AddDays(2)};
 
            var result = new GetNextUnreadGlobalFundingRuleResult {Rule = _expectedRule};
 
-            _mockMediator = new Mock<IMediator>();
+            _mockMediator = fixture.Freeze<Mock<IMediator>>();
             _config = new ReservationsWebConfiguration
             {
                 DashboardUrl = "test.com/test"
             };
 
-            var options = new Mock<IOptions<ReservationsWebConfiguration>>();
+            var options = fixture.Freeze<Mock<IOptions<ReservationsWebConfiguration>>>();
 
             options.Setup(o => o.Value).Returns(_config);
-
-            _controller = new ProviderReservationsController(_mockMediator.Object, options.Object);
-
+            
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
 
+            _controller = fixture.Create<ProviderReservationsController>();
             var claim = new Claim(ProviderClaims.ProviderUkprn, ExpectedUkPrn);
-
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
             {
                 User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}))
@@ -64,18 +66,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await _controller.Index(true) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
 
         [Test]
         public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
         {
             //act 
-            var view = await _controller.Index() as ViewResult;
+            var view = await _controller.Index(true) as ViewResult;
 
             var viewModel = view?.Model as FundingRestrictionNotificationViewModel;
 
@@ -97,11 +100,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await _controller.Index(true) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
 
         [Test]
@@ -112,11 +116,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await _controller.Index() as RedirectToActionResult;
+            var redirect = await _controller.Index(true) as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
     }
 }
