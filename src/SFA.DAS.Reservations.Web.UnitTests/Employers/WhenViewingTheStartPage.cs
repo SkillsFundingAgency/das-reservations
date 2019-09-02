@@ -56,11 +56,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 });
 
             //act 
-            var view = await _controller.Start(_routeModel) as ViewResult;
+            var view = await _controller.Start(_routeModel, true) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "Index");
+            var model = view.Model as EmployerStartViewModel;
+            Assert.AreEqual(true, model.IsFromManage);
         }
 
         [Test]
@@ -84,7 +86,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
 
             //act 
-            var view = await _controller.Start(_routeModel) as ViewResult;
+            var view = await _controller.Start(_routeModel, false) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -118,7 +120,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 p.Folder.Equals("accounts")))).Returns(expectedBackUrl);
 
             //act
-            var result = await _controller.Start(_routeModel) as ViewResult;
+            var result = await _controller.Start(_routeModel, false) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);

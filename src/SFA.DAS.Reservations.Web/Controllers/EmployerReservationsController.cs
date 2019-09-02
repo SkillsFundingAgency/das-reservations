@@ -102,14 +102,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
-        public async Task<IActionResult> Start(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> Start(ReservationsRouteModel routeModel, bool isFromManage)
         {
             try
             {
                 var viewModel = new EmployerStartViewModel
                 {
                     FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl,
+                    IsFromManage = isFromManage
                 };
                 var response = await _mediator.Send(new GetFundingRulesQuery());
                 var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
