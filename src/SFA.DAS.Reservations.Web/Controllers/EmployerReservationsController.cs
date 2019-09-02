@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool isFromManage)
         {
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
@@ -57,6 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
+                RouteData.Values.Add(nameof(isFromManage), isFromManage);
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
