@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -47,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        public async Task<IActionResult> Index(bool isFromManage)
+        public async Task<IActionResult> Index()
         {
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
@@ -57,7 +56,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
             {
-                RouteData.Values.Add(nameof(isFromManage), isFromManage);
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
@@ -102,7 +100,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
-        public async Task<IActionResult> Start(ReservationsRouteModel routeModel, bool isFromManage)
+        public async Task<IActionResult> Start(ReservationsRouteModel routeModel)
         {
             try
             {
@@ -110,7 +108,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
                     ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl,
-                    IsFromManage = isFromManage
                 };
                 var response = await _mediator.Send(new GetFundingRulesQuery());
                 var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();

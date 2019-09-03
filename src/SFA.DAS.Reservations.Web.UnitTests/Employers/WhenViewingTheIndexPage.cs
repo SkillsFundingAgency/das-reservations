@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
 
             //act 
-            await controller.Index(false);
+            await controller.Index();
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
@@ -60,12 +60,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await controller.Index(true) as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
-            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
 
         [Test, MoqAutoData]
@@ -90,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(result);
 
             //act 
-            var view = await controller.Index(false) as ViewResult;
+            var view = await controller.Index() as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -118,12 +117,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await controller.Index(true) as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
-            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
 
         [Test, MoqAutoData]
@@ -141,12 +139,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await controller.Index(true) as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToActionResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.ActionName, "Start");
-            Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
         }
     }
 }
