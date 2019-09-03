@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             if (!string.IsNullOrEmpty(query.TransferSenderEmployerAccountId))
             {
                 var transferConnections = await _employerAccountService.GetTransferConnections(_encodingService.Encode(query.AccountId,EncodingType.AccountId));
-                var connection = transferConnections.ToList().Find(c => c.FundingEmployerPublicHashedAccountId == query.TransferSenderEmployerAccountId);
+                var connection = transferConnections.ToList().Find(c => c.FundingEmployerPublicHashedAccountId.Equals(query.TransferSenderEmployerAccountId));
                 if (connection == null)
                 {
                     validationResult.FailedTransferReceiverCheck = true;
