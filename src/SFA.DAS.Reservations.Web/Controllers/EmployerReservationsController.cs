@@ -11,6 +11,7 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
@@ -110,17 +111,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
                     ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
                 };
-                var response = await _mediator.Send(new GetFundingRulesQuery());
-                var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
 
-	            if (activeGlobalRule == null)
+                var accountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+
+                var response = await _mediator.Send(new GetAccountFundingRulesQuery{ AccountId = accountId});
+                var activeGlobalRuleType = response?.ActiveRule;
+
+	            if (activeGlobalRuleType == null)
 	            {
 	                return View("Index", viewModel);
 	            }
 
-                var rule = activeGlobalRule.RuleType;
-
-                switch (rule)
+                switch (activeGlobalRuleType)
                 {
                     case GlobalRuleType.FundingPaused:
                         return View("EmployerFundingPaused");
