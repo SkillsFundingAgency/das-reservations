@@ -211,10 +211,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = RouteNames.EmployerPostReview)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostReview(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> PostReview(ReservationsRouteModel routeModel, ReviewViewModel viewModel)
         {
+            var isProvider = routeModel.UkPrn.HasValue;
+            var reviewViewName = isProvider ? ViewNames.ProviderReview : ViewNames.EmployerReview;
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View(reviewViewName, viewModel);
+                }
+
                 var command = new CreateReservationCommand
                 {
                     Id = routeModel.Id.GetValueOrDefault(),
