@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -19,8 +20,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         private Mock<IEmployerAccountService> _employerAccountService;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _config;
+        private Mock<IEncodingService> _encodingService;
         private const string ExpectedTransferSenderEmployerAccountId = "TGB456";
         private const long ExpectedAccountId = 432;
+        private const string ExpectedAccountHashedId = "CSQ212K";
         private const string ExpectedUrl = "https://test.local";
 
         [SetUp]
@@ -43,7 +46,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _config = new Mock<IOptions<ReservationsApiConfiguration>>();
             _config.Setup(x => x.Value.Url).Returns(ExpectedUrl);
 
-            _validator = new CreateReservationLevyEmployerCommandValidator(_employerAccountService.Object, _apiClient.Object, _config.Object);
+            _encodingService = new Mock<IEncodingService>();
+            _encodingService.Setup(x => x.Encode(ExpectedAccountId, EncodingType.AccountId)).Returns(ExpectedAccountHashedId);
+
+            _validator = new CreateReservationLevyEmployerCommandValidator(_employerAccountService.Object, _apiClient.Object, _config.Object, _encodingService.Object);
         }
 
         [Test]
@@ -125,13 +131,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             //Arrange
             _employerAccountService.Setup(x =>
-                    x.GetTransferConnections(ExpectedTransferSenderEmployerAccountId))
+                    x.GetTransferConnections(ExpectedAccountHashedId))
                 .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
                 {
-                    FundingEmployerAccountId = ExpectedAccountId,
+                    FundingEmployerAccountId = 78954,
                     FundingEmployerAccountName = "Test",
                     FundingEmployerHashedAccountId = "123EDC",
-                    FundingEmployerPublicHashedAccountId = "YTR34"
+                    FundingEmployerPublicHashedAccountId = ExpectedTransferSenderEmployerAccountId
                 }});
             var command = new CreateReservationLevyEmployerCommand
             {
@@ -145,7 +151,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            _employerAccountService.Verify(x=>x.GetTransferConnections(ExpectedTransferSenderEmployerAccountId));
+            _employerAccountService.Verify(x=>x.GetTransferConnections(ExpectedAccountHashedId));
             Assert.IsFalse(result.FailedTransferReceiverCheck);
         }
 
