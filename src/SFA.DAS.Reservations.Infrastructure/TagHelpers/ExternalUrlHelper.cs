@@ -53,6 +53,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
+            if (string.IsNullOrWhiteSpace(courseId) && !startDate.HasValue)
+            {
+                queryString += "&autocreated=true";
+            }
+
             string controller = "unapproved", action, id;
             
             if (ukPrn.HasValue)

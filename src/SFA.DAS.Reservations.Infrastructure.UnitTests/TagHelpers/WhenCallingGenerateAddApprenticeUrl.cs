@@ -136,7 +136,34 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
+                actualUrl);
+        }
+
+        [Test, MoqAutoData]
+        public void Then_adds_levy_flag_To_query_string_if_no_course_or_start_date_provided(
+            Guid reservationId,
+            string accountLegalEntityPublicHashedId,
+            string accountHashedId,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+
+            var originalConfigUrl = webConfig.EmployerApprenticeUrl;
+            webConfig.EmployerApprenticeUrl = $"https://{webConfig.EmployerApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                "",
+                null,
+                null,
+                "",
+                accountHashedId);
+
+            Assert.AreEqual(
+                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
                 actualUrl);
         }
 
