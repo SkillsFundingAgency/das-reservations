@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -13,13 +14,15 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         private readonly IEmployerAccountService _employerAccountService;
         private readonly IApiClient _apiClient;
+        private readonly IEncodingService _encodingService;
         private readonly ReservationsApiConfiguration _config;
 
         public CreateReservationLevyEmployerCommandValidator(IEmployerAccountService employerAccountService,
-            IApiClient apiClient, IOptions<ReservationsApiConfiguration> config)
+            IApiClient apiClient, IOptions<ReservationsApiConfiguration> config, IEncodingService encodingService)
         {
             _employerAccountService = employerAccountService;
             _apiClient = apiClient;
+            _encodingService = encodingService;
             _config = config.Value;
         }
 
@@ -44,8 +47,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (!string.IsNullOrEmpty(query.TransferSenderEmployerAccountId))
             {
-                var transferConnections = await _employerAccountService.GetTransferConnections(query.TransferSenderEmployerAccountId);
-                var connection = transferConnections.ToList().Find(c => c.FundingEmployerAccountId == query.AccountId);
+                var transferConnections = await _employerAccountService.GetTransferConnections(_encodingService.Encode(query.AccountId,EncodingType.AccountId));
+                var connection = transferConnections.ToList().Find(c => c.FundingEmployerPublicHashedAccountId.Equals(query.TransferSenderEmployerAccountId));
                 if (connection == null)
                 {
                     validationResult.FailedTransferReceiverCheck = true;
