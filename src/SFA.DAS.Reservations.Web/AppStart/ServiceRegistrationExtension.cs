@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Commitments.Services;
@@ -13,19 +14,37 @@ using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Services;
+using SFA.DAS.Reservations.Web.Stubs;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class ServiceRegistrationExtension
     {
-        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters)
+        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IHostingEnvironment env)
         {
+            if (env.IsDevelopment())
+            {
+                services.AddSingleton<CommitmentsApiClientStub>();
+
+                services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
+                    provider.GetService<CommitmentsApiClientStub>(),
+                    provider.GetService<IOptions<CommitmentsApiConfiguration>>()));
+            }
+            else
+            {
+                services.AddSingleton<CommitmentsApiClient>();
+
+                services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
+                    provider.GetService<CommitmentsApiClient>(),
+                    provider.GetService<IOptions<CommitmentsApiConfiguration>>()));
+            }
+
             services.AddSingleton(serviceParameters);
             services.AddScoped<NonEoiNotPermittedFilterAttribute>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
             services.AddSingleton<IApiClient, ApiClient>();
-            services.AddSingleton<CommitmentsApiClient>();
+           
             services.AddSingleton<IEncodingService, EncodingService>();
             services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
@@ -35,9 +54,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
 
-            services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
-                provider.GetService<CommitmentsApiClient>(),
-                provider.GetService<IOptions<CommitmentsApiConfiguration>>()));
+            
 
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         }

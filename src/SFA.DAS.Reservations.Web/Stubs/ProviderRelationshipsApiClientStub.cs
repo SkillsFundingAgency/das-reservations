@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Types.Dtos;
@@ -10,48 +12,36 @@ namespace SFA.DAS.Reservations.Web.Stubs
     public class ProviderRelationshipsApiClientStub : IProviderRelationshipsApiClient
     {
         private readonly IEncodingService _encodingService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProviderRelationshipsApiClientStub(IEncodingService encodingService)
+        public ProviderRelationshipsApiClientStub(IEncodingService encodingService, IHttpContextAccessor httpContextAccessor)
         {
             _encodingService = encodingService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetAccountProviderLegalEntitiesWithPermission(
             GetAccountProviderLegalEntitiesWithPermissionRequest withPermissionRequest,
             CancellationToken cancellationToken = new CancellationToken())
         {
+            var hashedAccountId = _httpContextAccessor.HttpContext.GetRouteValue("employerAccountId").ToString();
+            var accountId = _encodingService.Decode(hashedAccountId, EncodingType.AccountId);
+
+            var accountLegalEntityPublicHashedId = _httpContextAccessor.HttpContext.GetRouteValue("AccountLegalEntityPublicHashedId").ToString();
+            var accountLegalEntityId = _encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId);
+            
             return Task.FromResult(new GetAccountProviderLegalEntitiesWithPermissionResponse
             {
                 AccountProviderLegalEntities = new []
                 {
                     new AccountProviderLegalEntityDto
                     {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
-                        AccountName = "Account 1",
-                        AccountLegalEntityId = 11,
-                        AccountLegalEntityPublicHashedId =_encodingService.Encode(123, EncodingType.PublicAccountLegalEntityId),
-                        AccountLegalEntityName = "Legal Entity 1",
-                        AccountProviderId = withPermissionRequest.Ukprn
-                    },
-                    new AccountProviderLegalEntityDto
-                    {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
-                        AccountName = "Account 1",
-                        AccountLegalEntityId = 22,
-                        AccountLegalEntityPublicHashedId = _encodingService.Encode(456, EncodingType.PublicAccountLegalEntityId),
-                        AccountLegalEntityName = "Legal Entity 2",
-                        AccountProviderId = withPermissionRequest.Ukprn
-                    },
-                    new AccountProviderLegalEntityDto
-                    {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
-                        AccountName = "Account 1",
-                        AccountLegalEntityId = 33,
-                        AccountLegalEntityPublicHashedId = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId),
-                        AccountLegalEntityName = "Legal Entity 3",
+                        AccountId = accountId,
+                        AccountPublicHashedId = hashedAccountId,
+                        AccountName = "Test Account",
+                        AccountLegalEntityId = accountLegalEntityId,
+                        AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
+                        AccountLegalEntityName = "Test Legal Entity",
                         AccountProviderId = withPermissionRequest.Ukprn
                     }
                 }
