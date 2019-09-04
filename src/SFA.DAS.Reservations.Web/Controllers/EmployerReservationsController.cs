@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var viewModel = new EmployerStartViewModel
                 {
                     FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl,
+                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
                 };
                 var response = await _mediator.Send(new GetFundingRulesQuery());
                 var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
