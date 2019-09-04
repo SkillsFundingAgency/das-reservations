@@ -63,8 +63,10 @@
             </div>
 
             <form method="post" asp-route="@Model.ConfirmRouteName" asp-antiforgery="true">
-                <input type="hidden" asp-for="TrainingDate"/>
+                <input type="hidden" asp-for="TrainingDate.StartDate"/>
+                <input type="hidden" asp-for="TrainingDate.EndDate"/>
                 <input type="hidden" asp-for="AccountLegalEntityName"/>
+                <input type="hidden" asp-for="AccountLegalEntityPublicHashedId"/>
                 <input type="hidden" asp-for="CourseDescription"/>
                 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">

@@ -34,6 +34,16 @@ namespace SFA.DAS.Reservations.Web.Models
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
         }
 
+        public ReviewViewModel(ReservationsRouteModel routeModel, PostReviewViewModel postReviewViewModel) : 
+            this(routeModel, 
+                new TrainingDateModel{StartDate = postReviewViewModel.StartDate, EndDate = postReviewViewModel.EndDate}, 
+                postReviewViewModel.CourseDescription,
+                postReviewViewModel.AccountLegalEntityName,
+                postReviewViewModel.AccountLegalEntityPublicHashedId)
+        {
+            Reserve = postReviewViewModel.Reserve;
+        }
+
         public string ChangeCourseRouteName { get; }
         public string ChangeStartDateRouteName { get; }
         public string ConfirmRouteName { get; }
@@ -44,6 +54,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get;  }
         public string ViewName { get; }
         public string BackLink { get;}
+        public bool? Reserve { get; }
 
         private bool IsEmployerRoute(ReservationsRouteModel routeModel) => routeModel.UkPrn == null;
         

@@ -211,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/review", Name = RouteNames.EmployerPostReview)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostReview(ReservationsRouteModel routeModel, ReviewViewModel viewModel)
+        public async Task<IActionResult> PostReview(ReservationsRouteModel routeModel, PostReviewViewModel viewModel)
         {
             var isProvider = routeModel.UkPrn.HasValue;
             var reviewViewName = isProvider ? ViewNames.ProviderReview : ViewNames.EmployerReview;
@@ -219,7 +219,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(reviewViewName, viewModel);
+                    var reviewViewModel = new ReviewViewModel(routeModel, viewModel);
+                    return View(reviewViewName, reviewViewModel);
                 }
 
                 var command = new CreateReservationCommand

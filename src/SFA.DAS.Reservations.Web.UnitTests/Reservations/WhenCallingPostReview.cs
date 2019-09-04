@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Invalid_ViewModel_And_Has_Ukprn_Then_Renders_Provider_Review_Again(
             ReservationsRouteModel routeModel, 
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             ReservationsController controller)
         {
             controller.ModelState.AddModelError("key", "error message");
@@ -32,13 +32,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostReview(routeModel, viewModel) as ViewResult;
 
             result.ViewName.Should().Be(ViewNames.ProviderReview);
-            result.Model.Should().Be(viewModel);
+            result.Model.Should().BeEquivalentTo(new ReviewViewModel(routeModel, viewModel));
         }
 
         [Test, MoqAutoData]
         public async Task And_Invalid_ViewModel_And_No_Ukprn_Then_Renders_Provider_Review_Again(
             ReservationsRouteModel routeModel, 
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
@@ -47,13 +47,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostReview(routeModel, viewModel) as ViewResult;
 
             result.ViewName.Should().Be(ViewNames.EmployerReview);
-            result.Model.Should().Be(viewModel);
+            result.Model.Should().BeEquivalentTo(new ReviewViewModel(routeModel, viewModel));
         }
 
         [Test, MoqAutoData]
         public async Task Then_Sends_Create_Command_With_Correct_Values_Set(
             ReservationsRouteModel routeModel, 
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             CreateReservationResult createReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_Redirects_To_The_Confirmation_Employer_View_When_No_UkPrn(
             ReservationsRouteModel routeModel, 
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             CreateReservationResult createReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(
             ReservationsRouteModel routeModel, 
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             CreateReservationResult createReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -115,7 +115,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_ValidationException_And_Has_Ukprn_Then_Redirects_To_ProviderIndex(
             ReservationsRouteModel routeModel,
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -135,7 +135,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_ValidationException_And_No_Ukprn_Then_Redirects_To_EmployerIndex(
             ReservationsRouteModel routeModel,
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -156,7 +156,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_CachedReservationNotFoundException_And_Has_Ukprn_Then_Redirects_To_ProviderIndex(
             ReservationsRouteModel routeModel,
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             CachedReservationNotFoundException notFoundException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
@@ -175,7 +175,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_CachedReservationNotFoundException_And_No_Ukprn_Then_Redirects_To_EmployerIndex(
             ReservationsRouteModel routeModel,
-            ReviewViewModel viewModel,
+            PostReviewViewModel viewModel,
             CachedReservationNotFoundException notFoundException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
