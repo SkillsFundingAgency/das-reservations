@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string CourseDescription { get; set; }
         public string AccountLegalEntityName { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "yo, what are you waiting for??")]
         public bool? Reserve { get; set; }
     }
 }
