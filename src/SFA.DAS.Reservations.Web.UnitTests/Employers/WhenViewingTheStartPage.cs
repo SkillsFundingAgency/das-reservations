@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
@@ -15,6 +16,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
@@ -28,6 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IEncodingService> _mockEncodingService;
         private Mock<IOptions<ReservationsWebConfiguration>> _mockOptions;
         private Mock<IExternalUrlHelper> _externalUrlHelper;
+        private Mock<IUrlHelper> _urlHelper;
         private ReservationsRouteModel _routeModel;
         
 
@@ -42,12 +45,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockMediator = new Mock<IMediator>();
             _mockEncodingService = new Mock<IEncodingService>();
             _externalUrlHelper = new Mock<IExternalUrlHelper>();
+            _urlHelper = new Mock<IUrlHelper>();
+
             _routeModel = fixture.Create<ReservationsRouteModel>();
 
             _mockEncodingService.Setup(s => s.Decode(_routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(ExpectedAccountId);
 
             _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object, _externalUrlHelper.Object);
+
+            _controller.Url = _urlHelper.Object;
         }
 
         [Test]
@@ -123,13 +130,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     },
                     ActiveRule = GlobalRuleType.ReservationLimit
                 });
-            var expectedBackUrl = "https://test.com";
-
-            _externalUrlHelper.Setup(h => h.GenerateUrl(It.Is<UrlParameters>(p =>
-                p.Id.Equals(_routeModel.EmployerAccountId) &&
-                p.SubDomain.Equals("accounts") &&
-                p.Controller.Equals("teams") &&
-                p.Folder.Equals("accounts")))).Returns(expectedBackUrl);
 
             //act
             var result = await _controller.Start(_routeModel) as ViewResult;
@@ -137,7 +137,89 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("ReservationLimitReached",result.ViewName);
-            Assert.AreEqual(expectedBackUrl,result.Model);
+            
+        }
+
+        [Test]
+        public async Task IfReservationLimitRuleExists_AndNoCohortIsAvailable_ThenUseEmployerManagePageAsBackLink()
+        {
+            //arrange
+            _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAccountFundingRulesResult
+                {
+                    AccountFundingRules = new GetAccountFundingRulesApiResponse
+                    {
+                        GlobalRules = new List<GlobalRule>
+                        {
+                            new GlobalRule 
+                            {
+                                Id = 2, 
+                                ActiveFrom = DateTime.Now.AddDays(-2),
+                                RuleType = GlobalRuleType.ReservationLimit
+                            }
+                        }
+                    },
+                    ActiveRule = GlobalRuleType.ReservationLimit
+                });
+
+            //No cohort means request came from manage reservations page
+            _routeModel.CohortReference = null;
+
+            var expectedBackUrl = "http://www.test.com";
+
+            _urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
+                    c.RouteName.Equals(RouteNames.EmployerManage) &&
+                    c.Values.Equals(_routeModel))))
+                .Returns(expectedBackUrl);
+
+
+            //act
+            var result = await _controller.Start(_routeModel) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedBackUrl, result.Model);
+        }
+
+        [Test]
+        public async Task IfReservationLimitRuleExists_AndCohortIsAvailable_ThenUseCohortDetailsPageAsBackLink()
+        {
+            //arrange
+            _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAccountFundingRulesResult
+                {
+                    AccountFundingRules = new GetAccountFundingRulesApiResponse
+                    {
+                        GlobalRules = new List<GlobalRule>
+                        {
+                            new GlobalRule 
+                            {
+                                Id = 2, 
+                                ActiveFrom = DateTime.Now.AddDays(-2),
+                                RuleType = GlobalRuleType.ReservationLimit
+                            }
+                        }
+                    },
+                    ActiveRule = GlobalRuleType.ReservationLimit
+                });
+
+            
+            _routeModel.UkPrn = null;
+
+            var expectedBackUrl = "http://www.test.com";
+
+            _externalUrlHelper.Setup(h => h.GenerateCohortDetailsUrl(
+                    null,
+                    _routeModel.EmployerAccountId,
+                    _routeModel.CohortReference))
+                .Returns(expectedBackUrl);
+
+            //act
+            var result = await _controller.Start(_routeModel) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedBackUrl, result.Model);
         }
     }
 }
