@@ -53,7 +53,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
-            if (string.IsNullOrWhiteSpace(courseId) && !startDate.HasValue)
+            var isLevyAccount = string.IsNullOrWhiteSpace(courseId) && !startDate.HasValue;
+
+            if (isLevyAccount)
             {
                 queryString += "&autocreated=true";
             }
