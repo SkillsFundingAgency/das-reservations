@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
@@ -127,7 +128,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         return View("EmployerFundingPaused");
 
                     case GlobalRuleType.ReservationLimit:
-                        return View("ReservationLimitReached", GenerateAccountHomepageLink(routeModel.EmployerAccountId));
+                        return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
                     default:
                         return View("Index", viewModel);
                 }
@@ -195,7 +196,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                return View("ReservationLimitReached", GenerateAccountHomepageLink(routeModel.EmployerAccountId));
+                return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
             }
         }
 
@@ -233,15 +234,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
         }
 
-        private string GenerateAccountHomepageLink(string accountId)
+        private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
         {
-            return _urlHelper.GenerateUrl(new UrlParameters
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
-                Id = accountId,
-                Controller = "teams",
-                SubDomain = "accounts",
-                Folder = "accounts"
-            });
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
+            }
+
+            return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
         }
         
 
