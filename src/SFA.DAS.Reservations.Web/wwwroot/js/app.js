@@ -36,6 +36,10 @@ forms.on('submit', function (e) {
         form = this,
         validationMessages = [];
 
+    if (!canSubmit) {
+        enableFormSubmitButton();
+    }
+
     $('.autocomplete__input').each(function () {
         var that = $(this);
         setTimeout(function () {
@@ -44,7 +48,8 @@ forms.on('submit', function (e) {
                     errorMessage = $('#' + fieldId + '-select').data('validation-message'),
                     errorSummaryMessage = $('#' + fieldId + '-select').data('validation-summary-message') || $('#' + fieldId + '-select').data('validation-message');
                 validationMessages.unshift({ id: fieldId, message: errorMessage, summaryMessage: errorSummaryMessage });
-                canSubmit = false
+                canSubmit = false;
+                enableFormSubmitButton();
             }
         }, 100);
     });
@@ -82,6 +87,13 @@ forms.on('submit', function (e) {
         return false;
     }
 });
+
+var enableFormSubmitButton = function() {
+    forms.each(function () {
+        var button = $(this).find(".govuk-button");
+        button.removeAttr("disabled");
+    });
+}
 
 var checkField = function ($field) {
     var textInput = $field,

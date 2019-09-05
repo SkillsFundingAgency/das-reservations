@@ -9,10 +9,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -24,7 +22,7 @@ using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 {
     [TestFixture]
     public class WhenCallingGetManage
@@ -70,7 +68,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [ReservationsFromThisProvider] GetReservationsResult getReservationsResult2,
             [ReservationsFromThisProvider] GetReservationsResult getReservationsResult3,
             string hashedId,
+            string homeLink,
             [Frozen] ReservationsWebConfiguration config,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
@@ -87,6 +87,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
+            externalUrlHelper
+                .Setup(x => x.GenerateDashboardUrl(routeModel.EmployerAccountId)).Returns(homeLink);
 
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation =>
@@ -102,6 +104,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be(ViewNames.ProviderManage);
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
+            viewModel.BackLink.Should().Be(homeLink);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingMissingMembers().ExcludingFields().Excluding(c=>c.ApprenticeUrl));
         }
