@@ -76,14 +76,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public void And_Has_Ukprn_And_Manage_False_Then_Redirects_To_Provider_Dashboard(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
+            string providerDashboardUrl,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             ManageReservationsController controller)
         {
+            routeModel.EmployerAccountId = null;
+            externalUrlHelper.Setup(x => x.GenerateDashboardUrl(null)).Returns(providerDashboardUrl);
             viewModel.Manage = false;
 
             var result = controller.PostDeleteCompleted(routeModel, viewModel) as RedirectResult;
 
-            result.Url.Should().Be(mockOptions.Object.Value.DashboardUrl);
+            result.Url.Should().Be(providerDashboardUrl);
         }
 
         [Test, MoqAutoData]
@@ -97,12 +100,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             routeModel.UkPrn = null;
             viewModel.Manage = false;
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == routeModel.EmployerAccountId &&
-                        parameters.Controller == "teams" &&
-                        parameters.Folder == "accounts" &&
-                        parameters.SubDomain == "accounts")))
+                .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
                 .Returns(expectedUrl);
             
             var result = controller.PostDeleteCompleted(routeModel, viewModel) as RedirectResult;

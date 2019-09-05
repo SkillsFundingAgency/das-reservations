@@ -75,7 +75,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedReservation?.TrainingDate, 
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
-                routeModel.UkPrn);
+                routeModel.UkPrn,
+                routeModel.EmployerAccountId);
 
             return View(viewModel);
         }
@@ -104,7 +105,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         trainingDateModel,
                         formModel.FromReview,
                         formModel.CohortRef,
-                        routeModel.UkPrn);
+                        routeModel.UkPrn,
+                        routeModel.EmployerAccountId);
                        
                     return View("ApprenticeshipTraining", model);
                 }
@@ -154,7 +156,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     isProvider, 
                     formModel.AccountLegalEntityPublicHashedId, 
                     formModel.SelectedCourseId,
-                    trainingDateModel);
+                    trainingDateModel, 
+                    formModel.FromReview,
+                    formModel.CohortRef,
+                    routeModel.UkPrn, 
+                    routeModel.EmployerAccountId);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
@@ -310,18 +316,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 case CompletedReservationWhatsNext.AddAnApprentice:
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
-                        model.CohortRef,routeModel.EmployerAccountId);
-
+                        model.CohortRef, routeModel.EmployerAccountId);
                     return Redirect(addApprenticeUrl);
 
                 default:
-                    var homeUrl = routeModel.UkPrn.HasValue
-                        ? _urlHelper.GenerateUrl(new UrlParameters {Controller = "account"})
-                        : _urlHelper.GenerateUrl(new UrlParameters {
-                            Folder = "accounts",
-                            Controller = "teams",
-                            Id = routeModel.EmployerAccountId
-                        });
+                    var homeUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
                     return Redirect(homeUrl);
             }
         }
@@ -334,7 +333,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             TrainingDateModel selectedTrainingDate = null, 
             bool? routeModelFromReview = false,
             string cohortRef = "",
-            uint? ukPrn = null)
+            uint? ukPrn = null,
+            string accountId = "")
 
         {
             var accountLegalEntityId = _encodingService.Decode(
@@ -355,24 +355,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CohortRef = cohortRef,
                 FromReview = routeModelFromReview,
                 BackLink = isProvider ?
-                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn) 
+                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, accountId) 
                     : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse 
             };
         }
 
-        private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn)
+        private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn, string accountId)
         {
             if (string.IsNullOrEmpty(cohortRef))
             {
                 return routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer;
             }
 
-            return _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = ukPrn.ToString(),
-                Controller = $"apprentices/{cohortRef}",
-                Action = "details"
-            }); ;
+            return _urlHelper.GenerateCohortDetailsUrl(ukPrn, accountId, cohortRef);
+
         }
     }
 }
