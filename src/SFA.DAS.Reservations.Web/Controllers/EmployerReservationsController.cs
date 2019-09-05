@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -229,13 +228,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
-                return _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Id = routeModel.EmployerAccountId,
-                    Controller = $"apprentices/{cohortRef}",
-                    Action = "details",
-                    Folder = "commitments/accounts"
-                });
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
             }
             return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
         }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
@@ -16,8 +15,8 @@ using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -28,15 +27,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly ReservationsWebConfiguration _config;
+        private readonly IExternalUrlHelper _externalUrlHelper;
 
-        public ProviderReservationsController(IMediator mediator, IOptions<ReservationsWebConfiguration> options)
+        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper)
         {
             _mediator = mediator;
-            _config = options.Value;
+            _externalUrlHelper = externalUrlHelper;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool isFromManage)
         {
             var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
             
@@ -47,6 +46,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
             {
+                RouteData.Values.Add(nameof(isFromManage), isFromManage);
                 return RedirectToAction("Start", RouteData?.Values);
             }
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RuleId = nextGlobalRuleId.Value,
                 TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = _config.DashboardUrl
+                BackLink = _externalUrlHelper.GenerateDashboardUrl()
             };
 
             return View("FundingRestrictionNotification", viewModel);
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
 
         [Route("start", Name = RouteNames.ProviderStart)]
-        public async Task<IActionResult> Start(uint ukPrn)
+        public async Task<IActionResult> Start(uint ukPrn, bool isFromManage)
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
@@ -105,7 +105,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("NoPermissions");
             }
             
-            return View("Index");
+            var viewModel = new ProviderStartViewModel
+            {
+                IsFromManage = isFromManage
+            };
+            return View("Index", viewModel);
         }
 
         [HttpGet]

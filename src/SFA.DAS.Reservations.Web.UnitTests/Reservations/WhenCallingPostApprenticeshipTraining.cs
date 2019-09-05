@@ -270,11 +270,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel)
         {
             formModel.FromReview = false;
-            _urlHelper.Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Id == routeModel.UkPrn.ToString() &&
-                        parameters.Controller == $"apprentices/{formModel.CohortRef}" &&
-                        parameters.Action == "details")))
+            _urlHelper.Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,routeModel.EmployerAccountId,formModel.CohortRef))
                 .Returns(cohortDetailsUrl);
             formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
             _controller.ModelState.AddModelError("StartDate", "StartDate");

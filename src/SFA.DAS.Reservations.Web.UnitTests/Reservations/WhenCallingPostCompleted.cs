@@ -65,6 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var model = _fixture.Create<CompletedViewModel>();
             model.WhatsNext = selection;
             var routeModel = _fixture.Create<ReservationsRouteModel>();
+            routeModel.EmployerAccountId = null;
             model.CohortRef = string.Empty;
             var config = _fixture.Freeze<IOptions<ReservationsWebConfiguration>>();
             var providerRecruitUrl = _fixture.Create<string>();
@@ -84,8 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     model.StartDate, "", routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters => parameters.Controller == "account")))
+                .Setup(helper => helper.GenerateDashboardUrl(null))
                 .Returns(homeUrl);
             
             var controller = _fixture.Create<ReservationsController>();
@@ -150,11 +150,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     model.StartDate, "", routeModel.EmployerAccountId))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters => 
-                        parameters.Id == routeModel.EmployerAccountId &&
-                        parameters.Controller == "teams" &&
-                        parameters.Folder == "accounts")))
+                .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
                 .Returns(homeUrl);
             
             var controller = _fixture.Create<ReservationsController>();

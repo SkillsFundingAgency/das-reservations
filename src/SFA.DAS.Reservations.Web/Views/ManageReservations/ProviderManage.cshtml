@@ -15,7 +15,7 @@
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
                     <h2 class="govuk-heading-m">None of your employers have any funding to use.</h2>
                     <p class="govuk-body">You need to secure funding in order to add a new apprentice.</p>
-                    <a asp-route="@RouteNames.ProviderManageCreate" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
+                    <a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
                 </div>
             </div>
         </main>
@@ -30,7 +30,7 @@ else
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
 		            <p class="govuk-body">This feature is currently only available to employers and training providers taking part in testing.</p>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderManageCreate" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
+                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
                     <p class="govuk-body">@Model.Reservations.Count reservation@(Model.Reservations.Count != 1 ? "s" : null)</p>
                 </div>
             </div>

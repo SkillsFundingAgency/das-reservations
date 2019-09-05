@@ -6,7 +6,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 {
     [TestFixture]
     public class WhenCallingGetDeleteCompleted
@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public void And_Has_Ukprn_Then_Returns_Provider_Delete_Completed_View(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             var result = controller.DeleteCompleted(routeModel) as ViewResult;
 
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public void And_No_Ukprn_Then_Returns_Employer_Delete_Completed_View(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
 
