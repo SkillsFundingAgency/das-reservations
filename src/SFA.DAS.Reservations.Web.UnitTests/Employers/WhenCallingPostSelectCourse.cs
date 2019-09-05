@@ -145,12 +145,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
             var selectedCourse = _course.Id;
-            _externalUrlHelper.Setup(x => x.GenerateUrl(
-                    It.Is<UrlParameters>(c => c.Id.ToString() == routeModel.EmployerAccountId.ToString()
-                                              && c.Action == "details"
-                                              && c.Controller == $"apprentices/{routeModel.CohortReference}"
-                                              && c.Folder == "commitments/accounts"
-                    )))
+            _externalUrlHelper
+                .Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId,routeModel.CohortReference))
                 .Returns(cohortUrl);
 
             //Act

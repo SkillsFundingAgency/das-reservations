@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
@@ -27,7 +28,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         public void Arrange()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
-
             _mediator = fixture.Freeze<Mock<IMediator>>();
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
