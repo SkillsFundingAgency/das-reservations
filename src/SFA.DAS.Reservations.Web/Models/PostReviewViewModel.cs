@@ -1,16 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
     public class PostReviewViewModel
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public TrainingDateModel TrainingDate { get; set; }
         public string CourseDescription { get; set; }
         public string AccountLegalEntityName { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
-        [Required(ErrorMessage = "yo, what are you waiting for??")]
+        [Required(ErrorMessage = "Select whether you want to reserve funding or not")]
         public bool? Reserve { get; set; }
     }
 }

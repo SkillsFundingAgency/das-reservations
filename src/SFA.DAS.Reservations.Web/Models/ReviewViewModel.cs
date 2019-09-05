@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public ReviewViewModel(ReservationsRouteModel routeModel, PostReviewViewModel postReviewViewModel) : 
             this(routeModel, 
-                new TrainingDateModel{StartDate = postReviewViewModel.StartDate, EndDate = postReviewViewModel.EndDate}, 
+                postReviewViewModel.TrainingDate, 
                 postReviewViewModel.CourseDescription,
                 postReviewViewModel.AccountLegalEntityName,
                 postReviewViewModel.AccountLegalEntityPublicHashedId)

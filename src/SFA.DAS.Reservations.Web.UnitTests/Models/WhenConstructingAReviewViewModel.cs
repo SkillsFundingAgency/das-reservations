@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 AccountLegalEntityName = AccountLegalEntityName,
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
                 CourseDescription = CourseDescription,
-                StartDate = startDate.StartDate,
+                TrainingDate = startDate,
                 Reserve = ExpectedReserve
             };
             
