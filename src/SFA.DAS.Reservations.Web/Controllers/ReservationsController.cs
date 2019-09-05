@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -187,12 +188,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ValidationException e)
             {
+                var errors = new StringBuilder();
+                errors.AppendLine();
                 foreach (var member in e.ValidationResult.MemberNames)
                 {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+                    errors.AppendLine(member);
                 }
 
-                return View("Error");//todo: setup view correctly.
+                _logger.LogWarning($"Validation Error when reviewing a reservation: {errors}");
+
+                return RedirectToRoute(RouteNames.Error500);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return RedirectToRoute(RouteNames.Error500);
             }
 
             routeModel.FromReview = true;
