@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
@@ -16,8 +15,8 @@ using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -28,12 +27,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class ProviderReservationsController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly ReservationsWebConfiguration _config;
+        private readonly IExternalUrlHelper _externalUrlHelper;
 
-        public ProviderReservationsController(IMediator mediator, IOptions<ReservationsWebConfiguration> options)
+        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper)
         {
             _mediator = mediator;
-            _config = options.Value;
+            _externalUrlHelper = externalUrlHelper;
         }
 
         public async Task<IActionResult> Index(bool isFromManage)
@@ -56,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RuleId = nextGlobalRuleId.Value,
                 TypeOfRule = RuleType.GlobalRule,
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = _config.DashboardUrl
+                BackLink = _externalUrlHelper.GenerateDashboardUrl()
             };
 
             return View("FundingRestrictionNotification", viewModel);

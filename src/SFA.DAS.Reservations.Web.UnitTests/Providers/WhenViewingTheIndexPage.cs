@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -27,6 +28,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         private GlobalRule _expectedRule;
         private ReservationsWebConfiguration _config;
         private string ExpectedUkPrn = "123";
+        private string ExpectedDashboardUrl = "https://dashboard/account";
+        private Mock<IExternalUrlHelper> _externalUrlHelper;
 
         [SetUp]
         public void Arrange()
@@ -50,6 +53,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
 
+            _externalUrlHelper = fixture.Freeze<Mock<IExternalUrlHelper>>();
+            _externalUrlHelper.Setup(x => x.GenerateDashboardUrl(null)).Returns(ExpectedDashboardUrl);
+
+            
             _controller = fixture.Create<ProviderReservationsController>();
             var claim = new Claim(ProviderClaims.ProviderUkprn, ExpectedUkPrn);
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
@@ -89,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.AreEqual(_expectedRule.Id, viewModel.RuleId);
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
-            Assert.AreEqual(_config.DashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(ExpectedDashboardUrl, viewModel.BackLink);
         }
 
         [Test]
