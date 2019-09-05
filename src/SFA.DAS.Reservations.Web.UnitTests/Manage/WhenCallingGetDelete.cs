@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -13,7 +12,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 {
     [TestFixture]
     public class WhenCallingGetDelete
@@ -21,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_No_Id_Then_Redirects_To_Provider_Manage(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.Id = null;
 
@@ -34,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_And_No_Id_Then_Redirects_To_Employer_Manage(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             routeModel.Id = null;
@@ -49,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task Then_Gets_Reservation_Details(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             await controller.Delete(routeModel);
 
@@ -64,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationResult getReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -83,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_ViewName_Is_EmployerDelete(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
 
@@ -95,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_ViewName_Is_ProviderDelete(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             var result = await controller.Delete(routeModel) as ViewResult;
 

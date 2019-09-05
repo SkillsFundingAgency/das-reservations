@@ -9,10 +9,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -24,7 +22,7 @@ using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 {
     [TestFixture]
     public class WhenCallingGetManage
