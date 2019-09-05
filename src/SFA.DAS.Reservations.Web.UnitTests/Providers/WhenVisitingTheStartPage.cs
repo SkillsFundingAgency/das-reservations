@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -12,6 +14,7 @@ using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
@@ -24,10 +27,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [SetUp]
         public void Arrange()
         {
-            _mediator = new Mock<IMediator>();
-
-            _controller = new ProviderReservationsController(_mediator.Object, Mock.Of<IExternalUrlHelper>());
-
+            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+            _mediator = fixture.Freeze<Mock<IMediator>>();
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
                 {
@@ -39,6 +40,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     Employers = new List<Employer> { new Employer() }
                 });
+
+            _controller = fixture.Create<ProviderReservationsController>();
         }
 
         [Test]
@@ -53,12 +56,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             //Act
-            var result = await _controller.Start(123) as ViewResult;
+            var result = await _controller.Start(123, true) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("Index", result.ViewName);
-           
+            var model = result.Model as ProviderStartViewModel;
+            Assert.AreEqual(true, model.IsFromManage);
         }
 
         [Test]
@@ -76,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             //Act
-            var result = await _controller.Start(123) as ViewResult;
+            var result = await _controller.Start(123, true) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);
@@ -94,7 +98,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             //Act
-            var result = await _controller.Start(123) as ViewResult;
+            var result = await _controller.Start(123, true) as ViewResult;
 
             //Assert
             Assert.IsNotNull(result);

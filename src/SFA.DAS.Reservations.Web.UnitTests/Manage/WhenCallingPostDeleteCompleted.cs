@@ -11,7 +11,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
+namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 {
     [TestFixture]
     public class WhenCallingPostDeleteCompleted
@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void And_Has_Ukprn_And_Model_Invalid_Then_Returns_Provider_Completed_View(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             controller.ModelState.AddModelError("key", "error message");
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void And_No_Ukprn_And_Model_Invalid_Then_Returns_Employer_Completed_View(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             controller.ModelState.AddModelError("key", "error message");
@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void And_Has_Ukprn_And_Manage_True_Then_Redirects_To_Provider_Manage(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             viewModel.Manage = true;
 
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void And_No_Ukprn_And_Manage_True_Then_Redirects_To_Employer_Manage(
             ReservationsRouteModel routeModel,
             DeleteCompletedViewModel viewModel,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             viewModel.Manage = true;
@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             DeleteCompletedViewModel viewModel,
             string providerDashboardUrl,
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.EmployerAccountId = null;
             externalUrlHelper.Setup(x => x.GenerateDashboardUrl(null)).Returns(providerDashboardUrl);
@@ -95,7 +95,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             DeleteCompletedViewModel viewModel,
             string expectedUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            ReservationsController controller)
+            ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             viewModel.Manage = false;
