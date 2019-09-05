@@ -13,11 +13,8 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Check your information</h1>
-
-            <p>
-                You are securing funding for part, or all of the training costs for the following apprenticeship. This will be paid directly to the training provider you choose.
-            </p>
+            
+            <h1 class="das-notification das-notification--success govuk-heading-xl ">Apprenticeship funding is available to train and assess your apprentice</h1>
 
             <div class="govuk-summary-list">
 
@@ -50,21 +47,10 @@
 
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship training
+                        Apprenticeship training course
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.CourseDescription
-                        <br />
-                        <details class="govuk-details">
-                            <summary class="govuk-details__summary">
-                                <span class="govuk-details__summary-text">
-                                    Can I change the course?
-                                </span>
-                            </summary>
-                            <div class="govuk-details__text">
-                                You can change the course when you add an apprentice's details.
-                            </div>
-                        </details>
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName" asp-all-route-data="@changeRouteData">
@@ -74,17 +60,9 @@
                 </dl>
             </div>
 
-            <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-warning-text__assistive"></span>
-                    Remember you may need to pay towards the cost of training your apprentice.
-                </strong>
-            </div>
-
             <form method="post" asp-route="@Model.ConfirmRouteName" asp-antiforgery="true">
                 <button type="submit" draggable="false" class="govuk-button">
-                    Confirm and secure funding
+                    Confirm
                 </button>
             </form>
         </div>
