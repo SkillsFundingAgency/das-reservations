@@ -327,58 +327,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         
-
-        [Route("{ukPrn}/reservations/manage/create", Name = RouteNames.ProviderManageCreate)]
-        [Route("accounts/{employerAccountId}/reservations/manage/create", Name = RouteNames.EmployerManageCreate)]
-        public async Task<IActionResult> CreateReservation(ReservationsRouteModel routeModel)
-        {
-            string userId;
-
-            if (routeModel.UkPrn.HasValue)
-            {
-                var providerUkPrnClaim = HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
-                userId = providerUkPrnClaim.Value;
-            }
-            else
-            {
-                var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-                userId = userAccountIdClaim.Value;
-            }
-           
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userId});
-
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
-
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
-            {
-                if (routeModel.UkPrn.HasValue)
-                {
-                    return RedirectToRoute(RouteNames.ProviderStart, routeModel);
-                }
-
-                return RedirectToRoute(RouteNames.EmployerStart);
-            }
-
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value
-            };
-
-            if (routeModel.UkPrn.HasValue)
-            {
-                viewModel.BackLink = RouteNames.ProviderManage;
-
-                return View("../ProviderReservations/FundingRestrictionNotification", viewModel);
-            }
-
-            viewModel.BackLink = RouteNames.EmployerManage;
-
-            return View("../EmployerReservations/FundingRestrictionNotification", viewModel);
-        }
-        
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
