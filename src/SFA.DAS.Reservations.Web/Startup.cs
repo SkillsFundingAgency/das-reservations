@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,9 +13,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
 using SFA.DAS.Authorization.DependencyResolution;
 using SFA.DAS.Authorization.Mvc.Extensions;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
-using SFA.DAS.ProviderRelationships.Api.Client.Http;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
@@ -25,8 +21,6 @@ using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.StartupConfig;
-using SFA.DAS.Reservations.Web.Stubs;
-using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -88,11 +82,11 @@ namespace SFA.DAS.Reservations.Web
 
             if (isEmployerAuth)
             {
-                services.AddEmployerConfiguration(_configuration);
+                services.AddEmployerConfiguration(_configuration, _environment);
             }
             else if (isProviderAuth)
             {
-                services.AddProviderConfiguration(_configuration);
+                services.AddProviderConfiguration(_configuration, _environment);
             }
 
             var serviceProvider = services.BuildServiceProvider();
@@ -140,7 +134,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
             services.AddProviderRelationsApi(_configuration, _environment);
-            
+
             if (_configuration["Environment"] == "LOCAL")
             {
                 services.AddDistributedMemoryCache();
