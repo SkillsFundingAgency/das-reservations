@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,21 @@ namespace SFA.DAS.Reservations.Web.Filters
                 return;
             }
 
+            if (_serviceParameters.AuthenticationType == AuthenticationType.Employer &&
+                context.HttpContext.Request.Query.ContainsKey("transferSenderId"))
+            {
+                if (context.RouteData.Values["controller"].ToString().Equals("SelectReservations", StringComparison.CurrentCultureIgnoreCase) &&
+                    context.RouteData.Values["action"].ToString().Equals("SelectReservation", StringComparison.CurrentCultureIgnoreCase)
+                    )
+                {
+                    await next();
+                    return;
+                }
+
+                context.Result = new RedirectToRouteResult(RouteNames.Error500, null);
+                return;
+            }
+
             if (!context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
             {
                 context.Result = new RedirectToRouteResult(RouteNames.Error500, null);
@@ -64,13 +80,7 @@ namespace SFA.DAS.Reservations.Web.Filters
                     entity.AgreementType != AgreementType.NonLevyExpressionOfInterest) || 
                 !result.AccountLegalEntities.Any())
             {
-                var homeLink = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    Controller = "teams",
-                    SubDomain = "accounts",
-                    Folder = "accounts",
-                    Id = employerAccountId.ToString()
-                });
+                var homeLink = _urlHelper.GenerateDashboardUrl(employerAccountId?.ToString());
 
                 var model = new NonEoiHoldingViewModel
                 {
