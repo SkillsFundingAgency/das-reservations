@@ -62,6 +62,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
                 {
                     result.FailedEoiCheck = true;
+                    return result;
                 }
             }
 
