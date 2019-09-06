@@ -56,12 +56,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 {
                     AccountId = command.AccountId
                 });
+
                 if (queryResult.AccountLegalEntities.Any(entity =>
                     !entity.IsLevy && 
                     entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
                 {
-                    result.AddError(nameof(command.AccountId), 
-                        "Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
+                    result.FailedEoiCheck = true;
                 }
             }
 

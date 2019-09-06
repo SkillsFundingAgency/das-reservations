@@ -290,10 +290,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             var result = await validator.ValidateAsync(command);
 
-            result.IsValid().Should().BeFalse();
-            result.ValidationDictionary
-                .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountId))
-                .WhichValue.Should().Be("Sorry, this functionality is unavailable for this employer. You will be able to reserve apprenticeship funding at a later date.");
+            result.IsValid().Should().BeTrue();
+            result.FailedEoiCheck.Should().BeTrue();
         }
 
         // eoi
