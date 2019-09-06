@@ -73,12 +73,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task Then_Sends_Create_Command_With_Correct_Values_Set(
             ReservationsRouteModel routeModel, 
             PostReviewViewModel viewModel,
-            CreateReservationResult createReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-
-            
             await controller.PostReview(routeModel, viewModel);
 
             mockMediator.Verify(mediator => 
