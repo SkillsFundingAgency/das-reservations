@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -22,17 +23,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
     public class WhenCallingPostReview
     {
         [Test, MoqAutoData]
-        public async Task And_Invalid_ViewModel_And_Has_Ukprn_Then_Renders_Provider_Review_Again(
+        public async Task And_Invalid_ViewModel_And_Has_Ukprn_Then_Continues_As_Normal(
             ReservationsRouteModel routeModel, 
             PostReviewViewModel viewModel,
             ReservationsController controller)
         {
             controller.ModelState.AddModelError("key", "error message");
             
-            var result = await controller.PostReview(routeModel, viewModel) as ViewResult;
+            var result = await controller.PostReview(routeModel, viewModel) as RedirectToRouteResult;
 
-            result.ViewName.Should().Be(ViewNames.ProviderReview);
-            result.Model.Should().BeEquivalentTo(new ReviewViewModel(routeModel, viewModel));
+            result.RouteName.Should().Be(RouteNames.ProviderCompleted);
         }
 
         [Test, MoqAutoData]
@@ -51,6 +51,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task And_Reserve_False_And_No_Ukprn_Then_Redirect_To_Account_Home(
+            ReservationsRouteModel routeModel, 
+            PostReviewViewModel viewModel,
+            string expectedUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            ReservationsController controller)
+        {
+            viewModel.Reserve = false;
+            routeModel.UkPrn = null;
+            mockUrlHelper
+                .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
+                .Returns(expectedUrl);
+
+            var result = await controller.PostReview(routeModel, viewModel) as RedirectResult;
+
+            result.Url.Should().Be(expectedUrl);
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Sends_Create_Command_With_Correct_Values_Set(
             ReservationsRouteModel routeModel, 
             PostReviewViewModel viewModel,
@@ -58,9 +77,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(createReservationResult);
+
             
             await controller.PostReview(routeModel, viewModel);
 
@@ -78,6 +95,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
+            viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationResult);
@@ -141,6 +159,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
+            viewModel.Reserve = true;
             mockMediator
                 .Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(validationException);
@@ -181,6 +200,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
+            viewModel.Reserve = true;
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(notFoundException);
 

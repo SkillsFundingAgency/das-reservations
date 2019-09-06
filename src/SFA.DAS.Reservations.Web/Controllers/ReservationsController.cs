@@ -233,10 +233,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var reviewViewName = isProvider ? ViewNames.ProviderReview : ViewNames.EmployerReview;
             try
             {
-                if (!ModelState.IsValid)
+                if (!isProvider)
                 {
-                    var reviewViewModel = new ReviewViewModel(routeModel, viewModel);
-                    return View(reviewViewName, reviewViewModel);
+                    if (!ModelState.IsValid)
+                    {
+                        var reviewViewModel = new ReviewViewModel(routeModel, viewModel);
+                        return View(reviewViewName, reviewViewModel);
+                    }
+
+                    if (!viewModel.Reserve.Value)
+                    {
+                        var homeUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
+                        return Redirect(homeUrl);
+                    }
                 }
 
                 var command = new CreateReservationCommand
