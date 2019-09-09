@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,7 +68,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_Uses_Provider_Route_And_View(
             ReservationsRouteModel routeModel,
-            ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
         {
             var result = await controller.Review(routeModel) as ViewResult;
@@ -81,7 +81,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_Uses_Employer_Route_And_View(
             ReservationsRouteModel routeModel,
-            ApprenticeshipTrainingFormModel formModel,
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
@@ -93,31 +92,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be(ViewNames.EmployerReview);
         }
 
-        [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
-        public async Task And_Validation_Error_Then_Returns_Validation_Error_Details(
+        [Test, MoqAutoData]
+        public async Task And_Validation_Error_Then_Redirects_To_500(
             ReservationsRouteModel routeModel,
-            ApprenticeshipTrainingFormModel formModel,
-            Mock<IMediator> mockMediator,
-            Mock<IExternalUrlHelper> mockUrlHelper)
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Id|The Id field is not valid." }), null, null));
-            var controller = new ReservationsController(
-                mockMediator.Object, 
-                Mock.Of<ITrainingDateService>(), 
-                Mock.Of<IOptions<ReservationsWebConfiguration>>(), 
-                Mock.Of<ILogger<ReservationsController>>(), 
-                Mock.Of<IEncodingService>(),
-                mockUrlHelper.Object);
             
             var result = await controller.Review(routeModel);
             
             Assert.IsNotNull(result);
-            var actualViewResult = result as ViewResult;
+            var actualViewResult = result as RedirectToRouteResult;
             Assert.IsNotNull(actualViewResult);
-            Assert.IsFalse(actualViewResult.ViewData.ModelState.IsValid);
-            Assert.IsTrue(actualViewResult.ViewData.ModelState.ContainsKey("Id"));
+            Assert.AreEqual(RouteNames.Error500, actualViewResult.RouteName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Other_Error_Then_Redirects_To_500(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("foo bar"));
+            
+            var result = await controller.Review(routeModel);
+            
+            Assert.IsNotNull(result);
+            var actualViewResult = result as RedirectToRouteResult;
+            Assert.IsNotNull(actualViewResult);
+            Assert.AreEqual(RouteNames.Error500, actualViewResult.RouteName);
         }
     }
 }

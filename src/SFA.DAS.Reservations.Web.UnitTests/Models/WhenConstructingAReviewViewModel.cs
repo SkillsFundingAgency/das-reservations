@@ -11,6 +11,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         private const string AccountLegalEntityName = "Test Name";
         private const string AccountLegalEntityPublicHashedId = "123RDF";
         private const string CourseDescription = "Course 1";
+        private const bool ExpectedReserve = true;
        
 
         [TestCase(null)]
@@ -33,6 +34,44 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var actual = new ReviewViewModel(reservationsRouteModel, startDate,CourseDescription,AccountLegalEntityName,AccountLegalEntityPublicHashedId);
 
             //Assert
+            AssertAllProperties(actual, ukPrn, startDate);
+        }
+
+        [TestCase(null)]
+        [TestCase((uint)1564564)]
+        public void Then_The_Model_Is_Constructed_With_Correct_Route_Names_Using_Other_Constructor(uint? ukPrn)
+        {
+            //Arrange
+            var startDate = new TrainingDateModel{StartDate = DateTime.Now};
+
+            var reservationsRouteModel = new ReservationsRouteModel
+            {
+                AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
+                UkPrn = ukPrn,
+                Id = new Guid(),
+                EmployerAccountId = "123FDS",
+                FromReview = true
+            };
+
+            var postReviewViewModel = new PostReviewViewModel
+            {
+                AccountLegalEntityName = AccountLegalEntityName,
+                AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
+                CourseDescription = CourseDescription,
+                TrainingDate = startDate,
+                Reserve = ExpectedReserve
+            };
+            
+            //Act
+            var actual = new ReviewViewModel(reservationsRouteModel, postReviewViewModel);
+
+            //Assert
+            AssertAllProperties(actual, ukPrn, startDate);
+            Assert.AreEqual(ExpectedReserve, actual.Reserve);
+        }
+
+        private void AssertAllProperties(ReviewViewModel actual, uint? ukPrn, TrainingDateModel startDate)
+        {
             Assert.AreEqual(AccountLegalEntityName,actual.AccountLegalEntityName);
             Assert.AreEqual(AccountLegalEntityPublicHashedId, actual.AccountLegalEntityPublicHashedId);
             Assert.AreEqual(CourseDescription, actual.CourseDescription);
