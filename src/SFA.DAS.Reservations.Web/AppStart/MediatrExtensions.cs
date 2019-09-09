@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -45,6 +46,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddScoped(typeof(IValidator<CreateReservationLevyEmployerCommand>), typeof(CreateReservationLevyEmployerCommandValidator));
             services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
             services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
+            services.AddScoped(typeof(IValidator<GetAccountFundingRulesQuery>), typeof(GetAccountFundingRulesValidator));
         }
     }
 }

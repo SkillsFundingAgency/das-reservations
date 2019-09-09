@@ -128,6 +128,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached", backUrl);
             }
+            catch (NonEoiUserAccessDeniedException)
+            {
+                var homeLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
+
+                var model = new NonEoiHoldingViewModel
+                {
+                    HomeLink = homeLink
+                };
+
+                return View("NonEoiHolding", model);
+            }
             catch (GlobalReservationRuleException)
             {
                 if (routeModel.UkPrn.HasValue)
