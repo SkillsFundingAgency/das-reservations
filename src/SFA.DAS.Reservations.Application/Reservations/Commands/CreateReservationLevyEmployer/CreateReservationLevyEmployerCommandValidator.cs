@@ -52,8 +52,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                 if (connection == null)
                 {
                     validationResult.FailedTransferReceiverCheck = true;
-                    return validationResult;
                 }
+                return validationResult;
             }
             var response =
                 await _apiClient.Get<AccountReservationStatusResponse>(

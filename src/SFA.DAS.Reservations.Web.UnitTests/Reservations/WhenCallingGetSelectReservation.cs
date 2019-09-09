@@ -899,5 +899,60 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be("NoPermissions");
             result.Model.Should().Be(cohortDetailsUrl);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_User_Fails_Eoi_Check_Then_Non_Eoi_Holding_Page_Is_Shown(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetLegalEntitiesResponse employersResponse,
+                GetAvailableReservationsResult reservationsResult,
+                [Frozen] Mock<IMediator> mockMediator,
+                long expectedAccountId,
+                long expectedAccountLegalEntityId,
+                string expectedHomeLinkUrl,
+                [Frozen] Mock<IEncodingService> encodingService,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new NonEoiUserAccessDeniedException(expectedAccountId));
+
+            mockUrlHelper.Setup(h => h.GenerateDashboardUrl(routeModel.EmployerAccountId)).Returns(expectedHomeLinkUrl);
+            
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            result.ViewName.Should().Be("NonEoiHolding");
+
+            var actualModel = result.Model as NonEoiHoldingViewModel;
+
+            actualModel.Should().NotBeNull();
+            actualModel.HomeLink.Should().Be(expectedHomeLinkUrl);
+            
+        }
     }
 }

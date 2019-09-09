@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
@@ -14,6 +18,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -47,6 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             NonEoiNotPermittedFilterAttribute filter)
         {
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
 
@@ -68,6 +74,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             NonEoiNotPermittedFilterAttribute filter)
         {
             context.Result = null;
+            context.HttpContext = new DefaultHttpContext();
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var accountLegalEntity in legalEntitiesResponse.AccountLegalEntities)
@@ -105,6 +112,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             NonEoiNotPermittedFilterAttribute filter)
         {
             context.Result = null;
+            context.HttpContext = new DefaultHttpContext();
+            
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var accountLegalEntity in legalEntitiesResponse.AccountLegalEntities)
@@ -144,6 +153,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             NonEoiNotPermittedFilterAttribute filter)
         {
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             legalEntitiesResponse.AccountLegalEntities = new List<AccountLegalEntity>();
             mockEncodingService
@@ -157,12 +167,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Controller == "teams" &&
-                        parameters.SubDomain == "accounts" &&
-                        parameters.Folder == "accounts" &&
-                        parameters.Id == employerAccountId)))
+                .Setup(helper => helper.GenerateDashboardUrl(employerAccountId))
                 .Returns(homeUrl);
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
@@ -189,6 +194,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             NonEoiNotPermittedFilterAttribute filter)
         {
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var accountLegalEntity in legalEntitiesResponse.AccountLegalEntities)
             {
@@ -206,12 +212,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
             mockUrlHelper
-                .Setup(helper => helper.GenerateUrl(
-                    It.Is<UrlParameters>(parameters =>
-                        parameters.Controller == "teams" &&
-                        parameters.SubDomain == "accounts" &&
-                        parameters.Folder == "accounts" &&
-                        parameters.Id == employerAccountId)))
+                .Setup(helper => helper.GenerateDashboardUrl(employerAccountId))
                 .Returns(homeUrl);
 
             await filter.OnActionExecutionAsync(context, mockNext.Object);
@@ -222,5 +223,70 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             var model = result.Model as NonEoiHoldingViewModel;
             model.HomeLink.Should().Be(homeUrl);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Is_Non_Levy_And_Not_EOI_And_Has_TransferSenderId_In_Request_Then_Continues_To_Select_Action(
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            Mock<ActionExecutionDelegate> mockNext,
+            NonEoiNotPermittedFilterAttribute filter)
+        {
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
+            
+            context.HttpContext.Request.Path = PathString.FromUriComponent(new Uri("https://test.com/selectreservation/selectreservation"));
+            context.HttpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues>{{ "transferSenderId", "123RED"}});
+            context.RouteData.Values.Add("controller", "SelectReservations");
+            context.RouteData.Values.Add("action", "SelectReservation");
+
+            await filter.OnActionExecutionAsync(context, mockNext.Object);
+
+            mockNext.Verify(next => next(), Times.Once);
+            context.Result.Should().Be(null);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Is_Non_Levy_And_Not_EOI_And_Has_TransferSenderId_In_Request_And_Is_Not_On_The_Select_Controller_Then_Gets_An_Error(
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            Mock<ActionExecutionDelegate> mockNext,
+            NonEoiNotPermittedFilterAttribute filter)
+        {
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
+            context.HttpContext.Request.Path = PathString.FromUriComponent(new Uri("https://test.com/notselect/selectreservation"));
+            context.HttpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues> { { "transferSenderId", "123RED" } });
+            context.RouteData.Values.Add("controller", "Home");
+            context.RouteData.Values.Add("action", "SelectReservation");
+
+            await filter.OnActionExecutionAsync(context, mockNext.Object);
+
+            mockNext.Verify(next => next(), Times.Never());
+            var result = context.Result as RedirectToRouteResult;
+            result.RouteName.Should().Be(RouteNames.Error500);
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Is_Non_Levy_And_Not_EOI_And_Has_TransferSenderId_In_Request_And_Is_Not_On_The_Select_Action_Then_Gets_An_Error(
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            Mock<ActionExecutionDelegate> mockNext,
+            NonEoiNotPermittedFilterAttribute filter)
+        {
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.HttpContext = new DefaultHttpContext();
+            context.HttpContext.Request.Path = PathString.FromUriComponent(new Uri("https://test.com/notselect/selectreservation"));
+            context.HttpContext.Request.Query = new QueryCollection(new Dictionary<string, StringValues> { { "transferSenderId", "123RED" } });
+            context.RouteData.Values.Add("controller", "SelectReservations");
+            context.RouteData.Values.Add("action", "NotSelect");
+
+            await filter.OnActionExecutionAsync(context, mockNext.Object);
+
+            mockNext.Verify(next => next(), Times.Never());
+            var result = context.Result as RedirectToRouteResult;
+            result.RouteName.Should().Be(RouteNames.Error500);
+        }
+
     }
 }

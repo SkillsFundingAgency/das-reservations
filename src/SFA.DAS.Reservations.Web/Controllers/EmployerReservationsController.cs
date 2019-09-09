@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
@@ -109,23 +111,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
                     ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
                 };
-                var response = await _mediator.Send(new GetFundingRulesQuery());
-                var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(r => r.ActiveFrom).FirstOrDefault();
 
-	            if (activeGlobalRule == null)
+                var accountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+
+                var response = await _mediator.Send(new GetAccountFundingRulesQuery{ AccountId = accountId});
+                var activeGlobalRuleType = response?.ActiveRule;
+
+	            if (activeGlobalRuleType == null)
 	            {
 	                return View("Index", viewModel);
 	            }
 
-                var rule = activeGlobalRule.RuleType;
-
-                switch (rule)
+                switch (activeGlobalRuleType)
                 {
                     case GlobalRuleType.FundingPaused:
                         return View("EmployerFundingPaused");
 
                     case GlobalRuleType.ReservationLimit:
-                        return View("ReservationLimitReached", GenerateAccountHomepageLink(routeModel.EmployerAccountId));
+                        return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
                     default:
                         return View("Index", viewModel);
                 }
@@ -193,7 +196,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (ReservationLimitReachedException)
             {
-                return View("ReservationLimitReached", GenerateAccountHomepageLink(routeModel.EmployerAccountId));
+                return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
             }
         }
 
@@ -231,15 +234,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
         }
 
-        private string GenerateAccountHomepageLink(string accountId)
+        private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
         {
-            return _urlHelper.GenerateUrl(new UrlParameters
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
-                Id = accountId,
-                Controller = "teams",
-                SubDomain = "accounts",
-                Folder = "accounts"
-            });
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
+            }
+
+            return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
         }
         
 
