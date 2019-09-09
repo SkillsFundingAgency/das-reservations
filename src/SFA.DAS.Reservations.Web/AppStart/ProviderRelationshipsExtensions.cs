@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderRelationsApi(this IServiceCollection services, IConfiguration configuration,
             IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() && configuration.UseStub())
             {
                 services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>();
             }

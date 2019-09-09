@@ -9,6 +9,5 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
         public string ClientSecret { get; set; }
         public string IdentifierUri { get; set; }
         public string Tenant { get; set; }
-        public bool UseStub { get; set; }
     }
 }
