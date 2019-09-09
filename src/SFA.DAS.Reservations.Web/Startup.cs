@@ -146,6 +146,7 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
+            services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
             
             if (_configuration["Environment"] == "LOCAL")
