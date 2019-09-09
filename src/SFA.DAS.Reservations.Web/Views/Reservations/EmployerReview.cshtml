@@ -14,6 +14,8 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             
+            <partial name="_PageErrorsOverview"/>
+            
             <h1 class="das-notification das-notification--success govuk-heading-xl ">Apprenticeship funding is available to train and assess your apprentice</h1>
 
             <div class="govuk-summary-list">
@@ -61,6 +63,39 @@
             </div>
 
             <form method="post" asp-route="@Model.ConfirmRouteName" asp-antiforgery="true">
+                <input type="hidden" asp-for="TrainingDate.StartDate"/>
+                <input type="hidden" asp-for="TrainingDate.EndDate"/>
+                <input type="hidden" asp-for="AccountLegalEntityName"/>
+                <input type="hidden" asp-for="AccountLegalEntityPublicHashedId"/>
+                <input type="hidden" asp-for="CourseDescription"/>
+                
+                <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            Do you want to reserve funding now?
+                        </legend>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Reserve"))
+                        {
+                            <span id="confirm-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState["Reserve"].Errors.First().ErrorMessage
+                            </span>
+                        }
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Reserve" name="Reserve" type="radio" value="True">
+                                <label class="govuk-label govuk-radios__label" for="Reserve">
+                                    Yes, reserve funding now
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Reserve-no" name="Reserve" type="radio" value="False">
+                                <label class="govuk-label govuk-radios__label" for="Reserve-no">
+                                    No, return to account
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
                 <button type="submit" draggable="false" class="govuk-button">
                     Confirm
                 </button>
