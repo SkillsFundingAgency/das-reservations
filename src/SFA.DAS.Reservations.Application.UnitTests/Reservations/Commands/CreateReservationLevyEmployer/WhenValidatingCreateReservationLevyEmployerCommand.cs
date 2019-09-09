@@ -127,7 +127,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         }
 
         [Test]
-        public async Task Then_If_There_Is_A_Transfer_Id_It_Is_Checked_To_See_If_It_Is_A_Valid_Receiver()
+        public async Task Then_If_There_Is_A_Transfer_Id_It_Is_Checked_To_See_If_It_Is_A_Valid_Receiver_And_The_Api_Is_Not_Checked_And_FailedAutoReservationCheck_Is_False()
         {
             //Arrange
             _employerAccountService.Setup(x =>
@@ -153,6 +153,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             //Assert
             _employerAccountService.Verify(x=>x.GetTransferConnections(ExpectedAccountHashedId));
             Assert.IsFalse(result.FailedTransferReceiverCheck);
+            _apiClient.Verify(x=> x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()), Times.Never);
+            Assert.IsFalse(result.FailedAutoReservationCheck);
         }
 
         [Test]
