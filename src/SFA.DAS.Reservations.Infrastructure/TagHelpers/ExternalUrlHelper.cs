@@ -53,6 +53,13 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 queryString += $"&courseCode={courseId}";
             }
 
+            var isLevyAccount = string.IsNullOrWhiteSpace(courseId) && !startDate.HasValue;
+
+            if (isLevyAccount)
+            {
+                queryString += "&autocreated=true";
+            }
+
             string controller = "unapproved", action, id;
             
             if (ukPrn.HasValue)
