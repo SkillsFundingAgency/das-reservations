@@ -64,10 +64,14 @@ namespace SFA.DAS.Reservations.Web
             });
 
             services.AddHealthChecks()
-                .AddCheck<ApiHealthCheck>(
+                .AddCheck<ReservationsApiHealthCheck>(
                     "Reservation Api",
                     failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] {"ready"});
+                    tags: new[] {"ready"})
+                .AddCheck<CommitmentsApiHealthCheck>(
+                    "Commitments Api",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "ready" });
 
             services.AddOptions();
 
