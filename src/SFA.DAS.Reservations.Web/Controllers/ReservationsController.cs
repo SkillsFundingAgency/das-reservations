@@ -75,7 +75,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedReservation?.TrainingDate, 
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
-                routeModel.UkPrn);
+                routeModel.UkPrn,
+                routeModel.EmployerAccountId);
 
             return View(viewModel);
         }
@@ -104,7 +105,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         trainingDateModel,
                         formModel.FromReview,
                         formModel.CohortRef,
-                        routeModel.UkPrn);
+                        routeModel.UkPrn,
+                        routeModel.EmployerAccountId);
                        
                     return View("ApprenticeshipTraining", model);
                 }
@@ -154,7 +156,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     isProvider, 
                     formModel.AccountLegalEntityPublicHashedId, 
                     formModel.SelectedCourseId,
-                    trainingDateModel);
+                    trainingDateModel, 
+                    formModel.FromReview,
+                    formModel.CohortRef,
+                    routeModel.UkPrn, 
+                    routeModel.EmployerAccountId);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
@@ -310,188 +316,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 case CompletedReservationWhatsNext.AddAnApprentice:
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
-                        model.CohortRef,routeModel.EmployerAccountId);
-
+                        model.CohortRef, routeModel.EmployerAccountId);
                     return Redirect(addApprenticeUrl);
 
                 default:
-                    var homeUrl = routeModel.UkPrn.HasValue
-                        ? _urlHelper.GenerateUrl(new UrlParameters {Controller = "account"})
-                        : _urlHelper.GenerateUrl(new UrlParameters {
-                            Folder = "accounts",
-                            Controller = "teams",
-                            Id = routeModel.EmployerAccountId
-                        });
+                    var homeUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
                     return Redirect(homeUrl);
             }
         }
 
-        
-
-        [Route("{ukPrn}/reservations/manage/create", Name = RouteNames.ProviderManageCreate)]
-        [Route("accounts/{employerAccountId}/reservations/manage/create", Name = RouteNames.EmployerManageCreate)]
-        public async Task<IActionResult> CreateReservation(ReservationsRouteModel routeModel)
-        {
-            string userId;
-
-            if (routeModel.UkPrn.HasValue)
-            {
-                var providerUkPrnClaim = HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
-                userId = providerUkPrnClaim.Value;
-            }
-            else
-            {
-                var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-                userId = userAccountIdClaim.Value;
-            }
-           
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userId});
-
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
-
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
-            {
-                if (routeModel.UkPrn.HasValue)
-                {
-                    return RedirectToRoute(RouteNames.ProviderStart, routeModel);
-                }
-
-                return RedirectToRoute(RouteNames.EmployerStart);
-            }
-
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value
-            };
-
-            if (routeModel.UkPrn.HasValue)
-            {
-                viewModel.BackLink = RouteNames.ProviderManage;
-
-                return View("../ProviderReservations/FundingRestrictionNotification", viewModel);
-            }
-
-            viewModel.BackLink = RouteNames.EmployerManage;
-
-            return View("../EmployerReservations/FundingRestrictionNotification", viewModel);
-        }
-
-        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
-        public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
-        {
-            var isProvider = routeModel.UkPrn.HasValue;
-            try
-            {
-                if (!routeModel.Id.HasValue)
-                {
-                    _logger.LogInformation($"Reservation ID must be in URL, parameter [{nameof(routeModel.Id)}]");
-                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
-                    return RedirectToRoute(manageRoute, routeModel);
-                }
-
-                var query = new GetReservationQuery
-                {
-                    Id = routeModel.Id.Value,
-                    UkPrn = routeModel.UkPrn.GetValueOrDefault()
-                };
-                var queryResult = await _mediator.Send(query);
-
-                var viewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
-
-                return View(viewName, new DeleteViewModel(queryResult));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error preparing for the delete view");
-                throw;
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
-        public async Task<IActionResult> PostDelete(ReservationsRouteModel routeModel, DeleteViewModel viewModel)
-        {
-            var isProvider = routeModel.UkPrn.HasValue;
-            var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View(deleteViewName, viewModel);
-                }
-
-                if (viewModel.Delete.HasValue && !viewModel.Delete.Value ||
-                    !routeModel.Id.HasValue)
-                {
-                    var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
-                    return RedirectToRoute(manageRoute, routeModel);
-                }
-                
-                await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value});
-
-                var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
-                return RedirectToRoute(completedRoute, routeModel);
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogInformation(ex, $"Validation error trying to delete reservation [{routeModel.Id}]");
-                return View(deleteViewName, viewModel);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error trying to delete reservation [{routeModel.Id}]");
-                var errorRoute = isProvider ? RouteNames.ProviderError : RouteNames.EmployerError;
-                return RedirectToRoute(errorRoute, routeModel);
-            }
-        }
-
-        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
-        public IActionResult DeleteCompleted(ReservationsRouteModel routeModel)
-        {
-            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
-
-            return View(viewName);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
-        [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
-        public IActionResult PostDeleteCompleted(ReservationsRouteModel routeModel, DeleteCompletedViewModel viewModel)
-        {
-            var isProvider = routeModel.UkPrn.HasValue;
-            var deleteCompletedViewName = isProvider ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
-            var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
-            var dashboardUrl = isProvider ? 
-                _configuration.DashboardUrl : 
-                _urlHelper.GenerateUrl(
-                    new UrlParameters
-                    {
-                        Id = routeModel.EmployerAccountId,
-                        Controller = "teams",
-                        Folder = "accounts",
-                        SubDomain = "accounts"
-                    });
-            
-            if (!ModelState.IsValid)
-            {
-                return View(deleteCompletedViewName, viewModel);
-            }
-
-            if (viewModel.Manage.HasValue && viewModel.Manage.Value)
-            {
-                return RedirectToRoute(manageRouteName);
-            }
-
-            return Redirect(dashboardUrl);
-        }
         
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
@@ -500,7 +333,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             TrainingDateModel selectedTrainingDate = null, 
             bool? routeModelFromReview = false,
             string cohortRef = "",
-            uint? ukPrn = null)
+            uint? ukPrn = null,
+            string accountId = "")
 
         {
             var accountLegalEntityId = _encodingService.Decode(
@@ -521,24 +355,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CohortRef = cohortRef,
                 FromReview = routeModelFromReview,
                 BackLink = isProvider ?
-                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn) 
+                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, accountId) 
                     : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse 
             };
         }
 
-        private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn)
+        private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn, string accountId)
         {
             if (string.IsNullOrEmpty(cohortRef))
             {
                 return routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer;
             }
 
-            return _urlHelper.GenerateUrl(new UrlParameters
-            {
-                Id = ukPrn.ToString(),
-                Controller = $"apprentices/{cohortRef}",
-                Action = "details"
-            }); ;
+            return _urlHelper.GenerateCohortDetailsUrl(ukPrn, accountId, cohortRef);
+
         }
     }
 }

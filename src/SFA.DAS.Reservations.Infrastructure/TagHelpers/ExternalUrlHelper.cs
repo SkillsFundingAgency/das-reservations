@@ -168,5 +168,18 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 ? _options.EmployerDashboardUrl
                 : _options.DashboardUrl;
         }
+
+        public string GenerateDashboardUrl(string accountId = null)
+        {
+            return string.IsNullOrEmpty(accountId)
+                ? GenerateUrl(new UrlParameters {Controller = "Account"})
+                : GenerateUrl(new UrlParameters
+                {
+                    Controller = "teams",
+                    SubDomain = "accounts",
+                    Folder = "accounts",
+                    Id = accountId
+                });
+        }
     }
 }

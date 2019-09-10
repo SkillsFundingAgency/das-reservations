@@ -9,7 +9,6 @@ using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Options;
-using AutoFixture.NUnit3;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Interfaces;
