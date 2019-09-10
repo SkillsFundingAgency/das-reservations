@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.Reservations.Web.Stubs
 {
     public class EmployerAccountApiClientStub : IAccountApiClient
     {
+        private readonly IEncodingService _encodingService;
         private string _userId;
+
+        public EmployerAccountApiClientStub(IEncodingService encodingService)
+        {
+            _encodingService = encodingService;
+        }
 
         public Task<ICollection<TeamMemberViewModel>> GetAccountUsers(string accountId)
         {
@@ -40,8 +47,8 @@ namespace SFA.DAS.Reservations.Web.Stubs
             {
                 FundingEmployerAccountId = 456,
                 FundingEmployerAccountName = "Stubs Funding",
-                FundingEmployerHashedAccountId = "MWD47V",
-                FundingEmployerPublicHashedAccountId = "7996B7"
+                FundingEmployerHashedAccountId = _encodingService.Encode(456, EncodingType.AccountId),
+                FundingEmployerPublicHashedAccountId = _encodingService.Encode(456, EncodingType.PublicAccountId)
             });
 
             return Task.FromResult(transferConnections);
@@ -56,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.Stubs
                 new AccountDetailViewModel
                 {
                     AccountId = 123,
-                    HashedAccountId = "WM6XRM",
+                    HashedAccountId = _encodingService.Encode(123, EncodingType.AccountId),
                     DasAccountName = "Stubby McStubface"
                 }
             };

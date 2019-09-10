@@ -25,7 +25,7 @@ You are able to run the website by doing the following:
 
 - Set **Environment** to **LOCAL** which will require a SQL instance and also Azure Storage to run in this mode
 - Clone repository
-- Create table in Azure Storage called Configuration, and add an extra column called **Data**. Set partitionkey to `LOCAL`, Rowkey to `SFA.DAS.Reservations.Web_1.0`, then for the Data column add the following:
+- (This step can be skipped if you have loaded the [config](https://github.com/SkillsFundingAgency/das-employer-config) using [config loader tool](https://github.com/SkillsFundingAgency/das-employer-config-updater).) Create table in Azure Storage called Configuration, and add an extra column called **Data**. Set partitionkey to `LOCAL`, Rowkey to `SFA.DAS.Reservations.Web_1.0`, then for the Data column add the following:
 ```
 {
   "ReservationsWeb": {
@@ -71,6 +71,36 @@ You are able to run the website by doing the following:
 ### Selecting a Employer/Provider Authenication type
 
 To select which authenication system the web project uses you will need to set the  **AuthType** setting in appsetting.json in the web project to either ```Employer``` or ```Provider```
+
+### Using API stubs
+
+Reservations Web depends on several other API's. To facilitate local development all but the reservations API have been stubbed. In order to use the stubs you will need to ensure that `appSettings.json` contains the setting `"UseStub": true`. Also the stub has been configured to use a single employer account ID of 123. But, you will need to use the hashed version of this.
+
+So, you'll also need an account legal entity to match with the account id: 
+
+```
+use [SFA.DAS.Reservations]
+
+insert into AccountLegalEntity
+(Id, AccountId, LegalEntityId, AccountLegalEntityId, AccountLegalEntityName, ReservationLimit, AgreementSigned, IsLevy, AgreementType)
+values
+(newid(), 123, 456, 789, 'stubs r us', null, 1, 1, 0)
+```
+
+Likewise you if you are running in provider mode you will need to ensure you have db records that match values provided in provider permissions api stub, i.e. something like this: 
+
+```
+use [SFA.DAS.Reservations]
+
+insert into AccountLegalEntity
+(Id, AccountId, LegalEntityId, AccountLegalEntityId, AccountLegalEntityName, ReservationLimit, AgreementSigned, IsLevy, AgreementType)
+values
+(newid(), 1, 1, 123, 'Legal Entity 2', null, 1, 1, 0),
+(newid(), 1, 2, 456, 'Legal Entity 2', null, 1, 1, 0),
+(newid(), 1, 3, 789, 'Legal Entity 3', null, 1, 1, 0)
+```
+
+
 
 ## Authorization
 

@@ -27,9 +27,9 @@ namespace SFA.DAS.Reservations.Web.Stubs
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 11,
+                        AccountLegalEntityId = 123,
                         AccountLegalEntityPublicHashedId =_encodingService.Encode(123, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 1",
                         AccountProviderId = withPermissionRequest.Ukprn
@@ -37,9 +37,9 @@ namespace SFA.DAS.Reservations.Web.Stubs
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 22,
+                        AccountLegalEntityId = 456,
                         AccountLegalEntityPublicHashedId = _encodingService.Encode(456, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 2",
                         AccountProviderId = withPermissionRequest.Ukprn
@@ -47,9 +47,9 @@ namespace SFA.DAS.Reservations.Web.Stubs
                     new AccountProviderLegalEntityDto
                     {
                         AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 33,
+                        AccountLegalEntityId = 789,
                         AccountLegalEntityPublicHashedId = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 3",
                         AccountProviderId = withPermissionRequest.Ukprn
