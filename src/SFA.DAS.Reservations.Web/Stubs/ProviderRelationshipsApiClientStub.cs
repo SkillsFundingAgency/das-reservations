@@ -11,6 +11,11 @@ namespace SFA.DAS.Reservations.Web.Stubs
 {
     public class ProviderRelationshipsApiClientStub : IProviderRelationshipsApiClient
     {
+        private const string ProviderHashedAccountId = "AAAAAA";
+        private const long ProviderAccountId = 1 ;
+        private const string ProviderAccountLegalEntityPublicHashedId = "AAAAAA";
+        private const long ProviderAccountLegalEntityId = 1 ;
+
         private readonly IEncodingService _encodingService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -24,12 +29,33 @@ namespace SFA.DAS.Reservations.Web.Stubs
             GetAccountProviderLegalEntitiesWithPermissionRequest withPermissionRequest,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            var hashedAccountId = _httpContextAccessor.HttpContext.GetRouteValue("employerAccountId").ToString();
-            var accountId = _encodingService.Decode(hashedAccountId, EncodingType.AccountId);
+            var hashedAccountId = _httpContextAccessor.HttpContext.GetRouteValue("employerAccountId")?.ToString();
+            long accountId, accountLegalEntityId;
 
-            var accountLegalEntityPublicHashedId = _httpContextAccessor.HttpContext.GetRouteValue("AccountLegalEntityPublicHashedId").ToString();
-            var accountLegalEntityId = _encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId);
+            if (hashedAccountId != null)
+            {
+                accountId = _encodingService.Decode(hashedAccountId, EncodingType.AccountId);
+            }
+            else
+            {
+                hashedAccountId = ProviderHashedAccountId;
+                accountId = ProviderAccountId;
+            }
+
+            var accountLegalEntityPublicHashedId = _httpContextAccessor.HttpContext.GetRouteValue("AccountLegalEntityPublicHashedId")?.ToString();
             
+            
+            if (accountLegalEntityPublicHashedId != null)
+            {
+                accountLegalEntityId = _encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId);
+            }
+            else
+            {
+                accountLegalEntityPublicHashedId = ProviderAccountLegalEntityPublicHashedId;
+                accountLegalEntityId = ProviderAccountLegalEntityId;
+            }
+            
+         
             return Task.FromResult(new GetAccountProviderLegalEntitiesWithPermissionResponse
             {
                 AccountProviderLegalEntities = new []
