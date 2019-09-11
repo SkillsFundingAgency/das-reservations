@@ -16,6 +16,7 @@ namespace SFA.DAS.Reservations.Web.Models
             };
             
             Status = (ReservationStatusViewModel)reservation.Status;
+            IsExpired = reservation.IsExpired;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
             CanBeDeleted = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
@@ -23,6 +24,7 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public Guid Id { get; }
         public ReservationStatusViewModel Status { get; }
+        public bool IsExpired { get; set; }
         public string LegalEntityName { get; }
         public string CourseName { get; }
         public TrainingDateModel TrainingDate { get; }
