@@ -41,14 +41,15 @@ namespace SFA.DAS.Reservations.Web.Stubs
 
         public Task<ICollection<TransferConnectionViewModel>> GetTransferConnections(string accountHashedId)
         {
+            const int fundingEmployerAccountId = 456;
             ICollection<TransferConnectionViewModel> transferConnections = new List<TransferConnectionViewModel>();
 
             transferConnections.Add(new TransferConnectionViewModel
             {
-                FundingEmployerAccountId = 456,
+                FundingEmployerAccountId = fundingEmployerAccountId,
                 FundingEmployerAccountName = "Stubs Funding",
-                FundingEmployerHashedAccountId = _encodingService.Encode(456, EncodingType.AccountId),
-                FundingEmployerPublicHashedAccountId = _encodingService.Encode(456, EncodingType.PublicAccountId)
+                FundingEmployerHashedAccountId = _encodingService.Encode(fundingEmployerAccountId, EncodingType.AccountId),
+                FundingEmployerPublicHashedAccountId = _encodingService.Encode(fundingEmployerAccountId, EncodingType.PublicAccountId)
             });
 
             return Task.FromResult(transferConnections);
@@ -56,14 +57,16 @@ namespace SFA.DAS.Reservations.Web.Stubs
 
         public Task<ICollection<AccountDetailViewModel>> GetUserAccounts(string userId)
         {
+            const int accountId = 123;
+            
             _userId = userId;
-
+            
             ICollection<AccountDetailViewModel> accountDetails = new List<AccountDetailViewModel>
             {
                 new AccountDetailViewModel
                 {
-                    AccountId = 123,
-                    HashedAccountId = _encodingService.Encode(123, EncodingType.AccountId),
+                    AccountId = accountId,
+                    HashedAccountId = _encodingService.Encode(accountId, EncodingType.AccountId),
                     DasAccountName = "Stubby McStubface"
                 }
             };

@@ -6,8 +6,7 @@ namespace SFA.DAS.Reservations.Web.Stubs
     {
         public static bool UseStub(this IConfiguration config)
         {
-            var useStub = config.GetValue<bool>("UseStub");
-            return useStub;
+            return config.GetValue<bool>("UseStub");
         }
     }
 }
