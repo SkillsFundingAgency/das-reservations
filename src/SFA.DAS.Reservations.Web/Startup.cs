@@ -104,8 +104,10 @@ namespace SFA.DAS.Reservations.Web
 
             if (isProviderAuth)
             {
-                services.AddAndConfigureProviderAuthentication(serviceProvider
-                    .GetService<IOptions<ProviderIdamsConfiguration>>());
+                services.AddAndConfigureProviderAuthentication(
+                    serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>(),
+                    _configuration, 
+                    _environment);
             }
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
