@@ -10,7 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Authorization.CommitmentPermissions.Client;
 using SFA.DAS.Authorization.CommitmentPermissions.DependencyResolution;
+using SFA.DAS.Authorization.CommitmentPermissions.Handlers;
 using SFA.DAS.Authorization.DependencyResolution;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -21,6 +23,7 @@ using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using SFA.DAS.Reservations.Web.Stubs;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -93,7 +96,17 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
-            services.AddCommitmentPermissionsAuthorization();
+
+            if (_environment.IsDevelopment())
+            {
+                services.AddSingleton<ICommitmentPermissionsApiClient, CommitmentPermissionsApiStub>();
+                services.AddAuthorizationHandler<AuthorizationHandler>();
+            }
+            else
+            {
+                services.AddCommitmentPermissionsAuthorization();
+            }
+           
 
             if (isEmployerAuth)
             {
@@ -129,10 +142,11 @@ namespace SFA.DAS.Reservations.Web
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
 
-            services.AddServices(serviceParameters);
+            services.AddServices(serviceParameters, _environment);
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
+            services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
 
             if (_configuration["Environment"] == "LOCAL")
