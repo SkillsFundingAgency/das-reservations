@@ -36,7 +36,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableRese
             var result = new GetAvailableReservationsResult
             {
                 Reservations = reservations
-                    .Where(reservation => reservation.Status == ReservationStatus.Pending)
+                    .Where(reservation => reservation.Status == ReservationStatus.Pending &&
+                                          !reservation.IsExpired)
             };
 
             return result;

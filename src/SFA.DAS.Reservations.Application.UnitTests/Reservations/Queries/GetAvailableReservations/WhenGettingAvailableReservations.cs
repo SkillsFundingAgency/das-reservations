@@ -61,7 +61,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
         {
             var query = new GetAvailableReservationsQuery { AccountId = accountId };
             validationResult.ValidationDictionary.Clear();
-            serviceReservations.ForEach(reservation => reservation.Status = ReservationStatus.Pending);
+            serviceReservations.ForEach(reservation =>
+            {
+                reservation.Status = ReservationStatus.Pending;
+                reservation.IsExpired = false;
+            });
             mockService
                 .Setup(client => client.GetReservations(accountId))
                 .ReturnsAsync(serviceReservations);
@@ -82,6 +86,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
             var query = new GetAvailableReservationsQuery { AccountId = accountId };
             validationResult.ValidationDictionary.Clear();
             serviceReservations[0].Status = ReservationStatus.Completed;
+            mockService
+                .Setup(client => client.GetReservations(accountId))
+                .ReturnsAsync(serviceReservations);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.Reservations.Should().NotContain(serviceReservations[0]);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Expired_Then_Does_Not_Return_Reservation(
+            long accountId,
+            List<Reservation> serviceReservations,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IReservationService> mockService,
+            GetAvailableReservationsQueryHandler handler)
+        {
+            var query = new GetAvailableReservationsQuery { AccountId = accountId };
+            validationResult.ValidationDictionary.Clear();
+            serviceReservations[0].IsExpired = true;
+            
             mockService
                 .Setup(client => client.GetReservations(accountId))
                 .ReturnsAsync(serviceReservations);
