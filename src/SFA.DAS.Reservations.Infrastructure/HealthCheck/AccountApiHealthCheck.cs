@@ -27,12 +27,12 @@ namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
         }
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
-            _logger.LogInformation("Pinging Commitments API");
+            _logger.LogInformation("Pinging Accounts API");
 
             try
             {
                 var timer = Stopwatch.StartNew();
-                await _apiClient.GetStatistics();
+                await _apiClient.GetAccount(1);
                 timer.Stop();
 
                 var durationString = timer.Elapsed.ToHumanReadableString();
