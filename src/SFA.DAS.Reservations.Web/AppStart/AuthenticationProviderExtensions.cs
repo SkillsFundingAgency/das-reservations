@@ -5,18 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Provider.Idams.Stub.Extensions;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Stubs;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class AuthenticationProviderExtensions
     {
-        public static void AddAndConfigureProviderAuthentication(this IServiceCollection services, IOptions<ProviderIdamsConfiguration> configuration)
+        public static void AddAndConfigureProviderAuthentication(
+            this IServiceCollection services, 
+            IOptions<ProviderIdamsConfiguration> idamsConfiguration, 
+            IConfiguration config, 
+            IHostingEnvironment env)
         {
             var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
             {
@@ -25,7 +32,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 options.AccessDeniedPath = "/error/403";
             });
 
-            if (configuration.Value != null && configuration.Value.UseStub)
+            if (env.IsDevelopment() && config.UseStub())
             {
                 services.AddProviderIdamsStubAuthentication(cookieOptions, new OpenIdConnectEvents
                 {
@@ -48,8 +55,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     })
                     .AddWsFederation(options =>
                     {
-                        options.MetadataAddress = configuration.Value.MetadataAddress;
-                        options.Wtrealm = configuration.Value.Wtrealm;
+                        options.MetadataAddress = idamsConfiguration.Value.MetadataAddress;
+                        options.Wtrealm = idamsConfiguration.Value.Wtrealm;
                         options.CallbackPath = "/{ukprn}/reservations";
                         options.Events.OnSecurityTokenValidated = async (ctx) =>
                         {

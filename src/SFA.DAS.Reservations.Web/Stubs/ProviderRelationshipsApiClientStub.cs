@@ -20,37 +20,42 @@ namespace SFA.DAS.Reservations.Web.Stubs
             GetAccountProviderLegalEntitiesWithPermissionRequest withPermissionRequest,
             CancellationToken cancellationToken = new CancellationToken())
         {
+            const int accountId = 1;
+            const int accountLegalEntityId1 = 123;
+            const int accountLegalEntityId2 = 456;
+            const int accountLegalEntityId3 = 789;
+
             return Task.FromResult(new GetAccountProviderLegalEntitiesWithPermissionResponse
             {
                 AccountProviderLegalEntities = new []
                 {
                     new AccountProviderLegalEntityDto
                     {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountId = accountId,
+                        AccountPublicHashedId = _encodingService.Encode(accountId,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 11,
-                        AccountLegalEntityPublicHashedId =_encodingService.Encode(123, EncodingType.PublicAccountLegalEntityId),
+                        AccountLegalEntityId = accountLegalEntityId1,
+                        AccountLegalEntityPublicHashedId =_encodingService.Encode(accountLegalEntityId1, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 1",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountId = accountId,
+                        AccountPublicHashedId = _encodingService.Encode(accountId,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 22,
-                        AccountLegalEntityPublicHashedId = _encodingService.Encode(456, EncodingType.PublicAccountLegalEntityId),
+                        AccountLegalEntityId = accountLegalEntityId2,
+                        AccountLegalEntityPublicHashedId = _encodingService.Encode(accountLegalEntityId2, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 2",
                         AccountProviderId = withPermissionRequest.Ukprn
                     },
                     new AccountProviderLegalEntityDto
                     {
-                        AccountId = 1,
-                        AccountPublicHashedId = _encodingService.Encode(1,EncodingType.AccountId),
+                        AccountId = accountId,
+                        AccountPublicHashedId = _encodingService.Encode(accountId,EncodingType.PublicAccountId),
                         AccountName = "Account 1",
-                        AccountLegalEntityId = 33,
-                        AccountLegalEntityPublicHashedId = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId),
+                        AccountLegalEntityId = accountLegalEntityId3,
+                        AccountLegalEntityPublicHashedId = _encodingService.Encode(accountLegalEntityId3, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 3",
                         AccountProviderId = withPermissionRequest.Ukprn
                     }
@@ -58,6 +63,7 @@ namespace SFA.DAS.Reservations.Web.Stubs
             });
         }
 
+        #region not implemented
         public Task<bool> HasPermission(HasPermissionRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
             throw new NotImplementedException();
@@ -73,5 +79,6 @@ namespace SFA.DAS.Reservations.Web.Stubs
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }
