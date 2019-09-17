@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
         {
             var pingUrl = _apiOptions.Value.ApiBaseUrl;
 
-            pingUrl += pingUrl.EndsWith("/") ? "ping" : "/ping";
+            pingUrl += pingUrl.EndsWith("/") ? "api/ping" : "/api/ping";
 
             using (var client = new HttpClient())//not unit testable using directly
             {

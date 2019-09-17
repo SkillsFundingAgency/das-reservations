@@ -10,14 +10,14 @@ using SFA.DAS.Reservations.Infrastructure.Extensions;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
 {
-    public class ApiHealthCheck : IHealthCheck
+    public class ReservationsApiHealthCheck : IHealthCheck
     {
         private const string HealthCheckResultDescription = "Reservation Api check";
         
         private readonly IApiClient _apiClient;
-        private readonly ILogger<ApiHealthCheck> _logger;
+        private readonly ILogger<ReservationsApiHealthCheck> _logger;
 
-        public ApiHealthCheck(IApiClient apiClient, ILogger<ApiHealthCheck> logger)
+        public ReservationsApiHealthCheck(IApiClient apiClient, ILogger<ReservationsApiHealthCheck> logger)
         {
             _apiClient = apiClient;
             _logger = logger;
