@@ -18,7 +18,7 @@ using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationR
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetProviderCacheReservationCommand
 {
-    public class WhenIGetACommand
+    public class WhenGettingAProviderCacheReservationCommand
     {
         private Mock<IMediator> _mediator;
         private Mock<IValidator<GetProviderCacheReservationCommandQuery>> _validator;
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             _expectedAccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = "1",
+                AccountId = 1,
                 AccountLegalEntityPublicHashedId = _query.AccountLegalEntityPublicHashedId,
                 AccountLegalEntityName = "Test Employer",
                 AccountLegalEntityId = 123,
@@ -172,7 +172,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityName, result.Command.AccountLegalEntityName);
             Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityPublicHashedId, result.Command.AccountLegalEntityPublicHashedId);
             Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityId, result.Command.AccountLegalEntityId);
-            Assert.AreEqual(_expectedAccountLegalEntity.AccountId, result.Command.AccountId.ToString());
+            Assert.AreEqual(_expectedAccountLegalEntity.AccountId, result.Command.AccountId);
         }
 
         [Test]
@@ -194,24 +194,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             //Act + Assert
             Assert.ThrowsAsync<AccountLegalEntityNotFoundException>(() => _handler.Handle(_query, CancellationToken.None));
-        }
-
-        [Test]
-        public void ThenIfTheRetrievedLegalEntityHasAnInvalidIdAnExceptionIsThrown()
-        {
-            //Arrange
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse
-                {
-                    Employers = new Employer[0]
-                });
-            
-            _expectedAccountLegalEntity.AccountId = "Not a valid ID";
-
-            //Act + Assert
-            Assert.ThrowsAsync<AccountLegalEntityInvalidException>(() => _handler.Handle(_query, CancellationToken.None));
         }
 
         [Test]

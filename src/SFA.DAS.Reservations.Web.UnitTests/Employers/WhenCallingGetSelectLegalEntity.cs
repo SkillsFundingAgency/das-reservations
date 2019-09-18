@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             mockMediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationEmployerCommand>(command =>
                         command.Id != Guid.Empty &&
-                        command.AccountId == decodedAccountId &&
+                        command.AccountId == accountLegalEntity.AccountId &&
                         command.AccountLegalEntityId == accountLegalEntity.AccountLegalEntityId &&
                         command.AccountLegalEntityName == accountLegalEntity.AccountLegalEntityName &&
                         command.AccountLegalEntityPublicHashedId == accountLegalEntity.AccountLegalEntityPublicHashedId),
