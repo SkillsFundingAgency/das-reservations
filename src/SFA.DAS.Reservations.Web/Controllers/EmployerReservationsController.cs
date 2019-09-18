@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -150,7 +148,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
             }
 
-            var response = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId), });
+            var response = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+
+            if (response.AccountLegalEntities.Count() == 1)
+            {
+                var accountLegalEntityPublicHashedId = response.AccountLegalEntities.First().AccountLegalEntityPublicHashedId;
+                return await PostSelectLegalEntity(routeModel,
+                    new ConfirmLegalEntityViewModel {LegalEntity = accountLegalEntityPublicHashedId});
+            }
+
             var viewModel = new SelectLegalEntityViewModel(routeModel, response.AccountLegalEntities, cachedResponse?.AccountLegalEntityId);
             return View("SelectLegalEntity", viewModel);
         }
@@ -165,17 +171,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return await SelectLegalEntity(routeModel);
             }
 
-            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
-            var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
-                model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
-            var reservationId = routeModel.Id ?? Guid.NewGuid();
-
             try
             {
+                var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+                var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
+                var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
+                    model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+                var reservationId = routeModel.Id ?? Guid.NewGuid();
+                
                 await _mediator.Send(new CacheReservationEmployerCommand
                 {
                     Id = reservationId,
-                    AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId),
+                    AccountId = decodedAccountId,
                     AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
                     AccountLegalEntityName = selectedAccountLegalEntity.AccountLegalEntityName,
                     AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId

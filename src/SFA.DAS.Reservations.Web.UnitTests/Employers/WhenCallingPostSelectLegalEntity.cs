@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +24,6 @@ using SFA.DAS.Testing.AutoFixture;
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenCallingPostSelectLegalEntity
     {
         [Test, MoqAutoData]
@@ -132,9 +130,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             result.Should().NotBeNull();
             result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
-
-
-
         }
 
         [Test, MoqAutoData]
