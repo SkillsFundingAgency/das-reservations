@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             mockMediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationEmployerCommand>(command =>
                         command.Id != Guid.Empty &&
-                        command.AccountId == decodedAccountId &&
+                        command.AccountId == firstLegalEntity.AccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
                         command.AccountLegalEntityName == firstLegalEntity.AccountLegalEntityName &&
                         command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),

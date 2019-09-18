@@ -16,6 +16,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCou
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -148,17 +149,33 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
             }
 
-            var response = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+            var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
 
-            if (response.AccountLegalEntities.Count() == 1)
+            if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
             {
-                var accountLegalEntityPublicHashedId = response.AccountLegalEntities.First().AccountLegalEntityPublicHashedId;
-                return await PostSelectLegalEntity(routeModel,
-                    new ConfirmLegalEntityViewModel {LegalEntity = accountLegalEntityPublicHashedId});
+                var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
+                await CacheReservation(routeModel, accountLegalEntity);
+                return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
             }
 
-            var viewModel = new SelectLegalEntityViewModel(routeModel, response.AccountLegalEntities, cachedResponse?.AccountLegalEntityId);
+            var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
             return View("SelectLegalEntity", viewModel);
+        }
+
+        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity)
+        {
+            var reservationId = routeModel.Id ?? Guid.NewGuid();
+            
+            await _mediator.Send(new CacheReservationEmployerCommand
+            {
+                Id = reservationId,
+                AccountId = accountLegalEntity.AccountId,
+                AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
+                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId
+            });
+
+            routeModel.Id = reservationId;
         }
 
         [HttpPost]
@@ -168,7 +185,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return await SelectLegalEntity(routeModel);
+                var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+                var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
+                return View("SelectLegalEntity", requestViewModel);
             }
 
             try
@@ -177,18 +196,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
                 var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
                     model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
-                var reservationId = routeModel.Id ?? Guid.NewGuid();
-                
-                await _mediator.Send(new CacheReservationEmployerCommand
-                {
-                    Id = reservationId,
-                    AccountId = decodedAccountId,
-                    AccountLegalEntityId = selectedAccountLegalEntity.AccountLegalEntityId,
-                    AccountLegalEntityName = selectedAccountLegalEntity.AccountLegalEntityName,
-                    AccountLegalEntityPublicHashedId = selectedAccountLegalEntity.AccountLegalEntityPublicHashedId
-                });
 
-                routeModel.Id = reservationId;
+                await CacheReservation(routeModel, selectedAccountLegalEntity);
 
                 return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
             }
@@ -199,7 +208,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                return await SelectLegalEntity(routeModel);
+                var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+                var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
+                return View("SelectLegalEntity", requestViewModel);
             }
             catch (ReservationLimitReachedException)
             {
