@@ -297,5 +297,27 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
             }
         }
+
+        [HttpGet]
+        [Route("{id}/course-guidance", Name = RouteNames.EmployerCourseGuidance)]
+        public IActionResult CourseGuidance(ReservationsRouteModel routeModel)
+        {
+            var model = new CourseGuidanceViewModel
+            {
+                DashboardUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+                BackRouteName = RouteNames.EmployerSelectCourse,
+                ProviderPermissionsUrl = _urlHelper.GenerateUrl(new UrlParameters
+                {
+                    SubDomain = "permissions",
+                    Controller = "providers",
+                    Id = routeModel.EmployerAccountId,
+                    Folder = "accounts"
+                }),
+                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl
+            };
+
+
+            return View("CourseGuidance", model);
+        }
     }
 }

@@ -36,6 +36,7 @@
         public const string EmployerPostCompleted = "employer-post-completed";
         public const string EmployerSignOut = "employer-signout";
         public const string EmployerSelectCourse = "employer-select-course";
+        public const string EmployerCourseGuidance = "employer-course-guidance";
         public const string EmployerSelectLegalEntity = "employer-select-legal-entity";
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";

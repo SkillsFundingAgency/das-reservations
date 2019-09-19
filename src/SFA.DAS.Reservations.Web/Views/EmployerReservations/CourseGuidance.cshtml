@@ -1,0 +1,22 @@
+﻿@model CourseGuidanceViewModel
+@{
+    ViewData["Title"] = "Reservations - Select Course Guidance";
+}
+
+
+<a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper " id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">You must select a course to reserve apprenticeship funding</h1>
+            <p class="govuk-body">Use the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">Find apprenticeship training</a> service to view apprenticeship training courses and choose a training provider.</p>
+            <p class="govuk-body">Alternatively, contact your chosen training provider to:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>find out which apprenticeship training the apprentice will take</li>
+                <li>reserve apprenticeship funding on your behalf by assigning them <a href="@Model.ProviderPermissionsUrl" class="govuk-link">provider permissions</a></li>
+            </ul>
+            <a href="@Model.DashboardUrl" role="button" draggable="false" class="govuk-button" tabindex="1">Return to your account</a>
+        </div>
+    </div>
+</main>
