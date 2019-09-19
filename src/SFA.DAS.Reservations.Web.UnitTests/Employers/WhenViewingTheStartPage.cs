@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
@@ -33,26 +34,25 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IUrlHelper> _urlHelper;
         private ReservationsRouteModel _routeModel;
         
-
         [SetUp]
         public void Arrange()
         {
-            var fixture = new Fixture();
+            var fixture = new Fixture().Customize(new AutoMoqCustomization{ConfigureMembers = true});
             var config = fixture.Create<ReservationsWebConfiguration>();
             _mockOptions = new Mock<IOptions<ReservationsWebConfiguration>>();
             _mockOptions.SetupGet(options => options.Value)
                 .Returns(config);
-            _mockMediator = new Mock<IMediator>();
-            _mockEncodingService = new Mock<IEncodingService>();
-            _externalUrlHelper = new Mock<IExternalUrlHelper>();
-            _urlHelper = new Mock<IUrlHelper>();
+            _mockMediator = fixture.Freeze<Mock<IMediator>>();
+            _mockEncodingService = fixture.Freeze<Mock<IEncodingService>>();
+            _externalUrlHelper = fixture.Freeze<Mock<IExternalUrlHelper>>();
+            _urlHelper = fixture.Freeze<Mock<IUrlHelper>>();
 
             _routeModel = fixture.Create<ReservationsRouteModel>();
 
             _mockEncodingService.Setup(s => s.Decode(_routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(ExpectedAccountId);
 
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, _mockOptions.Object, _externalUrlHelper.Object);
+            _controller = fixture.Create<EmployerReservationsController>();
 
             _controller.Url = _urlHelper.Object;
         }

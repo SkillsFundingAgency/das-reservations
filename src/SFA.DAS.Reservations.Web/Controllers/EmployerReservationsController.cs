@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
@@ -35,13 +36,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
+        private readonly ILogger<EmployerReservationsController> _logger;
         private readonly ReservationsWebConfiguration _config;
 
-        public EmployerReservationsController(IMediator mediator, IEncodingService encodingService, IOptions<ReservationsWebConfiguration> options, IExternalUrlHelper urlHelper)
+        public EmployerReservationsController(
+            IMediator mediator, 
+            IEncodingService encodingService, 
+            IOptions<ReservationsWebConfiguration> options, 
+            IExternalUrlHelper urlHelper,
+            ILogger<EmployerReservationsController> logger)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
+            _logger = logger;
             _config = options.Value;
         }
 
@@ -132,34 +140,42 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         return View("Index", viewModel);
                 }
             }
-            catch (ValidationException)
+            catch (ValidationException e)
             {
+                _logger.LogInformation(e, e.Message);
                 return View("Error");
             }
         }
             
-
         [HttpGet]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
         {
-            GetCachedReservationResult cachedResponse = null;
-            if (routeModel.Id.HasValue)
+            try
             {
-                cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+                GetCachedReservationResult cachedResponse = null;
+                if (routeModel.Id.HasValue)
+                {
+                    cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+                }
+
+                var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+
+                if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
+                {
+                    var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
+                    await CacheReservation(routeModel, accountLegalEntity);
+                    return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
+                }
+
+                var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
+                return View("SelectLegalEntity", viewModel);
             }
-
-            var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
-
-            if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
+            catch (Exception e)
             {
-                var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
-                await CacheReservation(routeModel, accountLegalEntity);
-                return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
+                _logger.LogError(e, e.Message);
+                return RedirectToRoute(RouteNames.Error500);
             }
-
-            var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
-            return View("SelectLegalEntity", viewModel);
         }
 
         private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity)
@@ -183,15 +199,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
-                var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
-                return View("SelectLegalEntity", requestViewModel);
-            }
-
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+                    var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
+                    return View("SelectLegalEntity", requestViewModel);
+                }
+
                 var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
                 var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
                 var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
