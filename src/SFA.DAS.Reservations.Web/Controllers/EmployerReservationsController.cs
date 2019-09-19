@@ -253,20 +253,27 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
-                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef),
+                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
                 CohortReference = cachedReservation.CohortRef
             };
 
             return View(viewModel);
         }
 
-        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef)
+        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef, bool employerHasSingleLegalEntity = false)
         {
             if (!string.IsNullOrEmpty(routeModel.CohortReference))
             {
                 return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
             }
-            return routeModel.FromReview.HasValue && routeModel.FromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectLegalEntity;
+
+            if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
+                return RouteNames.EmployerReview;
+            
+            if (employerHasSingleLegalEntity)
+                return RouteNames.EmployerStart;
+
+            return RouteNames.EmployerSelectLegalEntity;
         }
 
         private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
@@ -279,7 +286,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
         }
         
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]

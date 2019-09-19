@@ -176,11 +176,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Arrange
             routeModel.FromReview = true;
             routeModel.CohortReference = string.Empty;
-            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetCoursesResult
-                {
-                    Courses = courses
-                });
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult { Courses = courses });
 
             //Act
             var result = await controller.SelectCourse(routeModel) as ViewResult;
@@ -194,19 +192,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView(
-            ICollection<Course> courses,
-            [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
+            ICollection<Course> courses,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
         {
             //Arrange
             routeModel.FromReview = false;
             routeModel.CohortReference = string.Empty;
-            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetCoursesResult
-                {
-                    Courses = courses
-                });
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult { Courses = courses });
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
 
             //Act
             var result = await controller.SelectCourse(routeModel) as ViewResult;
@@ -215,6 +215,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(RouteNames.EmployerSelectLegalEntity, viewModel.BackLink);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Single_Legal_Entity_Then_The_BackLink_Is_Set_To_Return_To_Start(
+            ReservationsRouteModel routeModel,
+            ICollection<Course> courses,
+            GetCachedReservationResult cachedReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            routeModel.FromReview = false;
+            routeModel.CohortReference = string.Empty;
+            cachedReservationResult.EmployerHasSingleLegalEntity = true;
+            mockMediator
+                .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult { Courses = courses });
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+
+            //Act
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
+
+            //Assert
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(RouteNames.EmployerStart, viewModel.BackLink);
         }
     }
 }
