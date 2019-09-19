@@ -72,7 +72,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                         command.AccountId == firstLegalEntity.AccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
                         command.AccountLegalEntityName == firstLegalEntity.AccountLegalEntityName &&
-                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),
+                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId &&
+                        !command.EmployerHasSingleLegalEntity),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }

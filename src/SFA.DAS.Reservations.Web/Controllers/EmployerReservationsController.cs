@@ -164,7 +164,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
                 {
                     var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
-                    await CacheReservation(routeModel, accountLegalEntity);
+                    await CacheReservation(routeModel, accountLegalEntity, true);
                     return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
                 }
 
@@ -178,7 +178,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity)
+        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
         {
             var reservationId = routeModel.Id ?? Guid.NewGuid();
             
@@ -188,7 +188,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 AccountId = accountLegalEntity.AccountId,
                 AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId
+                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId,
+                EmployerHasSingleLegalEntity = employerHasSingleLegalEntity
             });
 
             routeModel.Id = reservationId;
