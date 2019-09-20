@@ -143,7 +143,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ValidationException e)
             {
                 _logger.LogInformation(e, e.Message);
-                return View("Error");
+                return RedirectToRoute(RouteNames.Error500);
             }
         }
             
@@ -318,7 +318,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (getCoursesResponse?.Courses == null)
                 {
-                    return View("Error"); //todo: setup view correctly.
+                    return RedirectToRoute(RouteNames.Error500);
                 }
 
                 var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
