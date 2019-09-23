@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Microsoft.Azure.Documents.SystemFunctions
+@{
     var tagManagerCode = "GTM-TD56SF5";
 }
 @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
@@ -70,7 +71,21 @@
         <div class="govuk-header__content">
             @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
             {
-                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
+                if (ViewContext.RouteData.Values["employerAccountId"].IsNull())
+                {
+                    <a asp-external-controller="accounts" 
+                       asp-external-subdomain="accounts" 
+                       asp-external-folder="service" 
+                       class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
+                }
+                else
+                {
+                    <a asp-external-controller="teams" 
+                       asp-external-subdomain="accounts" 
+                       asp-external-folder="accounts" 
+                       asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" 
+                       class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
+                }
             }
             else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
             {
