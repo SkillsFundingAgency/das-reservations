@@ -71,7 +71,7 @@
         <div class="govuk-header__content">
             @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
             {
-                if (ViewContext.RouteData.Values["employerAccountId"].IsNull())
+                if (ViewContext.RouteData.Values["employerAccountId"] == null)
                 {
                     <a asp-external-controller="accounts" 
                        asp-external-subdomain="accounts" 
