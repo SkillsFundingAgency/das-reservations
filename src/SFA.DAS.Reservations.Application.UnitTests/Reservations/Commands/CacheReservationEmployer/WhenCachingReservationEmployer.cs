@@ -158,6 +158,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             };
 
             command.UkPrn = null;
+            command.EmployerHasSingleLegalEntity = true;
 
             _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
                 .ReturnsAsync(response);
@@ -175,7 +176,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     c.AccountLegalEntityPublicHashedId.Equals(command.AccountLegalEntityPublicHashedId) &&
                     c.AccountName.Equals(command.AccountName) &&
                     c.CohortRef.Equals(command.CohortRef) &&
-                    c.UkPrn.Equals(command.UkPrn)), 
+                    c.UkPrn.Equals(command.UkPrn) &&
+                    c.EmployerHasSingleLegalEntity.Equals(command.EmployerHasSingleLegalEntity)), 
                 1));
         }
 

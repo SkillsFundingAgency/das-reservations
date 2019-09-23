@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
-using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 

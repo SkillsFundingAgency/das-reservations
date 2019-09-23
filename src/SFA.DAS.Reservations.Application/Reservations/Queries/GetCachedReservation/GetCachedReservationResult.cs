@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string AccountName { get; set; }
         public string CohortRef { get; set; }
+        public bool EmployerHasSingleLegalEntity  { get; set; }
     }
 }

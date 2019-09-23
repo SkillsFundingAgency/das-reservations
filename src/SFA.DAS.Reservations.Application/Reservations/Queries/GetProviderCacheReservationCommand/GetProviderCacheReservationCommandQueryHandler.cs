@@ -73,24 +73,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                 throw new AccountLegalEntityNotFoundException(query.AccountLegalEntityPublicHashedId);
             }
 
-            long accountId;
-           
-            if (long.TryParse(legalEntity.AccountId, out var legalEntityAccountId))
-            {
-                accountId = legalEntityAccountId;
-            }
-            else
-            {
-                throw new AccountLegalEntityInvalidException(
-                    "Account legal entity Account Id cannot be parsed to a long for " +
-                    $"Legal entity Id [{query.AccountLegalEntityPublicHashedId}].");
-            }
-
             var cohort = await _mediator.Send(new GetCohortQuery {CohortId = query.CohortId}, cancellationToken);
 
             if (cohort.Cohort.AccountLegalEntityId != legalEntity.AccountLegalEntityId)
             {
-                throw new ProviderNotAuthorisedException(accountId, query.UkPrn);
+                throw new ProviderNotAuthorisedException(legalEntity.AccountId, query.UkPrn);
             }
 
             return new GetProviderCacheReservationCommandResponse
@@ -103,7 +90,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                     AccountLegalEntityId = legalEntity.AccountLegalEntityId,
                     Id = Guid.NewGuid(),
                     CohortRef = query.CohortRef,
-                    AccountId = accountId
+                    AccountId = legalEntity.AccountId
                 }
             };
         }

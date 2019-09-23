@@ -16,5 +16,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public uint? UkPrn { get; set; }
         public string AccountName { get; set; }
         public string CohortRef { get; set; }
+        public bool EmployerHasSingleLegalEntity { get; set; }
     }
 }

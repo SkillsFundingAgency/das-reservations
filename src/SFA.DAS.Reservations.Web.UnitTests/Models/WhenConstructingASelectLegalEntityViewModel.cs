@@ -27,10 +27,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             List<AccountLegalEntity> accountLegalEntities)
         {
             var legalEntity = accountLegalEntities.First();
-            var expectedLegalEntityId = legalEntity.AccountLegalEntityId;
             var expectedLegalEntityPublicHashedId = legalEntity.AccountLegalEntityPublicHashedId;
 
-            var viewModel = new SelectLegalEntityViewModel(routeModel, accountLegalEntities,expectedLegalEntityId);
+            var viewModel = new SelectLegalEntityViewModel(routeModel, accountLegalEntities, expectedLegalEntityPublicHashedId);
 
             viewModel.LegalEntities.Should().BeEquivalentTo(accountLegalEntities, option => option.ExcludingMissingMembers());
             viewModel.LegalEntities.First(c => c.AccountLegalEntityPublicHashedId.Equals(expectedLegalEntityPublicHashedId)).Selected.Should().BeTrue();

@@ -6,11 +6,13 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class SelectLegalEntityViewModel
     {
-        public SelectLegalEntityViewModel(ReservationsRouteModel routeModel,
-            IEnumerable<AccountLegalEntity> accountLegalEntities, long? selectedLegalEntity)
+        public SelectLegalEntityViewModel(
+            ReservationsRouteModel routeModel,
+            IEnumerable<AccountLegalEntity> accountLegalEntities, 
+            string selectedAccountLegalEntityPublicHashedId)
         {
             RouteModel = routeModel;
-            LegalEntities = accountLegalEntities?.Select(apiModel => new LegalEntityViewModel(apiModel, selectedLegalEntity));
+            LegalEntities = accountLegalEntities?.Select(apiModel => new LegalEntityViewModel(apiModel, selectedAccountLegalEntityPublicHashedId));
         }
 
         public IEnumerable<LegalEntityViewModel> LegalEntities { get; }
@@ -19,11 +21,11 @@ namespace SFA.DAS.Reservations.Web.Models
 
     public class LegalEntityViewModel
     {
-        public LegalEntityViewModel(AccountLegalEntity accountLegalEntity, long?selectedLegalEntity)
+        public LegalEntityViewModel(AccountLegalEntity accountLegalEntity, string selectedAccountLegalEntityPublicHashedId)
         {
             Name = accountLegalEntity.AccountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId;
-            Selected = selectedLegalEntity.HasValue && selectedLegalEntity.Value == accountLegalEntity.AccountLegalEntityId;
+            Selected = !string.IsNullOrWhiteSpace(selectedAccountLegalEntityPublicHashedId) && selectedAccountLegalEntityPublicHashedId == accountLegalEntity.AccountLegalEntityPublicHashedId;
         }
 
         public bool Selected { get; set; }

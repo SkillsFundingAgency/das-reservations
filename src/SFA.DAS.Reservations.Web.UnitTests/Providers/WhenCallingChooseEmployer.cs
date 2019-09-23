@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 AccountLegalEntities = expectedEmployers.Select(arg => new AccountLegalEntity
                 {
                     AccountLegalEntityPublicHashedId = arg.AccountLegalEntityPublicHashedId,
-                    AccountId = arg.AccountId.ToString(),
+                    AccountId = arg.AccountId,
                     IsLevy = false,
                     AgreementType = AgreementType.NonLevyExpressionOfInterest
                 })
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 AccountLegalEntities = expectedEmployers.Select(arg => new AccountLegalEntity
                 {
                     AccountLegalEntityPublicHashedId = arg.AccountLegalEntityPublicHashedId,
-                    AccountId = arg.AccountId.ToString(),
+                    AccountId = arg.AccountId,
                     IsLevy = false,
                     AgreementType = AgreementType.Levy
                 })
