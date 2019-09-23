@@ -13,5 +13,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         public uint? UkPrn { get; set; }
         public string AccountName { get; set; }
         public string CohortRef { get; set; }
+        public bool EmployerHasSingleLegalEntity  { get; set; }
     }
 }

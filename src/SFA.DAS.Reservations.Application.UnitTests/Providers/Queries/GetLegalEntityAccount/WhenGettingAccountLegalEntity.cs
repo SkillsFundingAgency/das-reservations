@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalE
         {
             _expectedLegalEntity = new AccountLegalEntity
             {
-                AccountId = "1",
+                AccountId = 1,
                 AccountLegalEntityId = 2,
                 AccountLegalEntityName = "Test entity",
                 AccountLegalEntityPublicHashedId = "ABC123",

@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
-using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
@@ -27,24 +21,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
     {
         private EmployerReservationsController _controller;
         private Mock<IMediator> _mockMediator;
-        private Mock<IEncodingService> _mockEncodingService;
         private ReservationsWebConfiguration _employerConfig;
 
         [SetUp]
         public void Arrange()
         {
-            _mockMediator = new Mock<IMediator>();
-            _mockEncodingService = new Mock<IEncodingService>();
+            var fixture = new Fixture().Customize(new AutoMoqCustomization{ConfigureMembers = true});
+            _mockMediator = fixture.Freeze<Mock<IMediator>>();
             _employerConfig = new ReservationsWebConfiguration
             {
                 EmployerDashboardUrl = "test.com/test"
             };
 
-            var options = new Mock<IOptions<ReservationsWebConfiguration>>();
-
+            var options = fixture.Freeze<Mock<IOptions<ReservationsWebConfiguration>>>();
             options.Setup(o => o.Value).Returns(_employerConfig);
 
-            _controller = new EmployerReservationsController(_mockMediator.Object, _mockEncodingService.Object, options.Object, Mock.Of<IExternalUrlHelper>());
+            _controller = fixture.Create<EmployerReservationsController>();
         }
 
         [Test, MoqAutoData]

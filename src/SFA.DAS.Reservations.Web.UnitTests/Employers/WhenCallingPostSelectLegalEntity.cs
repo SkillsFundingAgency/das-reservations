@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,14 +8,11 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -25,7 +21,6 @@ using SFA.DAS.Testing.AutoFixture;
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenCallingPostSelectLegalEntity
     {
         [Test, MoqAutoData]
@@ -74,10 +69,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             mockMediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationEmployerCommand>(command =>
                         command.Id != Guid.Empty &&
-                        command.AccountId == decodedAccountId &&
+                        command.AccountId == firstLegalEntity.AccountId &&
                         command.AccountLegalEntityId == firstLegalEntity.AccountLegalEntityId &&
                         command.AccountLegalEntityName == firstLegalEntity.AccountLegalEntityName &&
-                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId),
+                        command.AccountLegalEntityPublicHashedId == firstLegalEntity.AccountLegalEntityPublicHashedId &&
+                        !command.EmployerHasSingleLegalEntity),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -132,9 +128,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             result.Should().NotBeNull();
             result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
-
-
-
         }
 
         [Test, MoqAutoData]
@@ -142,8 +135,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
-            Mock<IEncodingService> mockEncodingService,
-            Mock<IMediator> mockMediator)
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
@@ -157,16 +150,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     new ValidationResult("Failed",
                         new List<string> {"AccountId| Account reservation limit has been reached."}), null, null));
 
-            var controller = new EmployerReservationsController(mockMediator.Object, mockEncodingService.Object, Mock.Of<IOptions<ReservationsWebConfiguration>>(), Mock.Of<IExternalUrlHelper>());
-            
             var actual = await controller.PostSelectLegalEntity(routeModel, viewModel);
 
             actual.Should().NotBeNull();
             var actualViewResult = actual as ViewResult;
             actualViewResult.Should().NotBeNull();
-            actualViewResult?.ViewData.ModelState.IsValid.Should().BeFalse();
-            actualViewResult?.ViewData.ModelState.Should().Contain(pair => pair.Key == "AccountId");
             actualViewResult?.ViewName.Should().Be("SelectLegalEntity");
+            controller.ModelState.IsValid.Should().BeFalse();
+            controller.ModelState.Should().Contain(pair => pair.Key == "AccountId");
         }
     }
 }
