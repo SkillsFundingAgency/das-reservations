@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -11,16 +12,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
     public class HomeController : Controller
     {    
         private readonly ILogger<HomeController> _logger;
+        private readonly IExternalUrlHelper _urlHelper;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IExternalUrlHelper urlHelper)
         {
             _logger = logger;
+            _urlHelper = urlHelper;
         }
 
-        [Route("{ukprn}/signout",Name = RouteNames.ProviderSignOut)]
-        public IActionResult SignOut(string ukprn)
+        [Route("signout",Name = RouteNames.ProviderSignOut)]
+        public IActionResult SignOut()
         {
-            _logger.LogDebug($"User signed out {ukprn}");
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
@@ -31,10 +33,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 WsFederationDefaults.AuthenticationScheme);
         }
 
-        [Route("accounts/{employerAccountId}/signout", Name = RouteNames.EmployerSignOut)]
-        public IActionResult SignOutEmployer(string employerAccountId)
+        [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
+        public IActionResult SignOutEmployer()
         {
-            _logger.LogDebug($"User signed out {employerAccountId}");
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
