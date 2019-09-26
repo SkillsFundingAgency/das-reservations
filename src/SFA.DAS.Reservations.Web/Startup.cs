@@ -20,6 +20,7 @@ using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using SFA.DAS.Reservations.Web.Stubs;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -32,6 +33,7 @@ namespace SFA.DAS.Reservations.Web
         {
             _environment = environment;
             var config = new ConfigurationBuilder()
+                .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
@@ -56,23 +58,26 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddHealthChecks()
-                .AddCheck<ReservationsApiHealthCheck>(
-                    "Reservation Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] {"ready"})
-                .AddCheck<CommitmentsApiHealthCheck>(
-                    "Commitments Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] {"ready"})
-                .AddCheck<ProviderRelationshipsApiHealthCheck>(
-                    "ProviderRelationships Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] {"ready"})
-                .AddCheck<AccountApiHealthCheck>(
-                    "Accounts Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] { "ready" });
+            if (!_configuration.UseStub())
+            {
+                services.AddHealthChecks()
+                    .AddCheck<ReservationsApiHealthCheck>(
+                        "Reservation Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<CommitmentsApiHealthCheck>(
+                        "Commitments Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<ProviderRelationshipsApiHealthCheck>(
+                        "ProviderRelationships Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<AccountApiHealthCheck>(
+                        "Accounts Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] { "ready" });
+            }
 
             services.AddOptions();
 
@@ -91,13 +96,16 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            if (isEmployerAuth)
+            if (_configuration["Environment"] != "DEV")
             {
-                services.AddEmployerConfiguration(_configuration, _environment);
-            }
-            else if (isProviderAuth)
-            {
-                services.AddProviderConfiguration(_configuration, _environment);
+                if (isEmployerAuth)
+                {
+                    services.AddEmployerConfiguration(_configuration, _environment);
+                }
+                else if (isProviderAuth)
+                {
+                    services.AddProviderConfiguration(_configuration, _environment);
+                }
             }
 
             var serviceProvider = services.BuildServiceProvider();
@@ -150,7 +158,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
 
-            if (_configuration["Environment"] == "LOCAL")
+            if (_configuration["Environment"] == "LOCAL" || _configuration["Environment"] == "DEV")
             {
                 services.AddDistributedMemoryCache();
             }
