@@ -299,7 +299,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
 
-
                 var viewModel = new EmployerSelectCourseViewModel
                 {
                     ReservationId = routeModel.Id.Value,
@@ -311,6 +310,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 return View("SelectCourse",viewModel);
             }
+
+
 
             if (postViewModel.ApprenticeTrainingKnown == false)
             {
@@ -355,7 +356,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ReservationId = routeModel.Id.Value,
                     Courses = courseViewModels,
                     BackLink = GenerateBackLink(routeModel, routeModel.CohortReference),
-                    CohortReference = routeModel.CohortReference
+                    CohortReference = routeModel.CohortReference,
+                    ApprenticeTrainingKnown = postViewModel.ApprenticeTrainingKnown
                 };
 
                 return View("SelectCourse", viewModel);
