@@ -30,61 +30,61 @@ if (selectEl) {
 
 forms.attr('novalidate', 'novalidate');
 
-forms.on('submit', function (e) {
+//forms.on('submit', function (e) {
 
-    var canSubmit = this.checkValidity(),
-        form = this,
-        validationMessages = [];
+//    var canSubmit = this.checkValidity(),
+//        form = this,
+//        validationMessages = [];
 
-    if (!canSubmit) {
-        enableFormSubmitButton();
-    }
+//    if (!canSubmit) {
+//        enableFormSubmitButton();
+//    }
 
-    $('.autocomplete__input').each(function () {
-        var that = $(this);
-        setTimeout(function () {
-            if (!checkField(that)) {
-                var fieldId = that.attr('id'),
-                    errorMessage = $('#' + fieldId + '-select').data('validation-message'),
-                    errorSummaryMessage = $('#' + fieldId + '-select').data('validation-summary-message') || $('#' + fieldId + '-select').data('validation-message');
-                validationMessages.unshift({ id: fieldId, message: errorMessage, summaryMessage: errorSummaryMessage });
-                canSubmit = false;
-                enableFormSubmitButton();
-            }
-        }, 100);
-    });
+//    $('.autocomplete__input').each(function () {
+//        var that = $(this);
+//        setTimeout(function () {
+//            if (!checkField(that)) {
+//                var fieldId = that.attr('id'),
+//                    errorMessage = $('#' + fieldId + '-select').data('validation-message'),
+//                    errorSummaryMessage = $('#' + fieldId + '-select').data('validation-summary-message') || $('#' + fieldId + '-select').data('validation-message');
+//                validationMessages.unshift({ id: fieldId, message: errorMessage, summaryMessage: errorSummaryMessage });
+//                canSubmit = false;
+//                enableFormSubmitButton();
+//            }
+//        }, 100);
+//    });
 
-    radioInputs.each(function () {
-        hideValidationMessage($(this));
-    });
+//    radioInputs.each(function () {
+//        hideValidationMessage($(this));
+//    });
 
-    radioInputs.each(function () {
-        var result = this.checkValidity();
-        if (!result) {
-            var errorMessage = showRadioValidationMessage($(this));
-            if (errorMessage !== undefined)
-                validationMessages.unshift(errorMessage);
-        }
-    });
+//    radioInputs.each(function () {
+//        var result = this.checkValidity();
+//        if (!result) {
+//            var errorMessage = showRadioValidationMessage($(this));
+//            if (errorMessage !== undefined)
+//                validationMessages.unshift(errorMessage);
+//        }
+//    });
 
-    setTimeout(function () {
-        if (canSubmit) {
-            hideErrorSummary();
-            form.submit();
-        } else {
-            hideErrorSummary();
-            showErrorSummary(validationMessages);
-        }
-    }, 300);
+//    setTimeout(function () {
+//        if (canSubmit) {
+//            hideErrorSummary();
+//            form.submit();
+//        } else {
+//            hideErrorSummary();
+//            showErrorSummary(validationMessages);
+//        }
+//    }, 300);
 
-    e.preventDefault();
+//    e.preventDefault();
 
-}).keydown(function (e) {
-    if (e.which === 13) {
-        e.preventDefault();
-        return false;
-    }
-});
+//}).keydown(function (e) {
+//    if (e.which === 13) {
+//        e.preventDefault();
+//        return false;
+//    }
+//});
 
 
 var enableFormSubmitButton = function() {
@@ -117,12 +117,17 @@ var showSelectValidationMessage = function ($field) {
         fieldLabel = fieldGroup.find('label'),
         validationMessageText = $field.data('validation-message'),
         validationMessage = $('<span>').addClass('govuk-error-message').text(validationMessageText),
-        alreadyShowingError = fieldGroup.hasClass('govuk-form-group--error');
+        alreadyShowingError = fieldGroup.hasClass('govuk-form-group--error') && fieldGroup.parent().hasClass('govuk-form-group--error');
 
     if (!alreadyShowingError) {
         fieldGroup.addClass('govuk-form-group--error');
+        fieldGroup.parent().addClass('govuk-form-group--error');
+        
+    }
+    if (!fieldLabel.next().hasClass('govuk-error-message')) {
         fieldLabel.after(validationMessage);
     }
+    
 };
 
 var showRadioValidationMessage = function ($field) {
