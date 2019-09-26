@@ -29,22 +29,22 @@ else
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     
-                    @if (!ViewData.ModelState.IsValid)
+                    @if (ViewData.ModelState.ContainsKey(nameof(Model.ApprenticeTrainingKnown)) && ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.Any())
                     {
-                        <span id="Course" class="govuk-error-message">
-                            @ViewData.ModelState.Values.First(x => x.ValidationState == ModelValidationState.Invalid).Errors.First().ErrorMessage
-                        </span>
+                    <span id="Course" class="govuk-error-message">
+                        @ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.First().ErrorMessage
+                    </span>
                     }
 
                     <fieldset class="govuk-fieldset">
                         <div class="govuk-radios govuk-radios--conditional" data-module="radios">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="ApprenticeTrainingKnown" name="ApprenticeTrainingKnown" type="radio" value="true" data-aria-controls="course-search-radio">
+                                <input class="govuk-radios__input" id="ApprenticeTrainingKnown" name="ApprenticeTrainingKnown" type="radio" value="true" @(Model.ApprenticeTrainingKnown.HasValue ? "checked='checked'" :"") data-aria-controls="course-search-radio">
                                 <label class="govuk-label govuk-radios__label" for="ApprenticeTrainingKnown-True">
                                     Yes
                                 </label>
                             </div>
-                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="course-search-radio">
+                            <div class="govuk-radios__conditional @(!Model.ApprenticeTrainingKnown.HasValue ? "govuk-radios__conditional--hidden" : "") " id="course-search-radio">
                                 <label class="govuk-label" for="course-search">
                                     Search for a course
                                 </label>
