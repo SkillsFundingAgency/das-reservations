@@ -30,4 +30,10 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Steps\" />
+  </ItemGroup>
+
 </Project>
