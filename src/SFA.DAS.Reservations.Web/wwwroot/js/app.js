@@ -64,8 +64,6 @@ forms.on('submit', function (e) {
             var errorMessage = showRadioValidationMessage($(this));
             if (errorMessage !== undefined)
                 validationMessages.unshift(errorMessage);
-        } else {
-            hideValidationMessage($(this));
         }
     });
 
@@ -88,6 +86,7 @@ forms.on('submit', function (e) {
     }
 });
 
+
 var enableFormSubmitButton = function() {
     forms.each(function () {
         var button = $(this).find(".govuk-button");
@@ -98,6 +97,10 @@ var enableFormSubmitButton = function() {
 var checkField = function ($field) {
     var textInput = $field,
         selectField = $('#' + textInput.attr('id') + '-select');
+
+    if (document.getElementsByClassName('govuk-radios__conditional--hidden').length === 1) {
+        return true;
+    }
 
     if (selectField[0].selectedIndex === 0) {
         showSelectValidationMessage(selectField);
@@ -169,9 +172,11 @@ var showErrorSummary = function (validationMessages) {
     }
 
     $.each(validationMessages, function (index, value) {
-        var errorLink = $('<a>').html(value.summaryMessage).attr('href', '#' + value.id);
-        var errorListItem = $('<li>').append(errorLink);
-        errorList.append(errorListItem);
+        if (document.getElementsByClassName('govuk-radios__conditional--hidden').length === 0) {
+            var errorLink = $('<a>').html(value.summaryMessage).attr('href', '#' + value.id);
+            var errorListItem = $('<li>').append(errorLink);
+            errorList.append(errorListItem);
+        }
     });
 };
 
