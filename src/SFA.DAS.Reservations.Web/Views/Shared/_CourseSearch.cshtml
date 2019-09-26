@@ -1,7 +1,12 @@
 @model SelectCourseViewModel
 
-
-<select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint" data-validation-message="Select which apprenticeship training your apprentice will take" data-validation-summary-message="Select which apprenticeship training your apprentice will take">
+@if (ViewData.ModelState.ContainsKey("CourseId") && ViewData.ModelState["CourseId"].Errors.Any())
+{
+<span id="Course" class="govuk-error-message">
+    @ViewData.ModelState["CourseId"].Errors.First().ErrorMessage
+</span>
+}
+<select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
     <option value="">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
