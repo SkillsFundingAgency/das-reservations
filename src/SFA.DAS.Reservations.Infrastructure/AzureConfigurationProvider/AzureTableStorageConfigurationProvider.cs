@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -27,6 +28,11 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider
 
         public override void Load()
         {
+            if (_environment.Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return;
+            }
+
             var table = GetTable();
             foreach (var config in _configName)
             {
