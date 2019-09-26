@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.202
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web", "SFA.DAS.Reservations.Web\SFA.DAS.Reservations.Web.csproj", "{F20ABA1D-C45D-46EA-AF6C-21BF15FE4268}"
 EndProject
@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Web.AcceptanceTests", "SFA.DAS.Reservations.Web.AcceptanceTests\SFA.DAS.Reservations.Web.AcceptanceTests.csproj", "{362F08C9-44DD-4CC0-8CDF-CF497F5D051F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +66,10 @@ Global
 		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{362F08C9-44DD-4CC0-8CDF-CF497F5D051F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{362F08C9-44DD-4CC0-8CDF-CF497F5D051F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{362F08C9-44DD-4CC0-8CDF-CF497F5D051F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{362F08C9-44DD-4CC0-8CDF-CF497F5D051F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{36E04F1E-9E5A-4A39-AB57-FFCF09EE4C57} = {429FE184-B674-47C2-971C-87AFC7411D47}
 		{DD46209A-CA75-4223-B61B-F7D355DD010C} = {429FE184-B674-47C2-971C-87AFC7411D47}
 		{49C2CBAC-B1E5-4D7F-8519-B5933F0ADE8A} = {429FE184-B674-47C2-971C-87AFC7411D47}
+		{362F08C9-44DD-4CC0-8CDF-CF497F5D051F} = {429FE184-B674-47C2-971C-87AFC7411D47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92493938-AEBD-43A6-936E-DC0B25100216}
