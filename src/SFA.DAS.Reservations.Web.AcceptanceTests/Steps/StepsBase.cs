@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = TestDataValues.EmployerAccountId,
+                AccountId = 1,
                 AccountLegalEntityId = 1,
                 AccountLegalEntityPublicHashedId = "ABC123",
                 AccountLegalEntityName = "Test Legal Entity",
