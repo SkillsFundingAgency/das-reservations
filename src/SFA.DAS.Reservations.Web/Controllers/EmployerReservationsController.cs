@@ -289,14 +289,40 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
-        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, string selectedCourseId)
+        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, PostSelectCourseViewModel postViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
+
+                var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+
+                var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
+
+
+                var viewModel = new EmployerSelectCourseViewModel
+                {
+                    ReservationId = routeModel.Id.Value,
+                    Courses = courseViewModels,
+                    BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
+                    CohortReference = cachedReservation.CohortRef
+                };
+
+                return View("SelectCourse",viewModel);
+            }
+
+            if (postViewModel.ApprenticeTrainingKnown == false)
+            {
+                return RedirectToRoute(RouteNames.EmployerCourseGuidance, routeModel);
+            }
+
+
             try
             {
                 await _mediator.Send(new CacheReservationCourseCommand
                 {
                     Id = routeModel.Id.Value,
-                    CourseId = selectedCourseId
+                    CourseId = postViewModel.SelectedCourseId
 
                 });
 
