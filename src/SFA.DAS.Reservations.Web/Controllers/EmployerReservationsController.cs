@@ -254,7 +254,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
                 BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
-                CohortReference = cachedReservation.CohortRef
+                CohortReference = cachedReservation.CohortRef,
+                ApprenticeTrainingKnown = routeModel.FromReview
             };
 
             return View(viewModel);
