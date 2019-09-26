@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            if (!_configuration.UseStub())
+            if (_configuration["Environment"] != "DEV")
             {
                 if (isEmployerAuth)
                 {
