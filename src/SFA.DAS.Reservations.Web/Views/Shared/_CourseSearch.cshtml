@@ -1,9 +1,9 @@
 @model SelectCourseViewModel
 
-@if (ViewData.ModelState.ContainsKey("CourseId") && ViewData.ModelState["CourseId"].Errors.Any())
+@if (ViewData.ModelState.ContainsKey("course-search") && ViewData.ModelState["course-search"].Errors.Any())
 {
 <span id="Course" class="govuk-error-message">
-    @ViewData.ModelState["CourseId"].Errors.First().ErrorMessage
+    @ViewData.ModelState["course-search"].Errors.First().ErrorMessage
 </span>
 }
 <select id="course-search" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
