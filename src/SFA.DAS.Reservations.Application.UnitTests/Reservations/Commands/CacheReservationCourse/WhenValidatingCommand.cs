@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.CourseId))
+                .Should().ContainKey("course-search")
                 .WhichValue.Should().Be("Select which apprenticeship training your apprentice will take");
         }
 
