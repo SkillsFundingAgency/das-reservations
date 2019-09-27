@@ -112,7 +112,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return View("ApprenticeshipTraining", model);
                 }
 
-		 		var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+                if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
+                {
+                    var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
+
+                    var selectedCourse =
+                        getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
+
+                    course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
+                    //todo: should be a validation exception, also this throw is not unit tested
+                }
+
+                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
                 if(isProvider)
 				{             

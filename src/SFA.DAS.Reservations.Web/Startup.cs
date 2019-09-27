@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            if (_configuration["Environment"] != "DEV")
+            if (!_configuration.UseStub())
             {
                 services.AddHealthChecks()
                     .AddCheck<ReservationsApiHealthCheck>(
