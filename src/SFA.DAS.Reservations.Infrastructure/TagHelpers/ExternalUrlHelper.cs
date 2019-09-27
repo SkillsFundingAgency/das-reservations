@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             
             if (ukPrn.HasValue)
             {
-                action = "add-apprentice";
+                action = "add/apprentice";
                 id = ukPrn.ToString();
             }
             else
