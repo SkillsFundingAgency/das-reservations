@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,5 +79,31 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             Assert.AreEqual(numberOfReservations, _actualModel.Reservations.Count);
         }
+
+        [Then(@"I am able to delete the reservation")]
+        public void ThenIAmAbleToDeleteTheReservation()
+        {
+            Assert.IsTrue(_actualModel.Reservations.First().CanProviderDeleteReservation);
+        }
+
+        [Then(@"I am not able to delete the reservation")]
+        public void ThenIAmNotAbleToDeleteTheReservation()
+        {
+            Assert.AreEqual(string.Empty, _actualModel.Reservations.First().DeleteRouteName);
+        }
+
+        [Then(@"I am able to add an apprentice")]
+        public void ThenIAmAbleToAddAnApprentice()
+        {
+            Assert.AreNotEqual(string.Empty, _actualModel.Reservations.First().ApprenticeUrl);
+        }
+
+        [Then(@"I am not able to add an apprentice")]
+        public void ThenIAmNotAbleToAddAnApprentice()
+        {
+            Assert.AreEqual(string.Empty, _actualModel.Reservations.First().ApprenticeUrl);
+        }
+
+
     }
 }

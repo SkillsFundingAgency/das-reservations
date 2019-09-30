@@ -142,11 +142,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 
             viewModel.Reservations
                 .Where(model => nonDeletableReservationIds.Contains(model.Id))
-                .Select(model => model.CanBeDeleted)
+                .Select(model => model.CanProviderDeleteReservation)
                 .Should().AllBeEquivalentTo(false);
             viewModel.Reservations
                 .Where(model => !nonDeletableReservationIds.Contains(model.Id))
-                .Select(model => model.CanBeDeleted)
+                .Select(model => model.CanProviderDeleteReservation)
                 .Should().AllBeEquivalentTo(true);
         }
 
@@ -211,6 +211,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 It.IsAny<DateTime>(),
                 It.IsAny<string>(),
                 It.IsAny<string>())).Returns(expectedUrl);
+
+            getReservationsResult.Reservations.ToList().ForEach(c =>
+            {
+                c.Status = ReservationStatus.Pending;
+                c.IsExpired = false;
+            });
 
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(
