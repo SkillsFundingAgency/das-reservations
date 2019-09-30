@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
                 actualUrl);
         }
 
@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add-apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
                 actualUrl);
         }
 
