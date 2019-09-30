@@ -239,54 +239,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {
-            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
-            if (cachedReservation == null)
+            var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, routeModel.FromReview);
+
+            if (viewModel == null)
             {
                 return View("Index");
             }
 
-            var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
-
-            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
-
-            var viewModel = new EmployerSelectCourseViewModel
-            {
-                ReservationId = routeModel.Id.Value,
-                Courses = courseViewModels,
-                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
-                CohortReference = cachedReservation.CohortRef,
-                ApprenticeTrainingKnown = routeModel.FromReview
-            };
-
-            return View(viewModel);
+            return View("SelectCourse",viewModel);
         }
 
-        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef, bool employerHasSingleLegalEntity = false)
-        {
-            if (!string.IsNullOrEmpty(routeModel.CohortReference))
-            {
-                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
-            }
-
-            if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
-                return RouteNames.EmployerReview;
-            
-            if (employerHasSingleLegalEntity)
-                return RouteNames.EmployerStart;
-
-            return RouteNames.EmployerSelectLegalEntity;
-        }
-
-        private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
-        {
-            if (!string.IsNullOrEmpty(routeModel.CohortReference))
-            {
-                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
-            }
-
-            return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
-        }
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
@@ -294,31 +256,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
 
-                var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+                var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown);
 
-                var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
-
-                var viewModel = new EmployerSelectCourseViewModel
+                if (viewModel == null)
                 {
-                    ReservationId = routeModel.Id.Value,
-                    Courses = courseViewModels,
-                    BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
-                    CohortReference = cachedReservation.CohortRef,
-                    ApprenticeTrainingKnown = postViewModel.ApprenticeTrainingKnown
-                };
+                    return View("Index");
+                }
 
                 return View("SelectCourse",viewModel);
             }
-
-
 
             if (postViewModel.ApprenticeTrainingKnown == false)
             {
                 return RedirectToRoute(RouteNames.EmployerCourseGuidance, routeModel);
             }
-
 
             try
             {
@@ -389,6 +341,58 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
 
             return View("CourseGuidance", model);
+        }
+
+        private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
+            ReservationsRouteModel routeModel,
+            bool? apprenticeTrainingKnownOrFromReview)
+        {
+            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
+            if (cachedReservation == null)
+            {
+                return null;
+            }
+
+            var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+
+            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
+
+            var viewModel = new EmployerSelectCourseViewModel
+            {
+                ReservationId = routeModel.Id.Value,
+                Courses = courseViewModels,
+                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
+                CohortReference = cachedReservation.CohortRef,
+                ApprenticeTrainingKnown = apprenticeTrainingKnownOrFromReview
+            };
+
+            return viewModel;
+        }
+
+        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef, bool employerHasSingleLegalEntity = false)
+        {
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
+            {
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
+            }
+
+            if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
+                return RouteNames.EmployerReview;
+            
+            if (employerHasSingleLegalEntity)
+                return RouteNames.EmployerStart;
+
+            return RouteNames.EmployerSelectLegalEntity;
+        }
+
+        private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
+        {
+            if (!string.IsNullOrEmpty(routeModel.CohortReference))
+            {
+                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
+            }
+
+            return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
         }
     }
 }
