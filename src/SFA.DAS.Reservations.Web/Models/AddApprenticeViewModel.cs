@@ -5,7 +5,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public abstract class AddApprenticeViewModel
     {
-        public AddApprenticeViewModel(string apprenticeUrl)
+        protected AddApprenticeViewModel(string apprenticeUrl)
         {
             ApprenticeUrl = apprenticeUrl;
         }

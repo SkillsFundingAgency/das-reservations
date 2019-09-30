@@ -76,7 +76,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("AuthType", authType),
                     new KeyValuePair<string, string>("ReservationsApi:url", "https://local.test.com"),
                     new KeyValuePair<string, string>("ReservationsWeb:DashboardUrl", $"https://{TestDataValues.DashboardUrl}"),
-                    new KeyValuePair<string, string>("ReservationsWeb:EmployerDashboardUrl", $"https://{TestDataValues.EmployerDashboardUrl}")
+                    new KeyValuePair<string, string>("ReservationsWeb:EmployerDashboardUrl", $"https://{TestDataValues.EmployerDashboardUrl}"),
+                    new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}")
                 }
             };
 
@@ -110,6 +111,18 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 {
                     ControllerContext = GetControllerContext<EmployerReservationsController>()
                 });
+            serviceCollection.AddTransient(sp => 
+                new ManageReservationsController(
+                    sp.GetService<IMediator>(),
+                    sp.GetService<IEncodingService>(),
+                    sp.GetService<IExternalUrlHelper>(),
+                    sp.GetService<IOptions<ReservationsWebConfiguration>>(),
+                    sp.GetService<ILogger<ManageReservationsController>>()
+                    )
+                {
+                    ControllerContext = GetControllerContext<ManageReservationsController>()
+                });
+            
         }
 
         private static ControllerContext GetControllerContext<T>() where T : ControllerBase

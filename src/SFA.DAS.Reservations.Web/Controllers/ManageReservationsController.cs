@@ -14,6 +14,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -80,14 +81,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
                         EncodingType.PublicAccountLegalEntityId);
 
-                    var apprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(
+                    var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
+                        ? _urlHelper.GenerateAddApprenticeUrl(
                         reservation.Id, 
                         accountLegalEntityPublicHashedId, 
                         reservation.Course.Id,
                         routeModel.UkPrn,
                         reservation.StartDate,
                         routeModel.CohortReference,
-                        routeModel.EmployerAccountId);
+                        routeModel.EmployerAccountId) 
+                        : string.Empty;
 
                     var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
 
