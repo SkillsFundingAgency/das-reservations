@@ -218,44 +218,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test, MoqAutoData]
-        public async Task WhenNoneOfTheRadioOptionsAreSelected_ThenModelIsInvalid(
-            ReservationsRouteModel routeModel,
-            PostSelectCourseViewModel postSelectCourseViewModel)
-        {
-            //Arrange
-            var expectedViewName = "SelectCourse";
-            postSelectCourseViewModel.ApprenticeTrainingKnown = null;
-            List<ValidationResult> validationResults = new List<ValidationResult>();
-            var context = new ValidationContext(postSelectCourseViewModel, null, null);
-
-
-            //Act 
-            Validator.TryValidateObject(postSelectCourseViewModel, context, validationResults, true);
-
-            //Assert
-            Assert.True(validationResults.Count > 0);
-        }
-
-        [Test, MoqAutoData]
-        public async Task WhenARadioOptionIsSelected_ThenModelIsValid(
-            ReservationsRouteModel routeModel,
-            PostSelectCourseViewModel postSelectCourseViewModel,
-            bool choice)
-        {
-            //Arrange
-            postSelectCourseViewModel.ApprenticeTrainingKnown = choice;
-            List<ValidationResult> validationResults = new List<ValidationResult>();
-            var context = new ValidationContext(postSelectCourseViewModel, null, null);
-
-
-            //Act 
-            Validator.TryValidateObject(postSelectCourseViewModel, context, validationResults, true);
-
-            //Assert
-            Assert.True(validationResults.Count == 0);
-        }
-
-        [Test, MoqAutoData]
         public async Task WhenApprenticeshipTrainingNotKnown_ThenRedirectsToGuidancePage(
             ReservationsRouteModel routeModel,
             EmployerReservationsController controller,
@@ -271,6 +233,29 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             Assert.NotNull(result);
             Assert.AreEqual(expectedRouteName, result.RouteName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task WhenApprenticeshipTrainingIsNull_ThenRedirectsToSelectCourse(
+            ReservationsRouteModel routeModel, 
+            PostSelectCourseViewModel postSelectCourseViewModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            //Arrange
+            postSelectCourseViewModel.ApprenticeTrainingKnown = null;
+            var expectedViewName = "SelectCourse";
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+
+            //Act
+            var result = await _controller.PostSelectCourse(routeModel, postSelectCourseViewModel) as ViewResult;
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.AreEqual(expectedViewName, result.ViewName);
+
+
         }
     }
 }
