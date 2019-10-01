@@ -13,7 +13,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             Guid id, 
             long legalEntityAccountId,
             string accountLegalEntityName,
-            string courseId = null) 
+            string courseId,
+            Guid? userId) 
         {
             BaseUrl = baseUrl;
             AccountId = accountId;
@@ -23,6 +24,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             AccountLegalEntityName = accountLegalEntityName;
             StartDate = startDate.ToString("yyyy-MMM-dd");
             CourseId = courseId;
+            UserId = userId;
         }
 
         public ReservationApiRequest(string baseUrl, Guid id)
@@ -67,6 +69,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
         public bool IsLevyAccount { get; }
+        public Guid? UserId { get; }
     }
 
 }
