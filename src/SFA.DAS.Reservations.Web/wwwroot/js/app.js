@@ -25,7 +25,23 @@ if (selectEl) {
                 this.selectElement.selectedIndex = 0;
             }
         }
+      
     });
+    forms.on('submit',
+        function(e) {
+
+            $('.autocomplete__input').each(function() {
+                var that = $(this);
+                    if (that.val().length === 0) {
+                        var fieldId = that.attr('id'),
+                            selectField = $('#' + fieldId + '-select');
+                        selectField[0].selectedIndex = 0;
+                    }
+            });
+
+        });
+
+
 }
 
 forms.attr('novalidate', 'novalidate');

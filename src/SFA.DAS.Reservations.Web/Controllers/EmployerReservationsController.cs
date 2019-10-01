@@ -295,23 +295,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
 
-                var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+                var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown, true);
 
-                if (getCoursesResponse?.Courses == null)
-                {
-                    return RedirectToRoute(RouteNames.Error500);
-                }
-
-                var courseViewModels = getCoursesResponse.Courses.Select(c => new CourseViewModel(c));
-
-                var viewModel = new EmployerSelectCourseViewModel
-                {
-                    ReservationId = routeModel.Id.Value,
-                    Courses = courseViewModels,
-                    BackLink = GenerateBackLink(routeModel, routeModel.CohortReference),
-                    CohortReference = routeModel.CohortReference,
-                    ApprenticeTrainingKnown = postViewModel.ApprenticeTrainingKnown
-                };
 
                 return View("SelectCourse", viewModel);
             }
@@ -345,7 +330,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
             ReservationsRouteModel routeModel,
-            bool? apprenticeTrainingKnownOrFromReview)
+            bool? apprenticeTrainingKnownOrFromReview,
+            bool failedValidation = false)
         {
             var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
             if (cachedReservation == null)
@@ -355,7 +341,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
 
-            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, cachedReservation.CourseId));
+            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, failedValidation? null : cachedReservation.CourseId));
 
             var viewModel = new EmployerSelectCourseViewModel
             {
@@ -363,7 +349,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Courses = courseViewModels,
                 BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
                 CohortReference = cachedReservation.CohortRef,
-                ApprenticeTrainingKnown = apprenticeTrainingKnownOrFromReview
+                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview
             };
 
             return viewModel;

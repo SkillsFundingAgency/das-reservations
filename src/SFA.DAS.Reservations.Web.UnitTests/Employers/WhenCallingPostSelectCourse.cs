@@ -148,13 +148,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             )
         {
             //Arrange
-            routeModel.CohortReference = "ABC123";
+            _cachedReservationResult.CohortRef = "ABC123";
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
-            postSelectCourseViewModel.SelectedCourseId = _course.Id;
+            postSelectCourseViewModel.SelectedCourseId = string.Empty;
             postSelectCourseViewModel.ApprenticeTrainingKnown = true;
             _externalUrlHelper
-                .Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId,routeModel.CohortReference))
+                .Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, _cachedReservationResult.CohortRef))
                 .Returns(cohortUrl);
 
             //Act
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var viewModel = result?.Model as EmployerSelectCourseViewModel;
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(cohortUrl, viewModel.BackLink);
-            Assert.AreEqual(routeModel.CohortReference, viewModel.CohortReference);
+            Assert.AreEqual(_cachedReservationResult.CohortRef, viewModel.CohortReference);
         }
 
         [Test, MoqAutoData]
@@ -175,6 +175,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
+            _cachedReservationResult.CohortRef = "";
             routeModel.CohortReference = "";
             routeModel.FromReview = true;
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
@@ -201,6 +202,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
+            _cachedReservationResult.CohortRef = "";
+            _cachedReservationResult.EmployerHasSingleLegalEntity = false;
             routeModel.CohortReference = "";
             routeModel.FromReview = false;
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))

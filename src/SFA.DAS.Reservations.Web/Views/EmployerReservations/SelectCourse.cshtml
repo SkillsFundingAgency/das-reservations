@@ -21,25 +21,31 @@ else
         <div class="govuk-grid-column-two-thirds">
 
             <partial name="_pageErrorsOverview" />
-
-            <h1 class="govuk-heading-xl">Do you know which apprenticeship training your apprentice will take?</h1>
-
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
-                <input asp-for="CohortReference" type="hidden"/>
+                <input asp-for="CohortReference" type="hidden" />
+
+                
+
+
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
-                    
-                    @if (ViewData.ModelState.ContainsKey(nameof(Model.ApprenticeTrainingKnown)) && ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.Any())
-                    {
-                    <span id="Course" class="govuk-error-message">
-                        @ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.First().ErrorMessage
-                    </span>
-                    }
-
                     <fieldset class="govuk-fieldset">
+                        <legend>
+                            <h1 class="govuk-heading-xl">Do you know which apprenticeship training your apprentice will take?</h1>
+                        </legend>
+                        
+
+                        @if (ViewData.ModelState.ContainsKey(nameof(Model.ApprenticeTrainingKnown)) && ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.Any())
+                        {
+                            <span class="govuk-error-message">
+                                @ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.First().ErrorMessage
+                            </span>
+                        }
+
+
                         <div class="govuk-radios govuk-radios--conditional" data-module="radios">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="ApprenticeTrainingKnown" name="ApprenticeTrainingKnown" type="radio" value="true" @(Model.ApprenticeTrainingKnown.HasValue ? "checked='checked'" :"") data-aria-controls="course-search-radio">
+                                <input class="govuk-radios__input" id="ApprenticeTrainingKnown" name="ApprenticeTrainingKnown" type="radio" value="true" @(Model.ApprenticeTrainingKnown.HasValue ? "checked='checked'" : "") data-aria-controls="course-search-radio">
                                 <label class="govuk-label govuk-radios__label" for="ApprenticeTrainingKnown">
                                     Yes
                                 </label>
@@ -59,7 +65,7 @@ else
                         </div>
                     </fieldset>
                 </div>
-                
+
                 <details class="govuk-details" data-module="govuk-details">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
