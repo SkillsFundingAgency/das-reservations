@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
@@ -93,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new ReservationViewModel(reservation, url, null);
 
-            viewModel.CanBeDeleted.Should().Be(true);
+            viewModel.CanProviderDeleteReservation.Should().Be(true);
         }
 
         [Test, AutoData]
@@ -105,7 +106,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
-            viewModel.CanBeDeleted.Should().Be(true);
+            viewModel.CanProviderDeleteReservation.Should().Be(true);
         }
 
         [Test, AutoData]
@@ -116,7 +117,60 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
-            viewModel.CanBeDeleted.Should().Be(false);
+            viewModel.CanProviderDeleteReservation.Should().Be(false);
+        }
+
+        [Test, AutoData]
+        public void Then_If_There_Is_A_Ukprn_And_It_Is_Pending_The_Reservation_Can_Be_Deleted(
+            Reservation reservation,
+            string url,
+            uint? loggedInProviderId)
+        {
+            reservation.Status = ReservationStatus.Pending;
+            reservation.IsExpired = false;
+
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
+
+            Assert.AreEqual(RouteNames.ProviderDelete,viewModel.DeleteRouteName);
+        }
+
+        [Test, AutoData]
+        public void Then_If_It_Is_Pending_The_Reservation_Can_Be_Deleted(
+            Reservation reservation,
+            string url)
+        {
+            reservation.Status = ReservationStatus.Pending;
+            reservation.IsExpired = false;
+
+            var viewModel = new ReservationViewModel(reservation, url, null);
+
+            Assert.AreEqual(RouteNames.EmployerDelete, viewModel.DeleteRouteName);
+        }
+
+
+        [Test, AutoData]
+        public void Then_If_It_Is_Confirmed_The_Reservation_Can_Not_Be_Deleted(
+            Reservation reservation,
+            string url)
+        {
+            reservation.Status = ReservationStatus.Confirmed;
+            reservation.IsExpired = false;
+
+            var viewModel = new ReservationViewModel(reservation, url, null);
+
+            Assert.AreEqual(string.Empty, viewModel.DeleteRouteName);
+        }
+
+        [Test, AutoData]
+        public void Then_If_It_Is_Expired_The_Reservation_Can_Not_Be_Deleted(
+            Reservation reservation,
+            string url)
+        {
+            reservation.IsExpired = true;
+
+            var viewModel = new ReservationViewModel(reservation, url, null);
+
+            Assert.AreEqual(string.Empty, viewModel.DeleteRouteName);
         }
     }
 }

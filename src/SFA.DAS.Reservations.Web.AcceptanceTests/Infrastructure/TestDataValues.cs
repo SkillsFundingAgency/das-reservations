@@ -5,5 +5,6 @@
         public static string DashboardUrl = "providerdashboard.local.test.com";
         public static string EmployerDashboardUrl = "employerdashboard.local.test.com";
         public static string EmployerAccountId = "ABC123";
+        public static string EmployerApprenticeUrl = "employerapprentice.local.test.com";
     }
 }

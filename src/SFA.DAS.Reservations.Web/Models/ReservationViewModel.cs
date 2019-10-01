@@ -1,6 +1,7 @@
 ﻿using System;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -19,7 +20,10 @@ namespace SFA.DAS.Reservations.Web.Models
             IsExpired = reservation.IsExpired;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
             LegalEntityName = reservation.AccountLegalEntityName;
-            CanBeDeleted = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
+            CanProviderDeleteReservation = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
+            DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
+                ? (loggedInProviderId == null ? RouteNames.EmployerDelete : RouteNames.ProviderDelete)
+                : string.Empty;
         }
 
         public Guid Id { get; }
@@ -28,6 +32,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string LegalEntityName { get; }
         public string CourseName { get; }
         public TrainingDateModel TrainingDate { get; }
-        public bool CanBeDeleted { get; }
+        public bool CanProviderDeleteReservation { get; }
+        public string DeleteRouteName { get; }
     }
 }
