@@ -277,7 +277,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 await _mediator.Send(new CacheReservationCourseCommand
                 {
                     Id = routeModel.Id.Value,
-                    CourseId = postViewModel.SelectedCourseId
+                    SelectedCourseId = postViewModel.SelectedCourseId
 
                 });
 

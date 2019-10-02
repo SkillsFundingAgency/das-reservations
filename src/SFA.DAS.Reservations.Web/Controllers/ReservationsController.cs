@@ -90,8 +90,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             TrainingDateModel trainingDateModel = null;
-            Course course = null;
-
+            
             try
             {
                 if (!string.IsNullOrWhiteSpace(formModel.StartDate))
@@ -111,18 +110,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                        
                     return View("ApprenticeshipTraining", model);
                 }
-
-                if (!string.IsNullOrEmpty(formModel.SelectedCourseId))
-                {
-                    var getCoursesResult = await _mediator.Send(new GetCoursesQuery());
-
-                    var selectedCourse =
-                        getCoursesResult.Courses.SingleOrDefault(c => c.Id.Equals(formModel.SelectedCourseId));
-
-                    course = selectedCourse ?? throw new ArgumentException("Selected course does not exist", nameof(formModel.SelectedCourseId));
-                    //todo: should be a validation exception, also this throw is not unit tested
-                }
-
+                
                 var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
                 if(isProvider)
@@ -130,7 +118,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 	                var courseCommand = new CacheReservationCourseCommand
 	                {
 	                    Id = cachedReservation.Id,
-	                    CourseId = course?.Id,
+	                    SelectedCourseId = formModel.SelectedCourseId,
 	                    UkPrn = routeModel.UkPrn
 	                };
 

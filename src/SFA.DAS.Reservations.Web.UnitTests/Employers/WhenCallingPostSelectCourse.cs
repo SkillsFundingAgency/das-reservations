@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             _mediator.Verify(mediator => 
                 mediator.Send(It.Is<CacheReservationCourseCommand>(command => 
-                    command.CourseId.Equals(_course.Id)), It.IsAny<CancellationToken>()));
+                    command.SelectedCourseId.Equals(_course.Id)), It.IsAny<CancellationToken>()));
         }
 
         [Test, MoqAutoData] 

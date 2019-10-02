@@ -7,6 +7,7 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         [Required(ErrorMessage = "You must select a start date")]
         public string StartDate { get; set; }
+        [Required(ErrorMessage = "Select which apprenticeship training your apprentice will take")]
         public string SelectedCourseId { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string CohortRef { get; set; }

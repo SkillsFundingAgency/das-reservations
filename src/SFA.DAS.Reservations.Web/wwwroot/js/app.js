@@ -1,6 +1,6 @@
 ﻿var forms = $('.validate-auto-complete');
 var radioInputs = forms.find('.govuk-radios__input');
-var idSelectField = 'course-search';
+var idSelectField = 'SelectedCourseId';
 
 var selectEl = document.querySelector('#' + idSelectField);
 if (selectEl) {

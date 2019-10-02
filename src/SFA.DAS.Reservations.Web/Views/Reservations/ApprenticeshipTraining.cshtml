@@ -6,14 +6,17 @@
 
     var firstStartDate = Model.PossibleStartDates.FirstOrDefault()?.Id;
 
-    var customErrorKeys = new Dictionary<string, string> { { "StartDate", $"StartDate-{firstStartDate}" } };
+    var customErrorKeys = new Dictionary<string, string>
+    {
+        { "StartDate", $"StartDate-{firstStartDate}" }
+    };
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
 
     var courseInvalid = !ViewData.ModelState.IsValid &&
-                        ViewData.ModelState.ContainsKey("CourseId") &&
-                        ViewData.ModelState["CourseId"].Errors != null &&
-                        ViewData.ModelState["CourseId"].Errors.Any();
+                        ViewData.ModelState.ContainsKey("SelectedCourseId") &&
+                        ViewData.ModelState["SelectedCourseId"].Errors != null &&
+                        ViewData.ModelState["SelectedCourseId"].Errors.Any();
 
     var startDateInvalid = !ViewData.ModelState.IsValid
                            && ViewData.ModelState.ContainsKey("StartDate") &&
@@ -70,13 +73,6 @@
                 {
                     <div class="govuk-form-group @(courseInvalid ? "govuk-form-group--error" : "")">
                         <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take?</h2>
-
-                        @if (courseInvalid)
-                        {
-                            <span id="Course" class="govuk-error-message">
-                                Select a course from the list.
-                            </span>
-                        }
 
                         <label class="govuk-label" for="course-search">
                             Search for a course
