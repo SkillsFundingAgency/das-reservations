@@ -83,6 +83,10 @@
                         </span>
                     </div>
                 }
+                else
+                {
+                    <input asp-for="CourseId" name="SelectedCourseId" type="hidden"/>
+                }
                 <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset">
                         @if (Model.IsProvider)
