@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -20,12 +18,11 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     [Binding]
     public class ManageReservationSteps :StepsBase
     {
-        private readonly List<GetReservationResponse> _reservationList;
         private ManageViewModel _actualModel;
 
         public ManageReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
-            _reservationList = new List<GetReservationResponse>();
+           
         }
 
         [Given(@"I have (.*) (.*) reservation")]
@@ -44,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 expiryDate = DateTime.UtcNow.AddMonths(-1);
             }
 
-            _reservationList.Add(
+            TestData.Reservations.Add(
                 new GetReservationResponse
                 {
                     Id = Guid.NewGuid(),
@@ -66,8 +63,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var controller = Services.GetService<ManageReservationsController>();
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
-            mock.Setup(x => x.GetAll<GetReservationResponse>(
-                It.IsAny<ReservationApiRequest>())).ReturnsAsync(_reservationList);
 
             var actual = controller.Manage(TestData.ReservationRouteModel).Result as ViewResult;
             Assert.IsNotNull(actual);
@@ -77,6 +72,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"(.*) reservations are displayed")]
         public void ThenReservationsAreDisplayed(int numberOfReservations)
         {
+            Assert.IsNotNull(_actualModel, "View model has not been set");
+            Assert.IsNotNull(_actualModel.Reservations, "Reservations have not been set");
             Assert.AreEqual(numberOfReservations, _actualModel.Reservations.Count);
         }
 

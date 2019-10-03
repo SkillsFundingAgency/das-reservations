@@ -43,8 +43,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         public void GivenIHaveChosenACourse()
         {
             var controller = Services.GetService<EmployerReservationsController>();
+            var postSelectCourseViewModel = new PostSelectCourseViewModel
+            {
+                SelectedCourseId = TestData.Course.Id,
+                ApprenticeTrainingKnown = true
+            };
 
-            var result = controller.PostSelectCourse(TestData.ReservationRouteModel, TestData.Course.Id)
+            var result = controller.PostSelectCourse(TestData.ReservationRouteModel, postSelectCourseViewModel)
                     .Result as RedirectToRouteResult;
 
             Assert.IsNotNull(result);

@@ -23,8 +23,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
 
         public async Task<IEnumerable<Reservation>> GetReservations(long accountId)
         {
-            var apiReservations =
-                await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, accountId));
+            var apiReservations = await _apiClient.GetAll<GetReservationResponse>(new ReservationApiRequest(_config.Url, accountId));
 
             var result = apiReservations.Select(apiReservation => new Reservation
             {

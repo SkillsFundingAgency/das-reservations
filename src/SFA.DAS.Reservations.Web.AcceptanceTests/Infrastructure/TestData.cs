@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -14,9 +16,12 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         public TrainingDateModel TrainingDate { get; set; }
         public Guid UserId { get; set; }
 
+        public List<GetReservationResponse> Reservations { get; set; }
+
         public void BuildTrainingDateModel(string startMonth)
         {
             var startDate = DateTime.Parse($"{DateTime.UtcNow.Year} {startMonth} 01");
+            
             TrainingDate = new TrainingDateModel
             {
                 StartDate = startDate,
