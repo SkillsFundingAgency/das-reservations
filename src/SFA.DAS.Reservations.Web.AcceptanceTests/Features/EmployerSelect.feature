@@ -1,7 +1,7 @@
 ﻿Feature: EmployerSelect
-	In order to select reservations
+	In order to add an apprentice to an existing cohort
 	As an employer
-	I want to be able to view or create the reservations when needed
+	I want to be able to select existing or create reservations to assign to an apprentice
 
 Scenario: Reservations available to select
 	Given I am a non levy employer
@@ -14,7 +14,7 @@ Scenario: Reservations not available to select
 	When I view the select reservation screen
 	Then I am redirected to the create reservation page
 
-Scenario: Employer comes through via transfer journey an ignores selection
+Scenario: Employer comes through via transfer journey and ignores selection
 	Given I am a non levy employer
 	And I have a transfer receiver	
 	When I view the select reservation screen
