@@ -2,6 +2,11 @@
 {
     public static class TestDataValues
     {
+        public const long NonLevyAccountId = 1;
+        public const string NonLevyHashedAccountId = "ABC123";
+        public const long LevyAccountId = 2;
+        public const string LevyHashedAccountId = "DEF456";
+
         public static string DashboardUrl = "providerdashboard.local.test.com";
         public static string EmployerDashboardUrl = "employerdashboard.local.test.com";
         public static string EmployerAccountId = "ABC123";

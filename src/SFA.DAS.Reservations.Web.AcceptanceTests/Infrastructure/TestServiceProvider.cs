@@ -14,10 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Services;
 
@@ -37,15 +39,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var startup = new Startup(configuration, hosting);
 
             var encodingService = new Mock<IEncodingService>();
-            encodingService.Setup(x => x.Decode(It.IsAny<string>(),It.IsAny<EncodingType>())).Returns(1);
-            encodingService.Setup(x => x.Encode(It.IsAny<long>(),It.IsAny<EncodingType>())).Returns("ABC123");
+            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.NonLevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
+            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.NonLevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
+            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.LevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
+            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.LevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
 
             var apiClient = new Mock<IApiClient>();
+            var accountApiClient = new Mock<IAccountApiClient>();
 
             startup.ConfigureServices(serviceCollection);
             serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
             serviceCollection.AddSingleton(encodingService.Object);
             serviceCollection.AddSingleton(apiClient.Object);
+            serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
+            serviceCollection.AddSingleton(accountApiClient.Object);
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
@@ -121,6 +128,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     )
                 {
                     ControllerContext = GetControllerContext<ManageReservationsController>()
+                });
+
+            serviceCollection.AddTransient(sp => 
+                new SelectReservationsController(
+                    sp.GetService<IMediator>(),
+                    sp.GetService<ILogger<ReservationsController>>(),
+                    sp.GetService<IEncodingService>(),
+                    sp.GetService<IExternalUrlHelper>()
+                )
+                {
+                    ControllerContext = GetControllerContext<SelectReservationsController>()
                 });
             
         }
