@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -67,6 +68,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var controller = Services.GetService<SelectReservationsController>();
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
+            mock.Setup(x => x.GetAll<GetReservationResponse>(
+                It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
             _actionResult = controller.SelectReservation(TestData.ReservationRouteModel, _viewModel).Result;
 

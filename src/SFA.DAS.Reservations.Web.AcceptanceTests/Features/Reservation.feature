@@ -6,6 +6,7 @@
 
 Scenario: Create non levy reservation as employer
 	Given I am a non levy employer
+	And I have chosen a legal entity
 	And I have chosen a course
 	And I have a reservation start date of September
 	When I review my reservation and confirm
@@ -13,6 +14,7 @@ Scenario: Create non levy reservation as employer
 
 Scenario: Create non levy reservation as employer but do not confirm
 	Given I am a non levy employer
+	And I have chosen a legal entity
 	And I have chosen a course
 	And I have a reservation start date of September
 	When I review my reservation and I do not confirm

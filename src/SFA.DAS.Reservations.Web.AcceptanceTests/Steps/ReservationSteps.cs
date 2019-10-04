@@ -25,6 +25,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Given(@"I am a non levy employer")]
         public void GivenIAmANonLevyEmployer()
         {
+            SelectedAccountId = TestDataValues.NonLevyAccountId;
+            SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
+
+            SetTestData();
+        }
+
+        [Given(@"I have chosen a legal entity")]
+        public void GivenIHaveChosenALegalEntity()
+        {
             var controller = Services.GetService<EmployerReservationsController>();
             var confirmLegalEntityViewModel = new ConfirmLegalEntityViewModel
             {
@@ -32,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             };
 
             var result = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
-                        .Result as RedirectToRouteResult;
+                .Result as RedirectToRouteResult;
 
             Assert.IsNotNull(result);
             Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
