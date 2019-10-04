@@ -144,7 +144,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                     It.Is<CacheReservationCourseCommand>( c => 
-                        c.CourseId.Equals(_course.Id) &&
+                        c.SelectedCourseId.Equals(_course.Id) &&
                         c.UkPrn.Equals(routeModel.UkPrn)),
                     It.IsAny<CancellationToken>()));
 
@@ -169,7 +169,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationCourseCommand>( c => 
-                    c.CourseId.Equals(_course.Id)),
+                    c.SelectedCourseId.Equals(_course.Id)),
                 It.IsAny<CancellationToken>()), Times.Never);
 
             _mediator.Verify(mediator => mediator.Send(
@@ -191,7 +191,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             _mediator.Verify(mediator => mediator.Send(
                 It.Is<CacheReservationCourseCommand>( c => 
-                    c.CourseId == null),
+                    c.SelectedCourseId == null),
                 It.IsAny<CancellationToken>()));
 
             _mediator.Verify(mediator => mediator.Send(

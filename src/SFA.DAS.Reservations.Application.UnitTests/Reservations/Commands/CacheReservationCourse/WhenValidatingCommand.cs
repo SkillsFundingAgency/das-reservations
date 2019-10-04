@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new  CacheReservationCourseCommand
             {
                 Id = Guid.Empty,
-                CourseId = "1"
+                SelectedCourseId = "1"
             };
 
             var result = await _validator.ValidateAsync(command);
@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new  CacheReservationCourseCommand
             {
                 Id = Guid.NewGuid(),
-                CourseId = ""
+                SelectedCourseId = ""
             };
 
             var result = await _validator.ValidateAsync(command);
@@ -57,8 +57,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.CourseId))
-                .WhichValue.Should().Be("Select a course");
+                .Should().ContainKey(nameof(CacheReservationCourseCommand.SelectedCourseId))
+                .WhichValue.Should().Be("Select which apprenticeship training your apprentice will take");
         }
 
         
@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new  CacheReservationCourseCommand
             {
                 Id = Guid.NewGuid(),
-                CourseId = "123"
+                SelectedCourseId = "123"
             };
 
             var result = await _validator.ValidateAsync(command);
@@ -78,8 +78,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.CourseId))
-                .WhichValue.Should().Be("Course is invalid");
+                .Should().ContainKey(nameof( CacheReservationCourseCommand.SelectedCourseId))
+                .WhichValue.Should().Be("Selected course does not exist");
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         {
             _courseService.Setup(s => s.CourseExists(It.IsAny<string>())).ReturnsAsync(false);
 
-            var command = new  CacheReservationCourseCommand{ CourseId = "INVALID" };
+            var command = new  CacheReservationCourseCommand{ SelectedCourseId = "INVALID" };
 
             var result = await _validator.ValidateAsync(command);
 
@@ -95,7 +95,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(2);
             result.ValidationDictionary
                 .Should().ContainKey(nameof( CacheReservationCourseCommand.Id))
-                .And.ContainKey(nameof( CacheReservationCourseCommand.CourseId));
+                .And.ContainKey(nameof( CacheReservationCourseCommand.SelectedCourseId));
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var command = new  CacheReservationCourseCommand
             {
                 Id = Guid.NewGuid(),
-                CourseId = "1"
+                SelectedCourseId = "1"
             };
 
             var result = await _validator.ValidateAsync(command);

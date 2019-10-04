@@ -1,5 +1,6 @@
 ﻿@using System.Text
 @using Microsoft.AspNetCore.Mvc.ModelBinding
+@using Microsoft.AspNetCore.Mvc.ModelBinding.Validation
 @using SFA.DAS.Reservations.Web.Infrastructure
 @model EmployerSelectCourseViewModel
 @{
@@ -20,35 +21,67 @@ else
         <div class="govuk-grid-column-two-thirds">
 
             <partial name="_pageErrorsOverview" />
-
-            <h1 class="govuk-heading-xl">Which apprenticeship training will the apprentice take?</h1>
-
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
-                <input asp-for="CohortReference" type="hidden"/>
+                <input asp-for="CohortReference" type="hidden" />
+
+                
+
+
+
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset">
+                        <legend>
+                            <h1 class="govuk-heading-xl">Do you know which apprenticeship training your apprentice will take?</h1>
+                        </legend>
+                        
+
+                        @if (ViewData.ModelState.ContainsKey(nameof(Model.ApprenticeTrainingKnown)) && ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.Any())
+                        {
+                            <span class="govuk-error-message">
+                                @ViewData.ModelState[nameof(Model.ApprenticeTrainingKnown)].Errors.First().ErrorMessage
+                            </span>
+                        }
 
 
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <span id="Course" class="govuk-error-message">
-                            Select a course from the list
-                        </span>
-                    }
-
-                    <label class="govuk-label" for="course-search">
-                        Search for a course
-                    </label>
-                    <span id="choose-apprenticeship-hint" class="govuk-hint">
-                        This information can be changed later. If you want to find the correct training,
-                        you can check <a class="govuk-link" target="_blank" href="https://findapprenticeshiptraining.apprenticeships.education.gov.uk/">Find apprenticeship training</a> or ask your training provider.
-                    </span>
-                    <partial name="_CourseSearch"/>
+                        <div class="govuk-radios govuk-radios--conditional" data-module="radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="ApprenticeTrainingKnown" name="ApprenticeTrainingKnown" type="radio" value="true" @(Model.ApprenticeTrainingKnown.HasValue ? "checked='checked'" : "") data-aria-controls="course-search-radio">
+                                <label class="govuk-label govuk-radios__label" for="ApprenticeTrainingKnown">
+                                    Yes
+                                </label>
+                            </div>
+                            <div class="govuk-radios__conditional @(!Model.ApprenticeTrainingKnown.HasValue ? "govuk-radios__conditional--hidden" : "") " id="course-search-radio">
+                                <label class="govuk-label" for="course-search">
+                                    Search for a course
+                                </label>
+                                <partial name="_CourseSearch"/>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="AprenticeTrainingKnown-False" name="ApprenticeTrainingKnown" type="radio" value="false">
+                                <label class="govuk-label govuk-radios__label" for="AprenticeTrainingKnown-False">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
+
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">
+                            Can I change the course?
+                        </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        You can change the apprenticeship training course when you add an apprentice's details.
+                    </div>
+                </details>
 
                 <button type="submit" class="govuk-button">
                     Save and continue
                 </button>
             </form>
+
         </div>
     </div>
 </main>

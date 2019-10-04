@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string RouteName { get; set; }
         public string BackLink { get; set; }
         public string CohortReference { get; set; }
+        public bool? ApprenticeTrainingKnown { get; set; }
     }
 }
