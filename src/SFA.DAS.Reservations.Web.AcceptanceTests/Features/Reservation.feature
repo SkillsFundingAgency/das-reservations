@@ -20,3 +20,16 @@ Scenario: Create non levy reservation as employer but do not confirm
 	When I review my reservation and I do not confirm
 	Then The reservation is not created
 	And redirected to employer dashboard
+
+Scenario: Reservation limit reached for non levy employer
+	Given I am a non levy employer
+	And I have reached my reservation limit
+	When I start the reservation journey
+	Then I am shown a message saying I have reached my reservation limit
+
+Scenario: Reservation limit reached for non levy employer when starting reservation
+	Given I am a non levy employer
+	And I have reached my reservation limit
+	And I have chosen a legal entity
+	Then The reservation is not created
+	Then I am shown a message saying I have reached my reservation limit

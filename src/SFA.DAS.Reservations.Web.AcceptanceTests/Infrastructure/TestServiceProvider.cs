@@ -47,12 +47,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var apiClient = new Mock<IApiClient>();
             var accountApiClient = new Mock<IAccountApiClient>();
 
+            var urlHelper = new Mock<IUrlHelper>();
+
             startup.ConfigureServices(serviceCollection);
             serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
             serviceCollection.AddSingleton(encodingService.Object);
             serviceCollection.AddSingleton(apiClient.Object);
             serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
             serviceCollection.AddSingleton(accountApiClient.Object);
+            serviceCollection.AddSingleton(urlHelper.Object);
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
@@ -84,7 +87,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("ReservationsApi:url", "https://local.test.com"),
                     new KeyValuePair<string, string>("ReservationsWeb:DashboardUrl", $"https://{TestDataValues.DashboardUrl}"),
                     new KeyValuePair<string, string>("ReservationsWeb:EmployerDashboardUrl", $"https://{TestDataValues.EmployerDashboardUrl}"),
-                    new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}")
+                    new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}"),
+                    new KeyValuePair<string, string>("ReservationsWeb:FindApprenticeshipTrainingUrl", $"https://test"),
+                    new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test")
                 }
             };
 
