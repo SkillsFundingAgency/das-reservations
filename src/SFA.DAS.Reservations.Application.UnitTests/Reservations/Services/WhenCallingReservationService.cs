@@ -60,6 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             long accountLegalEntityId,
             string accountLegalEntityName,
             long? transferSenderAccountId,
+            Guid? userId,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
@@ -67,7 +68,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             mockApiClient.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(new CreateReservationResponse() { Id = id });
             //Act
-            await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, transferSenderAccountId);
+            await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, transferSenderAccountId, userId);
 
             //Assert
             mockApiClient.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
@@ -75,6 +76,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                            request.AccountId == accountId &&
                            request.AccountLegalEntityId == accountLegalEntityId && 
                            request.TransferSenderAccountId == transferSenderAccountId && 
+                           request.UserId == userId && 
                            request.IsLevyAccount)));
         }
 
@@ -84,6 +86,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             Guid id,
             long accountId,
             long accountLegalEntityId,
+            Guid? userId,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
@@ -91,7 +94,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             mockApiClient.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync(new CreateReservationResponse() { Id = id });
             //Act
-            var result = await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, null);
+            var result = await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, null, userId);
 
             //Assert
             Assert.AreEqual(id, result.Id);

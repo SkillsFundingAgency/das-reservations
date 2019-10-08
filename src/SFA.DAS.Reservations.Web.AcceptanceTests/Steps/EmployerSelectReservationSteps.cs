@@ -101,13 +101,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"I am redirected to the add apprentice page")]
         public void ThenIAmRedirectedToTheAddApprenticePage()
         {
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
+
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
             Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}"));
             Assert.IsTrue(redirectResult.Url.Contains("reservationId="));
             Assert.IsTrue(redirectResult.Url.Contains("accountLegalEntityHashedId="));
-            
+            mock.Verify(x=>x.Create<CreateReservationResponse>(
+                It.Is<ReservationApiRequest>(c=>c.UserId.Equals(TestData.UserId) && c.AccountId.Equals(TestData.AccountLegalEntity.AccountId))));
         }
     }
 }

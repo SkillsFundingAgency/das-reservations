@@ -39,7 +39,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             AccountId = accountId;
         }
 
-        public ReservationApiRequest(string baseUrl, Guid id, long accountId, long accountLegalEntityId, bool isLevyAccount, long? transferSenderAccountId)
+        public ReservationApiRequest(string baseUrl, Guid id, long accountId, long accountLegalEntityId,
+            bool isLevyAccount, long? transferSenderAccountId, Guid? userId)
         {
             BaseUrl = baseUrl;
             Id = id;
@@ -47,6 +48,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             AccountLegalEntityId = accountLegalEntityId;
             IsLevyAccount = isLevyAccount;
             TransferSenderAccountId = transferSenderAccountId;
+            UserId = userId;
         }
 
         public long? TransferSenderAccountId { get; set; }
