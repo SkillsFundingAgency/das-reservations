@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -65,9 +68,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         public void WhenIViewTheSelectReservationScreen()
         {
             var controller = Services.GetService<SelectReservationsController>();
-            var apiClient = Services.GetService<IApiClient>();
-            var mock = Mock.Get(apiClient);
-
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            
             _actionResult = controller.SelectReservation(TestData.ReservationRouteModel, _viewModel).Result;
 
             var actual = _actionResult as ViewResult;
@@ -104,6 +107,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}"));
             Assert.IsTrue(redirectResult.Url.Contains("reservationId="));
             Assert.IsTrue(redirectResult.Url.Contains("accountLegalEntityHashedId="));
+            
         }
     }
 }
