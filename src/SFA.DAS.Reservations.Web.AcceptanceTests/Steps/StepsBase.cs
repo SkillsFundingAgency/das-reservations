@@ -103,6 +103,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
         protected void SetTestData()
         {
+            TestData.UserId = Guid.NewGuid();
+
             TestData.ReservationRouteModel = new ReservationsRouteModel
             {
                 EmployerAccountId = SelectedHashedAccountId,

@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 throw new CachedReservationNotFoundException(command.Id);
             }
 
-            if (string.IsNullOrEmpty(command.CourseId))
+            if (string.IsNullOrEmpty(command.SelectedCourseId))
             {
                 var course = new Course(null,null,0);
                 cachedReservation.CourseId = course.Id;
@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             }
             else
             {
-                var course = await _courseService.GetCourse(command.CourseId);
+                var course = await _courseService.GetCourse(command.SelectedCourseId);
 
                 cachedReservation.CourseId = course.Id;
                 cachedReservation.CourseDescription = course.CourseDescription;

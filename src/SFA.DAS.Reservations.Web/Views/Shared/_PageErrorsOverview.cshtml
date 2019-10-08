@@ -12,12 +12,10 @@
              <ul class="govuk-list govuk-error-summary__list">
                  @{
                      var errorStringBuilder = new StringBuilder();
-                     var errorCount = ViewData.ModelState.ErrorCount;
-                     var loopCount = 1;
-
+                     
                      var customErrorKeys = ViewData["CustomErrorKeys"] as Dictionary<string, string>;
 
-                     foreach (var error in ViewData.ModelState)
+                     foreach (var error in ViewData.ModelState.OrderBy(c=>c.Key))
                      {
                          if (error.Value.ValidationState == ModelValidationState.Invalid)
                          {
@@ -31,16 +29,7 @@
                              var errorMessage = error.Value.Errors.FirstOrDefault()?.ErrorMessage;
 
                              errorStringBuilder.Append($"<li><a href=\"#{errorKey}\">{errorMessage}</a></li>");
-                             if (loopCount == errorCount - 1)
-                             {
-                                 errorStringBuilder.Append(" and ");
-                             }
-                             else if (loopCount != errorCount)
-                             {
-                                 errorStringBuilder.Append(", ");
-                             }
-
-                             loopCount++;
+                             
                          }
                      }
                  }

@@ -168,14 +168,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             await _commandHandler.Handle(command, CancellationToken.None);
 
             //Assert
-            _mockCourseService.Verify(cs => cs.GetCourse(command.CourseId), Times.Once);
+            _mockCourseService.Verify(cs => cs.GetCourse(command.SelectedCourseId), Times.Once);
         }
 
         [Test, AutoData]
         public async Task Then_Calls_Cache_Service_To_Save_Reservation(CacheReservationCourseCommand command)
         {
             //Assign
-            command.CourseId = _expectedCourse.Id;
+            command.SelectedCourseId = _expectedCourse.Id;
 
             //Act
             await _commandHandler.Handle(command, CancellationToken.None);
@@ -192,7 +192,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         public async Task Then_Caches_Course_Choice_If_Not_Selected(CacheReservationCourseCommand command)
         {
             //Assign
-            command.CourseId = null;
+            command.SelectedCourseId = null;
 
             //Act
             await _commandHandler.Handle(command, CancellationToken.None);

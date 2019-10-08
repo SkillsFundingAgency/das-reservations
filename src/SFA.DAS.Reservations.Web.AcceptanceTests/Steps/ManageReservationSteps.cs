@@ -63,6 +63,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var controller = Services.GetService<ManageReservationsController>();
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
+            mock.Setup(x => x.GetAll<GetReservationResponse>(
+                It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
             var actual = controller.Manage(TestData.ReservationRouteModel).Result as ViewResult;
             Assert.IsNotNull(actual);

@@ -70,14 +70,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                     {ValidationDictionary = new Dictionary<string, string>(),
                         FailedAutoReservationCheck = true});
             service.Setup(x =>
-                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId))
+                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
                 .ReturnsAsync(new CreateReservationResponse { Id = id });
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
 
             //Assert
-            service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>()), Times.Never);
+            service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<Guid?>()), Times.Never);
             Assert.IsNull(result);
         }
 
@@ -100,14 +100,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                 });
 
             service.Setup(x =>
-                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId))
+                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
                 .ReturnsAsync(new CreateReservationResponse {Id = id});
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
             
             //Assert
-            service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId));
+            service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId));
             Assert.AreEqual(id, result.ReservationId);
         }
 
