@@ -70,6 +70,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var controller = Services.GetService<SelectReservationsController>();
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            mock.Setup(x => x.GetAll<GetReservationResponse>(
+                It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
             
             _actionResult = controller.SelectReservation(TestData.ReservationRouteModel, _viewModel).Result;
 
