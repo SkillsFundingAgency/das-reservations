@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourse;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
-
+                Guid? userId = null;
                 if (routeModel.UkPrn.HasValue)
                 {
                     var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
@@ -75,6 +75,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
                 else
                 {
+                    var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+                    userId = Guid.Parse(userAccountIdClaim.Value);
+
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
                         viewModel.CohortReference);
@@ -82,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                     viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn, viewModel.CohortReference, routeModel.EmployerAccountId);
+                    routeModel.UkPrn, viewModel.CohortReference, routeModel.EmployerAccountId, userId);
                 if (!string.IsNullOrEmpty(redirectResult))
                 {
                     if (redirectResult == RouteNames.Error500)
@@ -263,13 +266,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId)
+        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId)
         {  
             var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
             {
                 AccountId = accountId,
                 TransferSenderId = string.IsNullOrEmpty(transferSenderId) ? (long?)null : _encodingService.Decode(transferSenderId, EncodingType.PublicAccountId),
                 TransferSenderEmployerAccountId = transferSenderId,
+                UserId = userId,
                 AccountLegalEntityId = _encodingService.Decode(
                     accountLegalEntityPublicHashedId,
                     EncodingType.PublicAccountLegalEntityId)
