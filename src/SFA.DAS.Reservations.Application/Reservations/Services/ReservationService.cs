@@ -42,7 +42,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             return result;
         }
 
-        public async Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId, long accountId, long accountLegalEntityId, long? transferSenderAccountId)
+        public async Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId, long accountId,
+            long accountLegalEntityId, long? transferSenderAccountId, Guid? userId)
         {
             return await _apiClient.Create<CreateReservationResponse>(new ReservationApiRequest(
                 _config.Url,
@@ -50,7 +51,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
                 accountId,
                 accountLegalEntityId,
                 true,
-                transferSenderAccountId
+                transferSenderAccountId,
+                userId
                 ));
         }
     }

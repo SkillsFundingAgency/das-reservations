@@ -37,11 +37,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         private CachedReservation _cachedReservation;
         private long _expectedAccountId = 12;
         private string _expectedLegalEntityName = "Test Entity";
+        private Guid _expectedUserId;
         private IOptions<ReservationsApiConfiguration> _options;
 
         [SetUp]
         public void Arrange()
         {
+            _expectedUserId = Guid.NewGuid();
+
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization{ConfigureMembers = true});
 
@@ -160,26 +163,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             _mockCachedReservationValidator.Verify(validator => validator.ValidateAsync(_cachedReservation), Times.Once);
         }
-
+        
         [Test, AutoData]
-        public async Task Then_Calls_Reservation_Api_To_Create_Reservation_Without_Course(
-            CreateReservationCommand command)
-        {
-            _cachedReservation.CourseId = null;
-
-            await _commandHandler.Handle(command, CancellationToken.None);
-
-            _mockApiClient.Verify(client => client.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest => 
-                apiRequest.AccountId == _expectedAccountId &&
-                apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
-                apiRequest.CourseId == null)), Times.Once);
-        }
-
-        [Test, AutoData]
-        public async Task Then_Calls_Reservation_Api_To_Create_Reservation_With_Course(
+        public async Task Then_Calls_Reservation_Api_To_Create_Reservation_With_Course_And_UserId(
             CreateReservationCommand command)
         {
             _cachedReservation.CourseId = "123-1";
+            command.UserId = _expectedUserId;
 
             await _commandHandler.Handle(command, CancellationToken.None);
 
@@ -187,6 +177,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                     apiRequest.AccountId == _expectedAccountId &&
                     apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
                     apiRequest.AccountLegalEntityName == _expectedLegalEntityName &&
+                    apiRequest.UserId == _expectedUserId &&
                     apiRequest.CourseId.Equals("123-1"))), Times.Once);
         }
 

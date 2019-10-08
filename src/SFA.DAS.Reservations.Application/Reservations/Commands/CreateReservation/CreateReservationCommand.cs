@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         public Guid Id { get; set; }
         public uint? UkPrn { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

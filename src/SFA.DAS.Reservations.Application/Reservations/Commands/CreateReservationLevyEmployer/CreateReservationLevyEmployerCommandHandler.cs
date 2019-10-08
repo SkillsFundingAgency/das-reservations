@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             }
 
             var result = await _reservationService.CreateReservationLevyEmployer(Guid.NewGuid(), request.AccountId,
-                request.AccountLegalEntityId, request.TransferSenderId);
+                request.AccountLegalEntityId, request.TransferSenderId, request.UserId);
 
             return new CreateReservationLevyEmployerResult
             {

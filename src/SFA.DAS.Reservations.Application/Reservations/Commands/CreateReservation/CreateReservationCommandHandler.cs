@@ -80,7 +80,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                 cachedReservation.Id,
                 cachedReservation.AccountLegalEntityId,
                 cachedReservation.AccountLegalEntityName,
-                cachedReservation.CourseId);
+                cachedReservation.CourseId,
+                command.UserId);
 
             var response = await _apiClient.Create<CreateReservationResponse>(apiRequest);
 

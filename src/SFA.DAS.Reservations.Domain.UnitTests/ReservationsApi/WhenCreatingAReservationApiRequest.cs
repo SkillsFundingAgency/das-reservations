@@ -18,12 +18,16 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         }
 
         [Test]
-        public void Then_It_Sets_StartDate()
+        public void Then_It_Sets_Values()
         {
             var startDate = DateTime.Now.AddDays(-10);
-            var request = new ReservationApiRequest("test", 1, 2, startDate, Guid.NewGuid(),1, "Test Name");
+            var courseId = "1-2-3";
+            var userId = Guid.NewGuid();
+            var request = new ReservationApiRequest("test", 1, 2, startDate, Guid.NewGuid(),1, "Test Name",courseId, userId);
 
             request.StartDate.Should().Be(startDate.ToString("yyyy-MMM-dd"));
+            request.CourseId.Should().Be(courseId);
+            request.UserId.Should().Be(userId);
         }
 
         [Test, AutoData]
