@@ -58,7 +58,7 @@ else
                             }
                         </th>
                         <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
-                        <td class="govuk-table__cell" data-label="Start date">
+                        <td class="govuk-table__cell no-wrap" data-label="Start date">
                             @reservation.TrainingDate.GetGDSDateString()<br />
                             @if (reservation.IsExpired)
                             {
@@ -67,7 +67,7 @@ else
                         </td>
                         @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
                         {
-                            <td class="govuk-table__cell">
+                            <td class="govuk-table__cell no-wrap">
                                 <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
                             </td>
                             <td class="govuk-table__cell">
@@ -76,6 +76,10 @@ else
                                     <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                 }
                             </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" />
                         }
                     </tr>
                     }
