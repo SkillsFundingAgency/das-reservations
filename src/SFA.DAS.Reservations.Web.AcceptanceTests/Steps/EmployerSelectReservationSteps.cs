@@ -7,7 +7,6 @@ using NUnit.Framework;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
-using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
@@ -23,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     {
         private SelectReservationViewModel _actualModel;
         private IActionResult _actionResult;
-        private SelectReservationViewModel _viewModel;
+        private readonly SelectReservationViewModel _viewModel;
 
         public EmployerSelectReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
@@ -69,6 +68,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             var controller = Services.GetService<SelectReservationsController>();
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             mock.Setup(x => x.GetAll<GetReservationResponse>(
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
