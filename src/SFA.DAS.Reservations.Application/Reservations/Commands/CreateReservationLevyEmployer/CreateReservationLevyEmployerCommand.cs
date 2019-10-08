@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer
 {
@@ -8,5 +9,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
         public long AccountLegalEntityId { get; set; }
         public long? TransferSenderId { get; set; }
         public string TransferSenderEmployerAccountId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -158,6 +159,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             mock.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
                 c => c.Id.Equals(TestData.ReservationRouteModel.Id) &&
                      c.CourseId.Equals(TestData.Course.Id) &&
+                     c.UserId.Equals(TestData.UserId) &&
                      c.StartDate.Equals(new DateTime(TestData.TrainingDate.StartDate.Year,TestData.TrainingDate.StartDate.Month,1).ToString("yyyy-MMM-dd"))
             )), Times.Once);
         }
@@ -187,7 +189,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
         private IActionResult PostReviewStep(bool reserve)
         {
+
             var controller = Services.GetService<ReservationsController>();
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
 
             var viewModel = new PostReviewViewModel
             {

@@ -236,10 +236,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     }
                 }
 
+                Guid? userId = null;
+                if (!isProvider)
+                {
+                    var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+
+                    userId = Guid.Parse(userAccountIdClaim.Value);
+                }
+
                 var command = new CreateReservationCommand
                 {
                     Id = routeModel.Id.GetValueOrDefault(),
-                    UkPrn = routeModel.UkPrn
+                    UkPrn = routeModel.UkPrn,
+                    UserId = userId
                 };
 
                 var result = await _mediator.Send(command);

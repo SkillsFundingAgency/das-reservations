@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -137,6 +138,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationsController controller)
         {
             routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetLegalEntitiesQuery>(),
@@ -251,52 +254,55 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task AndHasLevyPayingEmployer_ThenCreatesReservationInTheBackground(
             ReservationsRouteModel routeModel,
             Employer employer,
+            GetLegalEntitiesResponse employersResponse,
+            long expectedAccountId,
+            Guid? expectedUserId,
+            string addAprrenticeUrl,
             SelectReservationViewModel viewModel,
             GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
+            [Frozen]Mock<IEncodingService> encodingService,
             [Frozen]Mock<IMediator> mediator,
+            [Frozen]Mock<IExternalUrlHelper> urlHelper,
             SelectReservationsController controller
         )
         {
             //Arrange
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
-
-           
-            var accountStatusResponse = new GetAccountReservationStatusResponse
-            {
-                CanAutoCreateReservations = true
-            };
-
+            routeModel.UkPrn = null;
+            employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
+            employer.AccountId = expectedAccountId;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mediator
+                .Setup(m => m.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
+                routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), null, It.IsAny<DateTime?>(),
+                viewModel.CohortReference, routeModel.EmployerAccountId)).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
-            
-            mediator.Setup(m =>
-                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
-                {
-                    Command = new CacheReservationEmployerCommand
-                    {
-                        Id = Guid.NewGuid(),
-                        AccountId = employer.AccountId,
-                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
-                        AccountLegalEntityId = employer.AccountLegalEntityId,
-                        AccountLegalEntityName = employer.AccountLegalEntityName,
-                        AccountName = employer.AccountName,
-                        CohortRef = routeModel.CohortReference,
-                        UkPrn = routeModel.UkPrn.Value
-                    }
-                });
-
-
-            mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
+            mediator.Setup(
+                    x => x.Send(
+                        It.Is<CreateReservationLevyEmployerCommand>(query => query.AccountId == employer.AccountId 
+                                                                    && query.UserId.Value == expectedUserId.Value), CancellationToken.None))
                 .ReturnsAsync(createReservationLevyResult);
             
             //Act   
-            await controller.SelectReservation(routeModel, viewModel);
+            var actual = await controller.SelectReservation(routeModel, viewModel);
 
 
             //Assert
-            mediator.Verify(x =>
-                x.Send(It.Is<CreateReservationLevyEmployerCommand>(query => query.AccountId == employer.AccountId), CancellationToken.None), Times.Once());
+            Assert.IsNotNull(actual);
+            var actualResult = actual as RedirectResult;
+            Assert.IsNotNull(actualResult);
+            Assert.AreEqual(addAprrenticeUrl, actualResult.Url);
+
 
         }
 
@@ -653,6 +659,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -759,6 +767,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -917,6 +927,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
