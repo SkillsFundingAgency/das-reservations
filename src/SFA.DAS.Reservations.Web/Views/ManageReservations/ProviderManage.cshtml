@@ -59,7 +59,10 @@ else
                         </th>
                         <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
                         <td class="govuk-table__cell no-wrap" data-label="Start date">
-                            @reservation.TrainingDate.GetGDSDateString()<br />
+                            <span class="das-no-wrap">
+                                @reservation.TrainingDate.GetGDSDateString()
+                            </span><br />
+                            
                             @if (reservation.IsExpired)
                             {
                                 <strong class="govuk-tag govuk-tag--inactive">expired</strong>
@@ -67,8 +70,10 @@ else
                         </td>
                         @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
                         {
-                            <td class="govuk-table__cell no-wrap">
-                                <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                            <td class="govuk-table__cell">
+                                <span class="das-no-wrap">
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                </span>
                             </td>
                             <td class="govuk-table__cell">
                                 @if (reservation.CanProviderDeleteReservation)
