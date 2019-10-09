@@ -110,8 +110,8 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             var urlParameters = new UrlParameters
             {
                 Id = ukprn.HasValue ? ukprn.Value.ToString() : accountId,
-                Controller = $"apprentices/{cohortRef}",
-                Action = "details",
+                Controller = string.IsNullOrEmpty(cohortRef) ? "unapproved/add" : $"apprentices/{cohortRef}",
+                Action = string.IsNullOrEmpty(cohortRef) ? "assign" : "details",
                 Folder = ukprn.HasValue ? "" : "commitments/accounts"
             };
 

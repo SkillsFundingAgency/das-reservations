@@ -29,6 +29,23 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
+        public void Then_Takes_You_Unapproved_Add_Assign_When_There_Is_No_CohortRef(
+            string accountId,
+            [Frozen] ReservationsWebConfiguration options,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+
+            var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, "");
+
+            Assert.AreEqual(
+                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add/assign",
+                actualUrl);
+        }
+
+        [Test, MoqAutoData]
         public void Then_Uses_Folder_When_There_Is_No_Ukprn(
             string accountId,
             string cohortRef,
