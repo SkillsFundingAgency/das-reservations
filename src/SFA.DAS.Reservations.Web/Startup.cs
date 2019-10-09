@@ -210,7 +210,10 @@ namespace SFA.DAS.Reservations.Web
             });
             app.UseAuthentication();
 
-            app.UseHealthChecks();
+            if (!_configuration.UseStub())
+            {
+                app.UseHealthChecks();
+            }
 
             app.UseMvc(routes =>
             {
