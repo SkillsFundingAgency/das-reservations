@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -37,6 +39,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             const string transferSenderPublicHashedAccountId = "BBB222";
 
             _viewModel.TransferSenderId = transferSenderPublicHashedAccountId;
+            _viewModel.CohortReference = TestDataValues.CohortReference;
 
             var accountApiClient = Services.GetService<IAccountApiClient>();
             var mock = Mock.Get(accountApiClient);
@@ -66,6 +69,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [When(@"I view the select reservation screen")]
         public void WhenIViewTheSelectReservationScreen()
         {
+            _viewModel.CohortReference = TestDataValues.CohortReference;
             var controller = Services.GetService<SelectReservationsController>();
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
             var apiClient = Services.GetService<IApiClient>();
@@ -104,8 +108,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"I am redirected to the add apprentice page")]
         public void ThenIAmRedirectedToTheAddApprenticePage()
         {
-            var apiClient = Services.GetService<IApiClient>();
-            var mock = Mock.Get(apiClient);
+            var redirectResult = _actionResult as RedirectResult;
+
+            Assert.IsNotNull(redirectResult);
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+
+            VerifyAddApprenticeQueryParams(redirectResult);
+
+            VerifyLevyReservationCreated();
+        }
 
             var redirectResult = _actionResult as RedirectResult;
 
@@ -115,6 +126,25 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.IsTrue(redirectResult.Url.Contains("accountLegalEntityHashedId="));
             mock.Verify(x=>x.Create<CreateReservationResponse>(
                 It.Is<ReservationApiRequest>(c=>c.UserId.Equals(TestData.UserId) && c.AccountId.Equals(TestData.AccountLegalEntity.AccountId))));
+        private void VerifyAddApprenticeQueryParams(RedirectResult redirectResult)
+        {
+            var uri = new Uri(redirectResult.Url);
+            var queryParams = uri.ParseQueryString();
+            Assert.AreEqual("true", queryParams["autocreated"]);
+            Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, queryParams["accountLegalEntityHashedId"]);
+            Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
+        }
+
+
+        private void VerifyLevyReservationCreated()
+        {
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
+            mock.Verify(x => x.Create<CreateReservationResponse>(
+                It.Is<ReservationApiRequest>(c => c.UserId.Equals(TestData.UserId)
+                                                  && c.AccountLegalEntityId.Equals(TestData.AccountLegalEntity
+                                                      .AccountLegalEntityId)
+                                                  && c.AccountId.Equals(TestData.AccountLegalEntity.AccountId))));
         }
     }
 }
