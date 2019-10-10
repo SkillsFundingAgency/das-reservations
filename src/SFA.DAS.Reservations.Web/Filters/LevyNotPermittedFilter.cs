@@ -39,13 +39,18 @@ namespace SFA.DAS.Reservations.Web.Filters
                     return;
                 }
 
-                var decodedAccountId = _encodingService.Decode(employerAccountId.ToString(), EncodingType.AccountId);
-                
-                var legalEntities = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId});
+                if (!_encodingService.TryDecode(employerAccountId.ToString(), EncodingType.AccountId,
+                    out var decodedAccountId))
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
+                    return;
+                }
+
+                var legalEntities = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = decodedAccountId });
 
                 if (legalEntities.AccountLegalEntities.Any(x => x.IsLevy))
                 {
-                    context.Result = new RedirectToRouteResult(RouteNames.Error403,null);
+                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
                     return;
                 }
             }
