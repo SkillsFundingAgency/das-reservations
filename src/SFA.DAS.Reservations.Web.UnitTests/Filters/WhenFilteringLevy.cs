@@ -33,7 +33,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             //Arrange
             serviceParameters.AuthenticationType = AuthenticationType.Provider;
             
-
             //Act
            await filter.OnActionExecutionAsync(context, nextMethod.Object);
 
@@ -49,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             GetLegalEntitiesResponse legalEntitiesResponse,
             IEnumerable<AccountLegalEntity> legalEntities,
             string employerAccountId,
-            uint decodedId,
+            long decodedId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [ArrangeActionContext] ActionExecutingContext context,
             [Frozen] Mock<ActionExecutionDelegate> nextMethod,
@@ -61,8 +60,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var legalEntity in legalEntitiesResponse.AccountLegalEntities) { legalEntity.IsLevy = false;}
             mockEncodingService
-                .Setup(x => x.Decode(employerAccountId, EncodingType.AccountId))
-                .Returns(decodedId);
+                .Setup(x => x.TryDecode(employerAccountId, EncodingType.AccountId, out decodedId))
+                .Returns(true);
             mockMediator
                 .Setup(x => x.Send(It.Is<GetLegalEntitiesQuery>(y => y.AccountId == decodedId),It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
@@ -82,7 +81,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             GetLegalEntitiesResponse legalEntitiesResponse,
             IEnumerable<AccountLegalEntity> legalEntities,
             string employerAccountId,
-            uint decodedId,
+            long decodedId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [ArrangeActionContext] ActionExecutingContext context,
             [Frozen] Mock<ActionExecutionDelegate> nextMethod,
@@ -94,8 +93,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var legalEntity in legalEntitiesResponse.AccountLegalEntities) { legalEntity.IsLevy = true; }
             mockEncodingService
-                .Setup(x => x.Decode(employerAccountId, EncodingType.AccountId))
-                .Returns(decodedId);
+                .Setup(x => x.TryDecode(employerAccountId, EncodingType.AccountId, out decodedId))
+                .Returns(true);
             mockMediator
                 .Setup(x => x.Send(It.Is<GetLegalEntitiesQuery>(y => y.AccountId == decodedId), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);
