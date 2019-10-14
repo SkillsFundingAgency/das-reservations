@@ -30,6 +30,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
+    [ServiceFilter(typeof(LevyNotPermittedFilter))]
     [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
     public class EmployerReservationsController : Controller
     {
@@ -105,7 +106,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return RedirectToRoute(RouteNames.EmployerStart);
         }
-
 
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
