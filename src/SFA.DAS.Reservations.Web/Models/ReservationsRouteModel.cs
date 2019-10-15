@@ -15,5 +15,8 @@ namespace SFA.DAS.Reservations.Web.Models
         
         [FromQuery]
         public string CohortReference { get; set; }
+
+        [FromQuery]
+        public uint? ProviderId { get; set; }
     }
 }

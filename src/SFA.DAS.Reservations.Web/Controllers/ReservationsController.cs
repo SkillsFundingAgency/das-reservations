@@ -254,6 +254,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
                 routeModel.CohortReference = result.CohortRef;
+                if (result.IsEmptyCohortFromSelect)
+                {
+                    routeModel.ProviderId = result.ProviderId;
+                }
             }
             catch (ValidationException ex)
             {
