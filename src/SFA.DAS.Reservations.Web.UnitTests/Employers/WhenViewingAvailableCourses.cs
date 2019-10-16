@@ -166,6 +166,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(cohortUrl,viewModel.BackLink);
             Assert.AreEqual(cachedReservationResult.CohortRef,viewModel.CohortReference);
+            Assert.AreEqual(cachedReservationResult.IsEmptyCohortFromSelect,viewModel.IsEmptyCohortFromSelect);
         }
 
 

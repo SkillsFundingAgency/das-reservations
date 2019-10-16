@@ -349,7 +349,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Courses = courseViewModels,
                 BackLink = GenerateBackLink(routeModel, cachedReservation),
                 CohortReference = cachedReservation.CohortRef,
-                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview
+                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview,
+                IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect
             };
 
             return viewModel;
