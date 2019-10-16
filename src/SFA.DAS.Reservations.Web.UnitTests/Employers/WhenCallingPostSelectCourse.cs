@@ -149,6 +149,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Arrange
             _cachedReservationResult.CohortRef = "ABC123";
+            _cachedReservationResult.UkPrn = null;
+            _cachedReservationResult.IsEmptyCohortFromSelect = false;
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
             postSelectCourseViewModel.SelectedCourseId = string.Empty;
