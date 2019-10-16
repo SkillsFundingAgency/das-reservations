@@ -62,14 +62,22 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             SelectedAccountId = TestDataValues.LevyAccountId;
             SelectedHashedAccountId = TestDataValues.LevyHashedAccountId;
+            _viewModel.CohortReference = TestDataValues.CohortReference;
 
             SetTestData();
         }
-        
+
+        [Given(@"I have no cohort reference")]
+        public void GivenIHaveNoCohortReference()
+        {
+            _viewModel.CohortReference = string.Empty;
+            _viewModel.ProviderId = TestDataValues.ProviderId;
+        }
+
+
         [When(@"I view the select reservation screen")]
         public void WhenIViewTheSelectReservationScreen()
         {
-            _viewModel.CohortReference = TestDataValues.CohortReference;
             var controller = Services.GetService<SelectReservationsController>();
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
             var apiClient = Services.GetService<IApiClient>();
@@ -118,14 +126,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             VerifyLevyReservationCreated();
         }
 
+        [Then(@"I am redirected to the add apprentice page with no cohort ref")]
+        public void ThenIAmRedirectedToTheAddApprenticePageWithNoCohortRef()
+        {
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}"));
-            Assert.IsTrue(redirectResult.Url.Contains("reservationId="));
-            Assert.IsTrue(redirectResult.Url.Contains("accountLegalEntityHashedId="));
-            mock.Verify(x=>x.Create<CreateReservationResponse>(
-                It.Is<ReservationApiRequest>(c=>c.UserId.Equals(TestData.UserId) && c.AccountId.Equals(TestData.AccountLegalEntity.AccountId))));
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/add/apprentice?"));
+            var queryParams = new Uri(redirectResult.Url).ParseQueryString();
+            Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
+            VerifyAddApprenticeQueryParams(redirectResult);
+
+            VerifyLevyReservationCreated();
+        }
+
         private void VerifyAddApprenticeQueryParams(RedirectResult redirectResult)
         {
             var uri = new Uri(redirectResult.Url);
