@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_No_UkPrn_Then_It_Uses_Employer_View(
+        public async Task And_No_UkPrn_Then_It_Uses_Employer_View_And_Uses_Provider_Id_If_Not_Null(
             ReservationsRouteModel routeModel,
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
@@ -79,6 +79,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsController controller)
         {
             routeModel.UkPrn = null;
+            mediatorResult.UkPrn = null;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
                 .ReturnsAsync(mediatorResult);
@@ -87,6 +88,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var viewResult = result.Should().BeOfType<ViewResult>().Subject;
             viewResult.ViewName.Should().Be(ViewNames.EmployerCompleted);
+            var model = viewResult.Model.Should().BeOfType<CompletedViewModel>().Subject;
+            model.UkPrn.Should().Be(routeModel.ProviderId);
         }
 
         [Test, MoqAutoData]
