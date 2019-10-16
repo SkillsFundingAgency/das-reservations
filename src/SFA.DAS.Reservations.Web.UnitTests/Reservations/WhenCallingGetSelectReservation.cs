@@ -284,7 +284,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(employersResponse);
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
-                routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), null, It.IsAny<DateTime?>(),
+                routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
                 viewModel.CohortReference, routeModel.EmployerAccountId, false)).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
             mediator.Setup(
@@ -492,6 +492,60 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Url.Should().Be(addApprenticeUrl);
         }
 
+        [Test, MoqAutoData]
+        public async Task And_Has_Levy_Paying_Employer_With_No_Transfer_Id_And_No_CohortRef_Then_Redirects_To_Add_An_Apprentice_For_Empty_Cohort_Journey(
+            ReservationsRouteModel routeModel,
+            Employer employer,
+            GetLegalEntitiesResponse employersResponse,
+            long expectedAccountId,
+            Guid? expectedUserId,
+            string addAprrenticeUrl,
+            SelectReservationViewModel viewModel,
+            GetAvailableReservationsResult reservationsResult,
+            CreateReservationLevyEmployerResult createReservationLevyResult,
+            [Frozen]Mock<IEncodingService> encodingService,
+            [Frozen]Mock<IMediator> mediator,
+            [Frozen]Mock<IExternalUrlHelper> urlHelper,
+            SelectReservationsController controller
+        )
+        {
+            //Arrange
+            employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
+            routeModel.UkPrn = null;
+            viewModel.CohortReference = string.Empty;
+            employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
+            employer.AccountId = expectedAccountId;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mediator
+                .Setup(m => m.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
+                routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
+                viewModel.CohortReference, routeModel.EmployerAccountId, true)).Returns(addAprrenticeUrl);
+            createReservationLevyResult.ReservationId = Guid.NewGuid();
+            mediator.Setup(
+                    x => x.Send(
+                        It.Is<CreateReservationLevyEmployerCommand>(query => query.AccountId == employer.AccountId
+                                                                    && query.UserId.Value == expectedUserId.Value), CancellationToken.None))
+                .ReturnsAsync(createReservationLevyResult);
+
+            //Act   
+            var actual = await controller.SelectReservation(routeModel, viewModel);
+
+
+            //Assert
+            Assert.IsNotNull(actual);
+            var actualResult = actual as RedirectResult;
+            Assert.IsNotNull(actualResult);
+            Assert.AreEqual(addAprrenticeUrl, actualResult.Url);
+        }
 
         [Test, MoqAutoData]
         public async Task AndHasLevyPayingEmployerAndReservationCreated_With_No_Transfer_Id_ThenRedirectsToAddAnApprentice(
@@ -706,6 +760,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             long expectedAccountId,
             long expectedAccountLegalEntityId,
+            uint providerId,
             [Frozen] Mock<IEncodingService> encodingService,
             SelectReservationsController controller)
         {
@@ -713,6 +768,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
             viewModel.CohortReference = string.Empty;
+            viewModel.ProviderId = providerId;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
@@ -739,6 +795,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         c =>
                             c.CohortRef.Equals(viewModel.CohortReference) &&
                             c.IsEmptyCohortFromSelect &&
+                            c.UkPrn.Equals(providerId) &&
                             c.AccountId.Equals(expectedAccountId) &&
                             c.AccountLegalEntityName.Equals(matchedEmployer.AccountLegalEntityName) &&
                             c.AccountLegalEntityPublicHashedId.Equals(matchedEmployer.AccountLegalEntityPublicHashedId) &&

@@ -264,9 +264,62 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
-                    reservationResult.StartDate, routeModel.CohortReference, routeModel.EmployerAccountId, false))
+                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, false))
                 .Returns(addApprenticeUrl);
             
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
+
+            result.Url.Should().Be(addApprenticeUrl);
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_ReservationId_And_No_CohortRef_Then_Redirects_To_AddApprentice_With_Reservation_Details(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetReservationResult reservationResult,
+            string addApprenticeUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            SelectReservationsController controller)
+        {
+            routeModel.CohortReference = string.Empty;
+            viewModel.CohortReference = string.Empty;
+            mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
+                    routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
+                    reservationResult.StartDate, string.Empty, routeModel.EmployerAccountId, true))
+                .Returns(addApprenticeUrl);
+
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
+
+            result.Url.Should().Be(addApprenticeUrl);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_ReservationId_And_Not_CohortRef_Then_Redirects_To_AddApprentice_With_Reservation_Details(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetReservationResult reservationResult,
+            string addApprenticeUrl,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            SelectReservationsController controller)
+        {
+            routeModel.CohortReference = string.Empty;
+            viewModel.CohortReference = string.Empty;
+            mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
+                    routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
+                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, true))
+                .Returns(addApprenticeUrl);
+
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
 
             result.Url.Should().Be(addApprenticeUrl);
