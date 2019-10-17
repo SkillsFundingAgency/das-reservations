@@ -154,7 +154,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(cachedReservationResult);
             externalUrlHelper.Setup(x => 
                 x.GenerateCohortDetailsUrl(
-                    null, routeModel.EmployerAccountId, cachedReservationResult.CohortRef
+                    null, routeModel.EmployerAccountId, cachedReservationResult.CohortRef, false
                     ))
                 .Returns(cohortUrl);
 
@@ -195,7 +195,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(cachedReservationResult);
             externalUrlHelper.Setup(x =>
                     x.GenerateCohortDetailsUrl(
-                        cachedReservationResult.UkPrn, routeModel.EmployerAccountId, string.Empty
+                        cachedReservationResult.UkPrn, routeModel.EmployerAccountId, string.Empty, true
                     ))
                 .Returns(cohortUrl);
 

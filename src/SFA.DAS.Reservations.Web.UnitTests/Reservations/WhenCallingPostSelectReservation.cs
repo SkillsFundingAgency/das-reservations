@@ -142,7 +142,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
-                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference))
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference,false))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -237,7 +237,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId,routeModel.UkPrn.Value));
             mockUrlHelper
-                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference))
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,routeModel.CohortReference, false))
                 .Returns(cohortDetailsUrl);
 
             //Act

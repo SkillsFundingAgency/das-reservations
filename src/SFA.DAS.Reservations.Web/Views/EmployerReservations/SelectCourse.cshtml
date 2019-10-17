@@ -7,7 +7,7 @@
     ViewData["Title"] = "Reservations - Select Course";
 }
 
-@if (string.IsNullOrEmpty(Model.CohortReference))
+@if (string.IsNullOrEmpty(Model.CohortReference) && !Model.IsEmptyCohortFromSelect)
 {
     <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
 }

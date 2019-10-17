@@ -211,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _externalUrlHelper.Setup(h => h.GenerateCohortDetailsUrl(
                     null,
                     _routeModel.EmployerAccountId,
-                    _routeModel.CohortReference))
+                    _routeModel.CohortReference, false))
                 .Returns(expectedBackUrl);
 
             //act
