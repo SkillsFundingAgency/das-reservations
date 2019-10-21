@@ -25,6 +25,7 @@ using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Extensions;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -32,6 +33,7 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
+    [ServiceFilter(typeof(LevyNotPermittedFilter))]
     public class ReservationsController : Controller
     {
         private readonly IMediator _mediator;

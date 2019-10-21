@@ -42,38 +42,51 @@ else
                         <th class="govuk-table__header" scope="col">Apprenticeship training</th>
                         <th class="govuk-table__header" scope="col">Apprenticeship start date</th>
                         <th class="govuk-table__header" scope="col"></th>
+                        <th class="govuk-table__header" scope="col"></th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                     @foreach (var reservation in Model.Reservations)
                     {
-                        <tr class="govuk-table__row">
-                            <th class="govuk-table__header" data-label="Employer" scope="row">@reservation.LegalEntityName</th>
-                            <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
-                            <td class="govuk-table__cell" data-label="Start date">@reservation.TrainingDate.GetGDSDateString()</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">
-                                @if (reservation.IsExpired)
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" data-label="Employer" scope="row">
+                            @reservation.LegalEntityName
+                            <br />
+                            @if (!reservation.IsExpired && reservation.Status != ReservationStatusViewModel.Pending)
+                            {
+                                <strong class="govuk-tag govuk-tag--inactive">used</strong>
+                            }
+                        </th>
+                        <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
+                        <td class="govuk-table__cell no-wrap" data-label="Start date">
+                            <span class="das-no-wrap">
+                                @reservation.TrainingDate.GetGDSDateString()
+                            </span><br />
+                            
+                            @if (reservation.IsExpired)
+                            {
+                                <strong class="govuk-tag govuk-tag--inactive">expired</strong>
+                            }
+                        </td>
+                        @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
+                        {
+                            <td class="govuk-table__cell">
+                                <span class="das-no-wrap">
+                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                </span>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (reservation.CanProviderDeleteReservation)
                                 {
-                                    <strong class="govuk-tag govuk-tag--inactive">expired</strong>
+                                    <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                 }
-                                else
-                                {
-                                    @if (reservation.Status == ReservationStatusViewModel.Pending)
-                                    {
-                                        <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
-                                        @if (reservation.CanProviderDeleteReservation)
-                                        {
-                                            <br/>
-                                            <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <strong class="govuk-tag govuk-tag--inactive">used</strong>
-                                    }
-                                }
-                            </td >
-                        </tr>
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" />
+                        }
+                    </tr>
                     }
                 </tbody>
             </table>

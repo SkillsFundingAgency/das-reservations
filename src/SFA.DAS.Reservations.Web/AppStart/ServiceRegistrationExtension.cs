@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             services.AddSingleton(serviceParameters);
             services.AddScoped<NonEoiNotPermittedFilterAttribute>();
+            services.AddScoped<LevyNotPermittedFilter>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
             services.AddSingleton<IApiClient, ApiClient>();
