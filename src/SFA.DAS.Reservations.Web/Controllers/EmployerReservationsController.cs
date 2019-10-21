@@ -160,7 +160,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
-
+                
                 if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
                 {
                     var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
@@ -171,11 +171,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
                 return View("SelectLegalEntity", viewModel);
             }
+            catch (ReservationLimitReachedException)
+            {
+                return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+            }
+            catch (GlobalReservationRuleException)
+            {
+                return View("EmployerFundingPaused");
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
                 return RedirectToRoute(RouteNames.Error500);
             }
+
         }
 
         private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
