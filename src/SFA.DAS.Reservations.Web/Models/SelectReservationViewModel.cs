@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public IEnumerable<AvailableReservationViewModel> AvailableReservations { get; set; }
         public long AccountId { get; set; }
         public string BackLink { get; set; }
+        public uint? ProviderId { get; set; }
     }
 }

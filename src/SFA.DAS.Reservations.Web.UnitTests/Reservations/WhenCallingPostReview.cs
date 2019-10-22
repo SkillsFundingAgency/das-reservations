@@ -130,6 +130,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task Then_Redirects_To_The_Confirmation_Employer_View_With_ProviderId_When_Part_Of_Empty_Cohort(
+            ReservationsRouteModel routeModel,
+            PostReviewViewModel viewModel,
+            CreateReservationResult createReservationResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            createReservationResult.IsEmptyCohortFromSelect = true;
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            viewModel.Reserve = true;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
+                .ReturnsAsync(createReservationResult);
+
+            var result = await controller.PostReview(routeModel, viewModel) as RedirectToRouteResult;
+
+            result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
+            result.RouteName.Should().Be(RouteNames.EmployerCompleted);
+            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
+            result.RouteValues.Should().ContainKey("cohortReference")
+                .WhichValue.Should().Be(createReservationResult.CohortRef);
+            result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId")
+                .WhichValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
+            result.RouteValues.Should().ContainKey("providerId")
+                .WhichValue.Should().Be(createReservationResult.ProviderId);
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Redirects_To_The_Confirmation_Provider_View_When_Has_UkPrn(
             ReservationsRouteModel routeModel, 
             PostReviewViewModel viewModel,

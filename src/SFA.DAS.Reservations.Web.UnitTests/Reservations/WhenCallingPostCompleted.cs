@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, "", routeModel.EmployerAccountId))
+                    model.StartDate, "", routeModel.EmployerAccountId, false))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(null))
@@ -147,7 +147,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, "", routeModel.EmployerAccountId))
+                    model.StartDate, "", routeModel.EmployerAccountId, false))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
@@ -196,13 +196,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId))
+                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, false))
                 .Returns(addApprenticeUrl);
             var controller = _fixture.Create<ReservationsController>();
 
             //Act
             var actual = controller.PostCompleted(routeModel, model);
             
+            //Assert
+            var result = actual as RedirectResult;
+            Assert.IsNotNull(result);
+            Assert.AreEqual(addApprenticeUrl, result.Url);
+        }
+
+
+        [Test]
+        public void Then_When_There_Is_No_Cohort_Ref_But_ProviderId_The_Add_Apprentice_Link_Includes_The_Reference_For_Employer()
+        {
+            //Arrange
+            var model = _fixture.Create<CompletedViewModel>();
+            model.WhatsNext = CompletedReservationWhatsNext.AddAnApprentice;
+            model.CohortRef = string.Empty;
+            var routeModel = _fixture.Create<ReservationsRouteModel>();
+            routeModel.UkPrn = null;
+            var addApprenticeUrl = _fixture.Create<string>();
+            var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
+            mockUrlHelper
+                .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
+                    routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
+                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, true))
+                .Returns(addApprenticeUrl);
+            var controller = _fixture.Create<ReservationsController>();
+
+            //Act
+            var actual = controller.PostCompleted(routeModel, model);
+
             //Assert
             var result = actual as RedirectResult;
             Assert.IsNotNull(result);

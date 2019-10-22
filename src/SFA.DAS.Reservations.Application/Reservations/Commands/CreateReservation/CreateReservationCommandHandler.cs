@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             var apiRequest = new ReservationApiRequest(
                 _apiOptions.Value.Url,
                 cachedReservation.AccountId, 
-                cachedReservation.UkPrn,
+                cachedReservation.IsEmptyCohortFromSelect ? null : cachedReservation.UkPrn,
                 new DateTime(cachedReservation.TrainingDate.StartDate.Year, cachedReservation.TrainingDate.StartDate.Month, 1),
                 cachedReservation.Id,
                 cachedReservation.AccountLegalEntityId,
@@ -91,7 +91,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
             {
                 Id = response.Id,
                 AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId,
-                CohortRef = cachedReservation.CohortRef
+                CohortRef = cachedReservation.CohortRef,
+                IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect,
+                ProviderId = cachedReservation.UkPrn
             };
         }
     }
