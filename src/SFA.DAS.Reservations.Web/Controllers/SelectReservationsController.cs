@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        [DasAuthorize(CommitmentOperation.AccessCohort)]
+        [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> SelectReservation(
@@ -80,12 +80,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
-                        viewModel.CohortReference);
+                        viewModel.CohortReference, viewModel.ProviderId);
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                     viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn, viewModel.CohortReference, routeModel.EmployerAccountId, userId);
+                    routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference, routeModel.EmployerAccountId, userId);
                 if (!string.IsNullOrEmpty(redirectResult))
                 {
                     if (redirectResult == RouteNames.Error500)
@@ -174,7 +174,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [DasAuthorize(CommitmentOperation.AccessCohort)]
+        [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
         public async Task<IActionResult> PostSelectReservation(
@@ -205,8 +205,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var reservation = await _mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
 
                 var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
-                    routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn, reservation.StartDate,
-                    routeModel.CohortReference, routeModel.EmployerAccountId);
+                    routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
+                    viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference));
 
                 var addApprenticeUrl = url;
 
@@ -233,7 +233,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
-                        viewModel.CohortReference);
+                        viewModel.CohortReference, viewModel.ProviderId);
                 }
 
                 await _mediator.Send(cacheReservationEmployerCommand);
@@ -283,13 +283,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                     accountLegalEntityPublicHashedId, "", ukPrn, null,
-                    cohortRef, hashedAccountId);
+                    cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef));
             }
             
             return string.Empty;
         }
 
-        private async Task<CacheReservationEmployerCommand> BuildEmployerReservationCacheCommand(string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef)
+        private async Task<CacheReservationEmployerCommand> BuildEmployerReservationCacheCommand(
+            string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef,
+            uint? providerId)
         {
             var accountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
             var accountLegalEntity = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = accountId });
@@ -307,8 +309,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
                 AccountId = accountId,
                 AccountLegalEntityId = legalEntity.AccountLegalEntityId,
+                UkPrn = providerId,
                 Id = Guid.NewGuid(),
-                CohortRef = cohortRef
+                CohortRef = cohortRef,
+                IsEmptyCohortFromSelect = string.IsNullOrEmpty(cohortRef)
             };
         }
 

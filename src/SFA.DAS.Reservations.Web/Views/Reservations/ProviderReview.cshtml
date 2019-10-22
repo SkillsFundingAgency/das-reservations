@@ -1,4 +1,4 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+@using SFA.DAS.Reservations.Web.Extensions
 @model ReviewViewModel
 @{
     ViewData["Title"] = "Reservations";
@@ -56,7 +56,7 @@
                     <dd class="govuk-summary-list__value">
                         @Model.CourseDescription
                         <br />
-                        <details class="govuk-details">
+                        <details class="govuk-details" data-module="govuk-details">
                             <summary class="govuk-details__summary">
                                 <span class="govuk-details__summary-text">
                                     Can I change the course?

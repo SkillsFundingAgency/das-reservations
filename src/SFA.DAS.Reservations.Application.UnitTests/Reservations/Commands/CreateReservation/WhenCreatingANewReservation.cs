@@ -53,6 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _cachedReservation.TrainingDate = new TrainingDateModel{ StartDate = _expectedStartDate };
             _cachedReservation.AccountId = _expectedAccountId;
             _cachedReservation.AccountLegalEntityName = _expectedLegalEntityName;
+            _cachedReservation.IsEmptyCohortFromSelect = false;
             _apiResponse = fixture.Create<CreateReservationResponse>();
 
             _mockCreateCommandValidator = fixture.Freeze<Mock<IValidator<CreateReservationCommand>>>();
@@ -182,6 +183,33 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         }
 
         [Test, AutoData]
+        public async Task Then_The_Provider_Id_Is_Not_Stored_And_Passed_Back_Through_Command_If_Reservation_Is_Empty_Cohort(CreateReservationCommand command)
+        {
+            //Arrange
+            _cachedReservation.IsEmptyCohortFromSelect = true;
+            _cachedReservation.UkPrn = 12354;
+            command.UserId = _expectedUserId;
+
+            //Act
+            var result = await _commandHandler.Handle(command, CancellationToken.None);
+
+            //Assert
+            _mockApiClient.Verify(client => client.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(apiRequest =>
+                apiRequest.AccountId == _expectedAccountId &&
+                apiRequest.ProviderId == null &&
+                apiRequest.StartDate == $"{_expectedStartDate:yyyy-MMM}-01" &&
+                apiRequest.AccountLegalEntityName == _expectedLegalEntityName &&
+                apiRequest.UserId == _expectedUserId)), Times.Once);
+
+            result.Id.Should().Be(_apiResponse.Id);
+            result.AccountLegalEntityPublicHashedId.Should()
+                .Be(_cachedReservation.AccountLegalEntityPublicHashedId);
+            result.CohortRef.Should().Be(_cachedReservation.CohortRef);
+            result.IsEmptyCohortFromSelect.Should().Be(_cachedReservation.IsEmptyCohortFromSelect);
+            result.ProviderId.Should().Be(_cachedReservation.UkPrn);
+        }
+
+        [Test, AutoData]
         public async Task Then_Cache_Service_Removes_From_Cache(
             CreateReservationCommand command)
         {
@@ -201,5 +229,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                 .Be(_cachedReservation.AccountLegalEntityPublicHashedId);
             result.CohortRef.Should().Be(_cachedReservation.CohortRef);
         }
+
     }
 }

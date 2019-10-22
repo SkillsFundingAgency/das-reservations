@@ -356,25 +356,26 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 ReservationId = routeModel.Id.Value,
                 Courses = courseViewModels,
-                BackLink = GenerateBackLink(routeModel, cachedReservation.CohortRef, cachedReservation.EmployerHasSingleLegalEntity),
+                BackLink = GenerateBackLink(routeModel, cachedReservation),
                 CohortReference = cachedReservation.CohortRef,
-                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview
+                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview,
+                IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect
             };
 
             return viewModel;
         }
 
-        private string GenerateBackLink(ReservationsRouteModel routeModel, string cohortRef, bool employerHasSingleLegalEntity = false)
+        private string GenerateBackLink(ReservationsRouteModel routeModel, GetCachedReservationResult result)
         {
-            if (!string.IsNullOrEmpty(routeModel.CohortReference))
+            if (!string.IsNullOrEmpty(result.CohortRef) || result.IsEmptyCohortFromSelect)
             {
-                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, cohortRef);
+                return _urlHelper.GenerateCohortDetailsUrl(result.UkPrn, routeModel.EmployerAccountId, result.CohortRef, result.IsEmptyCohortFromSelect);
             }
 
             if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
                 return RouteNames.EmployerReview;
             
-            if (employerHasSingleLegalEntity)
+            if (result.EmployerHasSingleLegalEntity)
                 return RouteNames.EmployerStart;
 
             return RouteNames.EmployerSelectLegalEntity;

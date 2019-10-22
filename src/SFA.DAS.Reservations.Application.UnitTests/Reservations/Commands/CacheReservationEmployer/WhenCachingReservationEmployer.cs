@@ -177,6 +177,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     c.AccountName.Equals(command.AccountName) &&
                     c.CohortRef.Equals(command.CohortRef) &&
                     c.UkPrn.Equals(command.UkPrn) &&
+                    c.IsEmptyCohortFromSelect.Equals(command.IsEmptyCohortFromSelect) &&
                     c.EmployerHasSingleLegalEntity.Equals(command.EmployerHasSingleLegalEntity)), 
                 1));
         }

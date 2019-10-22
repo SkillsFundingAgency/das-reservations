@@ -100,6 +100,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             //Assert
             Assert.AreEqual(_cachedReservation.Id, actual.Id);
             Assert.AreEqual(_cachedReservation.TrainingDate, actual.TrainingDate);
+            Assert.AreEqual(_cachedReservation.CohortRef, actual.CohortRef);
+            Assert.AreEqual(_cachedReservation.IsEmptyCohortFromSelect, actual.IsEmptyCohortFromSelect);
+            Assert.AreEqual(_cachedReservation.UkPrn, actual.UkPrn);
 
             _cacheReservationRepository.Verify(r => r.GetEmployerReservation(command.Id), Times.Once);
             _cacheReservationRepository.Verify(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()), Times.Never);
