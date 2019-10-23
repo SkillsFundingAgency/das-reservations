@@ -242,6 +242,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
             }
+            catch (GlobalReservationRuleException)
+            {
+                return View("EmployerFundingPaused");
+            }
         }
 
         [HttpGet]
