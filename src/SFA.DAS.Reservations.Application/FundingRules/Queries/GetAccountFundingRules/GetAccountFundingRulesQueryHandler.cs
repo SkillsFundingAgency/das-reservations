@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Rules;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules
 {
@@ -41,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundin
 
             if (rules?.GlobalRules != null && rules.GlobalRules.Any(x => x != null))
             {
-                result.ActiveRule = rules.GlobalRules.First().RuleType;
+                result.ActiveRule = rules.GlobalRules.First(x=> x != null).RuleType;
             }
 
             return result;
