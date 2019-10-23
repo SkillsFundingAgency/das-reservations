@@ -30,17 +30,21 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId)
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId, bool isEmptyEmployerCohort = false)
         {
             var queryString = $"?reservationId={reservationId}";
 
-            if (ukPrn.HasValue)
+            if (ukPrn.HasValue && !isEmptyEmployerCohort)
             {
                 queryString += $"&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
             }
             else
             {
                 queryString += $"&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}";
+            }
+            if (ukPrn.HasValue && isEmptyEmployerCohort)
+            {
+                queryString += $"&providerId={ukPrn}";
             }
 
             if (startDate.HasValue)
@@ -62,10 +66,15 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
             string controller = "unapproved", action, id;
             
-            if (ukPrn.HasValue)
+            if (ukPrn.HasValue && !isEmptyEmployerCohort)
             {
                 action = "add/apprentice";
                 id = ukPrn.ToString();
+            }
+            else if (ukPrn.HasValue)
+            {
+                action = "add/apprentice";
+                id = accountHashedId;
             }
             else
             {
@@ -105,14 +114,15 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef)
+        public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false)
         {
             var urlParameters = new UrlParameters
             {
-                Id = ukprn.HasValue ? ukprn.Value.ToString() : accountId,
-                Controller = $"apprentices/{cohortRef}",
-                Action = "details",
-                Folder = ukprn.HasValue ? "" : "commitments/accounts"
+                Id = ukprn.HasValue && !isEmptyCohort ? ukprn.Value.ToString() : accountId,
+                Controller = string.IsNullOrEmpty(cohortRef) ? "unapproved/add" : $"apprentices/{cohortRef}",
+                Action = isEmptyCohort ? "" : string.IsNullOrEmpty(cohortRef) ? "assign" : "details",
+                Folder = ukprn.HasValue && !isEmptyCohort ? "" : "commitments/accounts",
+                QueryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : ""
             };
 
             var baseUrl = GetBaseUrl();

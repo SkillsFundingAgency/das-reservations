@@ -212,6 +212,25 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, MoqAutoData]
+        public async Task And_Provider_Is_Supplied_For_Empty_Cohort_Then_It_Is_Not_Validated_For_Account_Legal_Entity(
+            CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mediator,
+            [Frozen]GetTrustedEmployersResponse response,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            SetupAccountLegalEntityAsEoi(mediator);
+            command.IsEmptyCohortFromSelect = true;
+            mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedAuthorisationValidation.Should().BeFalse();
+            mediator.Verify(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_Provider_Is_Not_Trusted_For_Account_Legal_Entity_Then_Mark_As_Not_Authorised(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mediator,
@@ -219,6 +238,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsEoi(mediator);
+            command.IsEmptyCohortFromSelect = false;
             mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
 
@@ -236,6 +256,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsEoi(mediator);
+            command.IsEmptyCohortFromSelect = false;
             response.Employers = new[]
             {
                 new Employer()

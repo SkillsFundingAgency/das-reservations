@@ -21,9 +21,10 @@
             <h1 class="govuk-heading-xl">Choose a Reservation</h1>
             
             <form method="post">
-                <input type="hidden" id="CohortReference" name="CohortReference" value="@Model.CohortReference" />
-                <input type="hidden" id="AccountId" name="AccountId" value="@Model.AccountId" />
-                <input type="hidden" id="TransferSenderId" name="TransferSenderId" value="@Model.TransferSenderId" />
+                <input asp-for="CohortReference" type="hidden" />
+                <input asp-for="AccountId" type="hidden" />
+                <input asp-for="TransferSenderId" type="hidden"/>
+                <input asp-for="ProviderId" type="hidden"/>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">

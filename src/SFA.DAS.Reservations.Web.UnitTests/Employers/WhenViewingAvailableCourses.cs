@@ -141,7 +141,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             )
         {
             //Arrange
-            routeModel.CohortReference = "ABC123";
+            cachedReservationResult.CohortRef = "ABC123";
+            cachedReservationResult.IsEmptyCohortFromSelect = false;
+            cachedReservationResult.UkPrn = null;
             mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
                 {
@@ -152,7 +154,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(cachedReservationResult);
             externalUrlHelper.Setup(x => 
                 x.GenerateCohortDetailsUrl(
-                    null, routeModel.EmployerAccountId, cachedReservationResult.CohortRef
+                    null, routeModel.EmployerAccountId, cachedReservationResult.CohortRef, false
                     ))
                 .Returns(cohortUrl);
 
@@ -164,6 +166,47 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(cohortUrl,viewModel.BackLink);
             Assert.AreEqual(cachedReservationResult.CohortRef,viewModel.CohortReference);
+            Assert.AreEqual(cachedReservationResult.IsEmptyCohortFromSelect,viewModel.IsEmptyCohortFromSelect);
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_Empty_CohortDetails_If_Part_Of_Empty_Cohort_Journey(
+            ICollection<Course> courses,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
+            GetCachedReservationResult cachedReservationResult,
+            string cohortUrl,
+            EmployerReservationsController controller
+        )
+        {
+            //Arrange
+            cachedReservationResult.IsEmptyCohortFromSelect = true;
+            cachedReservationResult.CohortRef = "";
+            routeModel.CohortReference = "";
+            mockMediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult
+                {
+                    Courses = courses
+                });
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            externalUrlHelper.Setup(x =>
+                    x.GenerateCohortDetailsUrl(
+                        cachedReservationResult.UkPrn, routeModel.EmployerAccountId, string.Empty, true
+                    ))
+                .Returns(cohortUrl);
+
+            //Act
+            var result = await controller.SelectCourse(routeModel) as ViewResult;
+
+            //Assert
+            var viewModel = result?.Model as EmployerSelectCourseViewModel;
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(cohortUrl, viewModel.BackLink);
+            Assert.AreEqual(cachedReservationResult.CohortRef, viewModel.CohortReference);
         }
 
         [Test, MoqAutoData]
@@ -200,7 +243,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Arrange
             routeModel.FromReview = false;
-            routeModel.CohortReference = string.Empty;
+            cachedReservationResult.CohortRef = string.Empty;
+            cachedReservationResult.IsEmptyCohortFromSelect = false;
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult { Courses = courses });
@@ -227,7 +271,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Arrange
             routeModel.FromReview = false;
-            routeModel.CohortReference = string.Empty;
+            cachedReservationResult.CohortRef = string.Empty;
+            cachedReservationResult.IsEmptyCohortFromSelect = false;
             cachedReservationResult.EmployerHasSingleLegalEntity = true;
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))

@@ -7,7 +7,7 @@
     ViewData["Title"] = "Select apprenticeship training course";
 }
 
-@if (string.IsNullOrEmpty(Model.CohortReference))
+@if (string.IsNullOrEmpty(Model.CohortReference) && !Model.IsEmptyCohortFromSelect)
 {
     <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
 }
@@ -30,7 +30,7 @@ else
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
-                        <legend>
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
                             <h1 class="govuk-heading-xl">Do you know which apprenticeship training your apprentice will take?</h1>
                         </legend>
                         

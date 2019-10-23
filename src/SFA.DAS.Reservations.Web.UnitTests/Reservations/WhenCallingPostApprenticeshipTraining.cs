@@ -270,7 +270,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ApprenticeshipTrainingFormModel formModel)
         {
             formModel.FromReview = false;
-            _urlHelper.Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,routeModel.EmployerAccountId,formModel.CohortRef))
+            _urlHelper.Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,routeModel.EmployerAccountId,formModel.CohortRef, false))
                 .Returns(cohortDetailsUrl);
             formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
             _controller.ModelState.AddModelError("StartDate", "StartDate");
