@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
                     null);
             }
 
-            var apiRequest = new ReservationApiRequest(_apiOptions.Value.Url, command.ReservationId);
+            var apiRequest = new ReservationApiRequest(_apiOptions.Value.Url, command.ReservationId, command.DeletedByEmployer);
             await _apiClient.Delete(apiRequest);
 
             return Unit.Value;

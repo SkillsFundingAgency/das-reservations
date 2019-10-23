@@ -33,6 +33,16 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
             Id = id;
         }
 
+        public ReservationApiRequest(string baseUrl, Guid id, bool deletedByEmployer)
+        {
+            BaseUrl = baseUrl;
+            Id = id;
+            DeletedByEmployer = deletedByEmployer;
+
+        }
+
+        public bool DeletedByEmployer { get; }
+
         public ReservationApiRequest(string baseUrl, long accountId)
         {
             BaseUrl = baseUrl;
@@ -66,7 +76,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
         public string GetAllUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
 
-        public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}";
+        public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}?{DeletedByEmployer}";
 
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
