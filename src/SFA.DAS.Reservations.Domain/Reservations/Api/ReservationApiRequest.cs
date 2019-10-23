@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
         public string GetAllUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
 
-        public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}?{DeletedByEmployer}";
+        public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}?employerDeleted={DeletedByEmployer}";
 
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
