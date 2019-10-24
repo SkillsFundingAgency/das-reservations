@@ -164,7 +164,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 
             result.RouteName.Should().Be(RouteNames.ProviderDeleteCompleted);
             mockMediator.Verify(mediator => mediator.Send(
-                It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id),
+                It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id && !command.DeletedByEmployer),
                 It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -183,7 +183,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 
             result.RouteName.Should().Be(RouteNames.EmployerDeleteCompleted);
             mockMediator.Verify(mediator => mediator.Send(
-                    It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id),
+                    It.Is<DeleteReservationCommand>(command => command.ReservationId == routeModel.Id && command.DeletedByEmployer),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
