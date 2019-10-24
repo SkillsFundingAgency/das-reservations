@@ -61,12 +61,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         [Test, AutoData]
         public void Then_It_Sets_The_DeleteUrl(
             string url,
-            bool employerDeleted,
             Guid reservationId)
         {
-            var request = new ReservationApiRequest(url, reservationId, employerDeleted);
+            var request = new ReservationApiRequest(url, reservationId);
 
-            request.DeleteUrl.Should().Be($"{url}api/reservations/{reservationId}?employerDeleted={employerDeleted}");
+            request.DeleteUrl.Should().Be($"{url}api/reservations/{reservationId}");
         }
     }
 }

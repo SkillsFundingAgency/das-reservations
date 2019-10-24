@@ -63,6 +63,9 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             using (var client = new HttpClient())//not unit testable using directly
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var jsonRequest = JsonConvert.SerializeObject(request);
+                var stringContent = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
                 
                 var response = await client.DeleteAsync(request.DeleteUrl).ConfigureAwait(false);
 

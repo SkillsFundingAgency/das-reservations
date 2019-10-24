@@ -161,7 +161,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return RedirectToRoute(manageRoute, routeModel);
                 }
                 
-                await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value, DeletedByEmployer = !isProvider});
+                await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value});
 
                 var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
                 return RedirectToRoute(completedRoute, routeModel);

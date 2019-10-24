@@ -6,6 +6,5 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
     public class DeleteReservationCommand : IRequest
     {
         public Guid ReservationId { get; set; }
-        public bool DeletedByEmployer { get; set; }
     }
 }
