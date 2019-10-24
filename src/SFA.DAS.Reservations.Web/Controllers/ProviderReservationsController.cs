@@ -95,7 +95,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
             {
-                return View( "ProviderFundingPaused");
+                var backLink = isFromManage
+                    ? Url.RouteUrl(RouteNames.ProviderManage, new {ukPrn, isFromManage})
+                    : _externalUrlHelper.GenerateDashboardUrl(); 
+                return View( "ProviderFundingPaused", backLink);
             }
 
             var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();

@@ -1,9 +1,10 @@
-﻿
+﻿@model string
+
 @{
     ViewData["Title"] = "ProviderFundingPaused";
 }
 
-    <a asp-external-controller="Account" tabindex="2" class="govuk-back-link">Back</a>
+    <a href="@Model" tabindex="2" class="govuk-back-link">Back</a>
     <main class="govuk-main-wrapper">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
