@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Delet
             [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
             DeleteReservationCommandHandler handler)
         {
-            var expectedApiRequest = new ReservationApiRequest(mockOptions.Object.Value.Url, command.ReservationId);
+            var expectedApiRequest = new ReservationApiRequest(mockOptions.Object.Value.Url, command.ReservationId, command.DeletedByEmployer);
             mockValidator
                 .Setup(validator => validator.ValidateAsync(command))
                 .ReturnsAsync(new ValidationResult());
