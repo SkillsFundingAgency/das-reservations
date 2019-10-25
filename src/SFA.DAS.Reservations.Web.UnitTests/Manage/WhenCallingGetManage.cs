@@ -30,6 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_Gets_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
             ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             GetReservationsResult getReservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
@@ -42,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
 
-            await controller.Manage(routeModel);
+            await controller.Manage(routeModel, filterModel);
 
             mockMediator.Verify(mediator =>
                     mediator.Send(
@@ -63,6 +64,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_Returns_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
             [Frozen] ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             [ReservationsFromThisProvider] GetReservationsResult getReservationsResult1,
             [ReservationsFromThisProvider] GetReservationsResult getReservationsResult2,
@@ -98,7 +100,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation =>
                 new ReservationViewModel(reservation, config.ApprenticeUrl, routeModel.UkPrn)));
 
-            var result = await controller.Manage(routeModel) as ViewResult;
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
 
             result.Should().NotBeNull();
             result.ViewName.Should().Be(ViewNames.ProviderManage);
@@ -112,6 +114,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_Reservation_From_Different_Provider_Then_Not_Deletable(
             [Frozen] ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             GetReservationsResult getReservationResultDifferentProvider,
             [ReservationsFromThisProvider] GetReservationsResult getReservationsResult1,
@@ -134,7 +137,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
-            var result = await controller.Manage(routeModel) as ViewResult;
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
 
             var viewModel = result.Model as ManageViewModel;
             var nonDeletableReservationIds = getReservationResultDifferentProvider.Reservations
@@ -153,6 +156,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_Gets_List_Of_Reservations_For_Single_Employer_Account(
             ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetReservationsResult getReservationsResult,
             long decodedAccountId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
@@ -167,7 +171,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(service => service.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(decodedAccountId);
 
-            await controller.Manage(routeModel);
+            await controller.Manage(routeModel, filterModel);
 
             mockMediator.Verify(mediator =>
                     mediator.Send(
@@ -185,6 +189,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_Returns_List_Of_Reservations_For_Single_Employer_Account(
             ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetReservationsResult getReservationsResult,
             string hashedId,
             string expectedUrl,
@@ -224,7 +229,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 getReservationsResult.Reservations.Select(
                     reservation => new ReservationViewModel(reservation, expectedUrl, routeModel.UkPrn)));
 
-            var result = await controller.Manage(routeModel) as ViewResult;
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
 
             result.Should().NotBeNull();
             result.ViewName.Should().Be(ViewNames.EmployerManage);
@@ -237,6 +242,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task Add_Apprentice_Url_UkPrn_Will_Be_Populated_From_RouteModel_Reservation(
             ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             GetTrustedEmployersResponse getTrustedEmployersResponse,
             Reservation reservation,
             string hashedId,
@@ -251,7 +257,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .ReturnsAsync(getTrustedEmployersResponse);
 
             reservation.ProviderId = null;
-            routeModel.UkPrn = 2000032;
 
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -276,7 +281,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Returns(expectedUrl);
                 
             
-            var result = await controller.Manage(routeModel) as ViewResult;
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
             
             var viewModel = result?.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
@@ -287,6 +292,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_The_Provider_Has_No_TrustedEmployers_Then_A_NoPermissions_View_Is_Returned(
             ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
         {
@@ -294,9 +300,37 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new List<Employer>()});
 
-            var result = await controller.Manage(routeModel) as ViewResult;
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
 
             result.ViewName.Should().Be("NoPermissions");
+        }
+
+        // todo: start search tests here
+
+        [Test, MoqAutoData]
+        public async Task Then_Filter_Params_Assigned_To_View_Model(
+            ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
+            GetTrustedEmployersResponse getTrustedEmployersResponse,
+            Reservation reservation,
+            [Frozen] Mock<IMediator> mockMediator,
+            ManageReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getTrustedEmployersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetReservationsResult
+                {
+                    Reservations = new []{ reservation }
+                });
+
+            var result = await controller.Manage(routeModel, filterModel) as ViewResult;
+
+            var viewModel = result?.Model as ManageViewModel;
+
+            viewModel.FilterModel.Should().BeEquivalentTo(filterModel);
         }
     }
 }

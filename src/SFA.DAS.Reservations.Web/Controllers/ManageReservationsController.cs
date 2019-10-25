@@ -7,7 +7,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
@@ -15,7 +14,6 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -29,26 +27,23 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
-        private readonly ReservationsWebConfiguration _configuration;
         private readonly ILogger<ManageReservationsController> _logger;
 
         public ManageReservationsController(
             IMediator mediator, 
             IEncodingService encodingService,
             IExternalUrlHelper urlHelper,
-            IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ManageReservationsController> logger)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
-            _configuration = configuration.Value;
             _logger = logger;
         }
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
-        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
         {
             var employerAccountIds = new List<long>();
             var reservations = new List<ReservationViewModel>();
@@ -102,10 +97,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName, new ManageViewModel
             {
                 Reservations = reservations,
-                BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId)
+                BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+                FilterModel = filterModel
             });
         }
-
         
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]

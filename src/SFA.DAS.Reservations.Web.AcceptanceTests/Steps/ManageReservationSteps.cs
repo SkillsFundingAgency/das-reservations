@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             mock.Setup(x => x.GetAll<GetReservationResponse>(
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
-            var actual = controller.Manage(TestData.ReservationRouteModel).Result as ViewResult;
+            var actual = controller.Manage(TestData.ReservationRouteModel, TestData.FilterModel).Result as ViewResult;
             Assert.IsNotNull(actual);
             _actualModel = actual.Model as ManageViewModel;
         }
