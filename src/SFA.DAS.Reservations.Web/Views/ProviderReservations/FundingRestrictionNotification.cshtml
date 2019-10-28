@@ -1,5 +1,9 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@using SFA.DAS.Reservations.Web.Infrastructure
 @model FundingRestrictionNotificationViewModel
+
+@{
+    ViewData["Title"] = "Upcoming change to government-funded training";
+}
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
 {
@@ -35,11 +39,11 @@
                     <button type="submit" class="govuk-button das-button--inverted das-panel__button">
                         Continue
                     </button>
-                
+
                     <p>
                         <div class="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input type="checkbox" class="govuk-checkboxes__input" id="markAsReadCheckbox" name="markRuleAsRead" value="true"/>
+                                <input type="checkbox" class="govuk-checkboxes__input" id="markAsReadCheckbox" name="markRuleAsRead" value="true" />
                                 <label class="govuk-checkboxes__label" for="markAsReadCheckbox">Do not show this message again</label>
                             </div>
                         </div>
