@@ -40,10 +40,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _urlHelper = urlHelper;
             _logger = logger;
         }
+
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
-        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
+        public async Task<IActionResult> EmployerManage(ReservationsRouteModel routeModel)
         {
             var employerAccountIds = new List<long>();
             var reservations = new List<ReservationViewModel>();
@@ -93,8 +93,43 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     reservations.Add(viewModel);
                 }
             }
-            
-            return View(viewName, new ManageViewModel
+
+            return View(ViewNames.EmployerManage, new ManageViewModel
+            {
+                Reservations = reservations,
+                BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId)
+            });
+        }
+
+        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
+        public async Task<IActionResult> ProviderManage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
+        {
+            var reservations = new List<ReservationViewModel>();
+
+            var searchResult = new { Reservations = new dynamic[]{} };//todo: get search results
+
+            foreach (var reservation in searchResult.Reservations)
+            {
+                var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
+                    EncodingType.PublicAccountLegalEntityId);
+
+                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
+                    ? _urlHelper.GenerateAddApprenticeUrl(
+                    reservation.Id, 
+                    accountLegalEntityPublicHashedId, 
+                    reservation.Course.Id,
+                    routeModel.UkPrn,
+                    reservation.StartDate,
+                    routeModel.CohortReference,
+                    routeModel.EmployerAccountId) 
+                    : string.Empty;
+
+                var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
+
+                reservations.Add(viewModel);
+            }
+
+            return View(ViewNames.ProviderManage, new ManageViewModel
             {
                 Reservations = reservations,
                 BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
