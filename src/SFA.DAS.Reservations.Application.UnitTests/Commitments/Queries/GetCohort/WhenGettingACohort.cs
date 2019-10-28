@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillThrowExceptionIfOneOccurs(
+        public void ThenWillThrowExceptionIfOneOccurs(
             GetCohortQuery query,
             Exception exception,
             [Frozen] Mock<ICommitmentService> mockCommitmentService,
@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillThrowExceptionIfValidationFails(
+        public void ThenWillThrowExceptionIfValidationFails(
             GetCohortQuery query,
             [Frozen] Mock<ICommitmentService> mockCommitmentService,
             [Frozen] Mock<IValidator<GetCohortQuery>> mockValidator,
