@@ -106,7 +106,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var reservations = new List<ReservationViewModel>();
 
-            var searchResult = new { Reservations = new dynamic[]{} };//todo: get search results
+            var searchResult = new { Reservations = new List<Reservation>() };//todo: get search results
 
             foreach (var reservation in searchResult.Reservations)
             {
