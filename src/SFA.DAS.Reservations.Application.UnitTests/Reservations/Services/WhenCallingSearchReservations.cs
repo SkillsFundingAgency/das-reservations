@@ -21,14 +21,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         [Test, MoqAutoData]
         public async Task Then_Gets_Reservations_From_Api(
             uint providerId,
-            ReservationFilter filter,
+            SearchReservationsRequest searchRequest,
+            SearchReservationsApiResponse reservationsApiResponse,
             [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
-            await service.SearchReservations(providerId, filter);
+            mockApiClient
+                .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
+                .ReturnsAsync(reservationsApiResponse);
 
-            mockApiClient.Verify(client => client.Search<SearchReservationResponse>(
+            await service.SearchReservations(providerId, searchRequest);
+
+            mockApiClient.Verify(client => client.Search<SearchReservationsApiResponse>(
                     It.Is<ISearchApiRequest>(request =>
                         request.SearchUrl.StartsWith(mockOptions.Object.Value.Url) &&
                         request.SearchUrl.Contains(providerId.ToString()))),
@@ -38,18 +43,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         [Test, MoqAutoData]
         public async Task Then_Returns_Mapped_Reservations(
             uint providerId,
-            ReservationFilter filter,
-            List<SearchReservationResponse> apiReservations,
+            SearchReservationsRequest request,
+            SearchReservationsApiResponse reservationsApiResponse,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService handler)
         {
             mockApiClient
-                .Setup(client => client.Search<SearchReservationResponse>(It.IsAny<ISearchApiRequest>()))
-                .ReturnsAsync(apiReservations);
+                .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
+                .ReturnsAsync(reservationsApiResponse);
 
-            var reservations = await handler.SearchReservations(providerId, filter);
+            var response = await handler.SearchReservations(providerId, request);
 
-            reservations.Should().BeEquivalentTo(apiReservations);
+            response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations);
+            response.NumberOfRecordsFound.Should().Be(reservationsApiResponse.NumberOfRecordsFound);
         }
     }
 }

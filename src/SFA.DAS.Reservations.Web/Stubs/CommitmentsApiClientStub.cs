@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.Stubs
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TResponse>> Search<TResponse>(ISearchApiRequest request)
+        public Task<TResponse> Search<TResponse>(ISearchApiRequest request)
         {
             throw new NotImplementedException();
         }

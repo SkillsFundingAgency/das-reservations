@@ -42,11 +42,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             return result;
         }
 
-        public async Task<IEnumerable<Reservation>> SearchReservations(uint providerId, ReservationFilter filter)
+        public async Task<SearchReservationsResponse> SearchReservations(uint providerId, SearchReservationsRequest filter)
         {
-            var apiReservations = await _apiClient.Search<SearchReservationResponse>(new ReservationSearchApiRequest(_config.Url, providerId, filter));
+            var apiReservations = await _apiClient.Search<SearchReservationsApiResponse>(new SearchReservationsApiRequest(_config.Url, providerId, filter));
 
-            var result = apiReservations.Select(apiReservation => new Reservation
+            var result = apiReservations.Reservations.Select(apiReservation => new Reservation
             {
                 Id = apiReservation.Id,
                 AccountLegalEntityName = apiReservation.AccountLegalEntityName,
@@ -60,7 +60,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
                 ProviderId = apiReservation.ProviderId
             });
 
-            return result;
+            return new SearchReservationsResponse
+            {
+                Reservations = result,
+                NumberOfRecordsFound = apiReservations.NumberOfRecordsFound
+            };
         }
 
         public async Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId, long accountId,

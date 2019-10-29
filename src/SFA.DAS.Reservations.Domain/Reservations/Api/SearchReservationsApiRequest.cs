@@ -2,12 +2,12 @@
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class ReservationSearchApiRequest : ISearchApiRequest
+    public class SearchReservationsApiRequest : ISearchApiRequest
     {
         private readonly uint _providerId;
-        private readonly ReservationFilter _filter;
+        private readonly SearchReservationsRequest _filter;
 
-        public ReservationSearchApiRequest(string url, uint providerId, ReservationFilter filter)
+        public SearchReservationsApiRequest(string url, uint providerId, SearchReservationsRequest filter)
         {
             _providerId = providerId;
             _filter = filter;

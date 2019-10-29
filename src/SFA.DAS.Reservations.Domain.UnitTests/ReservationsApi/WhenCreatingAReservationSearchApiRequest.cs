@@ -1,5 +1,4 @@
-﻿using System;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -14,9 +13,9 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         public void Then_It_Sets_The_SearchUrl(
             string url,
             uint providerId, 
-            ReservationFilter filter)
+            SearchReservationsRequest filter)
         {
-            var request = new ReservationSearchApiRequest(url, providerId, filter);
+            var request = new SearchReservationsApiRequest(url, providerId, filter);
 
             request.SearchUrl.Should().Be($"{url}api/reservations/search?providerId={providerId}&searchTerm={filter.SearchTerm}");
         }

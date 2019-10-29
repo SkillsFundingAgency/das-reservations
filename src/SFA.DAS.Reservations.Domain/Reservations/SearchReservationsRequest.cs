@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.Reservations.Domain.Reservations
 {
-    public class ReservationFilter
+    public class SearchReservationsRequest
     {
         public string SearchTerm { get; set; }
     }

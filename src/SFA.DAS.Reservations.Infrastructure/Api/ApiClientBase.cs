@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             }
         }
 
-        public async Task<IEnumerable<TResponse>> Search<TResponse>(ISearchApiRequest request)
+        public async Task<TResponse> Search<TResponse>(ISearchApiRequest request)
         {
             var accessToken = await GetAccessTokenAsync();
             using (var client = new HttpClient())//not unit testable using directly
@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
 
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonConvert.DeserializeObject<IEnumerable<TResponse>>(json);
+                return JsonConvert.DeserializeObject<TResponse>(json);
             }
         }
 

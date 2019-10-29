@@ -1,9 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Courses;
 
 namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
-    public class SearchReservationResponse
+    public class SearchReservationsApiResponse
+    {
+        public IEnumerable<SearchReservationApiModel> Reservations { get; set; }
+        public int NumberOfRecordsFound { get; set; }
+    }
+
+    public class SearchReservationApiModel
     {
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
