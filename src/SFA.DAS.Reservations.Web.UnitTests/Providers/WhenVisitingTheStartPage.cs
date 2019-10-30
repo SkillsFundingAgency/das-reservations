@@ -16,6 +16,7 @@ using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
@@ -140,7 +141,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.NotNull(viewResult);
             Assert.NotNull(viewResult.Model as string);
             Assert.AreEqual(expectedBacklink, viewResult.Model as string);
-            mockUrlHelper.Verify(x => x.RouteUrl(It.IsAny<UrlRouteContext>()),Times.Once);
+            mockUrlHelper.Verify(x => x.RouteUrl(It.Is<UrlRouteContext>(y => y.RouteName == RouteNames.ProviderManage)),Times.Once);
             mockExternalUrlHelper.Verify(x => x.GenerateDashboardUrl(It.IsAny<string>()), Times.Never);
         }
 
@@ -178,7 +179,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.NotNull(viewResult.Model as string);
             Assert.AreEqual(expectedBacklink, viewResult.Model as string);
             mockExternalUrlHelper.Verify(x => x.GenerateDashboardUrl(It.IsAny<string>()), Times.Once);
-            mockUrlHelper.Verify(x => x.RouteUrl(It.IsAny<UrlRouteContext>()), Times.Never);
+            mockUrlHelper.Verify(x => x.RouteUrl(It.Is<UrlRouteContext>(y => y.RouteName == RouteNames.ProviderManage)), Times.Never);
         }
     }
 }
