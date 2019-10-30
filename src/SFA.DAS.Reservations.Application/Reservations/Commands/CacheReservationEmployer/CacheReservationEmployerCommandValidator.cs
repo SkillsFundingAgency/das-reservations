@@ -45,8 +45,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 }
 
                 var globalRulesApiResponse = await _rulesService.GetFundingRules();
-                if (globalRulesApiResponse.GlobalRules != null && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) &&
-                    globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused) > 0)
+                if (globalRulesApiResponse.GlobalRules != null 
+                    && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) 
+                    && globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom) > 0)
                 {
                     result.FailedGlobalRuleValidation = true;
                 }
