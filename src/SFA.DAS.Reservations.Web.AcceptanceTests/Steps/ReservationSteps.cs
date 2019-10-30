@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Employers;
-using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -129,6 +127,30 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.AreEqual(RouteNames.EmployerReview, result.RouteName);
         }
 
+        [When(@"I do not choose a start date")]
+        public void GivenIHaveNotChosenAStartDate()
+        {
+            var controller = Services.GetService<ReservationsController>();
+            var trainingDateViewModel = new TrainingDateViewModel(new TrainingDateModel());
+            var apprenticeshipTrainingFormModel = new ApprenticeshipTrainingFormModel
+            {
+                StartDate = trainingDateViewModel.SerializedModel,
+                AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
+            };
+
+            _actualResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
+                .Result as ViewResult;
+
+        }
+
+
+        [When(@"I do not select any training")]
+        public void WhenIDoNotSelectWhetherOrNotIKnowTheTraining()
+        {
+            var controller = Services.GetService<EmployerReservationsController>();
+            _actualResult = controller.PostSelectCourse(TestData.ReservationRouteModel,
+                new PostSelectCourseViewModel {ApprenticeTrainingKnown = null, SelectedCourseId = null}).Result;
+        }
 
         [When(@"I review my reservation and confirm")]
         public void WhenIReviewMyReservationAndConfirm()
@@ -147,6 +169,14 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.IsNotNull(result);
             _reviewRedirectUrl = result.Url;
             
+        }
+
+        [Then(@"I am shown a validation message on the (.*) page")]
+        public void ThenIAmShownAValidationMessage(string viewName)
+        {
+            var result = _actualResult as ViewResult;
+            Assert.IsTrue(result.ViewData.ModelState.ErrorCount!=0);
+            Assert.AreEqual(viewName,result.ViewName);
         }
 
 
