@@ -4,8 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using AutoFixture.NUnit3;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
@@ -15,6 +17,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
@@ -103,6 +106,79 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual("NoPermissions", result.ViewName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task WhenFundingIsPaused_AndFromManage_ThenBackLinkSetToManage(
+            [Frozen] Mock<IMediator> mockMediator,
+            GetFundingRulesResult result,
+            [Frozen] Mock<IUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
+            GlobalRule rule,
+            ProviderReservationsController controller)
+        {
+            //Arrange
+            var expectedBacklink = "Test12345";
+            var expectedViewnName = "ProviderFundingPaused";
+            rule.ActiveFrom = DateTime.UtcNow.AddDays(-5);
+            result.GlobalRules.Add(rule);
+            
+            mockMediator
+                .Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), CancellationToken.None))
+                .ReturnsAsync(result);
+            mockUrlHelper
+                .Setup(x => x.RouteUrl(It.IsAny<UrlRouteContext>()))
+                .Returns(expectedBacklink);
+            mockExternalUrlHelper
+                .Setup(x => x.GenerateDashboardUrl(It.IsAny<string>()))
+                .Returns("unexpectedUrl");
+            controller.Url = mockUrlHelper.Object;
+            //Act
+            var viewResult = await controller.Start(ukPrn, true) as ViewResult;
+
+            //Assert
+            Assert.NotNull(viewResult);
+            Assert.NotNull(viewResult.Model as string);
+            Assert.AreEqual(expectedBacklink, viewResult.Model as string);
+            mockUrlHelper.Verify(x => x.RouteUrl(It.IsAny<UrlRouteContext>()),Times.Once);
+            mockExternalUrlHelper.Verify(x => x.GenerateDashboardUrl(It.IsAny<string>()), Times.Never);
+        }
+
+        [Test, MoqAutoData]
+        public async Task WhenFundingIsPaused_AndNotFromManage_ThenBackLinkSetToDashBoard(
+            [Frozen] Mock<IMediator> mockMediator,
+            GetFundingRulesResult result,
+            [Frozen] Mock<IUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
+            GlobalRule rule,
+            ProviderReservationsController controller)
+        {
+            //Arrange
+            var expectedBacklink = "Test12345";
+            var expectedViewnName = "ProviderFundingPaused";
+            rule.ActiveFrom = DateTime.UtcNow.AddDays(-5);
+            result.GlobalRules.Add(rule);
+
+            mockMediator
+                .Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), CancellationToken.None))
+                .ReturnsAsync(result);
+            mockUrlHelper
+                .Setup(x => x.RouteUrl(It.IsAny<UrlRouteContext>()))
+                .Returns("unexpectedBacklink");
+            mockExternalUrlHelper
+                .Setup(x => x.GenerateDashboardUrl(It.IsAny<string>()))
+                .Returns(expectedBacklink);
+            controller.Url = mockUrlHelper.Object;
+
+            //Act
+            var viewResult = await controller.Start(ukPrn, false) as ViewResult;
+
+            //Assert
+            Assert.NotNull(viewResult);
+            Assert.NotNull(viewResult.Model as string);
+            Assert.AreEqual(expectedBacklink, viewResult.Model as string);
+            mockExternalUrlHelper.Verify(x => x.GenerateDashboardUrl(It.IsAny<string>()), Times.Once);
+            mockUrlHelper.Verify(x => x.RouteUrl(It.IsAny<UrlRouteContext>()), Times.Never);
         }
     }
 }
