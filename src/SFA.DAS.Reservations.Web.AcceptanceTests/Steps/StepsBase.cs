@@ -98,6 +98,22 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
             mock.Setup(x => x.GetAll<GetReservationResponse>(
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
+
+            mock.Setup(x => x.Get<GetAvailableDatesApiResponse>(
+                    It.Is<GetAvailableDatesApiRequest>(
+                        c => c.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId))))
+                .ReturnsAsync(
+                    new GetAvailableDatesApiResponse
+                    {
+                        AvailableDates = new List<TrainingDateModel>
+                        {
+                            new TrainingDateModel
+                            {
+                                StartDate = DateTime.UtcNow.AddMonths(1),
+                                EndDate = DateTime.UtcNow.AddMonths(3)
+                            }
+                        }
+                    });
         }
 
 

@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillThrowExceptionIFOneOccurs(
+        public void ThenWillThrowExceptionIFOneOccurs(
             [Frozen] Mock<IApiClient> mockApiClient,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
             CommitmentService service,

@@ -33,3 +33,16 @@ Scenario: Reservation limit reached for non levy employer when starting reservat
 	And I have chosen a legal entity
 	Then The reservation is not created
 	Then I am shown a message saying I have reached my reservation limit
+
+Scenario: Course search validation no training selected
+	Given I am a non levy employer
+	And I have chosen a legal entity
+	When I do not select any training
+	Then I am shown a validation message on the SelectCourse page
+
+Scenario: Training date validation no date selected
+	Given I am a non levy employer
+	And I have chosen a legal entity
+	And I have chosen a course
+	When I do not choose a start date
+	Then I am shown a validation message on the ApprenticeshipTraining page
