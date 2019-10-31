@@ -33,7 +33,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
         {
-            routeModel.UkPrn = null;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
@@ -42,12 +41,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Returns(decodedAccountId);
 
             await controller.EmployerManage(routeModel);
-
-            mockMediator.Verify(mediator =>
-                    mediator.Send(
-                        It.IsAny<GetTrustedEmployersQuery>(),
-                        It.IsAny<CancellationToken>()),
-                Times.Never);
             
             mockMediator.Verify(mediator =>
                     mediator.Send(
@@ -67,8 +60,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
             ManageReservationsController controller)
         {
-            routeModel.UkPrn = null;
-            
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(getReservationsResult);
@@ -77,15 +68,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
-            mockExternalUrlHelper.Setup(h => h.GenerateAddApprenticeUrl(
-                It.IsAny<Guid>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<uint?>(),
-                It.IsAny<DateTime>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<bool>())).Returns(expectedUrl);
+            mockExternalUrlHelper
+                .Setup(h => h.GenerateAddApprenticeUrl(
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<uint?>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<bool>()))
+                .Returns(expectedUrl);
 
             getReservationsResult.Reservations.ToList().ForEach(c =>
             {

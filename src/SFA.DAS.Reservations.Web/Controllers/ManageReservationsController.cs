@@ -46,53 +46,29 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
         public async Task<IActionResult> EmployerManage(ReservationsRouteModel routeModel)
         {
-            var employerAccountIds = new List<long>();
             var reservations = new List<ReservationViewModel>();
-            string viewName;
 
-            if (routeModel.UkPrn.HasValue)
+            var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+            var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = decodedAccountId});
+
+            foreach (var reservation in reservationsResult.Reservations)
             {
-                var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+                var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
+                    EncodingType.PublicAccountLegalEntityId);
 
-                if (!trustedEmployersResponse.Employers.Any())
-                {
-                    return View("NoPermissions");
-                }
+                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
+                    ? _urlHelper.GenerateAddApprenticeUrl(
+                    reservation.Id, 
+                    accountLegalEntityPublicHashedId, 
+                    reservation.Course.Id,
+                    routeModel.UkPrn,
+                    reservation.StartDate,
+                    routeModel.CohortReference,
+                    routeModel.EmployerAccountId) 
+                    : string.Empty;
 
-                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId));
-                viewName = ViewNames.ProviderManage;
-            }
-            else
-            {
-                var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
-                employerAccountIds.Add(decodedAccountId);
-                viewName = ViewNames.EmployerManage;
-            }
-
-            foreach (var employerAccountId in employerAccountIds)
-            {
-                var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
-
-                foreach (var reservation in reservationsResult.Reservations)
-                {
-                    var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
-                        EncodingType.PublicAccountLegalEntityId);
-
-                    var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
-                        ? _urlHelper.GenerateAddApprenticeUrl(
-                        reservation.Id, 
-                        accountLegalEntityPublicHashedId, 
-                        reservation.Course.Id,
-                        routeModel.UkPrn,
-                        reservation.StartDate,
-                        routeModel.CohortReference,
-                        routeModel.EmployerAccountId) 
-                        : string.Empty;
-
-                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
-
-                    reservations.Add(viewModel);
-                }
+                var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
+                reservations.Add(viewModel);
             }
 
             return View(ViewNames.EmployerManage, new ManageViewModel
