@@ -60,15 +60,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
 
         [Test, MoqAutoData]
-        public async Task ThenRedirectToFundingPausedIfFundingRulesExist(
+        public async Task ThenRedirectToFundingNotificationIfFundingRulesExist(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> config,
@@ -100,6 +100,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(config.Object.Value.EmployerDashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(RouteNames.EmployerStart, viewModel.RouteName);
         }
 
         [Test, MoqAutoData]
@@ -117,11 +118,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
 
         [Test, MoqAutoData]
@@ -139,11 +140,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index() as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
     }
 }
