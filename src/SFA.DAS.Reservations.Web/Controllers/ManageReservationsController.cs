@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Web.Filters;
@@ -106,7 +107,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var reservations = new List<ReservationViewModel>();
 
-            var searchResult = new { Reservations = new List<Reservation>() };//todo: get search results
+            var searchResult = await _mediator.Send(new SearchReservationsQuery
+            {
+                ProviderId = routeModel.UkPrn.Value,
+                SearchTerm = filterModel.SearchTerm
+            });
+
+            if (searchResult.NumberOfRecordsFound == 0)
+            {
+                return View("NoPermissions");
+            }
 
             foreach (var reservation in searchResult.Reservations)
             {

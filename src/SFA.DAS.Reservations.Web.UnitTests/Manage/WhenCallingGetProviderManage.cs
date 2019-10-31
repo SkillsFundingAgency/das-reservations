@@ -12,9 +12,8 @@ using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
-using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -27,48 +26,32 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
     [TestFixture]
     public class WhenCallingGetProviderManage
     {
-        [Test, MoqAutoData, Ignore("todo")]
-        public async Task Then_Gets_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
+        [Test, MoqAutoData]
+        public async Task Then_Gets_List_Of_Reservations_From_Search(
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            GetReservationsResult getReservationsResult,
+            SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getReservationsResult);
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
 
             await controller.ProviderManage(routeModel, filterModel);
 
             mockMediator.Verify(mediator =>
                     mediator.Send(
-                        It.Is<GetTrustedEmployersQuery>(query => query.UkPrn == routeModel.UkPrn),
+                        It.Is<SearchReservationsQuery>(query => query.ProviderId == routeModel.UkPrn),//todo: yeah? or providerId?? :(
                         It.IsAny<CancellationToken>()),
                 Times.Once);
-
-            foreach (var employer in getTrustedEmployersResponse.Employers)
-            {
-                mockMediator.Verify(mediator =>
-                        mediator.Send(
-                            It.Is<GetReservationsQuery>(query => query.AccountId == employer.AccountId),
-                            It.IsAny<CancellationToken>()),
-                    Times.Once);
-            }
         }
 
-        [Test, MoqAutoData, Ignore("todo")]
+        [Test, MoqAutoData]
         public async Task Then_Returns_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
             [Frozen] ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            [ReservationsFromThisProvider] GetReservationsResult getReservationsResult1,
-            [ReservationsFromThisProvider] GetReservationsResult getReservationsResult2,
-            [ReservationsFromThisProvider] GetReservationsResult getReservationsResult3,
+            SearchReservationsResult searchResult,
             string hashedId,
             string homeLink,
             [Frozen] ReservationsWebConfiguration config,
@@ -78,14 +61,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-            mockMediator
-                .SetupSequence(mediator =>
-                    mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getReservationsResult1)
-                .ReturnsAsync(getReservationsResult2)
-                .ReturnsAsync(getReservationsResult3);
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
@@ -93,13 +70,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .Setup(x => x.GenerateDashboardUrl(routeModel.EmployerAccountId)).Returns(homeLink);
 
             var expectedReservations = new List<ReservationViewModel>();
-            expectedReservations.AddRange(getReservationsResult1.Reservations.Select(reservation =>
+            expectedReservations.AddRange(searchResult.Reservations.Select(reservation =>
                 new ReservationViewModel(reservation, config.ApprenticeUrl, routeModel.UkPrn)));
-            expectedReservations.AddRange(getReservationsResult2.Reservations.Select(reservation =>
-                new ReservationViewModel(reservation, config.ApprenticeUrl, routeModel.UkPrn)));
-            expectedReservations.AddRange(getReservationsResult3.Reservations.Select(reservation =>
-                new ReservationViewModel(reservation, config.ApprenticeUrl, routeModel.UkPrn)));
-
+            
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
             result.Should().NotBeNull();
@@ -108,31 +81,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             viewModel.Should().NotBeNull();
             viewModel.BackLink.Should().Be(homeLink);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
-                options => options.ExcludingMissingMembers().ExcludingFields().Excluding(c=>c.ApprenticeUrl));
+                options => options.ExcludingFields().Excluding(c=>c.ApprenticeUrl));
         }
 
         [Test, MoqAutoData]
-        public async Task And_Reservation_From_Different_Provider_Then_Not_Deletable(
+        public async Task And_Reservation_From_This_Provider_Then_Is_Deletable(
             [Frozen] ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            GetReservationsResult getReservationResultDifferentProvider,
-            [ReservationsFromThisProvider] GetReservationsResult getReservationsResult1,
-            [ReservationsFromThisProvider] GetReservationsResult getReservationsResult2,
+            [ReservationsFromThisProvider] SearchReservationsResult searchResult,
             string hashedId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-            mockMediator
-                .SetupSequence(mediator =>
-                    mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getReservationsResult1)
-                .ReturnsAsync(getReservationsResult2)
-                .ReturnsAsync(getReservationResultDifferentProvider);
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
@@ -140,25 +104,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
             var viewModel = result.Model as ManageViewModel;
-            var nonDeletableReservationIds = getReservationResultDifferentProvider.Reservations
-                    .Select(reservation => reservation.Id);
-
             viewModel.Reservations
-                .Where(model => nonDeletableReservationIds.Contains(model.Id))
-                .Select(model => model.CanProviderDeleteReservation)
-                .Should().AllBeEquivalentTo(false);
-            viewModel.Reservations
-                .Where(model => !nonDeletableReservationIds.Contains(model.Id))
                 .Select(model => model.CanProviderDeleteReservation)
                 .Should().AllBeEquivalentTo(true);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Reservation_From_Different_Provider_Then_Not_Deletable(
+            [Frozen] ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
+            SearchReservationsResult searchResult,
+            string hashedId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ManageReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
+            mockEncodingService
+                .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
+                .Returns(hashedId);
+
+            var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
+
+            var viewModel = result.Model as ManageViewModel;
+            viewModel.Reservations
+                .Select(model => model.CanProviderDeleteReservation)
+                .Should().AllBeEquivalentTo(false);
         }
 
         [Test, MoqAutoData]
         public async Task Add_Apprentice_Url_UkPrn_Will_Be_Populated_From_RouteModel_Reservation(
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            Reservation reservation,
+            SearchReservationsResult searchResult,
             string hashedId,
             string expectedUrl,
             [Frozen] Mock<IEncodingService> mockEncodingService,
@@ -167,43 +147,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-
-            reservation.ProviderId = null;
-
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetReservationsResult
-                {
-                    Reservations = new []{ reservation }
-                });
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
 
             mockEncodingService
                 .Setup(service => service.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(hashedId);
 
             mockUrlHelper.Setup(h => h.GenerateAddApprenticeUrl(
-                reservation.Id,
+                It.IsAny<Guid>(),
                 hashedId,
-                reservation.Course.Id,
+                It.IsAny<string>(),
                 routeModel.UkPrn,
-                reservation.StartDate,
+                It.IsAny<DateTime>(),
                 routeModel.CohortReference,
                 routeModel.EmployerAccountId,
                 false))
                 .Returns(expectedUrl);
                 
-            
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
             
             var viewModel = result?.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
 
-            Assert.IsTrue(viewModel.Reservations.All(c=>c.ApprenticeUrl.Equals(expectedUrl)));
+            viewModel.Reservations.Where(model => model.Status == ReservationStatusViewModel.Pending && !model.IsExpired)
+                .All(c => c.ApprenticeUrl.Equals(expectedUrl)).Should().BeTrue();
         }
 
-        [Test, MoqAutoData, Ignore("todo")]
+        [Test, MoqAutoData]
         public async Task And_The_Provider_Has_No_TrustedEmployers_Then_A_NoPermissions_View_Is_Returned(
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
@@ -211,8 +182,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new List<Employer>()});
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SearchReservationsResult{NumberOfRecordsFound = 0});
 
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
@@ -223,20 +194,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task Then_Filter_Params_Assigned_To_View_Model(
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
-            GetTrustedEmployersResponse getTrustedEmployersResponse,
-            Reservation reservation,
+            SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
             ManageReservationsController controller)
         {
             mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(getTrustedEmployersResponse);
-            mockMediator
-                .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetReservationsResult
-                {
-                    Reservations = new []{ reservation }
-                });
+                .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
 
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
