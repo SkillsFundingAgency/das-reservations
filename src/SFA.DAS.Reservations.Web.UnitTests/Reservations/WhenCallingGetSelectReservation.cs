@@ -747,7 +747,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                             c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
                     , It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, result.RouteName);
             Assert.AreNotEqual(Guid.Empty, routeModel.Id);
         }
 
@@ -803,7 +803,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                             c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
                     , It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, result.RouteName);
             Assert.AreNotEqual(Guid.Empty, routeModel.Id);
         }
 

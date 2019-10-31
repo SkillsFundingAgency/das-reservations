@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourse;
+                var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
                 Guid? userId = null;
                 if (routeModel.UkPrn.HasValue)
