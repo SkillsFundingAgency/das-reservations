@@ -260,7 +260,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var routeName = RouteNames.ProviderApprenticeshipTraining;
             if (!routeModel.UkPrn.HasValue)
             {
-                routeName = RouteNames.EmployerSelectCourse;
+                routeName = RouteNames.EmployerSelectCourseRuleCheck;
             }
             
             return RedirectToRoute(routeName, routeModel);
