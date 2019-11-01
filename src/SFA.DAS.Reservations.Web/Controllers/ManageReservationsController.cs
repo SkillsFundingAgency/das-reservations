@@ -118,6 +118,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(ViewNames.ProviderManage, new ManageViewModel
             {
                 Reservations = reservations,
+                NumberOfRecordsFound = searchResult.NumberOfRecordsFound,
                 BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
                 FilterModel = filterModel
             });

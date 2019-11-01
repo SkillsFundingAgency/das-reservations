@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -80,6 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
             viewModel.BackLink.Should().Be(homeLink);
+            viewModel.NumberOfRecordsFound.Should().Be(searchResult.NumberOfRecordsFound);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingFields().Excluding(c=>c.ApprenticeUrl));
         }
