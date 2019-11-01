@@ -70,32 +70,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
-        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
-        {
-            if(!markRuleAsRead)
-            {
-                return RedirectToRoute(RouteNames.EmployerStart);
-            }
-
-            var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-			
-            var userId = userAccountIdClaim.Value;
-
-            var command = new MarkRuleAsReadCommand
-            {
-                Id = userId,
-                RuleId = ruleId,
-                TypeOfRule = typeOfRule
-            };
-            
-            await _mediator.Send(command);
-
-            return RedirectToRoute(RouteNames.EmployerStart);
-        }
-
         [HttpGet]
         [Route("start",Name = RouteNames.EmployerStart)]
         public async Task<IActionResult> Start(ReservationsRouteModel routeModel)

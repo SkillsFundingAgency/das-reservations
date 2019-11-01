@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MediatR;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
@@ -57,6 +59,37 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _encodingService = encodingService;
             _configuration = configuration.Value;
             _urlHelper = urlHelper;
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("accounts/{employerAccountId}/reservations/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        [Route("{ukPrn}/reservations/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(ReservationsRouteModel routeModel, FundingRestrictionNotificationViewModel viewModel, bool markRuleAsRead)
+        {
+            if (!markRuleAsRead)
+            {
+                return RedirectToRoute(viewModel.RouteName);
+            }
+
+            var claim = routeModel.UkPrn != null ? 
+                HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)) : 
+                HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+
+            var claimValue = claim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = claimValue,
+                RuleId = viewModel.RuleId,
+                TypeOfRule = viewModel.TypeOfRule
+            };
+
+            await _mediator.Send(command);
+
+            return RedirectToRoute(viewModel.RouteName);
         }
 
         [Route("{ukPrn}/reservations/{id}/apprenticeship-training/{fromReview?}", Name = RouteNames.ProviderApprenticeshipTraining)]
