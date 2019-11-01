@@ -243,7 +243,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         {
             //Arrange
             routeModel.FromReview = false;
+            routeModel.IsFromManage = null;
             cachedReservationResult.CohortRef = string.Empty;
+            cachedReservationResult.EmployerHasSingleLegalEntity = false;
             cachedReservationResult.IsEmptyCohortFromSelect = false;
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))

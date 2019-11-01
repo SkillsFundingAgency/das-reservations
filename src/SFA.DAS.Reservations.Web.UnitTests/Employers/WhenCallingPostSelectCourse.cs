@@ -177,13 +177,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
+            routeModel.IsFromManage = false;
             _cachedReservationResult.CohortRef = "";
             routeModel.CohortReference = "";
             routeModel.FromReview = true;
             _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
             postSelectCourseViewModel.SelectedCourseId = _course.Id;
-
+            postSelectCourseViewModel.ApprenticeTrainingKnown = true;
 
             //Act
             var result = await _controller.PostSelectCourse(routeModel, postSelectCourseViewModel) as ViewResult;
@@ -204,14 +205,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
+            routeModel.IsFromManage = null;
             _cachedReservationResult.CohortRef = "";
             _cachedReservationResult.EmployerHasSingleLegalEntity = false;
             routeModel.CohortReference = "";
             routeModel.FromReview = false;
-            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+            //_mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+            //    .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
             postSelectCourseViewModel.SelectedCourseId= _course.Id;
-            
+            postSelectCourseViewModel.ApprenticeTrainingKnown = true;
+
 
             //Act
             var result = await _controller.PostSelectCourse(routeModel, postSelectCourseViewModel) as ViewResult;
