@@ -19,6 +19,7 @@
         public const string ProviderPostCompleted = "provider-reservation-completed";
         public const string ProviderChooseEmployer = "provider-choose-employer";
         public const string ProviderConfirmEmployer = "provider-confirm-employer";
+        public const string ProviderApprenticeshipTrainingRuleCheck = "provider-apprenticeship-training-rule-check";
 
         public const string EmployerIndex = "employer-index";
         public const string EmployerStart = "employer-start";

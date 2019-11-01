@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     cacheReservationEmployerCommand = response.Command;
 
-                    apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
+                    apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
                     
                 }
                 else
@@ -257,7 +257,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
                 return View("EmployerFundingPaused");
             }
-            var routeName = RouteNames.ProviderApprenticeshipTraining;
+            var routeName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
             if (!routeModel.UkPrn.HasValue)
             {
                 routeName = RouteNames.EmployerSelectCourseRuleCheck;
