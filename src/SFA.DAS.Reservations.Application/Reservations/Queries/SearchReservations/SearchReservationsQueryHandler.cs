@@ -5,7 +5,6 @@ using MediatR;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
-using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations
 {
@@ -31,15 +30,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
                 throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
-            var serviceResult = await _reservationService.SearchReservations(
-                request.ProviderId,
-                new SearchReservationsRequest{SearchTerm = request.SearchTerm});//todo: implicit operator
+            var serviceResult = await _reservationService.SearchReservations(request);
 
-            return new SearchReservationsResult
-            {
-                Reservations = serviceResult.Reservations,
-                NumberOfRecordsFound = serviceResult.NumberOfRecordsFound//todo: implicit operator
-            };
+            return serviceResult;
         }
     }
 }

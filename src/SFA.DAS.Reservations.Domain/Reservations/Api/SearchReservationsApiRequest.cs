@@ -4,17 +4,15 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 {
     public class SearchReservationsApiRequest : ISearchApiRequest
     {
-        private readonly uint _providerId;
-        private readonly SearchReservationsRequest _filter;
+        private readonly SearchReservationsRequest _request;
 
-        public SearchReservationsApiRequest(string url, uint providerId, SearchReservationsRequest filter)
+        public SearchReservationsApiRequest(string url, SearchReservationsRequest request)
         {
-            _providerId = providerId;
-            _filter = filter;
+            _request = request;
             BaseUrl = url;
         }
 
         public string BaseUrl { get; }
-        public string SearchUrl => $"{BaseUrl}api/reservations/search?providerId={_providerId}&searchTerm={_filter.SearchTerm}";
+        public string SearchUrl => $"{BaseUrl}api/reservations/search?providerId={_request.ProviderId}&searchTerm={_request.Filter.SearchTerm}";
     }
 }

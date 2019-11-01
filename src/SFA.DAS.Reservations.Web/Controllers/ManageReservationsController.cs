@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var searchResult = await _mediator.Send(new SearchReservationsQuery
             {
                 ProviderId = routeModel.UkPrn.Value,
-                SearchTerm = filterModel.SearchTerm
+                Filter = filterModel
             });
 
             if (searchResult.NumberOfRecordsFound == 0)

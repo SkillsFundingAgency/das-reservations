@@ -24,7 +24,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             ValidationResult validationResult,
             string propertyName,
             [Frozen]Mock<IValidator<SearchReservationsQuery>> mockValidator,
-            [Frozen]Mock<IReservationService> mockReservationService,
             SearchReservationsQueryHandler handler)
         {
             validationResult.AddError(propertyName);
@@ -50,8 +49,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             await handler.Handle(query, CancellationToken.None);
 
             mockReservationService.Verify(service => service.SearchReservations(
-                query.ProviderId, 
-                It.Is<SearchReservationsRequest>(request => request.SearchTerm == query.SearchTerm)));
+                It.Is<SearchReservationsRequest>(request => 
+                    request.Filter.SearchTerm == query.Filter.SearchTerm &&
+                    request.ProviderId == query.ProviderId)));
         }
 
         [Test, MoqAutoData]
@@ -65,8 +65,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             validationResult.ValidationDictionary.Clear();
             mockReservationService
                 .Setup(service => service.SearchReservations(
-                    query.ProviderId, 
-                    It.Is<SearchReservationsRequest>(request => request.SearchTerm == query.SearchTerm)))
+                    It.Is<SearchReservationsRequest>(request => 
+                        request.Filter.SearchTerm == query.Filter.SearchTerm &&
+                        request.ProviderId == query.ProviderId)))
                 .ReturnsAsync(serviceResponse);
 
             var result = await handler.Handle(query, CancellationToken.None);

@@ -2,6 +2,7 @@
 {
     public class SearchReservationsRequest
     {
-        public string SearchTerm { get; set; }
+        public uint ProviderId { get; set; }
+        public ReservationFilter Filter { get; set; }
     }
 }

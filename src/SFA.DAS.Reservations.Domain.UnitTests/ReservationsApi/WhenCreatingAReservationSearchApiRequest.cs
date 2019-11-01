@@ -12,12 +12,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         [Test, AutoData]
         public void Then_It_Sets_The_SearchUrl(
             string url,
-            uint providerId, 
             SearchReservationsRequest filter)
         {
-            var request = new SearchReservationsApiRequest(url, providerId, filter);
+            var request = new SearchReservationsApiRequest(url, filter);
 
-            request.SearchUrl.Should().Be($"{url}api/reservations/search?providerId={providerId}&searchTerm={filter.SearchTerm}");
+            request.SearchUrl.Should().Be($"{url}api/reservations/search?providerId={filter.ProviderId}&searchTerm={filter.Filter.SearchTerm}");
         }
     }
 }

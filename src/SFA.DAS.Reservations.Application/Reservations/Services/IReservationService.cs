@@ -9,7 +9,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
     public interface IReservationService
     {
         Task<IEnumerable<Reservation>> GetReservations(long accountId);
-        Task<SearchReservationsResponse> SearchReservations(uint providerId, SearchReservationsRequest filter);
+        Task<SearchReservationsResponse> SearchReservations(SearchReservationsRequest filter);
         Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId,
             long accountId,
             long accountLegalEntityId,

@@ -42,9 +42,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             return result;
         }
 
-        public async Task<SearchReservationsResponse> SearchReservations(uint providerId, SearchReservationsRequest filter)
+        public async Task<SearchReservationsResponse> SearchReservations(SearchReservationsRequest filter)
         {
-            var apiReservations = await _apiClient.Search<SearchReservationsApiResponse>(new SearchReservationsApiRequest(_config.Url, providerId, filter));
+            var apiReservations = await _apiClient.Search<SearchReservationsApiResponse>(new SearchReservationsApiRequest(_config.Url, filter));
 
             var result = apiReservations.Reservations.Select(apiReservation => new Reservation
             {
