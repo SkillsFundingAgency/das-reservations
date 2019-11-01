@@ -18,6 +18,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
+        [Route("CheckNextGlobalRule")]
         public async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink)
         {
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(claimName));
