@@ -197,7 +197,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
 
         [Test, MoqAutoData]
-        public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView(
+        public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView_When_Validation_Error(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
@@ -210,8 +210,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _cachedReservationResult.EmployerHasSingleLegalEntity = false;
             routeModel.CohortReference = "";
             routeModel.FromReview = false;
-            //_mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
-            //    .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
+            _mediator.Setup(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ValidationException(new ValidationResult("Failed", new List<string> { "Course|The Course field is not valid." }), null, null));
             postSelectCourseViewModel.SelectedCourseId= _course.Id;
             postSelectCourseViewModel.ApprenticeTrainingKnown = true;
 
