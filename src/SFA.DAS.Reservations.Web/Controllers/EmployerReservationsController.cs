@@ -12,7 +12,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -20,7 +19,6 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Filters;
@@ -32,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
     [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
-    public class EmployerReservationsController : Controller
+    public class EmployerReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
@@ -45,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IEncodingService encodingService, 
             IOptions<ReservationsWebConfiguration> options, 
             IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger)
+            ILogger<EmployerReservationsController> logger) : base(mediator, options)
         {
             _mediator = mediator;
             _encodingService = encodingService;
@@ -345,30 +343,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             routeModel.Id = reservationId;
         }
 
-        private async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName)
-        {
-            var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery { Id = userAccountIdClaim.Value });
-
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
-
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
-            {
-                return null;
-            }
-
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = _config.EmployerDashboardUrl,
-                RouteName = redirectRouteName
-            };
-
-            return View("FundingRestrictionNotification", viewModel);
-        }
 
         private string GenerateBackLink(ReservationsRouteModel routeModel, GetCachedReservationResult result)
         {
