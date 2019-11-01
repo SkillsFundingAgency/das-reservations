@@ -146,9 +146,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (routeModel.UkPrn.HasValue)
                 {
-                    return View("ProviderFundingPaused");
+                    return View("ProviderFundingPaused", backUrl);
                 }
-                return View("EmployerFundingPaused");
+                return View("EmployerFundingPaused", backUrl);
             }
             catch (AccountLegalEntityNotFoundException e)
             {
@@ -253,9 +253,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (routeModel.UkPrn.HasValue)
                 {
-                    return View("ProviderFundingPaused");
+                    return View("ProviderFundingPaused", backUrl);
                 }
-                return View("EmployerFundingPaused");
+                return View("EmployerFundingPaused", backUrl);
             }
             var routeName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
             if (!routeModel.UkPrn.HasValue)
