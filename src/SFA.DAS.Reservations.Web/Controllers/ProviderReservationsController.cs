@@ -32,14 +32,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _externalUrlHelper = externalUrlHelper;
         }
 
-        public async Task<IActionResult> Index(bool isFromManage)
+        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
             var viewResult = await CheckNextGlobalRule(RouteNames.ProviderStart, ProviderClaims.ProviderUkprn, _externalUrlHelper.GenerateDashboardUrl());
             
             if (viewResult == null)
             {
-                RouteData.Values.Add(nameof(isFromManage), isFromManage);
-                return RedirectToRoute(RouteNames.ProviderStart, RouteData?.Values);
+                return RedirectToRoute(RouteNames.ProviderStart, routeModel);
             }
 
             return viewResult;

@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
@@ -18,8 +17,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _mediator = mediator;
         }
 
-        [Route("CheckNextGlobalRule")]
-        public async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink)
+        [NonAction]
+        protected internal async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink)
         {
             var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(claimName));
             var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery { Id = userAccountIdClaim.Value });

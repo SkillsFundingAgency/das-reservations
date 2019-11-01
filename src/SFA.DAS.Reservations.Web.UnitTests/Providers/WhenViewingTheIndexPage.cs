@@ -71,21 +71,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             //arrange
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
+            var routeModel = new ReservationsRouteModel
+            {
+                UkPrn = 1,
+                IsFromManage = true
+            };
 
             //act 
-            var redirect = await _controller.Index(true) as RedirectToRouteResult;
+            var redirect = await _controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
             Assert.AreEqual(redirect.RouteName, RouteNames.ProviderStart);
             Assert.AreEqual(true, redirect.RouteValues["isFromManage"]);
+            Assert.AreEqual(1, redirect.RouteValues["ukPrn"]);
         }
 
         [Test]
         public async Task ThenRedirectToFundingPausedIfFundingRulesExist()
         {
+            //Arrange
+            var routeModel = new ReservationsRouteModel
+            {
+                UkPrn = 1,
+                IsFromManage = true
+            };
+
             //act 
-            var view = await _controller.Index(true) as ViewResult;
+            var view = await _controller.Index(routeModel) as ViewResult;
 
             var viewModel = view?.Model as FundingRestrictionNotificationViewModel;
 
@@ -102,12 +115,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [Test]
         public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule()
         {
-            //arrange
+            //Arrange
+            var routeModel = new ReservationsRouteModel
+            {
+                UkPrn = 1,
+                IsFromManage = true
+            };
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await _controller.Index(true) as RedirectToRouteResult;
+            var redirect = await _controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
@@ -118,12 +136,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [Test]
         public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule()
         {
-            //arrange
+            //Arrange
+            var routeModel = new ReservationsRouteModel
+            {
+                UkPrn = 1,
+                IsFromManage = true
+            };
             _mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await _controller.Index(true) as RedirectToRouteResult;
+            var redirect = await _controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
