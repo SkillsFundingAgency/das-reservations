@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, _config.EmployerDashboardUrl);
+            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage));
 
             if (viewResult == null)
             {

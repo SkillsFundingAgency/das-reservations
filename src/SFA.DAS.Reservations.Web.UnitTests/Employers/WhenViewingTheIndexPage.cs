@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -71,10 +72,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToFundingNotificationIfFundingRulesExist(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> config,
+            [Frozen] Mock<IUrlHelper> urlHelper,
+            string expectedBackUrl,
             EmployerReservationsController controller)
         {
             //Arrange
+            urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
+                    c.RouteName.Equals(RouteNames.EmployerManage))))
+                .Returns(expectedBackUrl);
             var expectedRule = new GlobalRule
             {
                 Id = 2,
@@ -99,7 +104,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(expectedRule.Id, viewModel.RuleId);
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
-            Assert.AreEqual(config.Object.Value.EmployerDashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
             Assert.AreEqual(RouteNames.EmployerStart, viewModel.RouteName);
         }
 

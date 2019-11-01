@@ -45,19 +45,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return viewResult;
         }
 
-        [HttpGet]
-        [Route("select-course-rule-check", Name = RouteNames.ProviderApprenticeshipTrainingRuleCheck)]
-        public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
-        {
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerSelectCourse, ProviderClaims.ProviderUkprn, Url.RouteUrl(RouteNames.ProviderSelect, routeModel));
-            if (viewResult != null)
-            {
-                return viewResult;
-            }
-
-            return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, routeModel);
-        }
-
         [Route("start", Name = RouteNames.ProviderStart)]
         public async Task<IActionResult> Start(uint ukPrn, bool isFromManage)
         {
