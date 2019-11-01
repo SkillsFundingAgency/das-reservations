@@ -10,9 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Authorization.Caching;
-using SFA.DAS.Authorization.Context;
-using SFA.DAS.Authorization.DependencyResolution;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -225,7 +222,5 @@ namespace SFA.DAS.Reservations.Web
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-
-        
     }
 }
