@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IEncodingService encodingService, 
             IOptions<ReservationsWebConfiguration> options, 
             IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger) : base(mediator, options)
+            ILogger<EmployerReservationsController> logger) : base(mediator)
         {
             _mediator = mediator;
             _encodingService = encodingService;
@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart);
+            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, _config.EmployerDashboardUrl);
 
             if (viewResult == null)
             {
@@ -196,7 +196,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{id}/select-course-rule-check", Name = RouteNames.EmployerSelectCourseRuleCheck)]
         public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
         {
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerSelectCourse);
+            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerSelectCourse, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerSelect, routeModel));
             if (viewResult != null)
             {
                 return viewResult;

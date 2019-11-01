@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
-    public class ReservationsController : Controller
+    public class ReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
         private readonly ITrainingDateService _trainingDateService;
@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ReservationsController> logger,
             IEncodingService encodingService,
-            IExternalUrlHelper urlHelper)
+            IExternalUrlHelper urlHelper) :base(mediator)
         {
             _mediator = mediator;
             _trainingDateService = trainingDateService;
@@ -63,10 +63,29 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
 
 
+        [HttpGet]
+        [Route("accounts/{employerAccountId}/reservations/{id}/select-course-rule-check", Name = RouteNames.EmployerSelectCourseRuleCheck)]
+        [Route("{ukPrn}/reservations/{id}/select-course-rule-check", Name = RouteNames.ProviderApprenticeshipTrainingRuleCheck)]
+        public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
+        {
+            var isProvider = routeModel.UkPrn != null;
+            var redirectRouteName = isProvider ? RouteNames.ProviderApprenticeshipTraining : RouteNames.EmployerSelectCourse;
+            var backRouteName = isProvider? RouteNames.ProviderSelect : RouteNames.EmployerSelect;
+            var identifier = isProvider ? ProviderClaims.ProviderUkprn : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
+            
+            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, Url.RouteUrl(backRouteName, routeModel));
+            if (viewResult != null)
+            {
+                return viewResult;
+            }
+
+            return RedirectToRoute(redirectRouteName, routeModel);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("accounts/{employerAccountId}/reservations/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoice)]
-        [Route("{ukPrn}/reservations/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoice)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        [Route("{ukPrn}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoice)]
         public async Task<IActionResult> SaveRuleNotificationChoice(ReservationsRouteModel routeModel, FundingRestrictionNotificationViewModel viewModel, bool markRuleAsRead)
         {
             if (!markRuleAsRead)
