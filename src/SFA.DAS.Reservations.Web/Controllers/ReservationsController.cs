@@ -63,12 +63,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{ukPrn}/reservations/{id}/select-course-rule-check", Name = RouteNames.ProviderApprenticeshipTrainingRuleCheck)]
         public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
         {
+            //only comes from select
             var isProvider = routeModel.UkPrn != null;
             var redirectRouteName = isProvider ? RouteNames.ProviderApprenticeshipTraining : RouteNames.EmployerSelectCourse;
-            var backRouteName = isProvider? RouteNames.ProviderSelect : RouteNames.EmployerSelect;
+            var backLink = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                routeModel.CohortReference, string.IsNullOrEmpty(routeModel.CohortReference));
             var identifier = isProvider ? ProviderClaims.ProviderUkprn : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
             
-            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, Url.RouteUrl(backRouteName, routeModel));
+            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, backLink);
             if (viewResult != null)
             {
                 return viewResult;

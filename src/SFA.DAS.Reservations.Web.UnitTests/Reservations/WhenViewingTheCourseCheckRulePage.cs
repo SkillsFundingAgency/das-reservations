@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -27,14 +28,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string expectedUserId,
             string expectedBackUrl,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IUrlHelper> urlHelper,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             ReservationsController controller)
         {
             //Arrange
             routeModel.UkPrn = null;
-            urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
-                    c.RouteName.Equals(RouteNames.EmployerSelect) && c.Values.Equals(routeModel))))
-                .Returns(expectedBackUrl);
             var expectedRule = new GlobalRule
             {
                 Id = 2,
@@ -47,6 +45,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = new GetNextUnreadGlobalFundingRuleResult { Rule = expectedRule };
             mockMediator.Setup(x => x.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(c=>c.Id.Equals(expectedUserId)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
+            externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId,
+                routeModel.CohortReference, routeModel.CohortReference == string.Empty)).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;
@@ -94,13 +94,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string expectedUkprn,
             string expectedBackUrl,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IUrlHelper> urlHelper,
+            [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             ReservationsController controller)
         {
             //Arrange
-            urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
-                    c.RouteName.Equals(RouteNames.ProviderSelect) && c.Values.Equals(routeModel))))
-                .Returns(expectedBackUrl);
             var expectedRule = new GlobalRule
             {
                 Id = 2,
@@ -113,6 +110,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = new GetNextUnreadGlobalFundingRuleResult { Rule = expectedRule };
             mockMediator.Setup(x => x.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(c=>c.Id.Equals(expectedUkprn)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
+            externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                routeModel.CohortReference, routeModel.CohortReference == string.Empty)).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;
