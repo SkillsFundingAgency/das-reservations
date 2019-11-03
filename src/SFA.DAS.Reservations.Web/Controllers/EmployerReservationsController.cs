@@ -54,14 +54,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
 
             var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage));
 
             if (viewResult == null)
             {
-                return RedirectToRoute(RouteNames.EmployerStart, RouteData?.Values);
+                return RedirectToRoute(RouteNames.EmployerStart, routeModel);
             }
 
             return viewResult;

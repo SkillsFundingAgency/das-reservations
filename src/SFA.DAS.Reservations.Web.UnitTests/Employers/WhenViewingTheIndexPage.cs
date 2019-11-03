@@ -9,11 +9,9 @@ using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
@@ -27,6 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenChecksIfRelatedUnreadRulesExists(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //Arrange
@@ -39,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
 
             //act 
-            await controller.Index();
+            await controller.Index(routeModel);
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
@@ -50,6 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToStartIfNoFundingRulesExist(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await controller.Index() as RedirectToRouteResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
@@ -74,6 +74,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IUrlHelper> urlHelper,
             string expectedBackUrl,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //Arrange
@@ -94,7 +95,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(result);
 
             //act 
-            var view = await controller.Index() as ViewResult;
+            var view = await controller.Index(routeModel) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -112,6 +113,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -123,7 +125,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToRouteResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
@@ -134,6 +136,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -145,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToRouteResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
