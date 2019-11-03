@@ -106,6 +106,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
+            Assert.AreEqual(false, viewModel.IsProvider);
             Assert.AreEqual(RouteNames.EmployerStart, viewModel.RouteName);
         }
 

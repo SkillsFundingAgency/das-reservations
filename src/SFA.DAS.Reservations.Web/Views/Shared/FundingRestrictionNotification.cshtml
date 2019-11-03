@@ -25,17 +25,29 @@
                 <h1 class="das-panel__heading">
                     Upcoming change to government-funded training
                 </h1>
-                <p>
-                    Government funding for apprenticeship training will be paused
-                    on @Model.RestrictionStartDate.ToString("d MMMM yyyy") . You must
-                    reserve funding for your non-levy employers' training before this date.
-                </p>
+                @if (Model.IsProvider)
+                {
+                    <p>
+                        Government funding for apprenticeship training will be paused
+                        on @Model.RestrictionStartDate.ToString("d MMMM yyyy"). 
+                        You must reserve funding for your non-levy employers' training before this date.
+                    </p>
+                }
+                else
+                {
+                    <p>
+                        Government funding for apprenticeship training will be paused 
+                        on @Model.RestrictionStartDate.ToString("d MMMM yyyy").
+                        You must reserve funding for your training before this date.
+                    </p>
+                }
                 <p>
                     This change will not affect funding reserved before @Model.RestrictionStartDate.ToString("d MMMM yyyy")
                 </p>
-                <form asp-route="@RouteNames.ProviderSaveRuleNotificationChoice">
-                    <input type="hidden" name="RuleId" value="@Model.RuleId" />
-                    <input type="hidden" name="TypeOfRule" value="@Model.TypeOfRule" />
+                <form asp-route="@(Model.IsProvider ? RouteNames.ProviderSaveRuleNotificationChoice : RouteNames.EmployerSaveRuleNotificationChoice)">
+                    <input asp-for="RuleId" type="hidden" />
+                    <input asp-for="TypeOfRule" type="hidden" />
+                    <input asp-for="RouteName" type="hidden" />
                     <button type="submit" class="govuk-button das-button--inverted das-panel__button">
                         Continue
                     </button>

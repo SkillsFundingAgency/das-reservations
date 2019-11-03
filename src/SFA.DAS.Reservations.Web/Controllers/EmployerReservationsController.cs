@@ -193,19 +193,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/select-course-rule-check", Name = RouteNames.EmployerSelectCourseRuleCheck)]
-        public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
-        {
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerSelectCourse, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerSelect, routeModel));
-            if (viewResult != null)
-            {
-                return viewResult;
-            }
-
-            return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
-        }
-
-        [HttpGet]
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
         {

@@ -109,6 +109,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.AreEqual(_expectedRule.Id, viewModel.RuleId);
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
+            Assert.AreEqual(true, viewModel.IsProvider);
             Assert.AreEqual(ExpectedDashboardUrl, viewModel.BackLink);
         }
 

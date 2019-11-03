@@ -60,6 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
+            Assert.AreEqual(false, viewModel.IsProvider);
             Assert.AreEqual(RouteNames.EmployerSelectCourse, viewModel.RouteName);
         }
 
@@ -125,6 +126,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
+            Assert.AreEqual(true, viewModel.IsProvider);
             Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, viewModel.RouteName);
         }
 
