@@ -61,11 +61,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 .ReturnsAsync(new GetFundingRulesApiResponse { GlobalRules = _globalRules });
         }
 
-        [When(@"I create a reservation")]
-        public void WhenICreateAReservation()
-        {
-        }
-
         [Then(@"I am shown that there are restrictions in place")]
         public void ThenIAmShownThatThereAreRestrictionsInPlace()
         {
