@@ -37,7 +37,8 @@
                 <p>
                     This change will not affect funding reserved before @Model.RestrictionStartDate.ToString("d MMMM yyyy")
                 </p>
-                <form asp-route="@(Model.IsProvider ? RouteNames.ProviderSaveRuleNotificationChoice : RouteNames.EmployerSaveRuleNotificationChoice)">
+                
+                <form method="post" asp-route="@Model.PostRouteName">
                     <input asp-for="RuleId" type="hidden" />
                     <input asp-for="TypeOfRule" type="hidden" />
                     <input asp-for="RouteName" type="hidden" />

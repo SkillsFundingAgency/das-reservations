@@ -9,18 +9,21 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules
 {
-    public class GetAccountFundingRulesQueryHandler : IRequestHandler<GetAccountFundingRulesQuery, GetAccountFundingRulesResult>
+    public class
+        GetAccountFundingRulesQueryHandler : IRequestHandler<GetAccountFundingRulesQuery, GetAccountFundingRulesResult>
     {
         private readonly IFundingRulesService _fundingRulesService;
         private readonly IValidator<GetAccountFundingRulesQuery> _validator;
 
-        public GetAccountFundingRulesQueryHandler(IFundingRulesService fundingRulesService, IValidator<GetAccountFundingRulesQuery> validator)
+        public GetAccountFundingRulesQueryHandler(IFundingRulesService fundingRulesService,
+            IValidator<GetAccountFundingRulesQuery> validator)
         {
             _fundingRulesService = fundingRulesService;
             _validator = validator;
         }
 
-        public async Task<GetAccountFundingRulesResult> Handle(GetAccountFundingRulesQuery request, CancellationToken cancellationToken)
+        public async Task<GetAccountFundingRulesResult> Handle(GetAccountFundingRulesQuery request,
+            CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(request);
 
@@ -34,13 +37,10 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundin
             var rules = await _fundingRulesService.GetAccountFundingRules(request.AccountId);
             result.AccountFundingRules = rules;
 
-            if (rules?.GlobalRules != null && rules.GlobalRules.Any(x => x != null))
-            {
-                result.ActiveRule = rules.GlobalRules.First(x=> x != null).RuleType;
-            }
+            result.ActiveRule = rules?.GlobalRules?.FirstOrDefault(x => x != null)?.RuleType;
+
 
             return result;
-
         }
     }
 }

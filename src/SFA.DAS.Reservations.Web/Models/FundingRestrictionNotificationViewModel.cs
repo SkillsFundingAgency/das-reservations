@@ -11,5 +11,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string BackLink { get; set; }
         public string RouteName { get; set; }
         public bool IsProvider { get; set; }
+        public string PostRouteName { get; set; }
+        public bool MarkRuleAsRead { get; set; }
     }
 }

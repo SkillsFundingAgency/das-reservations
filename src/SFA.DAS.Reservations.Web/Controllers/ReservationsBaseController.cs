@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [NonAction]
-        protected internal async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink)
+        protected internal async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink, string postRouteName)
         {
 
             var isProvider = claimName == ProviderClaims.ProviderUkprn;
@@ -42,7 +42,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 RestrictionStartDate = nextGlobalRuleStartDate.Value,
                 BackLink = backLink,
                 RouteName = redirectRouteName,
-                IsProvider = isProvider
+                IsProvider = isProvider,
+                PostRouteName = postRouteName
             };
 
             return View("FundingRestrictionNotification", viewModel);

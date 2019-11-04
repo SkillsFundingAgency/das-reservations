@@ -7,6 +7,7 @@ using AutoFixture.AutoMoq;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -29,7 +30,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         private ReservationsWebConfiguration _config;
         private string ExpectedUkPrn = "123";
         private string ExpectedDashboardUrl = "https://dashboard/account";
+        private string ExpectedManageUrl = "https://dashboard/account/manage";
         private Mock<IExternalUrlHelper> _externalUrlHelper;
+        private Mock<IUrlHelper> _urlHelper;
 
         [SetUp]
         public void Arrange()
@@ -56,7 +59,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _externalUrlHelper = fixture.Freeze<Mock<IExternalUrlHelper>>();
             _externalUrlHelper.Setup(x => x.GenerateDashboardUrl(null)).Returns(ExpectedDashboardUrl);
 
-            
+            _urlHelper = fixture.Freeze<Mock<IUrlHelper>>();
+            _urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
+                    c.RouteName.Equals(RouteNames.ProviderManage))))
+                .Returns(ExpectedManageUrl);
+
             _controller = fixture.Create<ProviderReservationsController>();
             var claim = new Claim(ProviderClaims.ProviderUkprn, ExpectedUkPrn);
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
@@ -110,7 +117,35 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
             Assert.AreEqual(true, viewModel.IsProvider);
+            Assert.AreEqual(ExpectedManageUrl, viewModel.BackLink);
+            Assert.AreEqual(RouteNames.ProviderSaveRuleNotificationChoiceNoReservation, viewModel.PostRouteName);
+        }
+
+        [Test]
+        public async Task Then_Back_Link_Set_To_Dashboard_If_Not_From_Manage()
+        {
+            //Arrange
+            var routeModel = new ReservationsRouteModel
+            {
+                UkPrn = 1,
+                IsFromManage = false
+            };
+
+            //act 
+            var view = await _controller.Index(routeModel) as ViewResult;
+
+            var viewModel = view?.Model as FundingRestrictionNotificationViewModel;
+
+            //assert
+            Assert.IsNotNull(view);
+            Assert.IsNotNull(viewModel);
+            Assert.AreEqual(view.ViewName, "FundingRestrictionNotification");
+            Assert.AreEqual(_expectedRule.Id, viewModel.RuleId);
+            Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
+            Assert.AreEqual(_expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
+            Assert.AreEqual(true, viewModel.IsProvider);
             Assert.AreEqual(ExpectedDashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(RouteNames.ProviderSaveRuleNotificationChoiceNoReservation, viewModel.PostRouteName);
         }
 
         [Test]

@@ -69,8 +69,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var backLink = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
                 routeModel.CohortReference, string.IsNullOrEmpty(routeModel.CohortReference));
             var identifier = isProvider ? ProviderClaims.ProviderUkprn : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
-            
-            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, backLink);
+            var postRouteName = isProvider
+                ? RouteNames.ProviderSaveRuleNotificationChoice
+                : RouteNames.EmployerSaveRuleNotificationChoice;
+
+
+            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, backLink, postRouteName);
             if (viewResult != null)
             {
                 return viewResult;
@@ -81,11 +85,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("accounts/{employerAccountId}/reservations/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoiceNoReservation)]
         [Route("accounts/{employerAccountId}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        [Route("{ukPrn}/reservations/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoiceNoReservation)]
         [Route("{ukPrn}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoice)]
-        public async Task<IActionResult> SaveRuleNotificationChoice(ReservationsRouteModel routeModel, FundingRestrictionNotificationViewModel viewModel, bool markRuleAsRead)
+        public async Task<IActionResult> SaveRuleNotificationChoice(ReservationsRouteModel routeModel, FundingRestrictionNotificationViewModel viewModel)
         {
-            if (!markRuleAsRead)
+            if (!viewModel.MarkRuleAsRead)
             {
                 return RedirectToRoute(viewModel.RouteName);
             }

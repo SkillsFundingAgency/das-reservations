@@ -108,6 +108,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
             Assert.AreEqual(false, viewModel.IsProvider);
             Assert.AreEqual(RouteNames.EmployerStart, viewModel.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSaveRuleNotificationChoiceNoReservation, viewModel.PostRouteName);
         }
 
         [Test, MoqAutoData]

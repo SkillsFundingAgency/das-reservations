@@ -29,13 +29,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //arrange
             viewModel.RouteName = RouteNames.ProviderApprenticeshipTraining;
             routeModel.UkPrn = ukprn;
-
+            viewModel.MarkRuleAsRead = true;
 
             var claim = new Claim(ProviderClaims.ProviderUkprn, expectedUkprn);
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
             
             //act
-            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel, true) as RedirectToRouteResult;
+            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel) as RedirectToRouteResult;
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c => 
@@ -58,13 +58,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //arrange
             viewModel.RouteName = RouteNames.ProviderApprenticeshipTraining;
             routeModel.UkPrn = null;
-
+            viewModel.MarkRuleAsRead = true;
 
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
 
             //act
-            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel, true) as RedirectToRouteResult;
+            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel) as RedirectToRouteResult;
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c =>
@@ -84,8 +84,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            //Arrange
+            viewModel.MarkRuleAsRead = false;
+
             //act
-            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel, false) as RedirectToRouteResult;
+            var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel) as RedirectToRouteResult;
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<MarkRuleAsReadCommand>(c =>

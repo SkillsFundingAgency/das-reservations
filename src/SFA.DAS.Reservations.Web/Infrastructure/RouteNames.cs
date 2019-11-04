@@ -5,6 +5,8 @@
         public const string ProviderIndex = "provider-index";
         public const string ProviderStart = "provider-start";
 		public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
+
+        public const string ProviderSaveRuleNotificationChoiceNoReservation = "provider-save-rule-notification-choice-noreservation";
         public const string ProviderManage = "provider-manage";
         public const string ProviderSelect = "provider-select";
         public const string ProviderDelete = "provider-delete";
@@ -24,6 +26,7 @@
         public const string EmployerIndex = "employer-index";
         public const string EmployerStart = "employer-start";
 		public const string EmployerSaveRuleNotificationChoice = "employer-save-rule-notification-choice";
+        public const string EmployerSaveRuleNotificationChoiceNoReservation = "employer-save-rule-notification-choice-noreservation";
         public const string EmployerManage = "employer-manage";
         public const string EmployerSelect = "employer-select";
         public const string EmployerDelete = "employer-delete";
@@ -46,5 +49,6 @@
         public const string Error403 = "403";
         public const string Error404 = "404";
         public const string Error500 = "500";
+        
     }
 }

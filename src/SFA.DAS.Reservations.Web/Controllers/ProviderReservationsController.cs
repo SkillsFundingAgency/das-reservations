@@ -34,7 +34,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
-            var viewResult = await CheckNextGlobalRule(RouteNames.ProviderStart, ProviderClaims.ProviderUkprn, _externalUrlHelper.GenerateDashboardUrl());
+            var backLink = routeModel.IsFromManage.HasValue && routeModel.IsFromManage.Value
+                ? Url.RouteUrl(RouteNames.ProviderManage,routeModel)
+                : _externalUrlHelper.GenerateDashboardUrl();
+
+            var viewResult = await CheckNextGlobalRule(RouteNames.ProviderStart, ProviderClaims.ProviderUkprn, backLink, RouteNames.ProviderSaveRuleNotificationChoiceNoReservation);
             
             if (viewResult == null)
             {
