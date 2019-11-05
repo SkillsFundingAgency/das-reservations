@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Returns_List_Of_Reservations_For_All_Trusted_Employer_Accounts(
+        public async Task Then_Returns_List_Of_Reservations_From_Mediator(
             [Frozen] ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
             SearchReservationsResult searchResult,
