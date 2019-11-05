@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             try
             {
-                var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourse;
+                var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
                 CacheReservationEmployerCommand cacheReservationEmployerCommand;
                 Guid? userId = null;
                 if (routeModel.UkPrn.HasValue)
@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     cacheReservationEmployerCommand = response.Command;
 
-                    apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTraining;
+                    apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
                     
                 }
                 else
@@ -146,9 +146,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (routeModel.UkPrn.HasValue)
                 {
-                    return View("ProviderFundingPaused");
+                    return View("ProviderFundingPaused", backUrl);
                 }
-                return View("EmployerFundingPaused");
+                return View("EmployerFundingPaused", backUrl);
             }
             catch (AccountLegalEntityNotFoundException e)
             {
@@ -253,14 +253,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (routeModel.UkPrn.HasValue)
                 {
-                    return View("ProviderFundingPaused");
+                    return View("ProviderFundingPaused", backUrl);
                 }
-                return View("EmployerFundingPaused");
+                return View("EmployerFundingPaused", backUrl);
             }
-            var routeName = RouteNames.ProviderApprenticeshipTraining;
+            var routeName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
             if (!routeModel.UkPrn.HasValue)
             {
-                routeName = RouteNames.EmployerSelectCourse;
+                routeName = RouteNames.EmployerSelectCourseRuleCheck;
             }
             
             return RedirectToRoute(routeName, routeModel);

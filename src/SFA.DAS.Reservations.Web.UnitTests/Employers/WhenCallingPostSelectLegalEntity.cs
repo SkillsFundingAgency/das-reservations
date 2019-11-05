@@ -12,6 +12,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -158,6 +159,41 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             actualViewResult?.ViewName.Should().Be("SelectLegalEntity");
             controller.ModelState.IsValid.Should().BeFalse();
             controller.ModelState.Should().Contain(pair => pair.Key == "AccountId");
+        }
+
+
+        [Test, MoqAutoData]
+        public async Task And_Global_Rule_Exists_Then_Shows_Funding_Paused_Page(
+            ReservationsRouteModel routeModel,
+            ConfirmLegalEntityViewModel viewModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new GlobalReservationRuleException(10));
+
+            var result = await controller.PostSelectLegalEntity(routeModel, viewModel) as ViewResult;
+
+            Assert.AreEqual("EmployerFundingPaused", result?.ViewName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Reservation_Limit_Has_Been_Exceeded_Then_Shows_Reservation_Limit_Reached_Page(
+            ReservationsRouteModel routeModel,
+            ConfirmLegalEntityViewModel viewModel,
+            GetLegalEntitiesResponse getLegalEntitiesResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ReservationLimitReachedException(10));
+
+            var result = await controller.PostSelectLegalEntity(routeModel, viewModel) as ViewResult;
+
+            Assert.AreEqual("ReservationLimitReached", result?.ViewName);
         }
     }
 }

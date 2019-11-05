@@ -644,10 +644,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
-            GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
-            long expectedAccountId,
-            long expectedAccountLegalEntityId,
             SelectReservationsController controller)
         {
             //Arrange
@@ -695,7 +692,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                            c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
                     , It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining,result.RouteName);
+            Assert.AreEqual(RouteNames.ProviderApprenticeshipTrainingRuleCheck,result.RouteName);
             Assert.AreNotEqual(Guid.Empty, routeModel.Id);
         }
 
@@ -704,10 +701,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
-            GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
             long expectedAccountId,
-            long expectedAccountLegalEntityId,
             [Frozen] Mock<IEncodingService> encodingService,
             SelectReservationsController controller)
         {
@@ -747,7 +742,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                             c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
                     , It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, result.RouteName);
             Assert.AreNotEqual(Guid.Empty, routeModel.Id);
         }
 
@@ -756,10 +751,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
-            GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
             long expectedAccountId,
-            long expectedAccountLegalEntityId,
             uint providerId,
             [Frozen] Mock<IEncodingService> encodingService,
             SelectReservationsController controller)
@@ -803,7 +796,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                             c.AccountLegalEntityId.Equals(matchedEmployer.AccountLegalEntityId))
                     , It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, result.RouteName);
             Assert.AreNotEqual(Guid.Empty, routeModel.Id);
         }
 
@@ -812,10 +805,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
-                GetAvailableReservationsResult reservationsResult,
                 [Frozen] Mock<IMediator> mockMediator,
                 long expectedAccountId,
-                long expectedAccountLegalEntityId,
                 string cohortDetailsUrl,
                 [Frozen] Mock<IEncodingService> encodingService,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
@@ -869,10 +860,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetLegalEntitiesResponse employersResponse,
-                GetAvailableReservationsResult reservationsResult,
                 [Frozen] Mock<IMediator> mockMediator,
                 long expectedAccountId,
-                long expectedAccountLegalEntityId,
                 [Frozen] Mock<IEncodingService> encodingService,
                 SelectReservationsController controller)
         {

@@ -10,18 +10,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
+using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Extensions;
@@ -34,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
-    public class ReservationsController : Controller
+    public class ReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
         private readonly ITrainingDateService _trainingDateService;
@@ -49,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ReservationsController> logger,
             IEncodingService encodingService,
-            IExternalUrlHelper urlHelper)
+            IExternalUrlHelper urlHelper) :base(mediator)
         {
             _mediator = mediator;
             _trainingDateService = trainingDateService;
@@ -57,6 +54,64 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _encodingService = encodingService;
             _configuration = configuration.Value;
             _urlHelper = urlHelper;
+        }
+
+
+
+        [HttpGet]
+        [Route("accounts/{employerAccountId}/reservations/{id}/select-course-rule-check", Name = RouteNames.EmployerSelectCourseRuleCheck)]
+        [Route("{ukPrn}/reservations/{id}/select-course-rule-check", Name = RouteNames.ProviderApprenticeshipTrainingRuleCheck)]
+        public async Task<IActionResult> SelectCourseRuleCheck(ReservationsRouteModel routeModel)
+        {
+            //only comes from select
+            var isProvider = routeModel.UkPrn != null;
+            var redirectRouteName = isProvider ? RouteNames.ProviderApprenticeshipTraining : RouteNames.EmployerSelectCourse;
+            var backLink = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                routeModel.CohortReference, string.IsNullOrEmpty(routeModel.CohortReference));
+            var identifier = isProvider ? ProviderClaims.ProviderUkprn : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
+            var postRouteName = isProvider
+                ? RouteNames.ProviderSaveRuleNotificationChoice
+                : RouteNames.EmployerSaveRuleNotificationChoice;
+
+
+            var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, backLink, postRouteName);
+            if (viewResult != null)
+            {
+                return viewResult;
+            }
+
+            return RedirectToRoute(redirectRouteName, routeModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("accounts/{employerAccountId}/reservations/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoiceNoReservation)]
+        [Route("accounts/{employerAccountId}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.EmployerSaveRuleNotificationChoice)]
+        [Route("{ukPrn}/reservations/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoiceNoReservation)]
+        [Route("{ukPrn}/reservations/{id}/saveRuleNotificationChoice", Name = RouteNames.ProviderSaveRuleNotificationChoice)]
+        public async Task<IActionResult> SaveRuleNotificationChoice(ReservationsRouteModel routeModel, FundingRestrictionNotificationViewModel viewModel)
+        {
+            if (!viewModel.MarkRuleAsRead)
+            {
+                return RedirectToRoute(viewModel.RouteName);
+            }
+
+            var claim = routeModel.UkPrn != null ? 
+                HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)) : 
+                HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+
+            var claimValue = claim.Value;
+
+            var command = new MarkRuleAsReadCommand
+            {
+                Id = claimValue,
+                RuleId = viewModel.RuleId,
+                TypeOfRule = viewModel.TypeOfRule
+            };
+
+            await _mediator.Send(command);
+
+            return RedirectToRoute(viewModel.RouteName);
         }
 
         [Route("{ukPrn}/reservations/{id}/apprenticeship-training/{fromReview?}", Name = RouteNames.ProviderApprenticeshipTraining)]

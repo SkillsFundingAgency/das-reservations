@@ -110,7 +110,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             {
                 GlobalRules = new List<GlobalRule>()
                 {
-                    new GlobalRule()
+                    new GlobalRule
                     {
                         Id = accountId,
                         RuleType = GlobalRuleType.ReservationLimit,
@@ -118,7 +118,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 }
 
             };
-            _query = new GetAccountFundingRulesQuery() { AccountId = accountId };
+            _query = new GetAccountFundingRulesQuery { AccountId = accountId };
 
             _validator.Setup(m => m.ValidateAsync(_query))
                 .ReturnsAsync(new ValidationResult());
@@ -134,16 +134,52 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 
         }
 
+
+        [Test, MoqAutoData]
+        public async Task If_Multiple_GlobalRulesReturned_ThenSetsActiveRulePropertyInResult(
+            [Frozen] long accountId)
+
+        {
+            //Arrange
+            var expectedRules = new GetAccountFundingRulesApiResponse()
+            {
+                GlobalRules = new List<GlobalRule>()
+                {
+                    null,
+                    new GlobalRule
+                    {
+                        Id = accountId,
+                        RuleType = GlobalRuleType.ReservationLimit,
+                    }
+                }
+
+            };
+            _query = new GetAccountFundingRulesQuery { AccountId = accountId };
+
+            _validator.Setup(m => m.ValidateAsync(_query))
+                .ReturnsAsync(new ValidationResult());
+
+            _fundingRulesService.Setup(m => m.GetAccountFundingRules(accountId)).ReturnsAsync(expectedRules);
+            _handler = new GetAccountFundingRulesQueryHandler(_fundingRulesService.Object, _validator.Object);
+
+            //Act
+            var result = await _handler.Handle(_query, CancellationToken.None);
+
+            //Assert
+            Assert.AreEqual(expectedRules.GlobalRules.First(x=>x!=null).RuleType, result.ActiveRule);
+
+        }
+
         [Test, MoqAutoData]
         public async Task IfNoGlobalRulesReturned_ThenSetsActiveRulePropertyToNull(
             [Frozen] long accountId)
 
         {
             //Arrange
-            var expectedRules = new GetAccountFundingRulesApiResponse() { 
+            var expectedRules = new GetAccountFundingRulesApiResponse { 
                 GlobalRules = new List<GlobalRule>()};
 
-            _query = new GetAccountFundingRulesQuery() { AccountId = accountId };
+            _query = new GetAccountFundingRulesQuery { AccountId = accountId };
 
             _validator.Setup(m => m.ValidateAsync(_query))
                 .ReturnsAsync(new ValidationResult());
