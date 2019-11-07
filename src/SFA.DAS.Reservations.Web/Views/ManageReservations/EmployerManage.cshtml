@@ -6,6 +6,10 @@
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
 }
 
+@{
+    ViewBag.GaData.Vpv = "/accounts/reservations/manage";
+}
+
 @if (!Model.Reservations.Any())
 {
     <div class="govuk-width-container">

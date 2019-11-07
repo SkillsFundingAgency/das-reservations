@@ -5,6 +5,10 @@
     var fromManageRouteData = (new Dictionary<string, string> {{"IsFromManage", "true"}});
 }
 
+@{
+    ViewBag.GaData.Vpv = "/reservations/delete";
+}
+
 <a asp-route="@RouteNames.ProviderManage" class="govuk-back-link" asp-all-route-data="@fromManageRouteData">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">

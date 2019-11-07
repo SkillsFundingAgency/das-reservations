@@ -10,6 +10,15 @@
     ViewData["CustomErrorKeys"] = customErrorKeys;
 }
 
+@if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+{
+    ViewBag.GaData.Vpv = "/accounts/reservations/select";
+}
+else
+{
+    ViewBag.GaData.Vpv = "/reservations/select";
+}
+
 <a href="@Model.BackLink" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
@@ -19,12 +28,12 @@
             <partial name="_PageErrorsOverview" />
 
             <h1 class="govuk-heading-xl">Choose a Reservation</h1>
-            
+
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
                 <input asp-for="AccountId" type="hidden" />
-                <input asp-for="TransferSenderId" type="hidden"/>
-                <input asp-for="ProviderId" type="hidden"/>
+                <input asp-for="TransferSenderId" type="hidden" />
+                <input asp-for="ProviderId" type="hidden" />
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">

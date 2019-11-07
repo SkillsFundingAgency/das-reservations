@@ -6,6 +6,10 @@
     var changeRouteData = (new Dictionary<string, string> {{"fromReview", "true"}});
 }
 
+@{
+    ViewBag.GaData.Vpv = "/accounts/reservations/review";
+}
+
 @if (!string.IsNullOrEmpty(Model.BackLink))
 {
     <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
