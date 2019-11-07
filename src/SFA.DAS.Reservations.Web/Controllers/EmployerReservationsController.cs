@@ -12,7 +12,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -20,7 +19,6 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Filters;
@@ -32,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
     [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
-    public class EmployerReservationsController : Controller
+    public class EmployerReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
@@ -45,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IEncodingService encodingService, 
             IOptions<ReservationsWebConfiguration> options, 
             IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger)
+            ILogger<EmployerReservationsController> logger) : base(mediator)
         {
             _mediator = mediator;
             _encodingService = encodingService;
@@ -56,55 +54,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         // GET
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
-            var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = userAccountIdClaim.Value});
 
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage), RouteNames.EmployerSaveRuleNotificationChoiceNoReservation);
 
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0|| !nextGlobalRuleStartDate.HasValue)
+            if (viewResult == null)
             {
-                return RedirectToAction("Start", RouteData?.Values);
+                return RedirectToRoute(RouteNames.EmployerStart, routeModel);
             }
 
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = _config.EmployerDashboardUrl
-            };
+            return viewResult;
 
-            return View("FundingRestrictionNotification", viewModel);
-        }
-            
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("saveRuleNotificationChoice",Name = RouteNames.EmployerSaveRuleNotificationChoice)]
-        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
-        {
-            if(!markRuleAsRead)
-            {
-                return RedirectToRoute(RouteNames.EmployerStart);
-            }
-
-            var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
-			
-            var userId = userAccountIdClaim.Value;
-
-            var command = new MarkRuleAsReadCommand
-            {
-                Id = userId,
-                RuleId = ruleId,
-                TypeOfRule = typeOfRule
-            };
-            
-            await _mediator.Send(command);
-
-            return RedirectToRoute(RouteNames.EmployerStart);
         }
 
         [HttpGet]
@@ -132,7 +93,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 switch (activeGlobalRuleType)
                 {
                     case GlobalRuleType.FundingPaused:
-                        return View("EmployerFundingPaused");
+                        return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
 
                     case GlobalRuleType.ReservationLimit:
                         return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
@@ -146,7 +107,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.Error500);
             }
         }
-            
+
         [HttpGet]
         [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
         public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
@@ -177,7 +138,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (GlobalReservationRuleException)
             {
-                return View("EmployerFundingPaused");
+                return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
             }
             catch (Exception e)
             {
@@ -185,23 +146,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.Error500);
             }
 
-        }
-
-        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
-        {
-            var reservationId = routeModel.Id ?? Guid.NewGuid();
-            
-            await _mediator.Send(new CacheReservationEmployerCommand
-            {
-                Id = reservationId,
-                AccountId = accountLegalEntity.AccountId,
-                AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId,
-                EmployerHasSingleLegalEntity = employerHasSingleLegalEntity
-            });
-
-            routeModel.Id = reservationId;
         }
 
         [HttpPost]
@@ -241,6 +185,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ReservationLimitReachedException)
             {
                 return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+            }
+            catch (GlobalReservationRuleException)
+            {
+                return View("EmployerFundingPaused");
             }
         }
 
@@ -364,6 +312,24 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return viewModel;
         }
+        
+        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
+        {
+            var reservationId = routeModel.Id ?? Guid.NewGuid();
+            
+            await _mediator.Send(new CacheReservationEmployerCommand
+            {
+                Id = reservationId,
+                AccountId = accountLegalEntity.AccountId,
+                AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
+                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId,
+                EmployerHasSingleLegalEntity = employerHasSingleLegalEntity
+            });
+
+            routeModel.Id = reservationId;
+        }
+
 
         private string GenerateBackLink(ReservationsRouteModel routeModel, GetCachedReservationResult result)
         {

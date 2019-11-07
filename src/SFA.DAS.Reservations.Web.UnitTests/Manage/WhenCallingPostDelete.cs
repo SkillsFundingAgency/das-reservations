@@ -194,6 +194,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             ManageReservationsController controller)
         {
+            routeModel.IsFromManage = null;
+            routeModel.UkPrn = 12345;
+            viewModel.Delete = false;
+
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderManage);
@@ -206,6 +210,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
+            routeModel.IsFromManage = null;
+            viewModel.Delete = false;
 
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 

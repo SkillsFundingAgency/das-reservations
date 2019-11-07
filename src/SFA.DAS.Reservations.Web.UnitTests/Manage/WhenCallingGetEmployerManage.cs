@@ -118,6 +118,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .ReturnsAsync(getTrustedEmployersResponse);
 
             reservation.ProviderId = null;
+            reservation.IsExpired = false;
 
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
