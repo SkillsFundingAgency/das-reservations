@@ -4,6 +4,10 @@
     ViewData["Title"] = "Reserve funding for non-levy employers";
 }
 
+@{
+    ViewBag.GaData.Vpv = "/reservations/start";
+}
+
 @if (Model.IsFromManage)
 {
     <a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
