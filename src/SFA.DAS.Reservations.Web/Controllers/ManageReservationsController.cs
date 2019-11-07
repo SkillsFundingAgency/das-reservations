@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 Filter = filterModel
             });
 
-            if (searchResult.NumberOfRecordsFound == 0)
+            if (searchResult.NumberOfRecordsFound == 0 && string.IsNullOrEmpty(filterModel.SearchTerm))
             {
                 return View("NoPermissions");
             }
