@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
             result?.RouteName.Should().NotBeNull();
-            result.RouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            result.RouteName.Should().Be(RouteNames.ProviderApprenticeshipTrainingRuleCheck);
             result.RouteValues["ukPrn"].Should().Be(routeModel.UkPrn);
             result.RouteValues["id"].Should().NotBe(Guid.Empty);
             mockMediator.Verify(x =>
@@ -105,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
             result?.RouteName.Should().NotBeNull();
-            result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
+            result.RouteName.Should().Be(RouteNames.EmployerSelectCourseRuleCheck);
             result.RouteValues["EmployerAccountId"].Should().Be(routeModel.EmployerAccountId);
             result.RouteValues["id"].Should().NotBe(Guid.Empty);
             mockMediator.Verify(x =>

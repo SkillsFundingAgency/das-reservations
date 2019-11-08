@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var redirectResult = _actionResult as RedirectToRouteResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.AreEqual(RouteNames.EmployerSelectCourse, redirectResult.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, redirectResult.RouteName);
             Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, redirectResult.RouteValues["AccountLegalEntityPublicHashedId"]);
             Assert.AreEqual(TestData.ReservationRouteModel.CohortReference, redirectResult.RouteValues["CohortReference"]);
             Assert.AreEqual(TestData.ReservationRouteModel.EmployerAccountId, redirectResult.RouteValues["EmployerAccountId"]);

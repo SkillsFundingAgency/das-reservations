@@ -8,11 +8,10 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Routing;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
@@ -26,6 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenChecksIfRelatedUnreadRulesExists(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //Arrange
@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
 
             //act 
-            await controller.Index();
+            await controller.Index(routeModel);
 
             //assert
             mockMediator.Verify(m => m.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(
@@ -49,6 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task ThenRedirectToStartIfNoFundingRulesExist(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -60,21 +61,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
 
         [Test, MoqAutoData]
-        public async Task ThenRedirectToFundingPausedIfFundingRulesExist(
+        public async Task ThenRedirectToFundingNotificationIfFundingRulesExist(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> config,
+            [Frozen] Mock<IUrlHelper> urlHelper,
+            string expectedBackUrl,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //Arrange
+            urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
+                    c.RouteName.Equals(RouteNames.EmployerManage))))
+                .Returns(expectedBackUrl);
             var expectedRule = new GlobalRule
             {
                 Id = 2,
@@ -89,7 +95,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(result);
 
             //act 
-            var view = await controller.Index() as ViewResult;
+            var view = await controller.Index(routeModel) as ViewResult;
 
             //assert
             Assert.IsNotNull(view);
@@ -99,13 +105,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.AreEqual(expectedRule.Id, viewModel.RuleId);
             Assert.AreEqual(RuleType.GlobalRule, viewModel.TypeOfRule);
             Assert.AreEqual(expectedRule.ActiveFrom, viewModel.RestrictionStartDate);
-            Assert.AreEqual(config.Object.Value.EmployerDashboardUrl, viewModel.BackLink);
+            Assert.AreEqual(expectedBackUrl, viewModel.BackLink);
+            Assert.AreEqual(false, viewModel.IsProvider);
+            Assert.AreEqual(RouteNames.EmployerStart, viewModel.RouteName);
+            Assert.AreEqual(RouteNames.EmployerSaveRuleNotificationChoiceNoReservation, viewModel.PostRouteName);
         }
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToStartIfNoIdFoundOnNextGlobalFundingRule(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -117,17 +127,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
 
         [Test, MoqAutoData]
         public async Task ThenRedirectToStartIfNoActiveFromDateFoundOnNextGlobalFundingRule(
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
+            ReservationsRouteModel routeModel,
             EmployerReservationsController controller)
         {
             //arrange
@@ -139,11 +150,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 
             //act 
-            var redirect = await controller.Index() as RedirectToActionResult;
+            var redirect = await controller.Index(routeModel) as RedirectToRouteResult;
 
             //assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual(redirect.ActionName, "Start");
+            Assert.AreEqual(redirect.RouteName, RouteNames.EmployerStart);
         }
     }
 }

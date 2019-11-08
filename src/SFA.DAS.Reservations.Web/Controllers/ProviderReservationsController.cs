@@ -10,13 +10,10 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -24,69 +21,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
     [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
-    public class ProviderReservationsController : Controller
+    public class ProviderReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
         private readonly IExternalUrlHelper _externalUrlHelper;
 
-        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper)
+        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper) : base(mediator)
         {
             _mediator = mediator;
             _externalUrlHelper = externalUrlHelper;
         }
 
-        public async Task<IActionResult> Index(bool isFromManage)
+        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
-            var providerUkPrnClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
+            var backLink = routeModel.IsFromManage.HasValue && routeModel.IsFromManage.Value
+                ? Url.RouteUrl(RouteNames.ProviderManage,routeModel)
+                : _externalUrlHelper.GenerateDashboardUrl();
+
+            var viewResult = await CheckNextGlobalRule(RouteNames.ProviderStart, ProviderClaims.ProviderUkprn, backLink, RouteNames.ProviderSaveRuleNotificationChoiceNoReservation);
             
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery{Id = providerUkPrnClaim.Value});
-
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
-
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
+            if (viewResult == null)
             {
-                RouteData.Values.Add(nameof(isFromManage), isFromManage);
-                return RedirectToAction("Start", RouteData?.Values);
+                return RedirectToRoute(RouteNames.ProviderStart, routeModel);
             }
 
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = _externalUrlHelper.GenerateDashboardUrl()
-            };
-
-            return View("FundingRestrictionNotification", viewModel);
+            return viewResult;
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("saveRuleNotificationChoice",Name = RouteNames.ProviderSaveRuleNotificationChoice)]
-        public async Task<IActionResult> SaveRuleNotificationChoice(long ruleId, RuleType typeOfRule, bool markRuleAsRead)
-        {
-            if (!markRuleAsRead)
-            {
-                return RedirectToRoute(RouteNames.ProviderStart);
-            }
-
-            var userAccountIdClaim = ControllerContext.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn));
-
-            var userId = userAccountIdClaim.Value;
-
-            var command = new MarkRuleAsReadCommand
-            {
-                Id = userId,
-                RuleId = ruleId,
-                TypeOfRule = typeOfRule
-            };
-
-            await _mediator.Send(command);
-
-            return RedirectToRoute(RouteNames.ProviderStart);
-        }
-
 
         [Route("start", Name = RouteNames.ProviderStart)]
         public async Task<IActionResult> Start(uint ukPrn, bool isFromManage)
@@ -95,7 +55,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
             {
-                return View( "ProviderFundingPaused");
+                var backLink = isFromManage
+                    ? Url.RouteUrl(RouteNames.ProviderManage, new {ukPrn, isFromManage})
+                    : _externalUrlHelper.GenerateDashboardUrl(); 
+                return View( "ProviderFundingPaused", backLink);
             }
 
             var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();

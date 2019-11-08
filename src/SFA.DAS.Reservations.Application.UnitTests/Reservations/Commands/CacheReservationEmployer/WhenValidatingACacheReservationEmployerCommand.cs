@@ -82,7 +82,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     new GlobalRule
                     {
                         Restriction = AccountRestriction.NonLevy,
-                        RuleType = GlobalRuleType.FundingPaused
+                        RuleType = GlobalRuleType.FundingPaused,
+                        ActiveFrom = DateTime.UtcNow.AddMonths(-1)
                     }
                 }
             });
@@ -91,6 +92,33 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             result.IsValid().Should().BeTrue();
             result.FailedGlobalRuleValidation.Should().BeTrue();
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_The_GlobalRules_Are_Checked_And_If_There_Is_An_Upcoming_Restriction_An_Error_Is_Not_Returned_And_Valid(
+            CacheReservationEmployerCommand command,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen]Mock<IFundingRulesService> rulesService,
+            CacheReservationEmployerCommandValidator validator)
+        {
+            SetupAccountLegalEntityAsEoi(mockMediator);
+            rulesService.Setup(x => x.GetFundingRules()).ReturnsAsync(new GetFundingRulesApiResponse
+            {
+                GlobalRules = new List<GlobalRule>
+                {
+                    new GlobalRule
+                    {
+                        Restriction = AccountRestriction.NonLevy,
+                        RuleType = GlobalRuleType.FundingPaused,
+                        ActiveFrom = DateTime.UtcNow.AddMonths(1)
+                    }
+                }
+            });
+
+            var result = await validator.ValidateAsync(command);
+
+            result.IsValid().Should().BeTrue();
+            result.FailedGlobalRuleValidation.Should().BeFalse();
         }
 
         [Test, MoqAutoData]
