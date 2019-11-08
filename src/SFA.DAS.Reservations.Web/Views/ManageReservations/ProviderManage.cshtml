@@ -5,121 +5,97 @@
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
 }
 
-@if (!Model.Reservations.Any())
-{
-    <div class="govuk-width-container">
-        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
-        <main class="govuk-main-wrapper">
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
-                    <h2 class="govuk-heading-m">None of your employers have any funding to use.</h2>
-                    <p class="govuk-body">You need to secure funding in order to add a new apprentice.</p>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
-                    <form method="get" asp-route="@RouteNames.ProviderManage">
-                        <div class="govuk-form-group">
-                            <label for="searchTerm" class="govuk-label">Search employer name or course</label>
-                            <div class="das-search-form__group">
-                                <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
-                                <div class="das-search-form__button-wrap">
-                                    <button class="govuk-button das-search-form__button" type="submit">Search</button>
-                                </div>
+
+<div class="govuk-width-container">
+    <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+    <main class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
+		        <p class="govuk-body">This feature is currently only available to employers and training providers taking part in testing.</p>
+                <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
+                <form method="get" asp-route="@RouteNames.ProviderManage">
+                    <div class="govuk-form-group">
+                        <label for="searchTerm" class="govuk-label">Search employer name or course</label>
+                        <div class="das-search-form__group">
+                            <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
+                            <div class="das-search-form__button-wrap">
+                                <button class="govuk-button das-search-form__button" type="submit">Search</button>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+                @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
+                {
+                    <p class="govuk-body"><a href="#">Clear search</a></p>
+                    <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
+                }
+                else
+                {
+                    <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null)</p>
+                }
             </div>
-        </main>
-    </div>
-}
-else
-{
-    <div class="govuk-width-container">
-        <a href="@Model.BackLink" class="govuk-back-link">Back</a>
-        <main class="govuk-main-wrapper">
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
-		            <p class="govuk-body">This feature is currently only available to employers and training providers taking part in testing.</p>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
-                    <form method="get" asp-route="@RouteNames.ProviderManage">
-                        <div class="govuk-form-group">
-                            <label for="searchTerm" class="govuk-label">Search employer name or course</label>
-                            <div class="das-search-form__group">
-                                <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
-                                <div class="das-search-form__button-wrap">
-                                    <button class="govuk-button das-search-form__button" type="submit">Search</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
+        </div>
+    @if (Model.Reservations.Count != 0)
+    {
+        <table class="govuk-table das-table--responsive">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row" data-position="top">
+                <th class="govuk-table__header" scope="col">Employer</th>
+                <th class="govuk-table__header" scope="col">Apprenticeship training</th>
+                <th class="govuk-table__header" scope="col">Apprenticeship start date</th>
+                <th class="govuk-table__header" scope="col"></th>
+                <th class="govuk-table__header" scope="col"></th>
+            </tr>
+            </thead>
+
+            <tbody class="govuk-table__body">
+            @foreach (var reservation in Model.Reservations)
+            {
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" data-label="Employer" scope="row">
+                        @reservation.LegalEntityName
+                        <br/>
+                        @if (!reservation.IsExpired && reservation.Status != ReservationStatusViewModel.Pending)
+                        {
+                            <strong class="govuk-tag govuk-tag--inactive">used</strong>
+                        }
+                    </th>
+                    <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
+                    <td class="govuk-table__cell no-wrap" data-label="Start date">
+                        <span class="das-no-wrap">
+                            @reservation.TrainingDate.GetGDSDateString()
+                        </span><br/>
+
+                        @if (reservation.IsExpired)
+                        {
+                            <strong class="govuk-tag govuk-tag--inactive">expired</strong>
+                        }
+                    </td>
+                    @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
                     {
-                        <p class="govuk-body"><a href="#">Clear search</a></p>
-                        <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
+                        <td class="govuk-table__cell">
+                            <span class="das-no-wrap">
+                                <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                            </span>
+                        </td>
+                        <td class="govuk-table__cell">
+                            @if (reservation.CanProviderDeleteReservation)
+                            {
+                                <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
+                            }
+                        </td>
                     }
                     else
                     {
-                        <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null)</p>
+                        <td colspan="2"/>
                     }
-                </div>
-            </div>
+                </tr>
+            }
+            </tbody>
 
-            <table class="govuk-table das-table--responsive">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row" data-position="top">
-                        <th class="govuk-table__header" scope="col">Employer</th>
-                        <th class="govuk-table__header" scope="col">Apprenticeship training</th>
-                        <th class="govuk-table__header" scope="col">Apprenticeship start date</th>
-                        <th class="govuk-table__header" scope="col"></th>
-                        <th class="govuk-table__header" scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @foreach (var reservation in Model.Reservations)
-                    {
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" data-label="Employer" scope="row">
-                            @reservation.LegalEntityName
-                            <br />
-                            @if (!reservation.IsExpired && reservation.Status != ReservationStatusViewModel.Pending)
-                            {
-                                <strong class="govuk-tag govuk-tag--inactive">used</strong>
-                            }
-                        </th>
-                        <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
-                        <td class="govuk-table__cell no-wrap" data-label="Start date">
-                            <span class="das-no-wrap">
-                                @reservation.TrainingDate.GetGDSDateString()
-                            </span><br />
-                            
-                            @if (reservation.IsExpired)
-                            {
-                                <strong class="govuk-tag govuk-tag--inactive">expired</strong>
-                            }
-                        </td>
-                        @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
-                        {
-                            <td class="govuk-table__cell">
-                                <span class="das-no-wrap">
-                                    <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
-                                </span>
-                            </td>
-                            <td class="govuk-table__cell">
-                                @if (reservation.CanProviderDeleteReservation)
-                                {
-                                    <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
-                                }
-                            </td>
-                        }
-                        else
-                        {
-                            <td colspan="2" />
-                        }
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </main>
-    </div>
-}
+        </table>
+    }
+    </main>
+</div>
+
