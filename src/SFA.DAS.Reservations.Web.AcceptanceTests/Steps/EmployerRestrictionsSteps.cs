@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.AreEqual(expectedIndexResultViewName, (TestData.ActionResult as ViewResult)?.ViewName);
         }
 
-        [Then(@"i am able to dismiss them")]
+        [Then(@"I am able to dismiss them")]
         public void ThenIAmAbleToDismissThem()
         {
             var controller = Services.GetService<ReservationsController>();

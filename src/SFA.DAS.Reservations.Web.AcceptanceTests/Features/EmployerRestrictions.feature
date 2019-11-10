@@ -14,10 +14,5 @@ Scenario: User is shown upcoming restriction and can dimiss
 	And there are upcoming funding restrictions in place
 	When I start the reservation journey
 	Then I am shown that there are upcoming restrictions in place
-	And i am able to dismiss them
+	And I am able to dismiss them
 	
-Scenario: Restriction in place stops reservation being created
-	Given I am a non levy employer
-	And there are funding restrictions in place
-	When I create a reservation
-	Then The reservation is not created
