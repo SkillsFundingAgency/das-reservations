@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
@@ -11,6 +12,7 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Models;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
@@ -73,6 +75,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"I am shown that there are upcoming restrictions in place")]
         public void ThenIAmShownThatThereAreUpcomingRestrictionsInPlace()
         {
+            var mockUrlHelper = new Mock<IUrlHelper>();
+            mockUrlHelper.Setup(x => x.RouteUrl(It.IsAny<UrlRouteContext>())).Returns("https://testUrl.local");
             
             var expectedStartResultViewName = "Index";
             var actualView = TestData.ActionResult as ViewResult;
@@ -82,7 +86,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var expectedIndexResultViewName = "FundingRestrictionNotification";
             var controller = Services.GetService<EmployerReservationsController>();
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { _claim }));
-            TestData.ActionResult = controller.Index().Result;
+            controller.Url = mockUrlHelper.Object;
+            TestData.ActionResult = controller.Index(TestData.ReservationRouteModel).Result;
             Assert.NotNull(TestData.ActionResult);
             Assert.AreEqual(expectedIndexResultViewName, (TestData.ActionResult as ViewResult)?.ViewName);
         }
@@ -90,9 +95,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"i am able to dismiss them")]
         public void ThenIAmAbleToDismissThem()
         {
-            var controller = Services.GetService<EmployerReservationsController>();
+            var controller = Services.GetService<ReservationsController>();
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { _claim }));
-            TestData.ActionResult = controller.SaveRuleNotificationChoice(_globalRule.Id, RuleType.GlobalRule, true).Result;
+            var fundingRestrictionViewModel = new FundingRestrictionNotificationViewModel
+            {
+                RuleId = _globalRule.Id,
+                TypeOfRule = RuleType.GlobalRule,
+                MarkRuleAsRead = true,
+                IsProvider = false,
+                RouteName = RouteNames.EmployerStart
+            };
+            TestData.ActionResult = controller.SaveRuleNotificationChoice(TestData.ReservationRouteModel, fundingRestrictionViewModel).Result;
             Assert.NotNull(TestData.ActionResult);
             Assert.AreEqual(RouteNames.EmployerStart, (TestData.ActionResult as RedirectToRouteResult)?.RouteName);
         }
