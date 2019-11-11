@@ -1,4 +1,6 @@
-﻿using SFA.DAS.Reservations.Domain.Reservations;
+﻿using System.Collections;
+using System.Collections.Generic;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -16,6 +18,7 @@ namespace SFA.DAS.Reservations.Web.Models
             }
         }
         public int TotalNumberOfRecords { get; set; }
+        public List<PageLink> PageLinks { get; set; }
 
         public static implicit operator ReservationFilter(ManageReservationsFilterModel source)
         {
@@ -24,5 +27,13 @@ namespace SFA.DAS.Reservations.Web.Models
                 SearchTerm = source.SearchTerm
             };
         }
+    }
+
+    public class PageLink
+    {
+        public string Label { get; set; }
+        public string AriaLabel { get; set; }
+        public bool? IsCurrent { get; set; }
+        public string Link { get; set; }
     }
 }

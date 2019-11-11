@@ -1,4 +1,5 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+﻿@using Microsoft.EntityFrameworkCore
+@using SFA.DAS.Reservations.Web.Extensions
 @using SFA.DAS.Reservations.Web.Infrastructure
 @model ManageViewModel
 @{
@@ -119,13 +120,24 @@ else
             <nav role="navigation" aria-label="Pagination">
                 <div class="pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.NumberOfRecordsFound result@(Model.NumberOfRecordsFound != 1 ? "s" : null)</div>
                 <ul class="pagination">
-                    <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Previous page"><span aria-hidden="true" role="presentation">&laquo;</span> Previous</a></li>
+                    @foreach (var pageLink in Model.FilterModel.PageLinks)
+                    {
+                        <li class="pagination__item">
+                            <a class="pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current")" 
+                               href="@pageLink.Link" 
+                               aria-current="@pageLink.IsCurrent" 
+                               aria-label="@pageLink.AriaLabel">
+                                @pageLink.Label
+                            </a>
+                        </li>
+                    }
+                    <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Previous page">Previous</a></li>
                     <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Page 1">1</a></li>
                     <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Page 2">2</a></li>
                     <li class="pagination__item"><a class="pagination__link current" href="#0" aria-current="true" aria-label="Page 3, current page">3</a></li>
                     <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Page 4">4</a></li>
                     <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Page 5">5</a></li>
-                    <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Next page">Next <span aria-hidden="true" role="presentation">&raquo;</span></a></li>
+                    <li class="pagination__item"><a class="pagination__link" href="#0" aria-label="Next page">Next</a></li>
                 </ul>
             </nav>
         </main>
