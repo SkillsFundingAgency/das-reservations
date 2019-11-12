@@ -7,6 +7,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
@@ -19,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
     public class WhenSearchingReservations
     {
         [Test, MoqAutoData]
-        public async Task And_Invalid_Then_Throws_Validation_Exception(
+        public void And_Invalid_Then_Throws_Validation_Exception(
             SearchReservationsQuery query,
             ValidationResult validationResult,
             string propertyName,
@@ -27,6 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             SearchReservationsQueryHandler handler)
         {
             validationResult.AddError(propertyName);
+            validationResult.FailedAuthorisationValidation = false;
             mockValidator
                 .Setup(validator => validator.ValidateAsync(query))
                 .ReturnsAsync(validationResult);
@@ -38,6 +40,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
         }
 
         [Test, MoqAutoData]
+        public void And_Has_No_Permissions_Then_Throws_No_Permissions_Exception(SearchReservationsQuery query,
+            ValidationResult validationResult,
+            string propertyName,
+            [Frozen]Mock<IValidator<SearchReservationsQuery>> mockValidator,
+            SearchReservationsQueryHandler handler)
+        {
+            validationResult.ValidationDictionary.Clear();
+            validationResult.FailedAuthorisationValidation = true;
+            mockValidator
+                .Setup(validator => validator.ValidateAsync(query))
+                .ReturnsAsync(validationResult);
+
+            Assert.ThrowsAsync<ProviderNotAuthorisedException>(() => handler.Handle(query, CancellationToken.None));
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Gets_Search_Result_From_Service(
             SearchReservationsQuery query,
             [Frozen] ValidationResult validationResult,
@@ -45,6 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             SearchReservationsQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
+            validationResult.FailedAuthorisationValidation = false;
 
             await handler.Handle(query, CancellationToken.None);
 
@@ -63,6 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             SearchReservationsQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
+            validationResult.FailedAuthorisationValidation = false;
             mockReservationService
                 .Setup(service => service.SearchReservations(
                     It.Is<SearchReservationsRequest>(request => 
