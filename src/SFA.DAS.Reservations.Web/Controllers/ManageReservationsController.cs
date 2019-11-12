@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
@@ -81,47 +82,50 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         public async Task<IActionResult> ProviderManage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
         {
-            var reservations = new List<ReservationViewModel>();
-
-            var searchResult = await _mediator.Send(new SearchReservationsQuery
+            try
             {
-                ProviderId = routeModel.UkPrn.Value,
-                Filter = filterModel
-            });
+                var reservations = new List<ReservationViewModel>();
 
-            if (searchResult.NumberOfRecordsFound == 0 && string.IsNullOrEmpty(filterModel.SearchTerm))
+                var searchResult = await _mediator.Send(new SearchReservationsQuery
+                {
+                    ProviderId = routeModel.UkPrn.Value,
+                    Filter = filterModel
+                });
+
+                foreach (var reservation in searchResult.Reservations)
+                {
+                    var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
+                        EncodingType.PublicAccountLegalEntityId);
+
+                    var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired
+                        ? _urlHelper.GenerateAddApprenticeUrl(
+                            reservation.Id,
+                            accountLegalEntityPublicHashedId,
+                            reservation.Course.Id,
+                            routeModel.UkPrn,
+                            reservation.StartDate,
+                            routeModel.CohortReference,
+                            routeModel.EmployerAccountId)
+                        : string.Empty;
+
+                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
+
+                    reservations.Add(viewModel);
+                }
+
+                return View(ViewNames.ProviderManage, new ManageViewModel
+                {
+                    Reservations = reservations,
+                    NumberOfRecordsFound = searchResult.NumberOfRecordsFound,
+                    BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+                    FilterModel = filterModel
+                });
+            }
+            catch (ProviderNotAuthorisedException e)
             {
+                _logger.LogInformation(e, $"Provider {e.UkPrn} has no permissions for viewing manage");
                 return View("NoPermissions");
             }
-
-            foreach (var reservation in searchResult.Reservations)
-            {
-                var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
-                    EncodingType.PublicAccountLegalEntityId);
-
-                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
-                    ? _urlHelper.GenerateAddApprenticeUrl(
-                    reservation.Id, 
-                    accountLegalEntityPublicHashedId, 
-                    reservation.Course.Id,
-                    routeModel.UkPrn,
-                    reservation.StartDate,
-                    routeModel.CohortReference,
-                    routeModel.EmployerAccountId) 
-                    : string.Empty;
-
-                var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
-
-                reservations.Add(viewModel);
-            }
-
-            return View(ViewNames.ProviderManage, new ManageViewModel
-            {
-                Reservations = reservations,
-                NumberOfRecordsFound = searchResult.NumberOfRecordsFound,
-                BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
-                FilterModel = filterModel
-            });
         }
         
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]

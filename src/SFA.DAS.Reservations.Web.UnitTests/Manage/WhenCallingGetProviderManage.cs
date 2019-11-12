@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -174,7 +175,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         }
 
         [Test, MoqAutoData]
-        public async Task And_The_Provider_Has_No_TrustedEmployers_And_Is_A_Blank_Search_Query_Then_A_NoPermissions_View_Is_Returned(
+        public async Task And_The_Provider_Has_No_TrustedEmployers_Then_A_NoPermissions_View_Is_Returned(
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
             [Frozen] Mock<IMediator> mockMediator,
@@ -183,7 +184,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             filterModel.SearchTerm = string.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new SearchReservationsResult{NumberOfRecordsFound = 0});
+                .ThrowsAsync(new ProviderNotAuthorisedException(0, 1));
 
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
