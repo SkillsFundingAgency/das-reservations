@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Models;
@@ -24,8 +25,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             {
                 pageLinks[i].Label.Should().Be($"{i+1}");
                 pageLinks[i].AriaLabel.Should().Be($"Page {i+1}");
-                pageLinks[i].Link.Should()
-                    .Be($"searchTerm={filterModel.SearchTerm}&pageSize={ManageReservationsFilterModel.PageSize}&pageNumber={i+1}");
+                pageLinks[i].RouteData.Should().BeEquivalentTo(new Dictionary<string, string>
+                    {
+                        {"searchTerm", filterModel.SearchTerm },
+                        {"pageSize", ManageReservationsFilterModel.PageSize.ToString() },
+                        {"pageNumber", (i+1).ToString() }
+                    });
             }
         }
 
@@ -183,9 +188,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             pageLinks.Last().Label.Should().Be("Next");
             pageLinks.Last().AriaLabel.Should().Be("Next page");
-            pageLinks.Last().Link.Should()
-                .Be(pageLinks.Single(link => 
-                    link.Label == (filterModel.PageNumber + 1).ToString()).Link);
+            pageLinks.Last().RouteData.Should()
+                .BeEquivalentTo(pageLinks.Single(link => 
+                    link.Label == (filterModel.PageNumber + 1).ToString()).RouteData);
         }
 
         [Test]
@@ -215,9 +220,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             pageLinks.First().Label.Should().Be("Previous");
             pageLinks.First().AriaLabel.Should().Be("Previous page");
-            pageLinks.First().Link.Should()
-                .Be(pageLinks.Single(link => 
-                    link.Label == 1.ToString()).Link);
+            pageLinks.First().RouteData.Should()
+                .BeEquivalentTo(pageLinks.Single(link => 
+                    link.Label == "1").RouteData);
         }
 
         [Test]

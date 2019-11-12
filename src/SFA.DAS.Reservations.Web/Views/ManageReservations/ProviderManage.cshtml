@@ -125,7 +125,7 @@ else
                         <li class="pagination__item">
                             <a class="pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")" 
                                asp-route="@RouteNames.ProviderManage"
-                               
+                               asp-all-route-data="@pageLink.RouteData"
                                aria-current="@pageLink.IsCurrent" 
                                aria-label="@pageLink.AriaLabel">
                                 @pageLink.Label

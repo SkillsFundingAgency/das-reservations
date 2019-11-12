@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.Models
                     {
                         Label = "Previous",
                         AriaLabel = "Previous page",
-                        Link = BuildLink(PageNumber-1)
+                        RouteData = BuildRouteData(PageNumber-1)
                     });
                 }
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Models
                         Label = (pageNumberSeed + i).ToString(),
                         AriaLabel = $"Page {pageNumberSeed + i}",
                         IsCurrent = i+1==PageNumber? true : (bool?)null,
-                        Link = BuildLink(pageNumberSeed + i)
+                        RouteData = BuildRouteData(pageNumberSeed + i)
                     };
                     links.Add(link);
                 }
@@ -67,7 +67,7 @@ namespace SFA.DAS.Reservations.Web.Models
                     {
                         Label = "Next",
                         AriaLabel = "Next page",
-                        Link = BuildLink(PageNumber+1)
+                        RouteData = BuildRouteData(PageNumber+1)
                     });
                 }
 
@@ -83,18 +83,19 @@ namespace SFA.DAS.Reservations.Web.Models
             };
         }
 
-        private string BuildLink(int pageNumber)
+        private Dictionary<string, string> BuildRouteData(int pageNumber)
         {
-            var link = new StringBuilder();
+            var routeData = new Dictionary<string, string>();
 
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                link.Append($"searchTerm={SearchTerm}&");
+                routeData.Add("searchTerm", SearchTerm);
             }
 
-            link.Append($"pageSize={PageSize}&pageNumber={pageNumber}");
+            routeData.Add("pageSize", PageSize.ToString());
+            routeData.Add("pageNumber", pageNumber.ToString());
 
-            return link.ToString();
+            return routeData;
         }
     }
 
@@ -103,6 +104,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string Label { get; set; }
         public string AriaLabel { get; set; }
         public bool? IsCurrent { get; set; }
-        public string Link { get; set; }
+        public Dictionary<string, string> RouteData { get; set; }
     }
 }
