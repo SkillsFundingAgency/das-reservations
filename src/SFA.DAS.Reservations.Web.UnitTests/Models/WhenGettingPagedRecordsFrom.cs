@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             filterModel.PageNumber = 2;
 
-            filterModel.PagedRecordsFrom.Should().Be(filterModel.PageSize+1);
+            filterModel.PagedRecordsFrom.Should().Be(ManageReservationsFilterModel.PageSize+1);
         }
 
         [Test, AutoData]
@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             filterModel.PageNumber = 3;
 
-            filterModel.PagedRecordsFrom.Should().Be(2*filterModel.PageSize+1);
+            filterModel.PagedRecordsFrom.Should().Be(2*ManageReservationsFilterModel.PageSize+1);
         }
     }
 }

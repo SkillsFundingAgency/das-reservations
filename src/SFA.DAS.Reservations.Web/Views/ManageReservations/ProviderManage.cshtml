@@ -123,8 +123,9 @@ else
                     @foreach (var pageLink in Model.FilterModel.PageLinks)
                     {
                         <li class="pagination__item">
-                            <a class="pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current")" 
-                               href="@pageLink.Link" 
+                            <a class="pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")" 
+                               asp-route="@RouteNames.ProviderManage"
+                               
                                aria-current="@pageLink.IsCurrent" 
                                aria-label="@pageLink.AriaLabel">
                                 @pageLink.Label
