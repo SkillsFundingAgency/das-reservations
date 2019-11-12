@@ -25,8 +25,14 @@
                         </div>
                     </div>
                 </form>
-
-                <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null)</p>
+                @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
+                {
+                    <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
+                }
+                else
+                {
+                    <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null)</p>
+                }
             
             </div>
         </div>
