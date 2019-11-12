@@ -28,7 +28,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 pageLinks[i].RouteData.Should().BeEquivalentTo(new Dictionary<string, string>
                     {
                         {"searchTerm", filterModel.SearchTerm },
-                        {"pageSize", ManageReservationsFilterModel.PageSize.ToString() },
                         {"pageNumber", (i+1).ToString() }
                     });
             }

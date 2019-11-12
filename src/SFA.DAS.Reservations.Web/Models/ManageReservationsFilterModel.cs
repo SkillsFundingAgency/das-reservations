@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Text;
 using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Web.Models
@@ -92,7 +90,6 @@ namespace SFA.DAS.Reservations.Web.Models
                 routeData.Add("searchTerm", SearchTerm);
             }
 
-            routeData.Add("pageSize", PageSize.ToString());
             routeData.Add("pageNumber", pageNumber.ToString());
 
             return routeData;
