@@ -77,7 +77,9 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             return new ReservationFilter
             {
-                SearchTerm = source.SearchTerm
+                SearchTerm = source.SearchTerm,
+                PageNumber = source.PageNumber,
+                PageSize = PageSize
             };
         }
 

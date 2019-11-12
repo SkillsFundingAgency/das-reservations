@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
 
             mockMediator.Verify(mediator =>
                     mediator.Send(
-                        It.Is<SearchReservationsQuery>(query => query.ProviderId == routeModel.UkPrn),//todo: yeah? or providerId?? :(
+                        It.Is<SearchReservationsQuery>(query => query.ProviderId == routeModel.UkPrn),
                         It.IsAny<CancellationToken>()),
                 Times.Once);
         }
