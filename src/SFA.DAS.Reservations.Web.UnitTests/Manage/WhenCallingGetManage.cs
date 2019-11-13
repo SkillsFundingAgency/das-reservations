@@ -211,7 +211,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 It.IsAny<DateTime>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
-                It.IsAny<bool>())).Returns(expectedUrl);
+                It.IsAny<bool>(),
+                string.Empty)).Returns(expectedUrl);
 
             getReservationsResult.Reservations.ToList().ForEach(c =>
             {
@@ -274,7 +275,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 reservation.StartDate,
                 routeModel.CohortReference,
                 routeModel.EmployerAccountId,
-                false))
+                false,
+                string.Empty))
                 .Returns(expectedUrl);
                 
             
