@@ -7,15 +7,15 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
+using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -29,83 +29,104 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
-        private readonly ReservationsWebConfiguration _configuration;
         private readonly ILogger<ManageReservationsController> _logger;
 
         public ManageReservationsController(
             IMediator mediator, 
             IEncodingService encodingService,
             IExternalUrlHelper urlHelper,
-            IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ManageReservationsController> logger)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
-            _configuration = configuration.Value;
             _logger = logger;
         }
+
         [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
-        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
-        public async Task<IActionResult> Manage(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> EmployerManage(ReservationsRouteModel routeModel)
         {
-            var employerAccountIds = new List<long>();
             var reservations = new List<ReservationViewModel>();
-            string viewName;
 
-            if (routeModel.UkPrn.HasValue)
+            var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+            var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = decodedAccountId});
+
+            foreach (var reservation in reservationsResult.Reservations)
             {
-                var trustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+                var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
+                    EncodingType.PublicAccountLegalEntityId);
 
-                if (!trustedEmployersResponse.Employers.Any())
-                {
-                    return View("NoPermissions");
-                }
+                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
+                    ? _urlHelper.GenerateAddApprenticeUrl(
+                    reservation.Id, 
+                    accountLegalEntityPublicHashedId, 
+                    reservation.Course.Id,
+                    routeModel.UkPrn,
+                    reservation.StartDate,
+                    routeModel.CohortReference,
+                    routeModel.EmployerAccountId) 
+                    : string.Empty;
 
-                employerAccountIds.AddRange(trustedEmployersResponse.Employers.Select(employer => employer.AccountId));
-                viewName = ViewNames.ProviderManage;
+                var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
+                reservations.Add(viewModel);
             }
-            else
-            {
-                var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
-                employerAccountIds.Add(decodedAccountId);
-                viewName = ViewNames.EmployerManage;
-            }
 
-            foreach (var employerAccountId in employerAccountIds)
-            {
-                var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = employerAccountId});
-
-                foreach (var reservation in reservationsResult.Reservations)
-                {
-                    var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
-                        EncodingType.PublicAccountLegalEntityId);
-
-                    var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
-                        ? _urlHelper.GenerateAddApprenticeUrl(
-                        reservation.Id, 
-                        accountLegalEntityPublicHashedId, 
-                        reservation.Course.Id,
-                        routeModel.UkPrn,
-                        reservation.StartDate,
-                        routeModel.CohortReference,
-                        routeModel.EmployerAccountId) 
-                        : string.Empty;
-
-                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
-
-                    reservations.Add(viewModel);
-                }
-            }
-            
-            return View(viewName, new ManageViewModel
+            return View(ViewNames.EmployerManage, new ManageViewModel
             {
                 Reservations = reservations,
                 BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId)
             });
         }
 
+        [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
+        public async Task<IActionResult> ProviderManage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
+        {
+            try
+            {
+                var reservations = new List<ReservationViewModel>();
+
+                var searchResult = await _mediator.Send(new SearchReservationsQuery
+                {
+                    ProviderId = routeModel.UkPrn.Value,
+                    Filter = filterModel
+                });
+
+                foreach (var reservation in searchResult.Reservations)
+                {
+                    var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
+                        EncodingType.PublicAccountLegalEntityId);
+
+                    var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired
+                        ? _urlHelper.GenerateAddApprenticeUrl(
+                            reservation.Id,
+                            accountLegalEntityPublicHashedId,
+                            reservation.Course.Id,
+                            routeModel.UkPrn,
+                            reservation.StartDate,
+                            routeModel.CohortReference,
+                            routeModel.EmployerAccountId)
+                        : string.Empty;
+
+                    var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
+
+                    reservations.Add(viewModel);
+                }
+
+                return View(ViewNames.ProviderManage, new ManageViewModel
+                {
+                    Reservations = reservations,
+                    NumberOfRecordsFound = searchResult.NumberOfRecordsFound,
+                    BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+                    FilterModel = filterModel
+                });
+            }
+            catch (ProviderNotAuthorisedException e)
+            {
+                _logger.LogInformation(e, $"Provider {e.UkPrn} has no permissions for viewing manage");
+                return View("NoPermissions");
+            }
+        }
         
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]

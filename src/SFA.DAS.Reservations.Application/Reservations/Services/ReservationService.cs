@@ -42,6 +42,31 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             return result;
         }
 
+        public async Task<SearchReservationsResponse> SearchReservations(SearchReservationsRequest filter)
+        {
+            var apiReservations = await _apiClient.Search<SearchReservationsApiResponse>(new SearchReservationsApiRequest(_config.Url, filter));
+
+            var result = apiReservations.Reservations.Select(apiReservation => new Reservation
+            {
+                Id = apiReservation.Id,
+                AccountLegalEntityName = apiReservation.AccountLegalEntityName,
+                AccountLegalEntityId = apiReservation.AccountLegalEntityId,
+                CreatedDate = apiReservation.CreatedDate,
+                StartDate = apiReservation.StartDate,
+                ExpiryDate = apiReservation.ExpiryDate,
+                IsExpired = apiReservation.IsExpired,
+                Course = apiReservation.Course,
+                Status = (ReservationStatus) apiReservation.Status,
+                ProviderId = apiReservation.ProviderId
+            });
+
+            return new SearchReservationsResponse
+            {
+                Reservations = result,
+                NumberOfRecordsFound = apiReservations.NumberOfRecordsFound
+            };
+        }
+
         public async Task<CreateReservationResponse> CreateReservationLevyEmployer(Guid reservationId, long accountId,
             long accountLegalEntityId, long? transferSenderAccountId, Guid? userId)
         {

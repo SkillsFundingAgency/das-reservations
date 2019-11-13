@@ -16,11 +16,11 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 {
     [Binding]
-    public class ManageReservationSteps :StepsBase
+    public class EmployerManageReservationSteps :StepsBase
     {
         private ManageViewModel _actualModel;
 
-        public ManageReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerManageReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
            
         }
@@ -41,20 +41,23 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 expiryDate = DateTime.UtcNow.AddMonths(-1);
             }
 
-            TestData.Reservations.Add(
-                new GetReservationResponse
-                {
-                    Id = Guid.NewGuid(),
-                    AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
-                    StartDate = startDate,
-                    ExpiryDate = expiryDate,
-                    Course = new Course("1", "Test Course", 1),
-                    AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
-                    IsExpired = isExpired,
-                    Status = (int)reservationStatus,
-                    CreatedDate = DateTime.UtcNow
-                }
-            );
+            for (var i = 0; i < numberOfReservations; i++)
+            {
+                TestData.Reservations.Add(
+                    new GetReservationResponse
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
+                        StartDate = startDate,
+                        ExpiryDate = expiryDate,
+                        Course = new Course("1", "Test Course", 1),
+                        AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
+                        IsExpired = isExpired,
+                        Status = (int)reservationStatus,
+                        CreatedDate = DateTime.UtcNow
+                    }
+                );
+            }
         }
 
         [When(@"I view the manage reservation screen")]
@@ -66,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             mock.Setup(x => x.GetAll<GetReservationResponse>(
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
-            var actual = controller.Manage(TestData.ReservationRouteModel).Result as ViewResult;
+            var actual = controller.EmployerManage(TestData.ReservationRouteModel).Result as ViewResult;
             Assert.IsNotNull(actual);
             _actualModel = actual.Model as ManageViewModel;
         }
@@ -102,7 +105,5 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             Assert.AreEqual(string.Empty, _actualModel.Reservations.First().ApprenticeUrl);
         }
-
-
     }
 }

@@ -21,6 +21,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
+using SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservations;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations;
 
@@ -47,6 +48,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddScoped(typeof(IValidator<GetProviderCacheReservationCommandQuery>), typeof(GetProviderCacheReservationCommandQueryValidator));
             services.AddScoped(typeof(IValidator<GetCohortQuery>), typeof(GetCohortQueryValidator));
             services.AddScoped(typeof(IValidator<GetAccountFundingRulesQuery>), typeof(GetAccountFundingRulesValidator));
+            services.AddScoped(typeof(IValidator<SearchReservationsQuery>), typeof(SearchReservationsQueryValidator));
         }
     }
 }

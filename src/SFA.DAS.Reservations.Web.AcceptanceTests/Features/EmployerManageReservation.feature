@@ -1,4 +1,4 @@
-﻿Feature: ManageReservation
+﻿Feature: EmployerManageReservation
 	In order to manage reservations
 	As an employer
 	I want to be able to view the reservations I have made

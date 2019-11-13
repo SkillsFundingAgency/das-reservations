@@ -30,7 +30,6 @@
     <Folder Include="Infrastructure\HasEmployerViewerUserRoleOrIsProviderTests\" />
     <Folder Include="Infrastructure\HasProviderOrEmployerAccountAuthorisationHandlerTests\" />
     <Folder Include="Infrastructure\ProviderAuthorizationHandlerTests\" />
-    <Folder Include="Manage\" />
   </ItemGroup>
 
 </Project>
