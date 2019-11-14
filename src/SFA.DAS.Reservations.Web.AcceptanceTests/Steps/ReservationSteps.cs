@@ -21,7 +21,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     public class ReservationSteps : StepsBase
     {
         private string _reviewRedirectUrl;
-        private IActionResult _actualResult;
 
         public ReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
@@ -60,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var urlHelper = Services.GetService<IUrlHelper>();
             var mock = Mock.Get(urlHelper);
             controller.Url = mock.Object;
-            _actualResult = controller.Start(TestData.ReservationRouteModel).Result;
+            TestData.ActionResult = controller.Start(TestData.ReservationRouteModel).Result;
         }
         
         [Given(@"I have chosen a legal entity")]
@@ -75,13 +74,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 LegalEntity = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
             };
 
-            _actualResult = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
+            TestData.ActionResult = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
                 .Result;
 
 
-            if (typeof(RedirectToRouteResult) == _actualResult.GetType())
+            if (typeof(RedirectToRouteResult) == TestData.ActionResult.GetType())
             {
-                var result = _actualResult as RedirectToRouteResult;
+                var result = TestData.ActionResult as RedirectToRouteResult;
 
                 Assert.IsNotNull(result);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
@@ -138,7 +137,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
             };
 
-            _actualResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
+            TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                 .Result as ViewResult;
 
         }
@@ -148,7 +147,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         public void WhenIDoNotSelectWhetherOrNotIKnowTheTraining()
         {
             var controller = Services.GetService<EmployerReservationsController>();
-            _actualResult = controller.PostSelectCourse(TestData.ReservationRouteModel,
+            TestData.ActionResult = controller.PostSelectCourse(TestData.ReservationRouteModel,
                 new PostSelectCourseViewModel {ApprenticeTrainingKnown = null, SelectedCourseId = null}).Result;
         }
 
@@ -174,7 +173,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"I am shown a validation message on the (.*) page")]
         public void ThenIAmShownAValidationMessage(string viewName)
         {
-            var result = _actualResult as ViewResult;
+            var result = TestData.ActionResult as ViewResult;
             Assert.IsTrue(result.ViewData.ModelState.ErrorCount!=0);
             Assert.AreEqual(viewName,result.ViewName);
         }
@@ -212,7 +211,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Then(@"I am shown a message saying I have reached my reservation limit")]
         public void ThenIAmShownAMessageSayingIHaveReachedMyReservationLimit()
         {
-            var actualViewResult = _actualResult as ViewResult;
+            var actualViewResult = TestData.ActionResult as ViewResult;
             Assert.IsNotNull(actualViewResult);
             Assert.AreEqual("ReservationLimitReached", actualViewResult.ViewName);
         }

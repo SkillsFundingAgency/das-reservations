@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -18,6 +19,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         public ManageReservationsFilterModel FilterModel { get; set; }
 
         public List<GetReservationResponse> Reservations { get; set; }
+        public IActionResult ActionResult { get; set; }
 
         public void BuildTrainingDateModel(string startMonth)
         {
