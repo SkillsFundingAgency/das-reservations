@@ -8,30 +8,30 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
     public class WhenGettingPagedRecordsTo
     {
         [Test, AutoData]
-        public void And_PageNumber_1_Then_Should_Be_PageSize_Plus_1(ManageReservationsFilterModel filterModel)
+        public void And_PageNumber_1_Then_Should_Be_PageSize(ManageReservationsFilterModel filterModel)
         {
             filterModel.PageNumber = 1;
             filterModel.NumberOfRecordsFound = 20 * ManageReservationsFilterModel.PageSize;
 
-            filterModel.PagedRecordsTo.Should().Be(ManageReservationsFilterModel.PageSize + 1);
+            filterModel.PagedRecordsTo.Should().Be(ManageReservationsFilterModel.PageSize);
         }
 
         [Test, AutoData]
-        public void And_PageNumber_2_Then_Should_Be_PageSize_Plus_1(ManageReservationsFilterModel filterModel)
+        public void And_PageNumber_2_Then_Should_Be_Double_PageSize(ManageReservationsFilterModel filterModel)
         {
             filterModel.PageNumber = 2;
             filterModel.NumberOfRecordsFound = 20 * ManageReservationsFilterModel.PageSize;
 
-            filterModel.PagedRecordsTo.Should().Be(2*ManageReservationsFilterModel.PageSize+1);
+            filterModel.PagedRecordsTo.Should().Be(2*ManageReservationsFilterModel.PageSize);
         }
 
         [Test, AutoData]
-        public void And_PageNumber_3_Then_Should_Be_Double_PageSize_Plus_1(ManageReservationsFilterModel filterModel)
+        public void And_PageNumber_3_Then_Should_Be_Triple_PageSize(ManageReservationsFilterModel filterModel)
         {
             filterModel.PageNumber = 3;
             filterModel.NumberOfRecordsFound = 20 * ManageReservationsFilterModel.PageSize;
 
-            filterModel.PagedRecordsTo.Should().Be(3*ManageReservationsFilterModel.PageSize+1);
+            filterModel.PagedRecordsTo.Should().Be(3*ManageReservationsFilterModel.PageSize);
         }
 
         [Test, AutoData]

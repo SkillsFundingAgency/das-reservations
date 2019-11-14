@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public int PagedRecordsTo {
             get
             {
-                var potentialValue = PageNumber * PageSize + 1;
+                var potentialValue = PageNumber * PageSize;
                 return NumberOfRecordsFound < potentialValue ? NumberOfRecordsFound: potentialValue;
             }
         }
