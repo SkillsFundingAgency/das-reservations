@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -91,6 +89,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     ProviderId = routeModel.UkPrn.Value,
                     Filter = filterModel
                 });
+                filterModel.NumberOfRecordsFound = searchResult.NumberOfRecordsFound;
 
                 foreach (var reservation in searchResult.Reservations)
                 {
@@ -116,7 +115,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View(ViewNames.ProviderManage, new ManageViewModel
                 {
                     Reservations = reservations,
-                    NumberOfRecordsFound = searchResult.NumberOfRecordsFound,
                     BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
                     FilterModel = filterModel
                 });

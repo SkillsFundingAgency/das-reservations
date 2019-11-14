@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 SearchTerm = "asedfas",
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 3
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
             var pageLinks = filterModel.PageLinks.Where(link => 
@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 3
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
             var pageLinks = filterModel.PageLinks.Where(link => 
@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 3,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 3
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
             var pageLinks = filterModel.PageLinks.Where(link => 
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 3
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
             filterModel.PageLinks.Count(link => 
@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 10
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 10
             };
 
             filterModel.PageLinks.Count(link => 
@@ -105,7 +105,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 4,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 5
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 5
             };
 
             var pageLinks = filterModel.PageLinks.Where(link =>
@@ -125,7 +125,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 7,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 10
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 10
             };
 
             var pageLinks = filterModel.PageLinks.Where(link =>
@@ -145,7 +145,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 10,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 10
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 10
             };
 
             var pageLinks = filterModel.PageLinks.Where(link =>
@@ -165,7 +165,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize - 1
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize - 1
             };
 
             var pageLinks = filterModel.PageLinks.ToList();
@@ -180,7 +180,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 6
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 6
             };
 
             var pageLinks = filterModel.PageLinks.ToList();
@@ -198,7 +198,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 6,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 6
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 6
             };
 
             var pageLinks = filterModel.PageLinks.ToList();
@@ -212,7 +212,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 2,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 6
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 6
             };
 
             var pageLinks = filterModel.PageLinks.ToList();
@@ -230,7 +230,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 PageNumber = 1,
-                TotalNumberOfRecords = ManageReservationsFilterModel.PageSize * 6
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 6
             };
 
             var pageLinks = filterModel.PageLinks.ToList();

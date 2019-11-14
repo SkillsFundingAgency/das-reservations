@@ -14,15 +14,15 @@ namespace SFA.DAS.Reservations.Web.Models
             get
             {
                 var potentialValue = PageNumber * PageSize + 1;
-                return TotalNumberOfRecords < potentialValue ? TotalNumberOfRecords: potentialValue;
+                return NumberOfRecordsFound < potentialValue ? NumberOfRecordsFound: potentialValue;
             }
         }
-        public int TotalNumberOfRecords { get; set; }
+        public int NumberOfRecordsFound { get; set; }
         public IEnumerable<PageLink> PageLinks {
             get
             {
                 var links = new List<PageLink>();
-                var totalPages = (int)Math.Ceiling((double)TotalNumberOfRecords / PageSize);
+                var totalPages = (int)Math.Ceiling((double)NumberOfRecordsFound / PageSize);
                 var totalPageLinks = totalPages < 5 ? totalPages : 5;
 
                 //previous link

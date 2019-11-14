@@ -6,7 +6,7 @@
 }
 
 
-@if (Model.NumberOfRecordsFound == 0 && string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
+@if (Model.FilterModel.NumberOfRecordsFound == 0 && string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
 {
     <div class="govuk-width-container">
         <a href="@Model.BackLink" class="govuk-back-link">Back</a>
@@ -45,11 +45,11 @@ else
                     </form>
                     @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
                     {
-                        <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
+                        <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
                     }
                     else
                     {
-                        <p class="govuk-body">@Model.NumberOfRecordsFound reservation@(Model.NumberOfRecordsFound != 1 ? "s" : null)</p>
+                        <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</p>
                     }
 
                 </div>
@@ -115,12 +115,12 @@ else
                 </table>
             }
             <nav role="navigation" aria-label="Pagination">
-                <div class="pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.NumberOfRecordsFound result@(Model.NumberOfRecordsFound != 1 ? "s" : null)</div>
-                <ul class="pagination">
+                <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound result@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>
+                <ul class="das-pagination">
                     @foreach (var pageLink in Model.FilterModel.PageLinks)
                     {
-                        <li class="pagination__item">
-                            <a class="pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")" 
+                        <li class="das-pagination__item">
+                            <a class="das-pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")" 
                                asp-route="@RouteNames.ProviderManage"
                                asp-all-route-data="@pageLink.RouteData"
                                aria-current="@pageLink.IsCurrent" 

@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
             viewModel.BackLink.Should().Be(homeLink);
-            viewModel.NumberOfRecordsFound.Should().Be(searchResult.NumberOfRecordsFound);
+            viewModel.FilterModel.NumberOfRecordsFound.Should().Be(searchResult.NumberOfRecordsFound);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingFields().Excluding(c=>c.ApprenticeUrl));
         }
