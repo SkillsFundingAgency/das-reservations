@@ -63,7 +63,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             return new SearchReservationsResponse
             {
                 Reservations = result,
-                NumberOfRecordsFound = apiReservations.NumberOfRecordsFound
+                NumberOfRecordsFound = apiReservations.NumberOfRecordsFound,
+                CourseFilters = apiReservations.CourseFilters
             };
         }
 
