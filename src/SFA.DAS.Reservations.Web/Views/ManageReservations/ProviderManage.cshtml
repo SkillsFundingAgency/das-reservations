@@ -43,6 +43,17 @@ else
                             </div>
                         </div>
                     </form>
+                    <form method="get" asp-route="@RouteNames.ProviderManage">
+                        <div class="govuk-form-group">
+                            <label for="searchTerm" class="govuk-label">Search employer name or course</label>
+                            <div class="das-search-form__group">
+                                <input id="searchTerm" name="searchTerm" type="hidden" value="@Model.FilterModel.SearchTerm">
+                                <div class="govuk-button">
+                                    <button class="govuk-button" type="submit">Apply filters</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                     @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
                     {
                         <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>

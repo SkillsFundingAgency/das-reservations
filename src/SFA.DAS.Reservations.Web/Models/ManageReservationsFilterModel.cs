@@ -83,6 +83,8 @@ namespace SFA.DAS.Reservations.Web.Models
             };
         }
 
+        public IEnumerable<string> CourseFilters { get; set; }
+
         private Dictionary<string, string> BuildRouteData(int pageNumber)
         {
             var routeData = new Dictionary<string, string>();
