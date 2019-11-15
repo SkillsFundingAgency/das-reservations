@@ -83,8 +83,8 @@ namespace SFA.DAS.Reservations.Web.Models
             };
         }
 
-        public IEnumerable<string> CourseFilters { get; set; }
-        public string SelectedCourseFilter { get; set; }
+        public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
+        public string SelectedCourse { get; set; }
 
         private Dictionary<string, string> BuildRouteData(int pageNumber)
         {

@@ -44,14 +44,39 @@ else
                         </div>
                     </form>
                     <form method="get" asp-route="@RouteNames.ProviderManage">
-                        <div class="govuk-form-group">
-                            <label for="searchTerm" class="govuk-label">Search employer name or course</label>
-                            <div class="das-search-form__group">
-                                <input id="searchTerm" name="searchTerm" type="hidden" value="@Model.FilterModel.SearchTerm">
-                                <div class="govuk-button">
-                                    <button class="govuk-button" type="submit">Apply filters</button>
+                        <input id="searchTerm" name="searchTerm" type="hidden" value="@Model.FilterModel.SearchTerm">
+                        <div class="das-pane">
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="selectedEmployer">Employer</label>
+                                        <select class="govuk-select govuk-!-width-full" id="selectedEmployer" name="selectedEmployer">
+                                            <option>All</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="selectedCourse">Apprenticeship training course</label>
+                                        <select class="govuk-select govuk-!-width-full" id="selectedCourse" name="selectedCourse">
+                                            <option>All</option>
+                                            @foreach (var course in Model.FilterModel.CourseFilters)
+                                            {
+                                                <option label="@course">@course</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="selectedStartDate">Start date</label>
+                                        <select class="govuk-select govuk-!-width-full" id="selectedStartDate" name="selectedStartDate">
+                                            <option>All</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+                            <button class="govuk-button govuk-!-margin-0" type="submit">Apply filters</button>
                         </div>
                     </form>
                     @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
