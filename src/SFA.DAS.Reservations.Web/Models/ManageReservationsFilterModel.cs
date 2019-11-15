@@ -79,7 +79,8 @@ namespace SFA.DAS.Reservations.Web.Models
             {
                 SearchTerm = source.SearchTerm,
                 PageNumber = source.PageNumber,
-                PageSize = PageSize
+                PageSize = PageSize,
+                SelectedCourse = source.SelectedCourse
             };
         }
 

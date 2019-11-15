@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             result.SearchTerm.Should().Be(filterModel.SearchTerm);
             result.PageNumber.Should().Be(filterModel.PageNumber);
             result.PageSize.Should().Be(ManageReservationsFilterModel.PageSize);
+            result.SelectedCourse.Should().Be(filterModel.SelectedCourse);
         }
     }
 }

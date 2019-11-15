@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations);
             response.NumberOfRecordsFound.Should().Be(reservationsApiResponse.NumberOfRecordsFound);
-            response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.CourseFilters);
+            response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.CourseFilters);
         }
     }
 }

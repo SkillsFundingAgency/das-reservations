@@ -90,6 +90,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Filter = filterModel
                 });
                 filterModel.NumberOfRecordsFound = searchResult.NumberOfRecordsFound;
+                filterModel.CourseFilters = searchResult.CourseFilters;
 
                 foreach (var reservation in searchResult.Reservations)
                 {
