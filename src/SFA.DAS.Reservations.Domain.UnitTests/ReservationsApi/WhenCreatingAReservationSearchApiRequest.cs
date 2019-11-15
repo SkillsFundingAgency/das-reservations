@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         {
             var request = new SearchReservationsApiRequest(url, filter);
 
-            request.SearchUrl.Should().Be($"{url}api/reservations/search?providerId={filter.ProviderId}&searchTerm={filter.Filter.SearchTerm}&pageNumber={filter.Filter.PageNumber}&pageItemCount={filter.Filter.PageSize}");
+            request.SearchUrl.Should().Be($"{url}api/reservations/search?providerId={filter.ProviderId}&searchTerm={filter.Filter.SearchTerm}&pageNumber={filter.Filter.PageNumber}&pageItemCount={filter.Filter.PageSize}&selectedCourse={filter.Filter.SelectedCourse}");
         }
     }
 }

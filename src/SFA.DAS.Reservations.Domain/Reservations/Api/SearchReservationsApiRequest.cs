@@ -13,6 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         }
 
         public string BaseUrl { get; }
-        public string SearchUrl => $"{BaseUrl}api/reservations/search?providerId={_request.ProviderId}&searchTerm={_request.Filter.SearchTerm}&pageNumber={_request.Filter.PageNumber}&pageItemCount={_request.Filter.PageSize}";
+        public string SearchUrl => $"{BaseUrl}api/reservations/search?providerId={_request.ProviderId}&searchTerm={_request.Filter.SearchTerm}&pageNumber={_request.Filter.PageNumber}&pageItemCount={_request.Filter.PageSize}&selectedCourse={_request.Filter.SelectedCourse}";
     }
 }

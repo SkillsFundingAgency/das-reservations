@@ -70,7 +70,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             mockReservationService.Verify(service => service.SearchReservations(
                 It.Is<SearchReservationsRequest>(request => 
                     request.Filter.SearchTerm == query.Filter.SearchTerm &&
-                    request.ProviderId == query.ProviderId)));
+                    request.ProviderId == query.ProviderId &&
+                    request.Filter.SelectedCourse == query.Filter.SelectedCourse)));
         }
 
         [Test, MoqAutoData]

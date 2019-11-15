@@ -35,7 +35,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                     It.Is<ISearchApiRequest>(request =>
                         request.SearchUrl.StartsWith(mockOptions.Object.Value.Url) &&
                         request.SearchUrl.Contains(searchRequest.ProviderId.ToString()) &&
-                        request.SearchUrl.Contains(searchRequest.Filter.SearchTerm))),
+                        request.SearchUrl.Contains(searchRequest.Filter.SearchTerm) &&
+                        request.SearchUrl.Contains(searchRequest.Filter.SelectedCourse))),
                 Times.Once);
         }
 

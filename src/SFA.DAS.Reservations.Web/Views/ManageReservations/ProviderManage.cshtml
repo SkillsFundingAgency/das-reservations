@@ -62,7 +62,14 @@ else
                                             <option>All</option>
                                             @foreach (var course in Model.FilterModel.CourseFilters)
                                             {
-                                                <option label="@course">@course</option>
+                                                if (course == Model.FilterModel.SelectedCourse)
+                                                {
+                                                    <option label="@course" selected="selected">@course</option>
+                                                }
+                                                else
+                                                {
+                                                    <option label="@course">@course</option>
+                                                }
                                             }
                                         </select>
                                     </div>
