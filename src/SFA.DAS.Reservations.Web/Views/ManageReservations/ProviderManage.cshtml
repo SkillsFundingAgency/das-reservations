@@ -43,6 +43,10 @@ else
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
                     <form method="get" asp-route="@RouteNames.ProviderManage">
                         <input id="searchTerm" name="searchTerm" type="hidden" value="@Model.FilterModel.SearchTerm">
                         <div class="das-pane">
@@ -51,7 +55,7 @@ else
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="selectedEmployer">Employer</label>
                                         <select class="govuk-select govuk-!-width-full" id="selectedEmployer" name="selectedEmployer">
-                                            <option>All</option>
+                                            <option label="All" aria-label="All employers"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -59,7 +63,7 @@ else
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="selectedCourse">Apprenticeship training course</label>
                                         <select class="govuk-select govuk-!-width-full" id="selectedCourse" name="selectedCourse">
-                                            <option>All</option>
+                                            <option label="All" aria-label="All courses"></option>
                                             @foreach (var course in Model.FilterModel.CourseFilters)
                                             {
                                                 if (course == Model.FilterModel.SelectedCourse)
@@ -78,7 +82,7 @@ else
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="selectedStartDate">Start date</label>
                                         <select class="govuk-select govuk-!-width-full" id="selectedStartDate" name="selectedStartDate">
-                                            <option>All</option>
+                                            <option label="All" aria-label="All start dates"></option>
                                         </select>
                                     </div>
                                 </div>
