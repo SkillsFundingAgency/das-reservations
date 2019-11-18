@@ -82,7 +82,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             viewModel.FilterModel.NumberOfRecordsFound.Should().Be(searchResult.NumberOfRecordsFound);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,
                 options => options.ExcludingFields().Excluding(c=>c.ApprenticeUrl));
+            viewModel.FilterModel.EmployerFilters.Should().BeEquivalentTo(searchResult.EmployerFilters);
             viewModel.FilterModel.CourseFilters.Should().BeEquivalentTo(searchResult.CourseFilters);
+            viewModel.FilterModel.StartDateFilters.Should().BeEquivalentTo(searchResult.StartDateFilters);
         }
 
         [Test, MoqAutoData]

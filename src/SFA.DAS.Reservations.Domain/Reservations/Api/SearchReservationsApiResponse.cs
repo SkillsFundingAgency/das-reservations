@@ -27,6 +27,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
 
     public class SearchFilters
     {
+        public IEnumerable<string> EmployerFilters { get; set; }
         public IEnumerable<string> CourseFilters { get; set; }
+        public IEnumerable<string> StartDateFilters { get; set; }
     }
 }

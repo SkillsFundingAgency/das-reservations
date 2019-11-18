@@ -56,6 +56,17 @@ else
                                         <label class="govuk-label" for="selectedEmployer">Employer</label>
                                         <select class="govuk-select govuk-!-width-full" id="selectedEmployer" name="selectedEmployer">
                                             <option label="All" aria-label="All employers"></option>
+                                            @foreach (var employer in Model.FilterModel.EmployerFilters)
+                                            {
+                                                if (employer == Model.FilterModel.SelectedEmployer)
+                                                {
+                                                    <option label="@employer" selected="selected">@employer</option>
+                                                }
+                                                else
+                                                {
+                                                    <option label="@employer">@employer</option>
+                                                }
+                                            }
                                         </select>
                                     </div>
                                 </div>
@@ -83,6 +94,17 @@ else
                                         <label class="govuk-label" for="selectedStartDate">Start date</label>
                                         <select class="govuk-select govuk-!-width-full" id="selectedStartDate" name="selectedStartDate">
                                             <option label="All" aria-label="All start dates"></option>
+                                            @foreach (var startDate in Model.FilterModel.StartDateFilters)
+                                            {
+                                                if (startDate == Model.FilterModel.SelectedStartDate)
+                                                {
+                                                    <option label="@startDate" selected="selected">@startDate</option>
+                                                }
+                                                else
+                                                {
+                                                    <option label="@startDate">@startDate</option>
+                                                }
+                                            }
                                         </select>
                                     </div>
                                 </div>

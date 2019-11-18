@@ -36,7 +36,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                         request.SearchUrl.StartsWith(mockOptions.Object.Value.Url) &&
                         request.SearchUrl.Contains(searchRequest.ProviderId.ToString()) &&
                         request.SearchUrl.Contains(searchRequest.Filter.SearchTerm) &&
-                        request.SearchUrl.Contains(searchRequest.Filter.SelectedCourse))),
+                        request.SearchUrl.Contains(searchRequest.Filter.SelectedEmployer) &&
+                        request.SearchUrl.Contains(searchRequest.Filter.SelectedCourse) &&
+                        request.SearchUrl.Contains(searchRequest.Filter.SelectedStartDate))),
                 Times.Once);
         }
 
@@ -55,7 +57,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations);
             response.NumberOfRecordsFound.Should().Be(reservationsApiResponse.NumberOfRecordsFound);
+            response.EmployerFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.EmployerFilters);
             response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.CourseFilters);
+            response.StartDateFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.StartDateFilters);
         }
     }
 }

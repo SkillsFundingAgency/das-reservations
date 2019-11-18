@@ -64,7 +64,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             {
                 Reservations = result,
                 NumberOfRecordsFound = apiReservations.NumberOfRecordsFound,
-                CourseFilters = apiReservations.Filters.CourseFilters
+                EmployerFilters = apiReservations.Filters.EmployerFilters ?? new List<string>(),
+                CourseFilters = apiReservations.Filters.CourseFilters ?? new List<string>(),
+                StartDateFilters = apiReservations.Filters.StartDateFilters ?? new List<string>()
             };
         }
 
