@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.Models
                     {
                         Label = (pageNumberSeed + i).ToString(),
                         AriaLabel = $"Page {pageNumberSeed + i}",
-                        IsCurrent = i+1==PageNumber? true : (bool?)null,
+                        IsCurrent = pageNumberSeed + i == PageNumber? true : (bool?)null,
                         RouteData = BuildRouteData(pageNumberSeed + i)
                     };
                     links.Add(link);
