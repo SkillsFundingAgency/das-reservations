@@ -70,6 +70,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test]
+        public void And_PageNumber_5_Of_7_Then_Sets_Current_On_5()
+        {
+            var filterModel = new ManageReservationsFilterModel
+            {
+                PageNumber = 5,
+                NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 7
+            };
+
+            var pageLinks = filterModel.PageLinks.Where(link => 
+                link.Label.ToUpper() != "PREVIOUS" 
+                && link.Label.ToUpper() != "NEXT").ToList();
+
+            pageLinks[0].IsCurrent.Should().BeNull();
+            pageLinks[1].IsCurrent.Should().BeNull();
+            pageLinks[2].IsCurrent.Should().BeTrue();
+            pageLinks[3].IsCurrent.Should().BeNull();
+            pageLinks[4].IsCurrent.Should().BeNull();
+        }
+
+        [Test]
         public void And_3_Pages_Then_Only_3_PageLinks()
         {
             var filterModel = new ManageReservationsFilterModel
