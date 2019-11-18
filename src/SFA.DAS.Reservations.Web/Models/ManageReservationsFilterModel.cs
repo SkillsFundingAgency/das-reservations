@@ -96,6 +96,11 @@ namespace SFA.DAS.Reservations.Web.Models
                 routeData.Add("searchTerm", SearchTerm);
             }
 
+            if (!string.IsNullOrWhiteSpace(SelectedCourse))
+            {
+                routeData.Add("selectedCourse", SelectedCourse);
+            }
+
             routeData.Add("pageNumber", pageNumber.ToString());
 
             return routeData;

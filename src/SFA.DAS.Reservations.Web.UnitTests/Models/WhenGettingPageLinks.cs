@@ -14,6 +14,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var filterModel = new ManageReservationsFilterModel
             {
                 SearchTerm = "asedfas",
+                SelectedCourse = "iknjso",
                 NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
@@ -28,6 +29,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 pageLinks[i].RouteData.Should().BeEquivalentTo(new Dictionary<string, string>
                     {
                         {"searchTerm", filterModel.SearchTerm },
+                        {"selectedCourse", filterModel.SelectedCourse},
                         {"pageNumber", (i+1).ToString() }
                     });
             }
