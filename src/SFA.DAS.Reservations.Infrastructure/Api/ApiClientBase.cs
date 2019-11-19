@@ -39,6 +39,21 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             }
         }
 
+        public async Task<TResponse> Search<TResponse>(ISearchApiRequest request)
+        {
+            var accessToken = await GetAccessTokenAsync();
+            using (var client = new HttpClient())//not unit testable using directly
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await client.GetAsync(request.SearchUrl).ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<TResponse>(json);
+            }
+        }
+
         public async Task<TResponse> Create<TResponse>(IPostApiRequest request)
         {
             var accessToken = await GetAccessTokenAsync();

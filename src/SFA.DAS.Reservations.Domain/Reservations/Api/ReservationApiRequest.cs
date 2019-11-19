@@ -62,26 +62,23 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         }
 
         public long? TransferSenderAccountId { get; set; }
-
         public Guid Id { get; }
-
         public long AccountId { get; }
         public uint? ProviderId { get; }
-
         public string StartDate { get; }
-
         public string CourseId { get; }
+        
         public string BaseUrl { get; }
         public string CreateUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
         public string GetUrl => $"{BaseUrl}api/reservations/{Id}";
         public string GetAllUrl => $"{BaseUrl}api/accounts/{AccountId}/reservations";
-
         public string DeleteUrl => $"{BaseUrl}api/reservations/{Id}?employerDeleted={DeletedByEmployer}";
 
         public long AccountLegalEntityId { get;}
         public string AccountLegalEntityName { get;}
         public bool IsLevyAccount { get; }
         public Guid? UserId { get; }
+        
     }
 
 }

@@ -16,6 +16,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         public Course Course { get; set; }
         public TrainingDateModel TrainingDate { get; set; }
         public Guid UserId { get; set; }
+        public ManageReservationsFilterModel FilterModel { get; set; }
 
         public List<GetReservationResponse> Reservations { get; set; }
         public IActionResult ActionResult { get; set; }

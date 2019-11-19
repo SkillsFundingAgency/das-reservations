@@ -1,66 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using FluentAssertions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Services;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 {
     [TestFixture]
-    public class WhenCallingReservationService
+    public class WhenCallingCreateReservationLevyEmployer
     {
         [Test, MoqAutoData]
-        public async Task AndGettingReservations_ThenGetsReservationsFromApi(
-            long accountId,
-            [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
-            [Frozen] Mock<IApiClient> mockApiClient,
-            ReservationService service)
-        {
-            await service.GetReservations(accountId);
-
-            mockApiClient.Verify(client => client.GetAll<GetReservationResponse>(
-                    It.Is<IGetAllApiRequest>(request =>
-                        request.GetAllUrl.StartsWith(mockOptions.Object.Value.Url) &&
-                        request.GetAllUrl.Contains(accountId.ToString()))),
-                Times.Once);
-        }
-
-        [Test, MoqAutoData]
-        public async Task AndGettingReservations_ThenReturnsMappedReservations(
-            long accountId,
-            List<GetReservationResponse> apiReservations,
-            [Frozen] Mock<IApiClient> mockApiClient,
-            ReservationService handler)
-        {
-            mockApiClient
-                .Setup(client => client.GetAll<GetReservationResponse>(It.IsAny<IGetAllApiRequest>()))
-                .ReturnsAsync(apiReservations);
-
-            var reservations = await handler.GetReservations(accountId);
-
-            reservations.Should().BeEquivalentTo(apiReservations);
-        }
-
-        [Test, MoqAutoData]
-        public async Task AndCreatingALevyReservation_ThenCallsApiClientWithCorrectRequest(
+        public async Task Then_Calls_Api_Client_With_Correct_Request(
             Guid id,
             long accountId,
-            uint providerId,
-            DateTime startDate,
             long accountLegalEntityId,
-            string accountLegalEntityName,
-            long? transferSenderAccountId,
-            Guid? userId,
+            long transferSenderAccountId,
+            Guid userId,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
@@ -80,13 +39,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                            request.IsLevyAccount)));
         }
 
-
         [Test, MoqAutoData]
-        public async Task AndCreatingALevyReservation_ThenReturnsCorrectResponse(
+        public async Task Then_Returns_Correct_Response(
             Guid id,
             long accountId,
             long accountLegalEntityId,
-            Guid? userId,
+            Guid userId,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
