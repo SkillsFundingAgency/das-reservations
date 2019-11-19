@@ -61,5 +61,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.CourseFilters);
             response.StartDateFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.StartDateFilters);
         }
+
+        [Test, MoqAutoData]
+        public async Task Then_Sorts_Filters(
+            SearchReservationsRequest request,
+            SearchReservationsApiResponse reservationsApiResponse,
+            [Frozen] Mock<IApiClient> mockApiClient,
+            ReservationService handler)
+        {
+            mockApiClient
+                .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
+                .ReturnsAsync(reservationsApiResponse);
+
+            var response = await handler.SearchReservations(request);
+
+            response.EmployerFilters.Should().BeInAscendingOrder();
+            response.CourseFilters.Should().BeInAscendingOrder();
+            response.StartDateFilters.Should().BeInAscendingOrder();
+        }
     }
 }
