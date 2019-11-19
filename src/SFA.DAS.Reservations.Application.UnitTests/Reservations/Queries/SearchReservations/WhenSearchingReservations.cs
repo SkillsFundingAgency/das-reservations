@@ -71,7 +71,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
                 It.Is<SearchReservationsRequest>(request => 
                     request.Filter.SearchTerm == query.Filter.SearchTerm &&
                     request.ProviderId == query.ProviderId &&
-                    request.Filter.SelectedCourse == query.Filter.SelectedCourse)));
+                    request.Filter.SelectedEmployer == query.Filter.SelectedEmployer &&
+                    request.Filter.SelectedCourse == query.Filter.SelectedCourse &&
+                    request.Filter.SelectedStartDate == query.Filter.SelectedStartDate)));
         }
 
         [Test, MoqAutoData]

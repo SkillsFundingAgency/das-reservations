@@ -86,7 +86,9 @@ namespace SFA.DAS.Reservations.Web.Models
                 SearchTerm = source.SearchTerm,
                 PageNumber = source.PageNumber,
                 PageSize = PageSize,
-                SelectedCourse = source.SelectedCourse
+                SelectedEmployer = source.SelectedEmployer,
+                SelectedCourse = source.SelectedCourse,
+                SelectedStartDate = source.SelectedStartDate
             };
         }
 
