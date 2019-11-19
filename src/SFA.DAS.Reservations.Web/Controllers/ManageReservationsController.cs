@@ -27,17 +27,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
+        private readonly ISessionStorageService<ManageReservationsFilterModelBase> _sessionStorageService;
         private readonly ILogger<ManageReservationsController> _logger;
 
         public ManageReservationsController(
             IMediator mediator, 
             IEncodingService encodingService,
             IExternalUrlHelper urlHelper,
+            ISessionStorageService<ManageReservationsFilterModelBase> sessionStorageService,
             ILogger<ManageReservationsController> logger)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
+            _sessionStorageService = sessionStorageService;
             _logger = logger;
         }
 
@@ -82,6 +85,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             try
             {
+                if (routeModel.IsFromManage.HasValue && routeModel.IsFromManage.Value)
+                {
+                    var storedSearch = _sessionStorageService.Get();
+                    filterModel.SearchTerm = storedSearch.SearchTerm;
+                    filterModel.SelectedCourse = storedSearch.SelectedCourse;
+                    filterModel.SelectedEmployer = storedSearch.SelectedEmployer;
+                    filterModel.SelectedStartDate = storedSearch.SelectedStartDate;
+                    filterModel.PageNumber = storedSearch.PageNumber;
+                    routeModel.IsFromManage = false;
+                }
+                else
+                {
+                    _sessionStorageService.Delete();
+                }
+                
                 var reservations = new List<ReservationViewModel>();
 
                 var searchResult = await _mediator.Send(new SearchReservationsQuery
@@ -115,6 +133,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     reservations.Add(viewModel);
                 }
 
+                if (!string.IsNullOrEmpty(filterModel.SearchTerm))
+                {
+                    _sessionStorageService.Store(filterModel);    
+                }
+                
+                
                 return View(ViewNames.ProviderManage, new ManageViewModel
                 {
                     Reservations = reservations,
