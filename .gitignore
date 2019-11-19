@@ -269,3 +269,5 @@ src/Tools/PhantomJS/tools/phantomjs/ChangeLog
 *.stackdump
 desktop.ini
 App.Debug.config
+
+src/SFA.DAS.Reservations.Web/appsettings.Development.json
