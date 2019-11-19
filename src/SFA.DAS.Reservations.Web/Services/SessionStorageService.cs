@@ -1,10 +1,11 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
-    public class SessionStorageService<T>
+    public class SessionStorageService<T> : ISessionStorageService<T>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 

@@ -35,6 +35,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
 
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
+
+            services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
         }
     }
 }
