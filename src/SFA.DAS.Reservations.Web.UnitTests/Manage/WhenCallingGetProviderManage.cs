@@ -233,7 +233,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             await controller.ProviderManage(routeModel, filterModel);
             
             mockMediator.Verify(x=>x.Send(It.Is<SearchReservationsQuery>(
-                c=>c.Filter.SearchTerm.Equals(baseFilterModel.SearchTerm)), It.IsAny<CancellationToken>()), Times.Once);
+                c=>
+                    c.Filter.SearchTerm.Equals(baseFilterModel.SearchTerm) 
+                   && c.Filter.SelectedCourse.Equals(baseFilterModel.SelectedCourse)
+                   && c.Filter.SelectedEmployer.Equals(baseFilterModel.SelectedEmployer)
+                   && c.Filter.SelectedStartDate.Equals(baseFilterModel.SelectedStartDate)
+                   && c.Filter.PageNumber.Equals(baseFilterModel.PageNumber)
+                    ), It.IsAny<CancellationToken>()), Times.Once);
             routeModel.IsFromManage = false;
         }
         

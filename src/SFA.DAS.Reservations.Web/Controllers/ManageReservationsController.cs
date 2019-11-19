@@ -89,6 +89,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     var storedSearch = _sessionStorageService.Get();
                     filterModel.SearchTerm = storedSearch.SearchTerm;
+                    filterModel.SelectedCourse = storedSearch.SelectedCourse;
+                    filterModel.SelectedEmployer = storedSearch.SelectedEmployer;
+                    filterModel.SelectedStartDate = storedSearch.SelectedStartDate;
+                    filterModel.PageNumber = storedSearch.PageNumber;
                     routeModel.IsFromManage = false;
                 }
                 else
