@@ -2,11 +2,12 @@
 @model ProviderStartViewModel
 @{
     ViewData["Title"] = "Reserve funding for non-levy employers";
+    var fromManageRouteData = (new Dictionary<string, string> {{"IsFromManage", "true"}});
 }
 
 @if (Model.IsFromManage)
 {
-    <a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+    <a asp-route="@RouteNames.ProviderManage" asp-all-route-data="@fromManageRouteData" class="govuk-back-link">Back</a>
 }
 else
 {
