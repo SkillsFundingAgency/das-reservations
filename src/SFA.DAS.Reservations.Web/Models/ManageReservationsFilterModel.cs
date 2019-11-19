@@ -4,17 +4,24 @@ using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
-    public class ManageReservationsFilterModel
+    public class ManageReservationsFilterModelBase
     {
-        public const int PageSize = 50;
+  		
         public int PageNumber { get; set; } = 1;
         public string SearchTerm { get; set; }
         public string SelectedEmployer { get; set; }
         public string SelectedCourse { get; set; }
         public string SelectedStartDate { get; set; }
-        public IEnumerable<string> EmployerFilters { get; set; } = new List<string>();
+        
+
+    }
+
+    public class ManageReservationsFilterModel : ManageReservationsFilterModelBase
+    {
+		public IEnumerable<string> EmployerFilters { get; set; } = new List<string>();
         public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
         public IEnumerable<string> StartDateFilters { get; set; } = new List<string>();
+        public const int PageSize = 50;
         public int PagedRecordsFrom => (PageNumber - 1) * PageSize + 1;
         public int PagedRecordsTo {
             get
