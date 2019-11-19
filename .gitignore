@@ -40,6 +40,9 @@ bld/
 *.VisualState.xml
 TestResult.xml
 
+# Specflow
+*.feature.cs
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
@@ -266,4 +269,3 @@ src/Tools/PhantomJS/tools/phantomjs/ChangeLog
 *.stackdump
 desktop.ini
 App.Debug.config
-/src/SFA.DAS.Reservations.Web.AcceptanceTests/Features/*.feature.cs
