@@ -86,6 +86,11 @@ namespace SFA.DAS.Reservations.Web.Models
             }
         }
 
+        public bool ShowClearLink => !string.IsNullOrWhiteSpace(SearchTerm) 
+                                     || !string.IsNullOrWhiteSpace(SelectedEmployer)
+                                     || !string.IsNullOrWhiteSpace(SelectedCourse)
+                                     || !string.IsNullOrWhiteSpace(SelectedStartDate);
+
         public static implicit operator ReservationFilter(ManageReservationsFilterModel source)
         {
             return new ReservationFilter

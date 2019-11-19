@@ -112,6 +112,10 @@ else
                             <button class="govuk-button govuk-!-margin-0" type="submit">Apply filters</button>
                         </div>
                     </form>
+                    @if (Model.FilterModel.ShowClearLink)
+                    {
+                        <p class="govuk-body"><a  class="govuk-link" asp-route="@RouteNames.ProviderManage">Clear search and filters</a></p>
+                    }
                     @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
                     {
                         <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
