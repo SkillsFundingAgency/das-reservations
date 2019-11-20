@@ -1,12 +1,10 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -82,7 +80,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, "", routeModel.EmployerAccountId, false))
+                    model.StartDate, "", routeModel.EmployerAccountId, false, string.Empty))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(null))
@@ -147,7 +145,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, "", routeModel.EmployerAccountId, false))
+                    model.StartDate, "", routeModel.EmployerAccountId, false, string.Empty))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
@@ -196,7 +194,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, false))
+                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, false, string.Empty))
                 .Returns(addApprenticeUrl);
             var controller = _fixture.Create<ReservationsController>();
 
@@ -224,7 +222,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
-                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, true))
+                    model.StartDate, model.CohortRef, routeModel.EmployerAccountId, true, string.Empty))
                 .Returns(addApprenticeUrl);
             var controller = _fixture.Create<ReservationsController>();
 
