@@ -32,20 +32,25 @@ else
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
                     <p class="govuk-body">This feature is currently only available to employers and training providers taking part in testing.</p>
                     <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
-                    <form method="get" asp-route="@RouteNames.ProviderManage">
-                        <div class="govuk-form-group">
-                            <label for="searchTerm" class="govuk-label">Search employer name or course</label>
-                            <div class="das-search-form__group">
-                                <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
-                                <div class="das-search-form__button-wrap">
-                                    <button class="govuk-button das-search-form__button" type="submit">Search</button>
+                    @if (Model.ShowSearch)
+                    {
+                        <form method="get" asp-route="@RouteNames.ProviderManage">
+                            <div class="govuk-form-group">
+                                <label for="searchTerm" class="govuk-label">Search employer name or course</label>
+                                <div class="das-search-form__group">
+                                    <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
+                                    <div class="das-search-form__button-wrap">
+                                        <button class="govuk-button das-search-form__button" type="submit">Search</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    }
                 </div>
             </div>
-            <div class="govuk-grid-row">
+            @if (Model.ShowSearch)
+            {
+                <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     <form method="get" asp-route="@RouteNames.ProviderManage">
                         <input id="searchTerm" name="searchTerm" type="hidden" value="@Model.FilterModel.SearchTerm">
@@ -127,6 +132,8 @@ else
 
                 </div>
             </div>
+            }
+
             @if (Model.Reservations.Count != 0)
             {
                 <table class="govuk-table das-table--responsive">
@@ -187,23 +194,27 @@ else
 
                 </table>
             }
-            <nav role="navigation" aria-label="Pagination">
-                <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound result@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>
-                <ul class="das-pagination">
-                    @foreach (var pageLink in Model.FilterModel.PageLinks)
-                    {
-                        <li class="das-pagination__item">
-                            <a class="das-pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")" 
-                               asp-route="@RouteNames.ProviderManage"
-                               asp-all-route-data="@pageLink.RouteData"
-                               aria-current="@pageLink.IsCurrent" 
-                               aria-label="@pageLink.AriaLabel">
-                                @pageLink.Label
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </nav>
+            @if (Model.ShowSearch)
+            {
+                <nav role="navigation" aria-label="Pagination">
+                    <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound result@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>
+                    <ul class="das-pagination">
+                        @foreach (var pageLink in Model.FilterModel.PageLinks)
+                        {
+                            <li class="das-pagination__item">
+                                <a class="das-pagination__link @(pageLink.IsCurrent.HasValue && pageLink.IsCurrent.Value ? "current":"")"
+                                   asp-route="@RouteNames.ProviderManage"
+                                   asp-all-route-data="@pageLink.RouteData"
+                                   aria-current="@pageLink.IsCurrent"
+                                   aria-label="@pageLink.AriaLabel">
+                                    @pageLink.Label
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+
         </main>
     </div>
 
