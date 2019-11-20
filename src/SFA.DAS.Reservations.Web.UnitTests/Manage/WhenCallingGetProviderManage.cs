@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             var expectedReservations = new List<ReservationViewModel>();
             expectedReservations.AddRange(searchResult.Reservations.Select(reservation =>
                 new ReservationViewModel(reservation, config.ApprenticeUrl, routeModel.UkPrn)));
-            
+
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
 
             result.Should().NotBeNull();
@@ -169,9 +169,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 false,
                 ""))
                 .Returns(expectedUrl);
-                
+
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;
-            
+
             var viewModel = result?.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
 
@@ -231,12 +231,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 .ReturnsAsync(searchResult);
             sessionStorageService.Setup(x => x.Get()).Returns(baseFilterModel);
             filterModel.SearchTerm = string.Empty;
-            
+
             await controller.ProviderManage(routeModel, filterModel);
-            
+
             mockMediator.Verify(x=>x.Send(It.Is<SearchReservationsQuery>(
                 c=>
-                    c.Filter.SearchTerm.Equals(baseFilterModel.SearchTerm) 
+                    c.Filter.SearchTerm.Equals(baseFilterModel.SearchTerm)
                    && c.Filter.SelectedCourse.Equals(baseFilterModel.SelectedCourse)
                    && c.Filter.SelectedEmployer.Equals(baseFilterModel.SelectedEmployer)
                    && c.Filter.SelectedStartDate.Equals(baseFilterModel.SelectedStartDate)
@@ -244,7 +244,33 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                     ), It.IsAny<CancellationToken>()), Times.Once);
             routeModel.IsFromManage = false;
         }
-        
+
+        [Test, MoqAutoData]
+        public async Task Then_The_Cached_Search_Is_Not_Loaded_If_Null_From_BackLink(
+            ReservationsRouteModel routeModel,
+            ManageReservationsFilterModel filterModel,
+            SearchReservationsResult searchResult,
+            ManageReservationsFilterModelBase baseFilterModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<ISessionStorageService<ManageReservationsFilterModelBase>> sessionStorageService,
+            ManageReservationsController controller)
+        {
+            filterModel.SearchTerm = string.Empty;
+            routeModel.IsFromManage = true;
+            mockMediator
+                .Setup(mediator => mediator.Send(It.Is<SearchReservationsQuery>(c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(searchResult);
+            sessionStorageService.Setup(x => x.Get()).Returns((ManageReservationsFilterModelBase) null);
+
+            await controller.ProviderManage(routeModel, filterModel);
+
+            mockMediator.Verify(x=>x.Send(It.Is<SearchReservationsQuery>(
+                c=>
+                    c.Filter.SearchTerm.Equals(filterModel.SearchTerm)
+            ), It.IsAny<CancellationToken>()), Times.Once);
+            routeModel.IsFromManage = false;
+        }
+
         [Test, MoqAutoData]
         public async Task Then_The_Cached_Search_Is_Deleted_If_Not_From_BackLink_And_New_One_Saved(
             ReservationsRouteModel routeModel,
@@ -258,14 +284,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             mockMediator
                 .Setup(mediator => mediator.Send(It.Is<SearchReservationsQuery>(c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(searchResult);
-            
+
             await controller.ProviderManage(routeModel, filterModel);
-            
+
             mockMediator.Verify(x=>x.Send(It.Is<SearchReservationsQuery>(
                 c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()), Times.Once);
             sessionStorageService.Verify(x=>x.Delete(), Times.Once);
             sessionStorageService.Verify(x=>x.Store(filterModel));
-            
+
         }
 
         [Test, MoqAutoData]
@@ -282,9 +308,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             mockMediator
                 .Setup(mediator => mediator.Send(It.Is<SearchReservationsQuery>(c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(searchResult);
-            
+
             await controller.ProviderManage(routeModel, filterModel);
-            
+
             mockMediator.Verify(x=>x.Send(It.Is<SearchReservationsQuery>(
                 c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()), Times.Once);
             sessionStorageService.Verify(x=>x.Delete(), Times.Once);

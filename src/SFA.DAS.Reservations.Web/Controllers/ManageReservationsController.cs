@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly ILogger<ManageReservationsController> _logger;
 
         public ManageReservationsController(
-            IMediator mediator, 
+            IMediator mediator,
             IEncodingService encodingService,
             IExternalUrlHelper urlHelper,
             ISessionStorageService<ManageReservationsFilterModelBase> sessionStorageService,
@@ -58,15 +58,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var accountLegalEntityPublicHashedId = _encodingService.Encode(reservation.AccountLegalEntityId,
                     EncodingType.PublicAccountLegalEntityId);
 
-                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired 
+                var apprenticeUrl = reservation.Status == ReservationStatus.Pending && !reservation.IsExpired
                     ? _urlHelper.GenerateAddApprenticeUrl(
-                    reservation.Id, 
-                    accountLegalEntityPublicHashedId, 
+                    reservation.Id,
+                    accountLegalEntityPublicHashedId,
                     reservation.Course.Id,
                     routeModel.UkPrn,
                     reservation.StartDate,
                     routeModel.CohortReference,
-                    routeModel.EmployerAccountId) 
+                    routeModel.EmployerAccountId)
                     : string.Empty;
 
                 var viewModel = new ReservationViewModel(reservation, apprenticeUrl, routeModel.UkPrn);
@@ -88,18 +88,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (routeModel.IsFromManage.HasValue && routeModel.IsFromManage.Value)
                 {
                     var storedSearch = _sessionStorageService.Get();
-                    filterModel.SearchTerm = storedSearch.SearchTerm;
-                    filterModel.SelectedCourse = storedSearch.SelectedCourse;
-                    filterModel.SelectedEmployer = storedSearch.SelectedEmployer;
-                    filterModel.SelectedStartDate = storedSearch.SelectedStartDate;
-                    filterModel.PageNumber = storedSearch.PageNumber;
+                    if (storedSearch != null)
+                    {
+                        filterModel.SearchTerm = storedSearch.SearchTerm;
+                        filterModel.SelectedCourse = storedSearch.SelectedCourse;
+                        filterModel.SelectedEmployer = storedSearch.SelectedEmployer;
+                        filterModel.SelectedStartDate = storedSearch.SelectedStartDate;
+                        filterModel.PageNumber = storedSearch.PageNumber;
+                    }
                     routeModel.IsFromManage = false;
                 }
                 else
                 {
                     _sessionStorageService.Delete();
                 }
-                
+
                 var reservations = new List<ReservationViewModel>();
 
                 var searchResult = await _mediator.Send(new SearchReservationsQuery
@@ -135,10 +138,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (!string.IsNullOrEmpty(filterModel.SearchTerm))
                 {
-                    _sessionStorageService.Store(filterModel);    
+                    _sessionStorageService.Store(filterModel);
                 }
-                
-                
+
+
                 return View(ViewNames.ProviderManage, new ManageViewModel
                 {
                     Reservations = reservations,
@@ -153,7 +156,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("NoPermissions");
             }
         }
-        
+
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
         public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
@@ -207,7 +210,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
                     return RedirectToRoute(manageRoute, routeModel);
                 }
-                
+
                 await _mediator.Send(new DeleteReservationCommand{ReservationId = routeModel.Id.Value, DeletedByEmployer = !isProvider});
 
                 var completedRoute = isProvider ? RouteNames.ProviderDeleteCompleted : RouteNames.EmployerDeleteCompleted;
@@ -245,7 +248,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var deleteCompletedViewName = isProvider ? ViewNames.ProviderDeleteCompleted : ViewNames.EmployerDeleteCompleted;
             var manageRouteName = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
             var dashboardUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
-            
+
             if (!ModelState.IsValid)
             {
                 return View(deleteCompletedViewName, viewModel);
