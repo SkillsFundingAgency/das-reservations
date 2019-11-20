@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
     public class ManageReservationsFilterModelBase
     {
-  		
+
         public int PageNumber { get; set; } = 1;
         public string SearchTerm { get; set; }
         public string SelectedEmployer { get; set; }
         public string SelectedCourse { get; set; }
         public string SelectedStartDate { get; set; }
-        
+
 
     }
 
@@ -21,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.Models
 		public IEnumerable<string> EmployerFilters { get; set; } = new List<string>();
         public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
         public IEnumerable<string> StartDateFilters { get; set; } = new List<string>();
-        public const int PageSize = 50;
+        public const int PageSize = ReservationsWebConfigurationConstants.NumberOfReservationsPerSearchPage;
         public int PagedRecordsFrom => (PageNumber - 1) * PageSize + 1;
         public int PagedRecordsTo {
             get
@@ -86,7 +87,7 @@ namespace SFA.DAS.Reservations.Web.Models
             }
         }
 
-        public bool ShowClearLink => !string.IsNullOrWhiteSpace(SearchTerm) 
+        public bool ShowClearLink => !string.IsNullOrWhiteSpace(SearchTerm)
                                      || !string.IsNullOrWhiteSpace(SelectedEmployer)
                                      || !string.IsNullOrWhiteSpace(SelectedCourse)
                                      || !string.IsNullOrWhiteSpace(SelectedStartDate);
