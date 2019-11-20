@@ -14,18 +14,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         [TestCase(100,true)]
         public void Then_If_The_Hide_Search_Flag_Is_Set_Based_On_Number_Of_Reservations(int numberOfReservations, bool expectedBool)
         {
-            //Arrange
-            var reservations = new List<ReservationViewModel>();
-            for (var i = 1; i <= numberOfReservations; i++)
-            {
-                reservations.Add(new ReservationViewModel(new Reservation(), "",null));
-            }
-
-
             //Act
             var actual = new ManageViewModel
             {
-                Reservations = reservations
+                TotalReservationCount = numberOfReservations
             };
 
             //Assert

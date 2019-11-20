@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -78,6 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             result.ViewName.Should().Be(ViewNames.ProviderManage);
             var viewModel = result.Model as ManageViewModel;
             viewModel.Should().NotBeNull();
+            viewModel.TotalReservationCount.Should().Be(searchResult.TotalReservationsForProvider);
             viewModel.BackLink.Should().Be(homeLink);
             viewModel.FilterModel.NumberOfRecordsFound.Should().Be(searchResult.NumberOfRecordsFound);
             viewModel.Reservations.Should().BeEquivalentTo(expectedReservations,

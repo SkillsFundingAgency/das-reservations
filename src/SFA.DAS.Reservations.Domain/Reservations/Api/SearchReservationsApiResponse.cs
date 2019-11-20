@@ -9,6 +9,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public IEnumerable<SearchReservationApiModel> Reservations { get; set; }
         public int NumberOfRecordsFound { get; set; }
         public SearchFilters Filters { get; set; }
+        public int TotalReservationsForProvider { get; set; }
     }
 
     public class SearchReservationApiModel

@@ -56,6 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             var response = await handler.SearchReservations(request);
 
             response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations);
+            response.TotalReservationsForProvider.Should().Be(reservationsApiResponse.TotalReservationsForProvider);
             response.NumberOfRecordsFound.Should().Be(reservationsApiResponse.NumberOfRecordsFound);
             response.EmployerFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.EmployerFilters);
             response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.CourseFilters);

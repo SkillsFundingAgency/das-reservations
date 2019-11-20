@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -143,7 +143,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Reservations = reservations,
                     BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
-                    FilterModel = filterModel
+                    FilterModel = filterModel,
+                    TotalReservationCount = searchResult.TotalReservationsForProvider
                 });
             }
             catch (ProviderNotAuthorisedException e)

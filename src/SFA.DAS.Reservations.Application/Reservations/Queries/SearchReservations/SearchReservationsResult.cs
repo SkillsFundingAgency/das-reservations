@@ -11,6 +11,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
         public IEnumerable<string> CourseFilters { get; set; }
         public IEnumerable<string> StartDateFilters { get; set; }
 
+        public int TotalReservationsForProvider { get; set; }
+
         public static implicit operator SearchReservationsResult(SearchReservationsResponse source)
         {
             return new SearchReservationsResult
@@ -19,7 +21,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
                 NumberOfRecordsFound = source.NumberOfRecordsFound,
                 EmployerFilters = source.EmployerFilters,
                 CourseFilters = source.CourseFilters,
-                StartDateFilters = source.StartDateFilters
+                StartDateFilters = source.StartDateFilters,
+                TotalReservationsForProvider = source.TotalReservationsForProvider
             };
         }
     }

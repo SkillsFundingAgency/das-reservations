@@ -9,5 +9,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public IEnumerable<string> EmployerFilters { get; set; } = new List<string>();
         public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
         public IEnumerable<string> StartDateFilters { get; set; } = new List<string>();
+        public int TotalReservationsForProvider { get; set; }
     }
 }
