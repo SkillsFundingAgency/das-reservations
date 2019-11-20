@@ -73,12 +73,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public async Task Then_Sorts_Filters(
             SearchReservationsRequest request,
             SearchReservationsApiResponse reservationsApiResponse,
-            List<DateTime> dates,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService handler)
         {
-            dates.Add(DateTime.Parse("Apr 2020"));
-            dates.Add(DateTime.Parse("Sep 2010"));
+            var dates = new List<DateTime>
+            {
+                DateTime.Parse("Apr 2020"), 
+                DateTime.Parse("Sep 2010"),
+                DateTime.Parse("Aug 2018"),
+                DateTime.Parse("Oct 2017"),
+                DateTime.Parse("Jul 2019")
+            };
             reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
             var expectedStartDates = dates
                 .OrderBy(dt => dt)
