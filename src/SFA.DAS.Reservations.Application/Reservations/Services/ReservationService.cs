@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -64,9 +65,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
             {
                 Reservations = result,
                 NumberOfRecordsFound = apiReservations.NumberOfRecordsFound,
-                EmployerFilters = apiReservations.Filters.EmployerFilters ?? new List<string>(),
-                CourseFilters = apiReservations.Filters.CourseFilters ?? new List<string>(),
-                StartDateFilters = apiReservations.Filters.StartDateFilters ?? new List<string>()
+                EmployerFilters = apiReservations.Filters.EmployerFilters?.OrderBy(s => s).ToList() ?? new List<string>(),
+                CourseFilters = apiReservations.Filters.CourseFilters?.OrderBy(s => s).ToList() ?? new List<string>(),
+                StartDateFilters = SortStartDateFilters(apiReservations.Filters.StartDateFilters) ?? new List<string>()
             };
         }
 
@@ -82,6 +83,26 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
                 transferSenderAccountId,
                 userId
                 ));
+        }
+
+        private IEnumerable<string> SortStartDateFilters(IEnumerable<string> startDateFilters)
+        {
+            if (startDateFilters == null)
+                return new List<string>();
+
+            var sortableFilters = new Dictionary<string, DateTime>();
+
+
+            foreach (var startDateFilter in startDateFilters)
+            {
+                var firstDate = startDateFilter.Substring(0, 8);
+                var date = DateTime.ParseExact(firstDate, "MMM yyyy", CultureInfo.InvariantCulture);
+                sortableFilters.Add(startDateFilter, date);
+            }
+
+            return sortableFilters
+                .OrderBy(pair => pair.Value)
+                .Select(pair => pair.Key);
         }
     }
 }

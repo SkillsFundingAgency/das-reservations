@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
@@ -21,10 +24,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public async Task Then_Gets_Reservations_From_Api(
             SearchReservationsRequest searchRequest,
             SearchReservationsApiResponse reservationsApiResponse,
+            List<DateTime> dates,
             [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
                 .ReturnsAsync(reservationsApiResponse);
@@ -46,9 +51,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public async Task Then_Returns_Mapped_Reservations(
             SearchReservationsRequest request,
             SearchReservationsApiResponse reservationsApiResponse,
+            List<DateTime> dates,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService handler)
         {
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
                 .ReturnsAsync(reservationsApiResponse);
@@ -60,6 +67,32 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             response.EmployerFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.EmployerFilters);
             response.CourseFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.CourseFilters);
             response.StartDateFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.StartDateFilters);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Sorts_Filters(
+            SearchReservationsRequest request,
+            SearchReservationsApiResponse reservationsApiResponse,
+            List<DateTime> dates,
+            [Frozen] Mock<IApiClient> mockApiClient,
+            ReservationService handler)
+        {
+            dates.Add(DateTime.Parse("Apr 2020"));
+            dates.Add(DateTime.Parse("Sep 2010"));
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+            var expectedStartDates = dates
+                .OrderBy(dt => dt)
+                .Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+            mockApiClient
+                .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
+                .ReturnsAsync(reservationsApiResponse);
+
+            var response = await handler.SearchReservations(request);
+
+            response.EmployerFilters.Should().BeInAscendingOrder();
+            response.CourseFilters.Should().BeInAscendingOrder();
+            response.StartDateFilters.Should().BeEquivalentTo(expectedStartDates,
+                options => options.WithStrictOrdering());
         }
     }
 }
