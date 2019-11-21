@@ -165,7 +165,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 It.IsAny<DateTime>(),
                 routeModel.CohortReference,
                 routeModel.EmployerAccountId,
-                false))
+                false,
+                ""))
                 .Returns(expectedUrl);
                 
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;

@@ -146,6 +146,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var queryParams = uri.ParseQueryString();
             Assert.AreEqual("true", queryParams["autocreated"]);
             Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, queryParams["accountLegalEntityHashedId"]);
+            Assert.AreEqual(_viewModel.TransferSenderId, queryParams["transferSenderId"]);
             Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
         }
 
