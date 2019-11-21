@@ -201,6 +201,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderManage);
+            result.RouteValues.Should().ContainKey("IsFromManage");
+            result.RouteValues["IsFromManage"].Should().Be(true);
         }
 
         [Test, MoqAutoData]
