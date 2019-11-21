@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
         public IEnumerable<string> StartDateFilters { get; set; } = new List<string>();
         public const int PageSize = 50;
-        public int PagedRecordsFrom => (PageNumber - 1) * PageSize + 1;
+        public int PagedRecordsFrom => NumberOfRecordsFound == 0 ? 0 : (PageNumber - 1) * PageSize + 1;
         public int PagedRecordsTo {
             get
             {
