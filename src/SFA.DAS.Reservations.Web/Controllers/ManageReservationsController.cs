@@ -137,7 +137,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     reservations.Add(viewModel);
                 }
 
-                if (!string.IsNullOrEmpty(filterModel.SearchTerm))
+                if (!string.IsNullOrEmpty(filterModel.SearchTerm)
+                    && filterModel.PageNumber != 1
+                    && !string.IsNullOrEmpty(filterModel.SelectedCourse)
+                    && !string.IsNullOrEmpty(filterModel.SelectedEmployer)
+                    && !string.IsNullOrEmpty(filterModel.SelectedStartDate))
                 {
                     _sessionStorageService.Store(filterModel);
                 }
