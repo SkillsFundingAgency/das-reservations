@@ -259,7 +259,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Guid? expectedUserId,
             string addAprrenticeUrl,
             SelectReservationViewModel viewModel,
-            GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             [Frozen]Mock<IEncodingService> encodingService,
             [Frozen]Mock<IMediator> mediator,
@@ -272,6 +271,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             employer.AccountId = expectedAccountId;
+            viewModel.TransferSenderId = string.Empty;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
@@ -285,7 +285,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(employersResponse);
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
                 routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
-                viewModel.CohortReference, routeModel.EmployerAccountId, false)).Returns(addAprrenticeUrl);
+                viewModel.CohortReference, routeModel.EmployerAccountId, false,"")).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
             mediator.Setup(
                     x => x.Send(
@@ -396,7 +396,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 });
             createReservationLevyResult.ReservationId = reservationId;
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(reservationId, employer.AccountLegalEntityPublicHashedId,
-                    "", routeModel.UkPrn.Value, null, viewModel.CohortReference, routeModel.EmployerAccountId, false))
+                    "", routeModel.UkPrn.Value, null, viewModel.CohortReference, routeModel.EmployerAccountId, false, viewModel.TransferSenderId))
                 .Returns(addApprenticeUrl);
             mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
                 .ReturnsAsync(employersResponse);
@@ -419,7 +419,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task AndHasLevyPayingEmployerAndReservationCreated_ThenRedirectsToAddAnApprentice(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             long expectedAccountId,
             long expectedTransferAccountId,
@@ -481,7 +480,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId,
                     routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value,
-                    null, viewModel.CohortReference, routeModel.EmployerAccountId, false))
+                    null, viewModel.CohortReference, routeModel.EmployerAccountId, false,viewModel.TransferSenderId))
                 .Returns(addApprenticeUrl);
            
             //Act
@@ -513,6 +512,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             routeModel.UkPrn = null;
             viewModel.CohortReference = string.Empty;
+            viewModel.TransferSenderId = string.Empty;
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             employer.AccountId = expectedAccountId;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
@@ -528,7 +528,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(employersResponse);
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
                 routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
-                viewModel.CohortReference, routeModel.EmployerAccountId, true)).Returns(addAprrenticeUrl);
+                viewModel.CohortReference, routeModel.EmployerAccountId, true,"")).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
             mediator.Setup(
                     x => x.Send(
@@ -551,10 +551,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task AndHasLevyPayingEmployerAndReservationCreated_With_No_Transfer_Id_ThenRedirectsToAddAnApprentice(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             long expectedAccountId,
-            long expectedTransferAccountId,
             long expectedAccountLegalEntityId,
             string expectedAccountPublicHashedId,
             string expectedAccountLegalEntityPublicHashedId,
@@ -574,7 +572,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 AccountLegalEntityId = expectedAccountLegalEntityId
             };
 
-            viewModel.TransferSenderId = null;
+            viewModel.TransferSenderId = "";
             routeModel.AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId;
           
 
@@ -627,7 +625,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     null, 
                     viewModel.CohortReference, 
                     routeModel.EmployerAccountId,
-                    false))
+                    false,""))
                 .Returns(addApprenticeUrl);
             
             //Act

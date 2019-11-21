@@ -197,5 +197,36 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 actualUrl);
         }
 
+        [Test, MoqAutoData]
+        public void Then_Adds_The_TransferSenderId_If_It_Has_Been_Provided(
+            Guid reservationId,
+            string accountLegalEntityPublicHashedId,
+            string courseId,
+            string transferSenderId,
+            uint ukPrn,
+            DateTime startDate,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("provider");
+
+            var originalConfigUrl = webConfig.ApprenticeUrl;
+            webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                courseId,
+                ukPrn,
+                startDate,
+                "",
+                "",
+                false,
+                transferSenderId);
+
+            Assert.AreEqual(
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}",
+                actualUrl);
+        }
     }
 }
