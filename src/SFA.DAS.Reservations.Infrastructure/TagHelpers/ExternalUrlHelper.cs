@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId, bool isEmptyEmployerCohort = false)
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId, bool isEmptyEmployerCohort = false, string transferSenderId = "")
         {
             var queryString = $"?reservationId={reservationId}";
 
@@ -62,6 +62,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             if (isLevyAccount)
             {
                 queryString += "&autocreated=true";
+            }
+
+            if (!string.IsNullOrEmpty(transferSenderId))
+            {
+                queryString += $"&transferSenderId={transferSenderId}";
             }
 
             string controller = "unapproved", action, id;
