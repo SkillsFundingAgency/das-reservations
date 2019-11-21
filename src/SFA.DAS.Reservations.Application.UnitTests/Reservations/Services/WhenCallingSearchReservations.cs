@@ -24,11 +24,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public async Task Then_Gets_Reservations_From_Api(
             SearchReservationsRequest searchRequest,
             SearchReservationsApiResponse reservationsApiResponse,
-            List<DateTime> dates,
             [Frozen] Mock<IOptions<ReservationsApiConfiguration>> mockOptions,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService service)
         {
+            var dates = new List<DateTime>
+            {
+                DateTime.Parse("Apr 2020"), 
+                DateTime.Parse("Sep 2010"),
+                DateTime.Parse("Aug 2018"),
+                DateTime.Parse("Oct 2017"),
+                DateTime.Parse("Jul 2019")
+            };
             reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
@@ -51,10 +58,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         public async Task Then_Returns_Mapped_Reservations(
             SearchReservationsRequest request,
             SearchReservationsApiResponse reservationsApiResponse,
-            List<DateTime> dates,
             [Frozen] Mock<IApiClient> mockApiClient,
             ReservationService handler)
         {
+            var dates = new List<DateTime>
+            {
+                DateTime.Parse("Apr 2020"), 
+                DateTime.Parse("Sep 2010"),
+                DateTime.Parse("Aug 2018"),
+                DateTime.Parse("Oct 2017"),
+                DateTime.Parse("Jul 2019")
+            };
             reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
