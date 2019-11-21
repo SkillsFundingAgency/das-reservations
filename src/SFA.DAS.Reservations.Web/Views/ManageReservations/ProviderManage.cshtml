@@ -58,7 +58,7 @@ else
                                             <option label="All" aria-label="All employers"></option>
                                             @foreach (var employer in Model.FilterModel.EmployerFilters)
                                             {
-                                                if (employer == Model.FilterModel.SelectedEmployer)
+                                                if (employer.Replace(" ", null) == Model.FilterModel.SelectedEmployer?.Replace(" ", null))
                                                 {
                                                     <option label="@employer" selected="selected">@employer</option>
                                                 }
@@ -77,7 +77,7 @@ else
                                             <option label="All" aria-label="All courses"></option>
                                             @foreach (var course in Model.FilterModel.CourseFilters)
                                             {
-                                                if (course == Model.FilterModel.SelectedCourse)
+                                                if (course.Replace(" ", null) == Model.FilterModel.SelectedCourse?.Replace(" ", null))
                                                 {
                                                     <option label="@course" selected="selected">@course</option>
                                                 }
@@ -96,7 +96,7 @@ else
                                             <option label="All" aria-label="All start dates"></option>
                                             @foreach (var startDate in Model.FilterModel.StartDateFilters)
                                             {
-                                                if (startDate == Model.FilterModel.SelectedStartDate)
+                                                if (startDate.Replace(" ", null) == Model.FilterModel.SelectedStartDate?.Replace(" ", null))
                                                 {
                                                     <option label="@startDate" selected="selected">@startDate</option>
                                                 }
