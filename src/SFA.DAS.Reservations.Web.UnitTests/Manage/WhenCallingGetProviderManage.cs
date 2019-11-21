@@ -304,6 +304,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         {
             routeModel.IsFromManage = false;
             filterModel.SearchTerm = string.Empty;
+            filterModel.PageNumber = 1;
+            filterModel.SelectedCourse = string.Empty;
+            filterModel.SelectedEmployer = string.Empty;
+            filterModel.SelectedStartDate = string.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(It.Is<SearchReservationsQuery>(c=>c.Filter.SearchTerm.Equals(filterModel.SearchTerm)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(searchResult);
