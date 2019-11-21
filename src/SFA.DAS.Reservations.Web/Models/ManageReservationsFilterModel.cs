@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.AspNetCore.Html;
 using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Web.Models
@@ -90,6 +93,40 @@ namespace SFA.DAS.Reservations.Web.Models
                                      || !string.IsNullOrWhiteSpace(SelectedEmployer)
                                      || !string.IsNullOrWhiteSpace(SelectedCourse)
                                      || !string.IsNullOrWhiteSpace(SelectedStartDate);
+
+        public HtmlString FiltersUsedMessage
+        {
+            get
+            {
+                var filters = new List<string>();
+                if (!string.IsNullOrWhiteSpace(SearchTerm)) filters.Add($"‘{SearchTerm}’");
+                if (!string.IsNullOrWhiteSpace(SelectedEmployer)) filters.Add(SelectedEmployer);
+                if (!string.IsNullOrWhiteSpace(SelectedCourse)) filters.Add(SelectedCourse);
+                if (!string.IsNullOrWhiteSpace(SelectedStartDate)) filters.Add(SelectedStartDate);
+
+                if (filters.Count == 0) return HtmlString.Empty;
+
+                var message = new StringBuilder();
+
+                message.Append($"matching <strong>{filters[0]}</strong>");
+
+                for (var i = 1; i < filters.Count; i++)
+                {
+                    if (i == filters.Count-1)
+                    {
+                        message.Append(" and ");
+                    }
+                    else
+                    {
+                        message.Append(", ");
+                    }
+
+                    message.Append($"<strong>{filters[i]}</strong>");
+                }
+
+                return new HtmlString(message.ToString());
+            }
+        }
 
         public static implicit operator ReservationFilter(ManageReservationsFilterModel source)
         {

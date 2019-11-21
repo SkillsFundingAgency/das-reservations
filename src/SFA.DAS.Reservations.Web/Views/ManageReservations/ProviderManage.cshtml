@@ -116,15 +116,7 @@ else
                     {
                         <p class="govuk-body"><a  class="govuk-link" asp-route="@RouteNames.ProviderManage">Clear search and filters</a></p>
                     }
-                    @if (!string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
-                    {
-                        <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) matching <strong>'@Model.FilterModel.SearchTerm'</strong></p>
-                    }
-                    else
-                    {
-                        <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</p>
-                    }
-
+                    <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) @Model.FilterModel.FiltersUsedMessage</p>
                 </div>
             </div>
             @if (Model.Reservations.Count != 0)
