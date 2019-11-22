@@ -6,7 +6,7 @@
 }
 
 
-@if (Model.FilterModel.NumberOfRecordsFound == 0 && string.IsNullOrEmpty(Model.FilterModel.SearchTerm))
+@if (Model.FilterModel.NumberOfRecordsFound == 0 && !Model.FilterModel.SearchOrFiltersApplied)
 {
     <div class="govuk-width-container">
         <a href="@Model.BackLink" class="govuk-back-link">Back</a>
@@ -112,7 +112,7 @@ else
                             <button class="govuk-button govuk-!-margin-0" type="submit">Apply filters</button>
                         </div>
                     </form>
-                    @if (Model.FilterModel.ShowClearLink)
+                    @if (Model.FilterModel.SearchOrFiltersApplied)
                     {
                         <p class="govuk-body"><a  class="govuk-link" asp-route="@RouteNames.ProviderManage">Clear search and filters</a></p>
                     }
