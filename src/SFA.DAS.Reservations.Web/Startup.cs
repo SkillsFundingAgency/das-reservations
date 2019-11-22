@@ -142,7 +142,7 @@ namespace SFA.DAS.Reservations.Web
                     options =>
                     {
                         options.Filters.Add(new AuthorizeFilter());
-                        options.Filters.Add(new GoogleAnalyticsFilter());
+                        options.Filters.Add(new GoogleAnalyticsFilter(serviceProvider.GetService<ServiceParameters>()));
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
