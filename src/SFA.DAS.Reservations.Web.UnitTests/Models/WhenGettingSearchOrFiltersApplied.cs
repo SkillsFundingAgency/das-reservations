@@ -4,7 +4,7 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Models
 {
-    public class WhenGettingShowClearLink
+    public class WhenGettingSearchOrFiltersApplied
     {
         [Test]
         public void And_Has_SearchTerm_Then_True()
@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 SearchTerm = "asedfas"
             };
 
-            filterModel.ShowClearLink.Should().BeTrue();
+            filterModel.SearchOrFiltersApplied.Should().BeTrue();
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 SelectedEmployer = "asedfas"
             };
 
-            filterModel.ShowClearLink.Should().BeTrue();
+            filterModel.SearchOrFiltersApplied.Should().BeTrue();
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 SelectedCourse = "asedfas"
             };
 
-            filterModel.ShowClearLink.Should().BeTrue();
+            filterModel.SearchOrFiltersApplied.Should().BeTrue();
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 SelectedStartDate = "asedfas"
             };
 
-            filterModel.ShowClearLink.Should().BeTrue();
+            filterModel.SearchOrFiltersApplied.Should().BeTrue();
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var filterModel = new ManageReservationsFilterModel();
 
-            filterModel.ShowClearLink.Should().BeFalse();
+            filterModel.SearchOrFiltersApplied.Should().BeFalse();
         }
     }
 }

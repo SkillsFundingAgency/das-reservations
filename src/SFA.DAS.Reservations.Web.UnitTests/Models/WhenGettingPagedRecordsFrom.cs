@@ -30,5 +30,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             filterModel.PagedRecordsFrom.Should().Be(2*ManageReservationsFilterModel.PageSize+1);
         }
+
+        [Test, AutoData]
+        public void And_PageNumber_1_And_0_Records_Found_Then_Should_Be_0(ManageReservationsFilterModel filterModel)
+        {
+            filterModel.PageNumber = 1;
+            filterModel.NumberOfRecordsFound = 0;
+
+            filterModel.PagedRecordsFrom.Should().Be(0);
+        }
     }
 }
