@@ -117,6 +117,7 @@ else
                 </div>
             </div>
             </form>
+            }
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     @if (Model.FilterModel.SearchOrFiltersApplied)
@@ -126,7 +127,7 @@ else
                     <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) @Model.FilterModel.FiltersUsedMessage</p>
                 </div>
             </div>
-            }
+            
 
             @if (Model.Reservations.Count != 0)
             {
