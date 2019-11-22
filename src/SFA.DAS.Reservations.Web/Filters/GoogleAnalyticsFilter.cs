@@ -1,33 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Filters
 {
     public class GoogleAnalyticsFilter : ActionFilterAttribute
     {
+        private readonly ServiceParameters _serviceParameters;
+
+        public GoogleAnalyticsFilter (ServiceParameters serviceParameters)
+        {
+            _serviceParameters = serviceParameters;
+        }
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var controller = context.Controller as Controller;
-
-            if (context.HttpContext.User.HasClaim(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier)))
-                controller.ViewBag.GaData = PopulateForEmployer(context);
-            else
-                controller.ViewBag.GaData = PopulateForProvider(context);
+            if (!(context.Controller is Controller controller))
+            {
+                return;
+            }
+            
+            controller.ViewBag.GaData = _serviceParameters.AuthenticationType == AuthenticationType.Employer 
+                ? PopulateForEmployer(context) : PopulateForProvider(context);
 
             base.OnActionExecuting(context);
         }
 
         private GaData PopulateForEmployer(ActionExecutingContext context)
         {
-            string userId = null;
             string hashedAccountId = null;
             
-            userId = context.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier)).Value;
+            var userId = context.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier)).Value;
 
-            if (!context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
+            if (context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
             {
                 hashedAccountId = employerAccountId.ToString();
             }
@@ -42,38 +49,20 @@ namespace SFA.DAS.Reservations.Web.Filters
         private GaData PopulateForProvider(ActionExecutingContext context)
         {
             string ukPrn = null;
-            string providerAccountId = null;
 
-            ukPrn = context.HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
-
-            if (!context.RouteData.Values.TryGetValue("providerAccountId", out var employerAccountId))
+            if (context.RouteData.Values.TryGetValue("ukPrn", out var providerId))
             {
-                providerAccountId = employerAccountId.ToString();
+                ukPrn = providerId.ToString();
             }
 
             return new GaData
             {
-                UkPrn = ukPrn,
-                Acc = providerAccountId
+                UkPrn = ukPrn
             };
         }
 
         public string DataLoaded { get; set; }
 
-        public class GaData
-        {
-            public GaData()
-            {
-
-            }
-            public string DataLoaded { get; set; } = "dataLoaded";
-            public string UserId { get; set; }
-
-            public string Vpv { get; set; }
-            public string Acc { get; set; }
-            public string UkPrn { get; set; }
-
-            public IDictionary<string, string> Extras { get; set; } = new Dictionary<string, string>();
-        }
+        
     }
 }
