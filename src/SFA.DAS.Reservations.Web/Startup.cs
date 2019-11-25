@@ -35,8 +35,10 @@ namespace SFA.DAS.Reservations.Web
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
+#if DEBUG
                 .AddJsonFile("appsettings.json", true)
                 .AddJsonFile("appsettings.Development.json", true)
+#endif
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -59,26 +61,7 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            if (!_configuration.UseStub())
-            {
-                services.AddHealthChecks()
-                    .AddCheck<ReservationsApiHealthCheck>(
-                        "Reservation Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<CommitmentsApiHealthCheck>(
-                        "Commitments Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<ProviderRelationshipsApiHealthCheck>(
-                        "ProviderRelationships Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<AccountApiHealthCheck>(
-                        "Accounts Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] { "ready" });
-            }
+            
 
             services.AddOptions();
 
@@ -138,7 +121,6 @@ namespace SFA.DAS.Reservations.Web
             services.AddMvc(
                     options =>
                     {
-                        options.Filters.Add(new AuthorizeFilter());
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
@@ -170,7 +152,7 @@ namespace SFA.DAS.Reservations.Web
                     options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
                 });
             }
-
+            
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -178,6 +160,29 @@ namespace SFA.DAS.Reservations.Web
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.IsEssential = true;
             });
+            
+            if (!_environment.IsDevelopment())
+            {
+                services.AddHealthChecks()
+                    .AddCheck<ReservationsApiHealthCheck>(
+                        "Reservation Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<CommitmentsApiHealthCheck>(
+                        "Commitments Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<ProviderRelationshipsApiHealthCheck>(
+                        "ProviderRelationships Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<AccountApiHealthCheck>(
+                        "Accounts Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] { "ready" });
+            }
+            
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -219,7 +224,7 @@ namespace SFA.DAS.Reservations.Web
             });
             app.UseAuthentication();
 
-            if (!_configuration.UseStub())
+            if (!_environment.IsDevelopment())
             {
                 app.UseHealthChecks();
             }
