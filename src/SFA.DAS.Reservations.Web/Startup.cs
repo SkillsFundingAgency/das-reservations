@@ -58,26 +58,7 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            if (!_configuration.UseStub())
-            {
-                services.AddHealthChecks()
-                    .AddCheck<ReservationsApiHealthCheck>(
-                        "Reservation Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<CommitmentsApiHealthCheck>(
-                        "Commitments Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<ProviderRelationshipsApiHealthCheck>(
-                        "ProviderRelationships Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
-                    .AddCheck<AccountApiHealthCheck>(
-                        "Accounts Api",
-                        failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] { "ready" });
-            }
+            
 
             services.AddOptions();
 
@@ -168,6 +149,27 @@ namespace SFA.DAS.Reservations.Web
                 {
                     options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
                 });
+            }
+            
+            if (!_configuration.UseStub())
+            {
+                services.AddHealthChecks()
+                    .AddCheck<ReservationsApiHealthCheck>(
+                        "Reservation Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<CommitmentsApiHealthCheck>(
+                        "Commitments Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<ProviderRelationshipsApiHealthCheck>(
+                        "ProviderRelationships Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] {"ready"})
+                    .AddCheck<AccountApiHealthCheck>(
+                        "Accounts Api",
+                        failureStatus: HealthStatus.Unhealthy,
+                        tags: new[] { "ready" });
             }
         }
 
