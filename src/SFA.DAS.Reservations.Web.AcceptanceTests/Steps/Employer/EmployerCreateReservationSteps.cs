@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             SelectedAccountId = TestDataValues.NonLevyAccountId;
             SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
 
-            SetTestData();
+            SetupEmployerTestData();
         }
         
         [Given(@"I have reached my reservation limit")]

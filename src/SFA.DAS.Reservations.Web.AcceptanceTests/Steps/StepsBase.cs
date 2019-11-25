@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     public class StepsBase
     {
         protected const long AccountLegalEntityId = 1;
+        protected const uint Ukprn= 10003456;
         protected const uint ProviderId = 15214;
         protected Guid ReservationId;
         protected readonly IServiceProvider Services;
@@ -40,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [BeforeScenario]
         public void InitialiseTestData()
         {
-            SetTestData();
+            SetupEmployerTestData();
 
             ArrangeApiClient();
         }
@@ -117,7 +118,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         }
 
 
-        protected void SetTestData()
+        protected void SetupEmployerTestData()
         {
             TestData.UserId = Guid.NewGuid();
 
@@ -129,6 +130,38 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             };
 
             TestData.AccountLegalEntity = new AccountLegalEntity
+            {
+                AccountId = SelectedAccountId,
+                AccountLegalEntityId = 1,
+                AccountLegalEntityPublicHashedId = "ABC123",
+                AccountLegalEntityName = "Test Legal Entity",
+                AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                IsLevy = SelectedAccountId.Equals(TestDataValues.LevyAccountId),
+                LegalEntityId = 1,
+                ReservationLimit = 5
+            };
+            TestData.Course = new Course("1", "Test Course", 1);
+
+            TestData.TrainingDate = new TrainingDateModel
+            {
+                StartDate = DateTime.UtcNow.AddMonths(1),
+                EndDate = DateTime.UtcNow.AddMonths(3)
+            };
+            
+            TestData.Reservations = new List<GetReservationResponse>();
+        }
+
+        protected void SetupProviderTestData()
+        {
+            TestData.UserId = Guid.NewGuid();
+
+            TestData.ReservationRouteModel = new ReservationsRouteModel
+            {
+                UkPrn = Ukprn,
+                Id = ReservationId // ??
+            };
+
+            TestData.AccountLegalEntity = new AccountLegalEntity // ??
             {
                 AccountId = SelectedAccountId,
                 AccountLegalEntityId = 1,

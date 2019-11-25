@@ -29,210 +29,31 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
         [Given(@"I am a provider")]
         public void GivenIAmAProvider()
         {
-            SelectedAccountId = TestDataValues.NonLevyAccountId;
-            SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
-
-            SetTestData();
-        }
-        /*
-
-        [Given(@"I have reached my reservation limit")]
-        public void GivenIHaveReachedMyReservationLimit()
-        {
-            var apiClient = Services.GetService<IApiClient>();
-            var mock = Mock.Get(apiClient);
-            mock.Setup(x => x.Get<GetAccountFundingRulesApiResponse>(It.IsAny<GetAccountFundingRulesApiRequest>()))
-                .ReturnsAsync(new GetAccountFundingRulesApiResponse{GlobalRules = new List<GlobalRule>
-                {
-                    new GlobalRule
-                    {
-                        RuleType = GlobalRuleType.ReservationLimit,
-                        ActiveFrom = DateTime.UtcNow.AddMonths(-1),
-                        Restriction = AccountRestriction.All
-                    }
-                }});
+            SetupProviderTestData();
         }
         
-        [When(@"I start the reservation journey")]
-        public void WhenIStartTheReservationJourney()
+        [When(@"I choose an employer's account legal entity")]
+        public void WhenIChooseAnEmployersAccountLegalEntity()
         {
-            var controller = Services.GetService<EmployerReservationsController>();
+            var controller = Services.GetService<ProviderReservationsController>();
             var urlHelper = Services.GetService<IUrlHelper>();
             var mock = Mock.Get(urlHelper);
             controller.Url = mock.Object;
-            TestData.ActionResult = controller.Start(TestData.ReservationRouteModel).Result;
-        }
-        
-        [Given(@"I have chosen a legal entity")]
-        public void GivenIHaveChosenALegalEntity()
-        {
-            var controller = Services.GetService<EmployerReservationsController>();
-            var urlHelper = Services.GetService<IUrlHelper>();
-            var mock = Mock.Get(urlHelper);
-            controller.Url = mock.Object;
-            var confirmLegalEntityViewModel = new ConfirmLegalEntityViewModel
+            var confirmEmployerViewModel = new ConfirmEmployerViewModel
             {
-                LegalEntity = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
+                AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
             };
 
-            TestData.ActionResult = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
+            TestData.ActionResult = controller.ProcessConfirmEmployer(confirmEmployerViewModel)
                 .Result;
-
-
+            
             if (typeof(RedirectToRouteResult) == TestData.ActionResult.GetType())
             {
                 var result = TestData.ActionResult as RedirectToRouteResult;
 
                 Assert.IsNotNull(result);
-                Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+                Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, result.RouteName);
             }
-            
-        }
-
-        [Given(@"I have chosen a course")]
-        public void GivenIHaveChosenACourse()
-        {
-            var controller = Services.GetService<EmployerReservationsController>();
-            var postSelectCourseViewModel = new PostSelectCourseViewModel
-            {
-                SelectedCourseId = TestData.Course.Id,
-                ApprenticeTrainingKnown = true
-            };
-
-            var result = controller.PostSelectCourse(TestData.ReservationRouteModel, postSelectCourseViewModel)
-                    .Result as RedirectToRouteResult;
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, result.RouteName);
-        }
-
-        [Given(@"I have a reservation start date of (.*)")]
-        public void GivenIHaveAReservationStartDateOfAugust(string month)
-        {
-            TestData.BuildTrainingDateModel(month);
-
-            var controller = Services.GetService<ReservationsController>();
-            var trainingDateViewModel = new TrainingDateViewModel(TestData.TrainingDate);
-
-            var apprenticeshipTrainingFormModel = new ApprenticeshipTrainingFormModel
-            {
-                StartDate = trainingDateViewModel.SerializedModel,
-                AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
-            };
-
-            var result = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
-                        .Result as RedirectToRouteResult;
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerReview, result.RouteName);
-        }
-
-        [When(@"I do not choose a start date")]
-        public void GivenIHaveNotChosenAStartDate()
-        {
-            var controller = Services.GetService<ReservationsController>();
-            var trainingDateViewModel = new TrainingDateViewModel(new TrainingDateModel());
-            var apprenticeshipTrainingFormModel = new ApprenticeshipTrainingFormModel
-            {
-                StartDate = trainingDateViewModel.SerializedModel,
-                AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
-            };
-
-            TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
-                .Result as ViewResult;
-
-        }
-
-
-        [When(@"I do not select any training")]
-        public void WhenIDoNotSelectWhetherOrNotIKnowTheTraining()
-        {
-            var controller = Services.GetService<EmployerReservationsController>();
-            TestData.ActionResult = controller.PostSelectCourse(TestData.ReservationRouteModel,
-                new PostSelectCourseViewModel {ApprenticeTrainingKnown = null, SelectedCourseId = null}).Result;
-        }
-
-        [When(@"I review my reservation and confirm")]
-        public void WhenIReviewMyReservationAndConfirm()
-        {
-            var result = PostReviewStep(true) as RedirectToRouteResult;
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerCompleted, result.RouteName);
-        }
-
-        [When(@"I review my reservation and I do not confirm")]
-        public void WhenIReviewMyReservationAndIDoNotConfirm()
-        {
-            var result = PostReviewStep(false) as RedirectResult;
-
-            Assert.IsNotNull(result);
-            _reviewRedirectUrl = result.Url;
-            
-        }
-
-        [Then(@"I am shown a validation message on the (.*) page")]
-        public void ThenIAmShownAValidationMessage(string viewName)
-        {
-            var result = TestData.ActionResult as ViewResult;
-            Assert.IsTrue(result.ViewData.ModelState.ErrorCount!=0);
-            Assert.AreEqual(viewName,result.ViewName);
-        }
-
-
-        [Then(@"The reservation is created")]
-        public void ThenThenTheReservationIsCreated()
-        {
-            var apiClient = Services.GetService<IApiClient>();
-            var mock = Mock.Get(apiClient);
-            
-            mock.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
-                c => c.Id.Equals(TestData.ReservationRouteModel.Id) &&
-                     c.CourseId.Equals(TestData.Course.Id) &&
-                     c.UserId.Equals(TestData.UserId) &&
-                     c.StartDate.Equals(new DateTime(TestData.TrainingDate.StartDate.Year,TestData.TrainingDate.StartDate.Month,1).ToString("yyyy-MMM-dd"))
-            )), Times.Once);
-        }
-
-        [Then(@"The reservation is not created")]
-        public void ThenTheReservationIsNotCreated()
-        {
-            var apiClient = Services.GetService<IApiClient>();
-            var mock = Mock.Get(apiClient);
-
-            mock.Verify(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()), Times.Never);
-        }
-
-        [Then(@"redirected to employer dashboard")]
-        public void ThenRedirectedToEmployerDashboard()
-        {
-            Assert.AreEqual($"https://accounts.{TestDataValues.EmployerDashboardUrl}/accounts/{TestDataValues.EmployerAccountId}/teams",_reviewRedirectUrl);
-        }
-
-        [Then(@"I am shown a message saying I have reached my reservation limit")]
-        public void ThenIAmShownAMessageSayingIHaveReachedMyReservationLimit()
-        {
-            var actualViewResult = TestData.ActionResult as ViewResult;
-            Assert.IsNotNull(actualViewResult);
-            Assert.AreEqual("ReservationLimitReached", actualViewResult.ViewName);
-        }*/
-
-        private IActionResult PostReviewStep(bool reserve)
-        {
-
-            var controller = Services.GetService<ReservationsController>();
-            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
-
-            var viewModel = new PostReviewViewModel
-            {
-                Reserve = reserve,
-                TrainingDate = TestData.TrainingDate
-            };
-
-            var result = controller.PostReview(TestData.ReservationRouteModel, viewModel)
-                .Result;
-            return result;
         }
     }
 }

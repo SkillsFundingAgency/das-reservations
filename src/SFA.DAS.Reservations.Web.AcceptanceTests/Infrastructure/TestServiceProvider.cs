@@ -123,6 +123,14 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 {
                     ControllerContext = GetControllerContext<EmployerReservationsController>()
                 });
+            serviceCollection.AddTransient(sp =>
+                new ProviderReservationsController(
+                    sp.GetService<IMediator>(),
+                    sp.GetService<IExternalUrlHelper>()
+                )
+                {
+                    ControllerContext = GetControllerContext<ProviderReservationsController>()
+                });
             serviceCollection.AddTransient(sp => 
                 new ManageReservationsController(
                     sp.GetService<IMediator>(),

@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             SelectedHashedAccountId = TestDataValues.LevyHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
 
-            SetTestData();
+            SetupEmployerTestData();
         }
 
         [Given(@"I have no cohort reference")]
