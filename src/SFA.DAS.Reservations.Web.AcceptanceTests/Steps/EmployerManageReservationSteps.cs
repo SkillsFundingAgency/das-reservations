@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     {
         private ManageViewModel _actualModel;
 
-        public EmployerManageReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerManageReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
            
         }

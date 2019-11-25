@@ -110,7 +110,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.AreEqual(RouteNames.EmployerStart, (TestData.ActionResult as RedirectToRouteResult)?.RouteName);
         }
 
-        public EmployerRestrictionsSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerRestrictionsSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
             _claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
         }

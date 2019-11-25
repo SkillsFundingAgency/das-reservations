@@ -30,9 +30,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public TestServiceProvider()
+        public TestServiceProvider(string authType)
         {
-            var authType = "employer";
             var serviceCollection = new ServiceCollection();
             var hosting = new HostingEnvironment{EnvironmentName = EnvironmentName.Development, ApplicationName = "SFA.DAS.Reservations.Web"};
 ;            var configuration = GenerateConfiguration(authType);
@@ -163,6 +162,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var context = new ControllerContext(new ActionContext(httpContext, new RouteData(), descriptor));
 
             return context;
+        }
+    }
+
+    public class EmployerTestServiceProvider : TestServiceProvider
+    {
+        public EmployerTestServiceProvider() : base("employer")
+        {
+        }
+    }
+
+    public class ProviderTestServiceProvider : TestServiceProvider
+    {
+        public ProviderTestServiceProvider() : base("provider")
+        {
         }
     }
 }

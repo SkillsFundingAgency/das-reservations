@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
         }
 
-        [BeforeScenario()]
+        [BeforeScenario]
         public void InitialiseTestData()
         {
             SetTestData();

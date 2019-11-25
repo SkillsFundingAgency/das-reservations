@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         private IActionResult _actionResult;
         private readonly SelectReservationViewModel _viewModel;
 
-        public EmployerSelectReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerSelectReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
             _viewModel = new SelectReservationViewModel();
         }

@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     {
         private string _reviewRedirectUrl;
 
-        public EmployerCreateReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerCreateReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
         }
 
