@@ -1,4 +1,4 @@
-﻿Feature: Reservation
+﻿Feature: Employer Create Reservation
 	In order reserve funding for non levy employers
 	As an employer
 	I want to be able to create a reservation

@@ -18,11 +18,11 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 {
     [Binding]
-    public class ReservationSteps : StepsBase
+    public class EmployerCreateReservationSteps : StepsBase
     {
         private string _reviewRedirectUrl;
 
-        public ReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerCreateReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
         }
 
