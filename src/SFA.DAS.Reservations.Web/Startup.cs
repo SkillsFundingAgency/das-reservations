@@ -152,7 +152,7 @@ namespace SFA.DAS.Reservations.Web
                 });
             }
             
-            if (!_configuration.UseStub() && _environment.IsDevelopment())
+            if (!_environment.IsDevelopment())
             {
                 services.AddHealthChecks()
                     .AddCheck<ReservationsApiHealthCheck>(
@@ -213,7 +213,7 @@ namespace SFA.DAS.Reservations.Web
             });
             app.UseAuthentication();
 
-            if (!_configuration.UseStub() && _environment.IsDevelopment())
+            if (!_environment.IsDevelopment())
             {
                 app.UseHealthChecks();
             }
