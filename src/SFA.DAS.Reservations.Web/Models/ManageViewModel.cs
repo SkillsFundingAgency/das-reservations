@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -7,6 +8,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public List<ReservationViewModel> Reservations { get; set; }
         public string BackLink { get; set; }
         public ManageReservationsFilterModel FilterModel { get; set; }
-        public int NumberOfRecordsFound { get; set; }
+        public bool ShowSearch => TotalReservationCount >= ReservationsWebConfigurationConstants.NumberOfReservationsRequiredForSearch;
+        public int TotalReservationCount { get; set; }
     }
 }

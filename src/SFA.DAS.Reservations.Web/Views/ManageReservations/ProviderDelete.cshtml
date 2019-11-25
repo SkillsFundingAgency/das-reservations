@@ -2,9 +2,10 @@
 @model DeleteViewModel
 @{
     ViewData["Title"] = "Reservations";
+    var fromManageRouteData = (new Dictionary<string, string> {{"IsFromManage", "true"}});
 }
 
-<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.ProviderManage" class="govuk-back-link" asp-all-route-data="@fromManageRouteData">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">

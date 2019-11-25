@@ -36,6 +36,7 @@ namespace SFA.DAS.Reservations.Web
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appsettings.Development.json", true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -169,6 +170,14 @@ namespace SFA.DAS.Reservations.Web
                     options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
                 });
             }
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -214,6 +223,8 @@ namespace SFA.DAS.Reservations.Web
             {
                 app.UseHealthChecks();
             }
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {
