@@ -70,7 +70,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
             mockReservationService.Verify(service => service.SearchReservations(
                 It.Is<SearchReservationsRequest>(request => 
                     request.Filter.SearchTerm == query.Filter.SearchTerm &&
-                    request.ProviderId == query.ProviderId)));
+                    request.ProviderId == query.ProviderId &&
+                    request.Filter.SelectedEmployer == query.Filter.SelectedEmployer &&
+                    request.Filter.SelectedCourse == query.Filter.SelectedCourse &&
+                    request.Filter.SelectedStartDate == query.Filter.SelectedStartDate)));
         }
 
         [Test, MoqAutoData]
@@ -94,6 +97,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
 
             result.Reservations.Should().BeEquivalentTo(serviceResponse.Reservations);
             result.NumberOfRecordsFound.Should().Be(serviceResponse.NumberOfRecordsFound);
+            result.EmployerFilters.Should().BeEquivalentTo(serviceResponse.EmployerFilters);
+            result.CourseFilters.Should().BeEquivalentTo(serviceResponse.CourseFilters);
+            result.StartDateFilters.Should().BeEquivalentTo(serviceResponse.StartDateFilters);
         }
     }
 }

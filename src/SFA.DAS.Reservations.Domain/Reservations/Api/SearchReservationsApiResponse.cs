@@ -8,6 +8,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
     {
         public IEnumerable<SearchReservationApiModel> Reservations { get; set; }
         public int NumberOfRecordsFound { get; set; }
+        public SearchFilters Filters { get; set; }
+        public int TotalReservationsForProvider { get; set; }
     }
 
     public class SearchReservationApiModel
@@ -22,5 +24,12 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
         public long AccountLegalEntityId { get; set; }
         public uint? ProviderId { get; set; }
         public int Status { get; set; }
+    }
+
+    public class SearchFilters
+    {
+        public IEnumerable<string> EmployerFilters { get; set; }
+        public IEnumerable<string> CourseFilters { get; set; }
+        public IEnumerable<string> StartDateFilters { get; set; }
     }
 }
