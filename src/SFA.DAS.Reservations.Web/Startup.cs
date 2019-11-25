@@ -35,7 +35,9 @@ namespace SFA.DAS.Reservations.Web
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
+#if DEBUG
                 .AddJsonFile("appsettings.json", true)
+#endif
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -150,7 +152,7 @@ namespace SFA.DAS.Reservations.Web
                 });
             }
             
-            if (!_configuration.UseStub())
+            if (!_configuration.UseStub() && _environment.IsDevelopment())
             {
                 services.AddHealthChecks()
                     .AddCheck<ReservationsApiHealthCheck>(
@@ -211,7 +213,7 @@ namespace SFA.DAS.Reservations.Web
             });
             app.UseAuthentication();
 
-            if (!_configuration.UseStub())
+            if (!_configuration.UseStub() && _environment.IsDevelopment())
             {
                 app.UseHealthChecks();
             }
