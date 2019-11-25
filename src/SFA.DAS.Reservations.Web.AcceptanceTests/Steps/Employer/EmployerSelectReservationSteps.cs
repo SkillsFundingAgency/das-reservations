@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -17,7 +17,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using TechTalk.SpecFlow;
 
-namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
+namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 {
     [Binding]
     public class EmployerSelectReservationSteps : StepsBase
