@@ -118,7 +118,6 @@ namespace SFA.DAS.Reservations.Web
             services.AddMvc(
                     options =>
                     {
-                        options.Filters.Add(new AuthorizeFilter());
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
