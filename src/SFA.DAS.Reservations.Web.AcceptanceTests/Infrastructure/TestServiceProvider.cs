@@ -21,6 +21,7 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
@@ -128,6 +129,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     sp.GetService<IMediator>(),
                     sp.GetService<IEncodingService>(),
                     sp.GetService<IExternalUrlHelper>(),
+                    sp.GetService<ISessionStorageService<ManageReservationsFilterModelBase>>(),
                     sp.GetService<ILogger<ManageReservationsController>>()
                     )
                 {

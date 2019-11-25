@@ -7,13 +7,22 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
     {
         public IEnumerable<Reservation> Reservations { get; set; }
         public int NumberOfRecordsFound { get; set; }
+        public IEnumerable<string> EmployerFilters { get; set; }
+        public IEnumerable<string> CourseFilters { get; set; }
+        public IEnumerable<string> StartDateFilters { get; set; }
+
+        public int TotalReservationsForProvider { get; set; }
 
         public static implicit operator SearchReservationsResult(SearchReservationsResponse source)
         {
             return new SearchReservationsResult
             {
                 Reservations = source.Reservations,
-                NumberOfRecordsFound = source.NumberOfRecordsFound
+                NumberOfRecordsFound = source.NumberOfRecordsFound,
+                EmployerFilters = source.EmployerFilters,
+                CourseFilters = source.CourseFilters,
+                StartDateFilters = source.StartDateFilters,
+                TotalReservationsForProvider = source.TotalReservationsForProvider
             };
         }
     }
