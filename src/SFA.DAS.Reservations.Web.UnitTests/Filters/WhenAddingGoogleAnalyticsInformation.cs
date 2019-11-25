@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.AppStart;
@@ -65,6 +66,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             Assert.IsNotNull(viewBagData);
             Assert.AreEqual(accountId.ToString(), viewBagData.Acc);
             Assert.AreEqual(userId.ToString(), viewBagData.UserId);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Controller_Is_Not_A_Controller_No_Data_Is_Added_To_ViewBag(
+            Guid userId,
+            long accountId,
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            [Frozen] Mock<ActionExecutionDelegate> nextMethod,
+            GoogleAnalyticsFilter filter)
+        {
+            //Arrange
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, userId.ToString());
+            context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            context.RouteData.Values.Add("employerAccountId", accountId);
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+
+            var contextWithoutController = new ActionExecutingContext(
+                new ActionContext(context.HttpContext, context.RouteData, context.ActionDescriptor), 
+                context.Filters,
+                context.ActionArguments,
+                "");
+
+            //Act
+            await filter.OnActionExecutionAsync(contextWithoutController, nextMethod.Object);
+
+            //Assert
+            Assert.DoesNotThrowAsync(() => filter.OnActionExecutionAsync(contextWithoutController, nextMethod.Object));
         }
     }
 }
