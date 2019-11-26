@@ -34,19 +34,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Services = serviceProvider;
             TestData = testData;
             ReservationId = Guid.NewGuid();
-            SelectedAccountId = TestDataValues.NonLevyAccountId;
-            SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
         }
 
-        [BeforeScenario]
-        public void InitialiseTestData()
-        {
-            SetupEmployerTestData();
-
-            ArrangeApiClient();
-        }
-
-        private void ArrangeApiClient()
+        protected void ArrangeApiClient()
         {
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
@@ -116,8 +106,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                         }
                     });
         }
-
-
+        
         protected void SetupEmployerTestData()
         {
             TestData.UserId = Guid.NewGuid();

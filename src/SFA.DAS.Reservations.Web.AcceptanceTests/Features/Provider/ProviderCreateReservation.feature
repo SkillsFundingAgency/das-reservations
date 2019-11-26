@@ -2,10 +2,12 @@
 	In order reserve funding for non levy employers
 	As a provider
 	I want to be able to create a reservation
-
+	
+#Background:
+#	Given a provider web app is running
 
 Scenario: Create non levy reservation as provider
-	Given I am a provider
+	Given a provider web app is running
 	When I choose an employer's account legal entity
 	#And I have chosen a course
 	#And I have a reservation start date of September
@@ -13,7 +15,7 @@ Scenario: Create non levy reservation as provider
 	#Then The reservation is created
 
 Scenario: Create non levy reservation as employer but do not confirm
-	Given I am a provider
+	Given a provider web app is running
 	When I choose an employer's account legal entity
 	#And I have chosen a course
 	#And I have a reservation start date of September

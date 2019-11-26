@@ -74,7 +74,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             _viewModel.ProviderId = TestDataValues.ProviderId;
         }
 
-
         [When(@"I view the select reservation screen")]
         public void WhenIViewTheSelectReservationScreen()
         {
@@ -119,7 +118,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
 
             VerifyAddApprenticeQueryParams(redirectResult);
 
@@ -132,7 +131,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/add/apprentice?"));
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?"));
             var queryParams = new Uri(redirectResult.Url).ParseQueryString();
             Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
             VerifyAddApprenticeQueryParams(redirectResult);

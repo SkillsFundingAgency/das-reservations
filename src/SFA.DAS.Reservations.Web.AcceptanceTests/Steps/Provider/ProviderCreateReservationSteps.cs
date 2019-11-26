@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Reservations.Api;
-using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Rules.Api;
-using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -22,16 +15,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
     {
         private string _reviewRedirectUrl;
 
-        public ProviderCreateReservationSteps(ProviderTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public ProviderCreateReservationSteps(
+            ProviderTestServiceProvider serviceProvider, 
+            TestData testData) 
+            : base(serviceProvider, testData)
         {
         }
 
-        [Given(@"I am a provider")]
-        public void GivenIAmAProvider()
-        {
-            SetupProviderTestData();
-        }
-        
         [When(@"I choose an employer's account legal entity")]
         public void WhenIChooseAnEmployersAccountLegalEntity()
         {
@@ -54,6 +44,23 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
                 Assert.IsNotNull(result);
                 Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, result.RouteName);
             }
+        }
+
+        [When(@"I have chosen a course")]
+        public void GivenIHaveChosenACourse()
+        {
+            var controller = Services.GetService<EmployerReservationsController>();
+            var postSelectCourseViewModel = new PostSelectCourseViewModel
+            {
+                SelectedCourseId = TestData.Course.Id,
+                ApprenticeTrainingKnown = true
+            };
+
+            var result = controller.PostSelectCourse(TestData.ReservationRouteModel, postSelectCourseViewModel)
+                .Result as RedirectToRouteResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, result.RouteName);
         }
     }
 }

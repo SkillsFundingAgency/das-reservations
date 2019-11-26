@@ -77,7 +77,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             TestData.ActionResult = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
                 .Result;
 
-
             if (typeof(RedirectToRouteResult) == TestData.ActionResult.GetType())
             {
                 var result = TestData.ActionResult as RedirectToRouteResult;
@@ -85,7 +84,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                 Assert.IsNotNull(result);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
             }
-            
         }
 
         [Given(@"I have chosen a course")]
@@ -139,9 +137,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 
             TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                 .Result as ViewResult;
-
         }
-
 
         [When(@"I do not select any training")]
         public void WhenIDoNotSelectWhetherOrNotIKnowTheTraining()
@@ -167,7 +163,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 
             Assert.IsNotNull(result);
             _reviewRedirectUrl = result.Url;
-            
         }
 
         [Then(@"I am shown a validation message on the (.*) page")]
