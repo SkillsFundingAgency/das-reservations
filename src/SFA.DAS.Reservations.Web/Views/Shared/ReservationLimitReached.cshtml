@@ -20,6 +20,10 @@ else
     <a href="@Model" tabindex="2" class="govuk-back-link">Back</a>
 }
 
+@{
+    ViewBag.GaData.Vpv = "/reservationlimitreached";
+}
+
 <main class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -40,9 +44,9 @@ else
             {
                 <h1 class="govuk-heading-xl">Reservation limit reached</h1>
                 <p class="govuk-body">You have reached the limit of the number of funding reservations you can make.</p>
-                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]"  tabindex="1" class="govuk-button">Return to account</a>
+                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" tabindex="1" class="govuk-button">Return to account</a>
             }
-           
+
         </div>
     </div>
 </main>
