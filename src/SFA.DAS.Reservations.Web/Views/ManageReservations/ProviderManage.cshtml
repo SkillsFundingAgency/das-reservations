@@ -192,7 +192,7 @@ else
             @if (Model.ShowSearch)
             {
                 <nav role="navigation" aria-label="Pagination">
-                    <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound result@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>
+                    <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>
                     <ul class="das-pagination">
                         @foreach (var pageLink in Model.FilterModel.PageLinks)
                         {
