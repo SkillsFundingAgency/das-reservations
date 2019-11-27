@@ -31,7 +31,12 @@ namespace SFA.DAS.Reservations.Application.Providers.Services
 
         public async Task<IEnumerable<AccountLegalEntity>> GetTrustedEmployers(uint ukPrn)
         {
-            throw new NotImplementedException();
+            var request = new GetTrustedEmployersRequest(_configuration.Url, ukPrn);
+
+            var legalEntities = await _apiClient.GetAll<AccountLegalEntity>(request);
+
+            return legalEntities;
+
         }
     }
 }
