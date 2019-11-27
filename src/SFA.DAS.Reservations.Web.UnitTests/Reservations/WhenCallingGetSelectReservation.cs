@@ -249,7 +249,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));
         }
 
-        
+         
         [Test, MoqAutoData]
         public async Task AndHasLevyPayingEmployer_ThenCreatesReservationInTheBackground(
             ReservationsRouteModel routeModel,
@@ -734,6 +734,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 x.Send(It.Is<CacheReservationEmployerCommand>(
                         c =>
                             c.CohortRef.Equals(viewModel.CohortReference) &&
+                            c.JourneyData.Equals(viewModel.JourneyData) &&
                             c.AccountId.Equals(expectedAccountId) &&
                             !c.IsEmptyCohortFromSelect &&
                             c.AccountLegalEntityName.Equals(matchedEmployer.AccountLegalEntityName) &&
@@ -787,6 +788,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 x.Send(It.Is<CacheReservationEmployerCommand>(
                         c =>
                             c.CohortRef.Equals(viewModel.CohortReference) &&
+                            c.JourneyData.Equals(viewModel.JourneyData) &&
                             c.IsEmptyCohortFromSelect &&
                             c.UkPrn.Equals(providerId) &&
                             c.AccountId.Equals(expectedAccountId) &&
@@ -951,7 +953,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             Assert.IsNotNull(result);
             result.ViewName.Should().Be("ProviderFundingPaused");
-
         }
 
 

@@ -70,7 +70,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     cacheReservationEmployerCommand = response.Command;
 
                     apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
-                    
                 }
                 else
                 {
@@ -79,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
-                        viewModel.CohortReference, viewModel.ProviderId);
+                        viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
@@ -232,7 +231,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                         routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
-                        viewModel.CohortReference, viewModel.ProviderId);
+                        viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
                 }
 
                 await _mediator.Send(cacheReservationEmployerCommand);
@@ -291,7 +290,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         private async Task<CacheReservationEmployerCommand> BuildEmployerReservationCacheCommand(
             string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef,
-            uint? providerId)
+            uint? providerId, string journeyData)
         {
             var accountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
             var accountLegalEntity = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = accountId });
@@ -312,7 +311,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 UkPrn = providerId,
                 Id = Guid.NewGuid(),
                 CohortRef = cohortRef,
-                IsEmptyCohortFromSelect = string.IsNullOrEmpty(cohortRef)
+                IsEmptyCohortFromSelect = string.IsNullOrEmpty(cohortRef),
+                JourneyData = journeyData
             };
         }
 
