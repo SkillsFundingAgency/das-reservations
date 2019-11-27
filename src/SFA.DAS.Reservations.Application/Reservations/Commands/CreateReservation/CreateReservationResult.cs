@@ -9,5 +9,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
         public string CohortRef { get; set; }
         public bool IsEmptyCohortFromSelect { get; set; }
         public uint? ProviderId { get; set; }
+        public string JourneyData { get; set; }
     }
 }
