@@ -285,7 +285,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(employersResponse);
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
                 routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
-                viewModel.CohortReference, routeModel.EmployerAccountId, false,"")).Returns(addAprrenticeUrl);
+                viewModel.CohortReference, routeModel.EmployerAccountId, false,"", 
+                It.IsAny<string>())).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
             mediator.Setup(
                     x => x.Send(
@@ -396,7 +397,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 });
             createReservationLevyResult.ReservationId = reservationId;
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(reservationId, employer.AccountLegalEntityPublicHashedId,
-                    "", routeModel.UkPrn.Value, null, viewModel.CohortReference, routeModel.EmployerAccountId, false, viewModel.TransferSenderId))
+                    "", routeModel.UkPrn.Value, null, viewModel.CohortReference, routeModel.EmployerAccountId, false, viewModel.TransferSenderId, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
             mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
                 .ReturnsAsync(employersResponse);
@@ -480,7 +481,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             urlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId,
                     routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value,
-                    null, viewModel.CohortReference, routeModel.EmployerAccountId, false,viewModel.TransferSenderId))
+                    null, viewModel.CohortReference, routeModel.EmployerAccountId, 
+                    false,viewModel.TransferSenderId, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
            
             //Act
@@ -528,7 +530,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(employersResponse);
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(It.IsAny<Guid>(),
                 routeModel.AccountLegalEntityPublicHashedId, It.IsAny<string>(), viewModel.ProviderId, It.IsAny<DateTime?>(),
-                viewModel.CohortReference, routeModel.EmployerAccountId, true,"")).Returns(addAprrenticeUrl);
+                viewModel.CohortReference, routeModel.EmployerAccountId, true,"", 
+                It.IsAny<string>())).Returns(addAprrenticeUrl);
             createReservationLevyResult.ReservationId = Guid.NewGuid();
             mediator.Setup(
                     x => x.Send(
@@ -625,7 +628,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     null, 
                     viewModel.CohortReference, 
                     routeModel.EmployerAccountId,
-                    false,""))
+                    false,
+                    "",
+                    It.IsAny<string>()))
                 .Returns(addApprenticeUrl);
             
             //Act

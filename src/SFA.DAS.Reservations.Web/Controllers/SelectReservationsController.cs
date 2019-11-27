@@ -84,8 +84,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
-                    viewModel.TransferSenderId, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference, routeModel.EmployerAccountId, userId);
+                    viewModel.TransferSenderId, viewModel.JourneyData, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
+                    routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference, 
+                    routeModel.EmployerAccountId, userId);
                 if (!string.IsNullOrEmpty(redirectResult))
                 {
                     if (redirectResult == RouteNames.Error500)
@@ -266,7 +267,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId,string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId)
+        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId)
         {  
             var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
             {
@@ -283,7 +284,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                     accountLegalEntityPublicHashedId, "", ukPrn, null,
-                    cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef),transferSenderId);
+                    cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef),
+                    transferSenderId, journeyData);
             }
             
             return string.Empty;
@@ -317,6 +319,4 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
     }
-
-
 }

@@ -30,7 +30,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId, bool isEmptyEmployerCohort = false, string transferSenderId = "")
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId,
+            string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
+            bool isEmptyEmployerCohort = false, string transferSenderId = "", string journeyData = "")
         {
             var queryString = $"?reservationId={reservationId}";
 

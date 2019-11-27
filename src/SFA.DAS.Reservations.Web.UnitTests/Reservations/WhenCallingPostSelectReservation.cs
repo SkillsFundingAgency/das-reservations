@@ -264,7 +264,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
-                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, false, string.Empty))
+                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, 
+                    false, string.Empty, string.Empty))
                 .Returns(addApprenticeUrl);
             
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -291,7 +292,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
-                    reservationResult.StartDate, string.Empty, routeModel.EmployerAccountId, true, string.Empty))
+                    reservationResult.StartDate, string.Empty, routeModel.EmployerAccountId, 
+                    true, string.Empty, string.Empty))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -317,7 +319,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
-                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, true, string.Empty))
+                    reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId, 
+                    true, string.Empty, string.Empty))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
