@@ -1,16 +1,13 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace SFA.DAS.Reservations.Application.Employers.Queries
+namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
     public class GetTrustedEmployersQueryHandler : IRequestHandler<GetTrustedEmployersQuery, GetTrustedEmployersResponse>
     {

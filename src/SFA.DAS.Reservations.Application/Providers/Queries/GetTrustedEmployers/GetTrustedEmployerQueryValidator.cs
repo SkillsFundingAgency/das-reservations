@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
-namespace SFA.DAS.Reservations.Application.Employers.Queries
+namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
     public class GetTrustedEmployerQueryValidator : IValidator<GetTrustedEmployersQuery>
     {
