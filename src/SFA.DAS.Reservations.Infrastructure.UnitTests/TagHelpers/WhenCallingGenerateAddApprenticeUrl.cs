@@ -28,7 +28,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(urlParameters);
             
             Assert.AreEqual(
-                $"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}", 
+                $"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}" +
+                         $"/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}", 
                 actualUrl);
         }
 
@@ -77,7 +78,43 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "");
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
+                         $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
+                         $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                actualUrl);
+        }
+        
+        [Test, MoqAutoData]
+        public void Then_Uses_Journey_Data(
+            Guid reservationId,
+            string accountLegalEntityPublicHashedId,
+            string courseId,
+            uint ukPrn,
+            DateTime startDate,
+            string cohortRef,
+            string journeyData,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("provider");
+
+            var originalConfigUrl = webConfig.ApprenticeUrl;
+            webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                courseId,
+                ukPrn,
+                startDate,
+                cohortRef,
+                "",
+                journeyData: journeyData);
+
+            Assert.AreEqual(
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
+                $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
+                $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&journeyData={journeyData}",
                 actualUrl);
         }
 

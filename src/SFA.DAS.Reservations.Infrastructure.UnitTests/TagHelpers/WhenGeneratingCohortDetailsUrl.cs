@@ -81,5 +81,25 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add?providerId={ukprn}",
                 actualUrl);
         }
+        
+        [Test, MoqAutoData]
+        public void Then_Uses_Journey_Data(
+            string accountId,
+            uint ukprn,
+            string journeyData,
+            [Frozen] ReservationsWebConfiguration options,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+
+            var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, journeyData);
+
+            Assert.AreEqual(
+                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add?" +
+                         $"providerId={ukprn}&journeyData={journeyData}",
+                actualUrl);
+        }
     }
 }
