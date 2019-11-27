@@ -50,9 +50,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            
-            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, viewModel.CohortReference);
-
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
+                viewModel.CohortReference, journeyData:viewModel.JourneyData);
             try
             {
                 var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
@@ -109,7 +108,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     viewModel.BackLink = backUrl;
                     return View(ViewNames.Select, viewModel);
                 }
-
 
                 await _mediator.Send(cacheReservationEmployerCommand);
 
@@ -182,8 +180,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-
-            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, routeModel.CohortReference);
+            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
+                routeModel.CohortReference, journeyData:viewModel.JourneyData);
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {
