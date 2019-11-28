@@ -19,5 +19,9 @@ namespace SFA.DAS.Reservations.Web.Models
 
         [FromQuery]
         public uint? ProviderId { get; set; }
+
+        [FromQuery]
+        public string JourneyData { get; set; }
+
     }
 }

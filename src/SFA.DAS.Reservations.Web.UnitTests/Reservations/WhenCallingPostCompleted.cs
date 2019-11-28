@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
                     model.StartDate, "", routeModel.EmployerAccountId, 
-                    false, string.Empty, string.Empty))
+                    false, string.Empty, routeModel.JourneyData))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(null))
@@ -148,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
                     model.StartDate, "", routeModel.EmployerAccountId, 
-                    false, string.Empty, string.Empty))
+                    false, string.Empty, routeModel.JourneyData))
                 .Returns(addApprenticeUrl);
             mockUrlHelper
                 .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
@@ -198,7 +198,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
                     model.StartDate, model.CohortRef, routeModel.EmployerAccountId, 
-                    false, string.Empty, String.Empty))
+                    false, string.Empty, routeModel.JourneyData))
                 .Returns(addApprenticeUrl);
             var controller = _fixture.Create<ReservationsController>();
 
@@ -227,7 +227,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
                     model.StartDate, model.CohortRef, routeModel.EmployerAccountId, 
-                    true, string.Empty, string.Empty))
+                    true, string.Empty, routeModel.JourneyData))
                 .Returns(addApprenticeUrl);
             var controller = _fixture.Create<ReservationsController>();
 
