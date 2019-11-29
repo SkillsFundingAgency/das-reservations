@@ -22,17 +22,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
     {
         private string _reviewRedirectUrl;
 
-        public EmployerCreateReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerCreateReservationSteps(
+            EmployerTestServiceProvider serviceProvider, 
+            TestData testData) 
+            : base(serviceProvider, testData)
         {
         }
 
         [Given(@"I am a non levy employer")]
         public void GivenIAmANonLevyEmployer()
         {
-            SelectedAccountId = TestDataValues.NonLevyAccountId;
-            SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
-
-            SetupEmployerTestData();
+            SetupNonLevyEmployerTestData();
         }
         
         [Given(@"I have reached my reservation limit")]

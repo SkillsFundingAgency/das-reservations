@@ -19,21 +19,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 {
     public class StepsBase
     {
-        protected const long AccountLegalEntityId = 1;
-        protected const uint Ukprn= 10003456;
-        protected const uint ProviderId = 15214;
-        protected Guid ReservationId;
         protected readonly IServiceProvider Services;
         protected readonly TestData TestData;
         
-        protected long SelectedAccountId;
-        protected string SelectedHashedAccountId;
-
         public StepsBase(TestServiceProvider serviceProvider, TestData testData)
         {
             Services = serviceProvider;
             TestData = testData;
-            ReservationId = Guid.NewGuid();
         }
 
         protected void ArrangeApiClient()
@@ -71,15 +63,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             mock.Setup(x => x.Get<GetFundingRulesApiResponse>(It.IsAny<GetFundingRulesApiRequest>()))
                 .ReturnsAsync(new GetFundingRulesApiResponse {GlobalRules = new List<GlobalRule>()});
 
-            mock.Setup(x =>
-                    x.Create<CreateReservationResponse>(
-                        It.Is<ReservationApiRequest>(c => c.Id.Equals(TestData.ReservationRouteModel.Id))))
-                .ReturnsAsync(new CreateReservationResponse { Id = TestData.ReservationRouteModel.Id.Value });
-
-            mock.Setup(x =>
-                    x.Create<CreateReservationResponse>(
-                        It.Is<ReservationApiRequest>(c => !c.Id.Equals(TestData.ReservationRouteModel.Id))))
-                .ReturnsAsync(new CreateReservationResponse { Id = Guid.NewGuid() });
+            mock.Setup(x =>x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
+                .ReturnsAsync((ReservationApiRequest request) => new CreateReservationResponse { Id = request.Id });
 
             mock.Setup(x => x.Get<GetCoursesApiResponse>(It.IsAny<GetCoursesApiRequest>())).ReturnsAsync(
                 new GetCoursesApiResponse
@@ -107,25 +92,56 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                     });
         }
         
-        protected void SetupEmployerTestData()
+        protected void SetupNonLevyEmployerTestData()
         {
             TestData.UserId = Guid.NewGuid();
 
             TestData.ReservationRouteModel = new ReservationsRouteModel
             {
-                EmployerAccountId = SelectedHashedAccountId,
-                AccountLegalEntityPublicHashedId = "ABC123",
-                Id = ReservationId
+                EmployerAccountId = TestDataValues.NonLevyHashedAccountId,
+                AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId
             };
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = SelectedAccountId,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityPublicHashedId = "ABC123",
+                AccountId = TestDataValues.NonLevyAccountId,
+                AccountLegalEntityId = TestDataValues.NonLevyAccountLegalEntityId,
+                AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId,
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
-                IsLevy = SelectedAccountId.Equals(TestDataValues.LevyAccountId),
+                IsLevy = false,
+                LegalEntityId = 1,
+                ReservationLimit = 5
+            };
+            TestData.Course = new Course("1", "Test Course", 1);
+
+            TestData.TrainingDate = new TrainingDateModel
+            {
+                StartDate = DateTime.UtcNow.AddMonths(1),
+                EndDate = DateTime.UtcNow.AddMonths(3)
+            };
+            
+            TestData.Reservations = new List<GetReservationResponse>();
+        }
+
+        protected void SetupLevyEmployerTestData()
+        {
+            TestData.UserId = Guid.NewGuid();
+
+            TestData.ReservationRouteModel = new ReservationsRouteModel
+            {
+                EmployerAccountId = TestDataValues.LevyHashedAccountId,
+                AccountLegalEntityPublicHashedId = TestDataValues.LevyHashedAccountLegalEntityId
+            };
+
+            TestData.AccountLegalEntity = new AccountLegalEntity
+            {
+                AccountId = TestDataValues.LevyAccountId,
+                AccountLegalEntityId = TestDataValues.LevyAccountLegalEntityId,
+                AccountLegalEntityPublicHashedId = TestDataValues.LevyHashedAccountLegalEntityId,
+                AccountLegalEntityName = "Test Legal Entity",
+                AgreementType = AgreementType.Levy,
+                IsLevy = true,
                 LegalEntityId = 1,
                 ReservationLimit = 5
             };
@@ -146,18 +162,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
             TestData.ReservationRouteModel = new ReservationsRouteModel
             {
-                UkPrn = Ukprn,
-                Id = ReservationId // ??
+                UkPrn = 10003456
             };
 
-            TestData.AccountLegalEntity = new AccountLegalEntity // ??
+            TestData.AccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = SelectedAccountId,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityPublicHashedId = "ABC123",
+                AccountId = TestDataValues.NonLevyAccountId,
+                AccountLegalEntityId = TestDataValues.NonLevyAccountLegalEntityId,
+                AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId,
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
-                IsLevy = SelectedAccountId.Equals(TestDataValues.LevyAccountId),
+                IsLevy = false,
                 LegalEntityId = 1,
                 ReservationLimit = 5
             };

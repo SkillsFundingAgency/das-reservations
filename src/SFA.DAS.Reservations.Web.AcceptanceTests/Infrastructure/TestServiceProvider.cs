@@ -39,10 +39,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var startup = new Startup(configuration, hosting);
 
             var encodingService = new Mock<IEncodingService>();
-            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.NonLevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
-            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.NonLevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
-            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.LevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
-            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.LevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
+            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyHashedAccountLegalEntityId);
+            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyAccountLegalEntityId);
+
+            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyHashedAccountLegalEntityId);
+            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyAccountLegalEntityId);
 
             var apiClient = new Mock<IApiClient>();
             var accountApiClient = new Mock<IAccountApiClient>();

@@ -3,9 +3,14 @@
     public static class TestDataValues
     {
         public const long NonLevyAccountId = 1;
+        public const long NonLevyAccountLegalEntityId = 123;
         public const string NonLevyHashedAccountId = "ABC123";
+        public const string NonLevyHashedAccountLegalEntityId = "5UMP00";
+
         public const long LevyAccountId = 2;
+        public const long LevyAccountLegalEntityId = 456;
         public const string LevyHashedAccountId = "DEF456";
+        public const string LevyHashedAccountLegalEntityId = "DUM8A55";
 
         public static string CohortReference = "TGB567";
         public static string DashboardUrl = "providerdashboard.local.test.com";

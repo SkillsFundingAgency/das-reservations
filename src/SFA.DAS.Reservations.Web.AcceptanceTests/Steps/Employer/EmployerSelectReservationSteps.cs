@@ -60,11 +60,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         [Given(@"I am a levy employer")]
         public void GivenIAmALevyEmployer()
         {
-            SelectedAccountId = TestDataValues.LevyAccountId;
-            SelectedHashedAccountId = TestDataValues.LevyHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
 
-            SetupEmployerTestData();
+            SetupLevyEmployerTestData();
         }
 
         [Given(@"I have no cohort reference")]
