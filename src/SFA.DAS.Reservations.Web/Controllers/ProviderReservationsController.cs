@@ -7,14 +7,17 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Providers.Queries;
+using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -27,11 +30,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IExternalUrlHelper _externalUrlHelper;
+        private readonly IEncodingService _encodingService;
 
-        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper) : base(mediator)
+        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper, IEncodingService encodingService) : base(mediator)
         {
             _mediator = mediator;
             _externalUrlHelper = externalUrlHelper;
+            _encodingService = encodingService;
         }
 
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
@@ -88,17 +93,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
             
-            // eoi filter
-            var eoiEmployers = new List<Domain.Employers.Employer>();
+            
+            var eoiEmployers = new List<AccountLegalEntity>();
             foreach (var employer in getTrustedEmployersResponse.Employers)
             {
-                var getLegalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery{AccountId = employer.AccountId});
-                if (getLegalEntitiesResponse.AccountLegalEntities.All(entity =>
-                    !entity.IsLevy
-                    && entity.AgreementType == AgreementType.NonLevyExpressionOfInterest))
-                {
-                    eoiEmployers.Add(employer);
-                }
+                employer.AccountLegalEntityPublicHashedId = _encodingService.Encode(employer.AccountLegalEntityId,
+                    EncodingType.PublicAccountLegalEntityId);
+                eoiEmployers.Add(employer);
             }
 
             var viewModel = new ChooseEmployerViewModel
@@ -189,6 +190,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("ReservationLimitReached");
             }
+        }
+
+        [HttpGet]
+        [Route("employer-agreement-not-signed/{id?}", Name=RouteNames.ProviderEmployerAgreementNotSigned)]
+        public async Task<IActionResult> EmployerAgreementNotSigned(ReservationsRouteModel routeModel, string id)
+        {
+        
+            var result = await _mediator.Send(new GetAccountLegalEntityQuery {AccountLegalEntityPublicHashedId = id});
+            var viewModel = new EmployerAgreementNotSignedViewModel
+            {
+                AccountName = result.LegalEntity.AccountLegalEntityName, 
+                DashboardUrl = _externalUrlHelper.GenerateDashboardUrl(null)
+            };
+
+            return View(viewModel);
+        
         }
     }
 }
