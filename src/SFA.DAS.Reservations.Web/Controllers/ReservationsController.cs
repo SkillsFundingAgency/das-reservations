@@ -406,7 +406,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
                         model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
-                        journeyData: routeModel.JourneyData);
+                        journeyData: model.JourneyData);
                     return Redirect(addApprenticeUrl);
 
                 default:
