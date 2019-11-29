@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new List<Employer> { new Employer() }
+                    Employers = new List<AccountLegalEntity> { new AccountLegalEntity() }
                 });
 
             _controller = fixture.Create<ProviderReservationsController>();
@@ -99,7 +99,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new List<Employer> ()
+                    Employers = new List<AccountLegalEntity> ()
                 });
 
             //Act

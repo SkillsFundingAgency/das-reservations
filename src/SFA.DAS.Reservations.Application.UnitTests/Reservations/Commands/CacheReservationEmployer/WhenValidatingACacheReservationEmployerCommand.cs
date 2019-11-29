@@ -289,7 +289,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             command.IsEmptyCohortFromSelect = false;
             response.Employers = new[]
             {
-                new Employer()
+                new AccountLegalEntity
                 {
                     AccountLegalEntityPublicHashedId = command.AccountLegalEntityPublicHashedId
                 }

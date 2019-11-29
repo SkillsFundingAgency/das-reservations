@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
         private GetProviderCacheReservationCommandQuery _query;
         private GetTrustedEmployersResponse _getTrustedEmployersResponse;
         private GetAccountLegalEntityResult _getAccountLegalEntityResponse;
-        private Employer _expectedEmployer;
+        private AccountLegalEntity _expectedEmployer;
         private AccountLegalEntity _expectedAccountLegalEntity;
         private Cohort _expectedCohort;
 
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             _handler = new GetProviderCacheReservationCommandQueryHandler(_mediator.Object, _validator.Object);
 
-            _expectedEmployer = new Employer
+            _expectedEmployer = new AccountLegalEntity
             {
                 AccountId = 1,
                 AccountLegalEntityPublicHashedId = _query.AccountLegalEntityPublicHashedId,
@@ -141,7 +141,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new Employer[0]
+                    Employers = new AccountLegalEntity[0]
                 });
 
             //Act
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new Employer[0]
+                    Employers = new AccountLegalEntity[0]
                 });
 
             //Act
@@ -186,7 +186,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new Employer[0]
+                    Employers = new AccountLegalEntity[0]
                 });
 
             _mediator.Setup(mediator => mediator.Send(
@@ -216,7 +216,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new Employer[0]});
+                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new AccountLegalEntity[0]});
 
             //Act
             await _handler.Handle(_query, CancellationToken.None);
@@ -235,7 +235,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetTrustedEmployersQuery>(),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new Employer[0]});
+                .ReturnsAsync(new GetTrustedEmployersResponse{Employers = new AccountLegalEntity[0]});
 
             //Act + Assert
             Assert.ThrowsAsync<ProviderNotAuthorisedException>(() => _handler.Handle(_query, CancellationToken.None));

@@ -12,14 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
-using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
@@ -49,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(), 
+                    It.IsAny<GetProviderCacheReservationCommandQuery>(), 
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(validationException);
 
@@ -62,19 +59,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_Exception_Then_Redirect_To_ProviderError(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            Employer employer,
+            string accountLegalEntityPublicHashedId,
             Exception exception,
             [Frozen] Mock<IMediator> mockMediator,
             SelectReservationsController controller)
         {
-            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            routeModel.AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
             
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(), 
-                    It.IsAny<CancellationToken>()))
-                .ThrowsAsync(exception);
-
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.Error500);
@@ -319,18 +310,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         )
         {
             //Arrange
-            var employersResponse = new GetTrustedEmployersResponse
-            {
-                Employers = new List<Employer>
-                {
-                    new Employer {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
-                }
-            };
-
-            createReservationLevyResult.ReservationId = Guid.NewGuid();
-
-            mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
-                .ReturnsAsync(employersResponse);
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
                 .ThrowsAsync(new TransferSenderNotAllowedException(1, "1"));
 
@@ -371,14 +350,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 AccountPublicHashedId = expectedAccountPublicHashedId,
                 AccountLegalEntityId = expectedAccountLegalEntityId
             };
-            var employersResponse = new GetTrustedEmployersResponse
-            {
-                Employers = new List<Employer>
-                {
-                    new Employer {AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId}
-                }
-            };
-
+            
             var reservationId = Guid.NewGuid();
             mediator.Setup(m =>
                     m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
@@ -400,8 +372,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             urlHelper.Setup(x => x.GenerateAddApprenticeUrl(reservationId, employer.AccountLegalEntityPublicHashedId,
                     "", routeModel.UkPrn.Value, null, viewModel.CohortReference, routeModel.EmployerAccountId, false, viewModel.TransferSenderId))
                 .Returns(addApprenticeUrl);
-            mediator.Setup(x => x.Send(It.IsAny<GetTrustedEmployersQuery>(), CancellationToken.None))
-                .ReturnsAsync(employersResponse);
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationLevyResult);
 
