@@ -5,6 +5,6 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
     public class GetTrustedEmployersResponse
     {
-        public IEnumerable<Employer> Employers { get; set; }
+        public IEnumerable<AccountLegalEntity> Employers { get; set; }
     }
 }

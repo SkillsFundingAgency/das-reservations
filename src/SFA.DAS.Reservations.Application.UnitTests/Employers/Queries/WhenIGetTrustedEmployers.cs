@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
+using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -22,26 +23,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
         public const uint ExpectedUkPrn = 12345;
 
         private GetTrustedEmployersQueryHandler _handler;
-        private Mock<IProviderPermissionsService> _providerPermissionsService;
+        private Mock<IProviderService> _providerService;
         private GetTrustedEmployersQuery _query;
-        private IList<Employer> _expectedEmployers;
+        private IList<AccountLegalEntity> _expectedEmployers;
         private Mock<IValidator<GetTrustedEmployersQuery>> _validator;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedEmployers = new List<Employer>
+            _expectedEmployers = new List<AccountLegalEntity>
             {
-                new Employer
+                new AccountLegalEntity
                 {
                     AccountId = 1,
+                    AgreementSigned = false,
                     AccountName = "account 1",
                     AccountLegalEntityId = 11,
                     AccountLegalEntityName = "Entity 1"
                 },
-                new Employer
+                new AccountLegalEntity
                 {
                     AccountId = 2,
+                    AgreementSigned = true,
                     AccountName = "account 2",
                     AccountLegalEntityId = 22,
                     AccountLegalEntityName = "Entity 2"
@@ -53,12 +56,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
                 UkPrn = ExpectedUkPrn
             };
 
-            _providerPermissionsService = new Mock<IProviderPermissionsService>();
+            _providerService = new Mock<IProviderService>();
             _validator = new Mock<IValidator<GetTrustedEmployersQuery>>();
 
-            _handler = new GetTrustedEmployersQueryHandler(_providerPermissionsService.Object, _validator.Object);
+            _handler = new GetTrustedEmployersQueryHandler(_providerService.Object, _validator.Object);
 
-            _providerPermissionsService.Setup(s => s.GetTrustedEmployers(ExpectedUkPrn)).ReturnsAsync(_expectedEmployers);
+            _providerService.Setup(s => s.GetTrustedEmployers(ExpectedUkPrn)).ReturnsAsync(_expectedEmployers);
             _validator.Setup(v => v.ValidateAsync(It.IsAny<GetTrustedEmployersQuery>()))
                 .ReturnsAsync(new ValidationResult());
         }

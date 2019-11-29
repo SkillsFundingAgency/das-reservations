@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Extensions;
+using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
@@ -11,13 +12,13 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
     public class GetTrustedEmployersQueryHandler : IRequestHandler<GetTrustedEmployersQuery, GetTrustedEmployersResponse>
     {
-        private readonly IProviderPermissionsService _providerPermissionsService;
+        private readonly IProviderService _providerService;
         private readonly IValidator<GetTrustedEmployersQuery> _validator;
 
-        public GetTrustedEmployersQueryHandler(IProviderPermissionsService providerPermissionsService,
+        public GetTrustedEmployersQueryHandler(IProviderService providerService,
             IValidator<GetTrustedEmployersQuery> validator)
         {
-            _providerPermissionsService = providerPermissionsService;
+            _providerService = providerService;
             _validator = validator;
         }
 
@@ -30,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
                 throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
-            var trustedEmployers = await _providerPermissionsService.GetTrustedEmployers(request.UkPrn);
+            var trustedEmployers = await _providerService.GetTrustedEmployers(request.UkPrn);
 
             return new GetTrustedEmployersResponse
             {
