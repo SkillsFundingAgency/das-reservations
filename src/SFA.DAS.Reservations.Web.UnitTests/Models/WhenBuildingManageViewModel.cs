@@ -32,8 +32,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         public void Then_The_Hide_Footer_Flag_Is_Set_Based_On_Number_Of_Filtered_Reservations(
             int numberOfFilteredReservations, bool expectedBool)
         {
+            //Arrange
+            var filterModel = new ManageReservationsFilterModel {NumberOfRecordsFound = numberOfFilteredReservations};
+
             //Act
-            var actual = new ManageViewModel {TotalReservationCount = numberOfFilteredReservations};
+            var actual = new ManageViewModel {FilterModel = filterModel};
 
             //Assert
             Assert.AreEqual(expectedBool, actual.ShowFilteredSearch);
