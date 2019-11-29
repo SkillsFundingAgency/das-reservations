@@ -11,6 +11,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool ShowSearch => TotalReservationCount >= ReservationsWebConfigurationConstants.NumberOfReservationsRequiredForSearch;
         public int TotalReservationCount { get; set; }
         public bool ShowFilteredSearch =>
-            Reservations.Count > ReservationsWebConfigurationConstants.NumberOfReservationsPerSearchPage;
+            TotalReservationCount > ReservationsWebConfigurationConstants.NumberOfReservationsPerSearchPage;
     }
 }
