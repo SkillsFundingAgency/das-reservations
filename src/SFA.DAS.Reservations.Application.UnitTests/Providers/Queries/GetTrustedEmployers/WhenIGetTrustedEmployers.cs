@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Employers;
-using SFA.DAS.Reservations.Domain.Interfaces;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
 
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTrustedEmployers
 {
     public class WhenIGetTrustedEmployers
     {
@@ -25,13 +21,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
         private GetTrustedEmployersQueryHandler _handler;
         private Mock<IProviderService> _providerService;
         private GetTrustedEmployersQuery _query;
-        private IList<AccountLegalEntity> _expectedEmployers;
+        private IList<AccountLegalEntity> _expectedAccountLegalEntities;
         private Mock<IValidator<GetTrustedEmployersQuery>> _validator;
 
         [SetUp]
         public void Arrange()
         {
-            _expectedEmployers = new List<AccountLegalEntity>
+            _expectedAccountLegalEntities = new List<AccountLegalEntity>
             {
                 new AccountLegalEntity
                 {
@@ -61,7 +57,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
 
             _handler = new GetTrustedEmployersQueryHandler(_providerService.Object, _validator.Object);
 
-            _providerService.Setup(s => s.GetTrustedEmployers(ExpectedUkPrn)).ReturnsAsync(_expectedEmployers);
+            _providerService.Setup(s => s.GetTrustedEmployers(ExpectedUkPrn)).ReturnsAsync(_expectedAccountLegalEntities);
             _validator.Setup(v => v.ValidateAsync(It.IsAny<GetTrustedEmployersQuery>()))
                 .ReturnsAsync(new ValidationResult());
         }
@@ -73,7 +69,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            result.Employers.Should().BeEquivalentTo(_expectedEmployers);
+            result.Employers.Should().BeEquivalentTo(_expectedAccountLegalEntities);
         }
 
         [Test]

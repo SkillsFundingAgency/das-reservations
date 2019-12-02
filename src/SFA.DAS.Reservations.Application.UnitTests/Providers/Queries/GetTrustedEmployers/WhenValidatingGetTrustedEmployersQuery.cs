@@ -2,11 +2,9 @@
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTrustedEmployers
 {
     public class WhenValidatingGetTrustedEmployersQuery
     {
