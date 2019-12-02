@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var actual = new ManageViewModel {FilterModel = filterModel};
 
             //Assert
-            Assert.AreEqual(expectedBool, actual.ShowFilteredSearch);
+            Assert.AreEqual(expectedBool, actual.ShowPageLinks);
         }
     }
 }
