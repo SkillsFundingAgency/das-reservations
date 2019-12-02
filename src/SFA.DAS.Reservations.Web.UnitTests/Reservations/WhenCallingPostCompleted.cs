@@ -223,12 +223,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             var addApprenticeUrl = _fixture.Create<string>();
             var mockUrlHelper = _fixture.Freeze<Mock<IExternalUrlHelper>>();
+            
             mockUrlHelper
                 .Setup(helper => helper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn,
                     model.StartDate, model.CohortRef, routeModel.EmployerAccountId, 
                     true, string.Empty, model.JourneyData))
                 .Returns(addApprenticeUrl);
+
             var controller = _fixture.Create<ReservationsController>();
 
             //Act

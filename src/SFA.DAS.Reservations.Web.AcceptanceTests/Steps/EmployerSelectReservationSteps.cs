@@ -29,6 +29,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         public EmployerSelectReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
             _viewModel = new SelectReservationViewModel();
+            _viewModel.JourneyData = "test data";
         }
 
         [Given(@"I have a transfer receiver")]
@@ -63,6 +64,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             SelectedAccountId = TestDataValues.LevyAccountId;
             SelectedHashedAccountId = TestDataValues.LevyHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
+            _viewModel.JourneyData = "test data";
 
             SetTestData();
         }
@@ -74,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             _viewModel.ProviderId = TestDataValues.ProviderId;
         }
 
-
+        [Given(@"I view the select reservation screen")]
         [When(@"I view the select reservation screen")]
         public void WhenIViewTheSelectReservationScreen()
         {
@@ -92,6 +94,27 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             _actualModel = actual?.Model as SelectReservationViewModel;
         }
 
+        [When(@"I select that pending reservation")]
+        public void WhenISelectThatPendingReservation()
+        {
+            var controller = Services.GetService<SelectReservationsController>();
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, TestData.UserId.ToString());
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            mock.Setup(x => x.Get<GetReservationResponse>(
+                It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations.First);
+
+            _viewModel.SelectedReservationId = _actualModel.AvailableReservations.First().ReservationId;
+
+            _actionResult = controller.PostSelectReservation(TestData.ReservationRouteModel, _viewModel).Result;
+
+            var actual = _actionResult as ViewResult;
+            _actualModel = actual?.Model as SelectReservationViewModel;
+        }
+
+
+        [Given(@"(.*) reservations are selectable")]
         [Then(@"(.*) reservations are selectable")]
         public void ThenReservationsAreSelectable(int numberOfReservations)
         {
@@ -119,11 +142,22 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+
+            if (string.IsNullOrWhiteSpace(_viewModel.CohortReference))
+            {
+                Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/add?reservationId="));
+            }
+            else
+            {
+                Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+            }
 
             VerifyAddApprenticeQueryParams(redirectResult);
 
-            VerifyLevyReservationCreated();
+            if(_viewModel.SelectedReservationId == null)
+            {
+                VerifyLevyReservationCreated();
+            }
         }
 
         [Then(@"I am redirected to the add apprentice page with no cohort ref")]
@@ -135,6 +169,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/add/apprentice?"));
             var queryParams = new Uri(redirectResult.Url).ParseQueryString();
             Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
+
             VerifyAddApprenticeQueryParams(redirectResult);
 
             VerifyLevyReservationCreated();
@@ -144,9 +179,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             var uri = new Uri(redirectResult.Url);
             var queryParams = uri.ParseQueryString();
-            Assert.AreEqual("true", queryParams["autocreated"]);
+
+            if (TestData.AccountLegalEntity.IsLevy)
+            {
+                Assert.AreEqual("true", queryParams["autocreated"]);
+            }
+
             Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, queryParams["accountLegalEntityHashedId"]);
             Assert.AreEqual(_viewModel.TransferSenderId, queryParams["transferSenderId"]);
+            Assert.AreEqual(_viewModel.JourneyData, queryParams["journeyData"]);
             Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
         }
 
