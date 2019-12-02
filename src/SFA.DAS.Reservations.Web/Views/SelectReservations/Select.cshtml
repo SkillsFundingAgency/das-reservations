@@ -8,15 +8,15 @@
     var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
-}
 
-@if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
-{
-    ViewBag.GaData.Vpv = "/accounts/reservations/select";
-}
-else
-{
-    ViewBag.GaData.Vpv = "/reservations/select";
+    if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+    {
+        ViewBag.GaData.Vpv = "/accounts/reservations/select";
+    }
+    else
+    {
+        ViewBag.GaData.Vpv = "/reservations/select";
+    }
 }
 
 <a href="@Model.BackLink" class="govuk-back-link">Back</a>

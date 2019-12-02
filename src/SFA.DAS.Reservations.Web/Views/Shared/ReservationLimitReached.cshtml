@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "ReservationLimitReached";
+
+    ViewBag.GaData.Vpv = "/reservationlimitreached";
 }
 @if (string.IsNullOrEmpty(Model))
 {
@@ -18,10 +20,6 @@
 else
 {
     <a href="@Model" tabindex="2" class="govuk-back-link">Back</a>
-}
-
-@{
-    ViewBag.GaData.Vpv = "/reservationlimitreached";
 }
 
 <main class="govuk-main-wrapper">

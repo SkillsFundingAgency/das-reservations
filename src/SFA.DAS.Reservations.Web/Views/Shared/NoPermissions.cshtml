@@ -2,6 +2,8 @@
 @model string
 @{
     ViewData["Title"] = "Reservations";
+
+    ViewBag.GaData.Vpv = "/nopermissions";
 }
 @if (!string.IsNullOrEmpty(Model))
 {
@@ -17,10 +19,6 @@ else
     {
         <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" tabindex="1" draggable="false" class="govuk-back-link">Back</a>
     }
-}
-
-@{
-    ViewBag.GaData.Vpv = "/nopermissions";
 }
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
