@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -72,6 +74,34 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
             result.RouteName.Should().Be(RouteNames.ProviderReview);
             result.RouteValues["Id"].Should().Be(TestData.ReservationRouteModel.Id);
             result.RouteValues["UkPrn"].Should().Be(TestData.ReservationRouteModel.UkPrn);
+        }
+
+        [When(@"I review a reservation on behalf of an employer")]
+        public void WhenIReviewAReservationOnBehalfOfAnEmployer()
+        {
+            var controller = Services.GetService<ReservationsController>();
+
+            var result = controller.PostReview(TestData.ReservationRouteModel,
+                new PostReviewViewModel
+                {
+                    Reserve = true
+                }).Result as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.ProviderCompleted);
+        }
+
+        [Then(@"The reservation is created on behalf of an employer")]
+        public void ThenThenTheReservationIsCreatedOnBehalfOfAnEmployer()
+        {
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
+            
+            mock.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
+                c => c.Id.Equals(TestData.ReservationRouteModel.Id) &&
+                     c.CourseId.Equals(TestData.Course.Id) &&
+                     c.ProviderId.Equals(TestData.ReservationRouteModel.UkPrn) &&
+                     c.StartDate.Equals(new DateTime(TestData.TrainingDate.StartDate.Year,TestData.TrainingDate.StartDate.Month,1).ToString("yyyy-MMM-dd"))
+            )), Times.Once);
         }
     }
 }

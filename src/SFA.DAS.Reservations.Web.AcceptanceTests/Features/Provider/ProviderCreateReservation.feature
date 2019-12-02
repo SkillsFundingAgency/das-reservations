@@ -10,9 +10,8 @@ Scenario: Create non levy reservation as provider
 	Given a provider web app is running
 	When I choose an employer's account legal entity
 	And I choose a course and date of July on behalf of an employer
-	#And I have a reservation start date of September
-	#When I review my reservation and confirm
-	#Then The reservation is created
+	And I review a reservation on behalf of an employer
+	Then The reservation is created on behalf of an employer
 
 Scenario: Create non levy reservation as employer but do not confirm
 	Given a provider web app is running

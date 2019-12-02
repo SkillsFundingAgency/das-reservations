@@ -173,7 +173,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             Assert.AreEqual(viewName,result.ViewName);
         }
 
-
         [Then(@"The reservation is created")]
         public void ThenThenTheReservationIsCreated()
         {
