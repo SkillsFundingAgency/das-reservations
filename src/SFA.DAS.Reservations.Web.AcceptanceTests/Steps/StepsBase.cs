@@ -90,6 +90,22 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                             }
                         }
                     });
+            mock.Setup(x =>
+                    x.GetAll<AccountLegalEntity>(
+                        It.Is<GetTrustedEmployersRequest>(c => c.Id.Equals(TestData.ReservationRouteModel.UkPrn))))
+                .ReturnsAsync(new List<AccountLegalEntity>
+                {
+                    new AccountLegalEntity
+                    {
+                        AccountId = TestDataValues.NonLevyAccountId,
+                        AccountName = "Account 1",
+                        AccountLegalEntityId = TestDataValues.NonLevyAccountLegalEntityId,
+                        AccountLegalEntityName = "Legal Entity 1",
+                        AgreementSigned = true,
+                        IsLevy = false,
+                        AgreementType = AgreementType.NonLevyExpressionOfInterest
+                    }
+                });
         }
         
         protected void SetupNonLevyEmployerTestData()
@@ -139,6 +155,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountId = TestDataValues.LevyAccountId,
                 AccountLegalEntityId = TestDataValues.LevyAccountLegalEntityId,
                 AccountLegalEntityPublicHashedId = TestDataValues.LevyHashedAccountLegalEntityId,
+                
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.Levy,
                 IsLevy = true,

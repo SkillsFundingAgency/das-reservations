@@ -131,7 +131,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddTransient(sp =>
                 new ProviderReservationsController(
                     sp.GetService<IMediator>(),
-                    sp.GetService<IExternalUrlHelper>()
+                    sp.GetService<IExternalUrlHelper>(),
+                    sp.GetService<IEncodingService>()
                 )
                 {
                     ControllerContext = GetControllerContext<ProviderReservationsController>()
