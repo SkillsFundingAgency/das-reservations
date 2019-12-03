@@ -189,7 +189,7 @@ else
 
                 </table>
             }
-            @if (Model.ShowSearch)
+            @if (Model.ShowPageLinks)
             {
                 <nav role="navigation" aria-label="Pagination">
                     <div class="das-pagination__summary">Showing @Model.FilterModel.PagedRecordsFrom - @Model.FilterModel.PagedRecordsTo of @Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null)</div>

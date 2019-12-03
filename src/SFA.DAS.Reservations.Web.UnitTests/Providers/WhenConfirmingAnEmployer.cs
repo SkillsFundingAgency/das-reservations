@@ -133,11 +133,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
    
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
-            var redirectResult = result as RedirectToActionResult;
+            var redirectResult = result as RedirectToRouteResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.AreEqual("ProviderReservations",redirectResult.ControllerName);
-            Assert.AreEqual("ChooseEmployer",redirectResult.ActionName);
+            Assert.AreEqual(RouteNames.ProviderChooseEmployer, redirectResult.RouteName);
             Assert.AreEqual(viewModel.UkPrn,redirectResult.RouteValues["UkPrn"]);
         }
     }

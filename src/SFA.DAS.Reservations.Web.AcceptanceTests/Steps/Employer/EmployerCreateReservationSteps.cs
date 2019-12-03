@@ -15,24 +15,24 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using TechTalk.SpecFlow;
 
-namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
+namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 {
     [Binding]
-    public class ReservationSteps : StepsBase
+    public class EmployerCreateReservationSteps : StepsBase
     {
         private string _reviewRedirectUrl;
 
-        public ReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerCreateReservationSteps(
+            EmployerTestServiceProvider serviceProvider, 
+            TestData testData) 
+            : base(serviceProvider, testData)
         {
         }
 
         [Given(@"I am a non levy employer")]
         public void GivenIAmANonLevyEmployer()
         {
-            SelectedAccountId = TestDataValues.NonLevyAccountId;
-            SelectedHashedAccountId = TestDataValues.NonLevyHashedAccountId;
-
-            SetTestData();
+            SetupNonLevyEmployerTestData();
         }
         
         [Given(@"I have reached my reservation limit")]
@@ -77,7 +77,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             TestData.ActionResult = controller.PostSelectLegalEntity(TestData.ReservationRouteModel, confirmLegalEntityViewModel)
                 .Result;
 
-
             if (typeof(RedirectToRouteResult) == TestData.ActionResult.GetType())
             {
                 var result = TestData.ActionResult as RedirectToRouteResult;
@@ -85,7 +84,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 Assert.IsNotNull(result);
                 Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
             }
-            
         }
 
         [Given(@"I have chosen a course")]
@@ -139,9 +137,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
             TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                 .Result as ViewResult;
-
         }
-
 
         [When(@"I do not select any training")]
         public void WhenIDoNotSelectWhetherOrNotIKnowTheTraining()
@@ -167,7 +163,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
             Assert.IsNotNull(result);
             _reviewRedirectUrl = result.Url;
-            
         }
 
         [Then(@"I am shown a validation message on the (.*) page")]
@@ -177,7 +172,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             Assert.IsTrue(result.ViewData.ModelState.ErrorCount!=0);
             Assert.AreEqual(viewName,result.ViewName);
         }
-
 
         [Then(@"The reservation is created")]
         public void ThenThenTheReservationIsCreated()

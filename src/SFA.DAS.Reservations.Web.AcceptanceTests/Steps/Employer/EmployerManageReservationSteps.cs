@@ -13,14 +13,14 @@ using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using TechTalk.SpecFlow;
 
-namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
+namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 {
     [Binding]
     public class EmployerManageReservationSteps :StepsBase
     {
         private ManageViewModel _actualModel;
 
-        public EmployerManageReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerManageReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
            
         }

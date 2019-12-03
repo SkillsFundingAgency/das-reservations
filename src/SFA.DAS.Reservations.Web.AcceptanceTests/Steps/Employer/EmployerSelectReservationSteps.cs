@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -17,7 +17,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using TechTalk.SpecFlow;
 
-namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
+namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 {
     [Binding]
     public class EmployerSelectReservationSteps : StepsBase
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         private IActionResult _actionResult;
         private readonly SelectReservationViewModel _viewModel;
 
-        public EmployerSelectReservationSteps(TestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
+        public EmployerSelectReservationSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)
         {
             _viewModel = new SelectReservationViewModel();
         }
@@ -60,11 +60,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         [Given(@"I am a levy employer")]
         public void GivenIAmALevyEmployer()
         {
-            SelectedAccountId = TestDataValues.LevyAccountId;
-            SelectedHashedAccountId = TestDataValues.LevyHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
 
-            SetTestData();
+            SetupLevyEmployerTestData();
         }
 
         [Given(@"I have no cohort reference")]
@@ -73,7 +71,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             _viewModel.CohortReference = string.Empty;
             _viewModel.ProviderId = TestDataValues.ProviderId;
         }
-
 
         [When(@"I view the select reservation screen")]
         public void WhenIViewTheSelectReservationScreen()
@@ -119,7 +116,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
 
             VerifyAddApprenticeQueryParams(redirectResult);
 
@@ -132,7 +129,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             var redirectResult = _actionResult as RedirectResult;
 
             Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{SelectedHashedAccountId}/unapproved/add/apprentice?"));
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?"));
             var queryParams = new Uri(redirectResult.Url).ParseQueryString();
             Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
             VerifyAddApprenticeQueryParams(redirectResult);
