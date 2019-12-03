@@ -147,9 +147,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 if (!viewModel.Confirm.Value)
                 {
-                    return RedirectToAction("ChooseEmployer", "ProviderReservations", new
+                    return RedirectToRoute(RouteNames.ProviderChooseEmployer, new
                     {
-                        UkPrn = viewModel.UkPrn
+                        viewModel.UkPrn
                     });
                 }
 
@@ -170,7 +170,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     Id = reservationId,
                     EmployerAccountId = viewModel.AccountPublicHashedId,
-                    UkPrn = viewModel.UkPrn
+                    viewModel.UkPrn
                 });
 
             }

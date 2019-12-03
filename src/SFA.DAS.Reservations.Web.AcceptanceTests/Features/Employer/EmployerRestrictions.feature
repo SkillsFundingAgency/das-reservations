@@ -5,12 +5,14 @@
 	
 Scenario: Restriction in place shown to user
 	Given I am a non levy employer
+	And an employer web app is running
 	And there are funding restrictions in place
 	When I start the reservation journey
 	Then I am shown that there are restrictions in place
 	
 Scenario: User is shown upcoming restriction and can dimiss
 	Given I am a non levy employer
+	And an employer web app is running
 	And there are upcoming funding restrictions in place
 	When I start the reservation journey
 	Then I am shown that there are upcoming restrictions in place

@@ -145,7 +145,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogError(e, e.Message);
                 return RedirectToRoute(RouteNames.Error500);
             }
-
         }
 
         [HttpPost]
