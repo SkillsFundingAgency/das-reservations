@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
                 trustedEmployer.AccountPublicHashedId =
                     _encodingService.Encode(trustedEmployer.AccountId, EncodingType.PublicAccountId);
                 trustedEmployer.AccountLegalEntityPublicHashedId =
-                    _encodingService.Encode(trustedEmployer.AccountId, EncodingType.PublicAccountLegalEntityId);
+                    _encodingService.Encode(trustedEmployer.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
             }
             
             return new GetTrustedEmployersResponse
