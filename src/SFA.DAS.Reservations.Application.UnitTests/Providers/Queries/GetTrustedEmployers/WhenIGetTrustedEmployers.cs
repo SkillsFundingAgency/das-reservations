@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
@@ -23,6 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTruste
         private GetTrustedEmployersQuery _query;
         private IList<AccountLegalEntity> _expectedAccountLegalEntities;
         private Mock<IValidator<GetTrustedEmployersQuery>> _validator;
+        private Mock<IEncodingService> _encodingService;
 
         [SetUp]
         public void Arrange()
@@ -52,10 +55,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTruste
                 UkPrn = ExpectedUkPrn
             };
 
+            _encodingService = new Mock<IEncodingService>();
+            _encodingService.Setup(x => x.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
+                .Returns("ABC123");
+            _encodingService.Setup(x => x.Encode(It.IsAny<long>(), EncodingType.PublicAccountId))
+                .Returns("DEF456");
+            
             _providerService = new Mock<IProviderService>();
             _validator = new Mock<IValidator<GetTrustedEmployersQuery>>();
 
-            _handler = new GetTrustedEmployersQueryHandler(_providerService.Object, _validator.Object);
+            _handler = new GetTrustedEmployersQueryHandler(_providerService.Object, _encodingService.Object, _validator.Object);
 
             _providerService.Setup(s => s.GetTrustedEmployers(ExpectedUkPrn)).ReturnsAsync(_expectedAccountLegalEntities);
             _validator.Setup(v => v.ValidateAsync(It.IsAny<GetTrustedEmployersQuery>()))
@@ -70,6 +79,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTruste
 
             //Assert
             result.Employers.Should().BeEquivalentTo(_expectedAccountLegalEntities);
+            result.Employers.All(c => c.AccountPublicHashedId.Equals("DEF456")).Should().BeTrue();
+            result.Employers.All(c => c.AccountLegalEntityPublicHashedId.Equals("ABC123")).Should().BeTrue();
         }
 
         [Test]
