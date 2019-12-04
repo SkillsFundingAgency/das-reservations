@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace SFA.DAS.Reservations.Application.Employers.Queries
+namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
     public class GetTrustedEmployersQuery : IRequest<GetTrustedEmployersResponse>
     {

@@ -156,6 +156,16 @@ namespace SFA.DAS.Reservations.Web.Models
                 routeData.Add("selectedCourse", SelectedCourse);
             }
 
+            if (!string.IsNullOrWhiteSpace(SelectedEmployer))
+            {
+                routeData.Add("selectedEmployer", SelectedEmployer);
+            }
+            
+            if (!string.IsNullOrWhiteSpace(SelectedStartDate))
+            {
+                routeData.Add("selectedStartDate", SelectedStartDate);
+            }
+
             routeData.Add("pageNumber", pageNumber.ToString());
 
             return routeData;
