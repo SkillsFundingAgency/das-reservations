@@ -8,12 +8,13 @@ using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Services
 {
     public class WhenCallingUserIsInRole
     {
-        [Test, AutoData]
+        [Test, MoqAutoData]
         public void And_User_Not_In_Role_Then_Returns_False(
             string employerAccountId,
             UserClaimsService userClaimsService)
@@ -24,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                 .Should().BeFalse();
         }
 
-        [Test, AutoData]
+        [Test, MoqAutoData]
         public void And_User_Is_In_Role_Then_Returns_True(
             string employerAccountId,
             UserClaimsService userClaimsService)
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                 .Should().BeTrue();
         }
 
-        [Test, AutoData]
+        [Test, MoqAutoData]
         public void And_Claim_Not_Found_Then_Returns_False(
             string employerAccountId,
             UserClaimsService userClaimsService)
@@ -46,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                 .Should().BeFalse();
         }
 
-        [Test, AutoData]
+        [Test, MoqAutoData]
         public void And_User_Not_Found_Then_Returns_False(
             string employerAccountId,
             string differentAccountId,

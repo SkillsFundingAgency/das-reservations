@@ -24,6 +24,7 @@ using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -36,6 +37,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
         private readonly ILogger<EmployerReservationsController> _logger;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ReservationsWebConfiguration _config;
 
         public EmployerReservationsController(
@@ -43,12 +45,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IEncodingService encodingService, 
             IOptions<ReservationsWebConfiguration> options, 
             IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger) : base(mediator)
+            ILogger<EmployerReservationsController> logger,
+            IUserClaimsService userClaimsService) : base(mediator)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
             _logger = logger;
+            _userClaimsService = userClaimsService;
             _config = options.Value;
         }
 
@@ -165,6 +169,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
                 var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
                     model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+
+                if (!selectedAccountLegalEntity.AgreementSigned)
+                {
+                    if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+                        EmployerUserRole.Owner, User.Claims))
+                    {
+                        routeModel.PreviousPage = RouteNames.EmployerSelectLegalEntity;
+                        return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
+                    }
+
+                    routeModel.PreviousPage = RouteNames.EmployerSelectLegalEntity;
+                    return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
+                }
 
                 await CacheReservation(routeModel, selectedAccountLegalEntity);
 
@@ -283,6 +300,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return View("CourseGuidance", model);
         }
+
+
 
         private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
             ReservationsRouteModel routeModel,

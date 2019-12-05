@@ -125,6 +125,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId,
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                AgreementSigned = true,
                 IsLevy = false,
                 LegalEntityId = 1,
                 ReservationLimit = 5
@@ -158,6 +159,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.Levy,
+                AgreementSigned = true,
                 IsLevy = true,
                 LegalEntityId = 1,
                 ReservationLimit = 5
@@ -189,6 +191,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId,
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                AgreementSigned = true,
                 IsLevy = false,
                 LegalEntityId = 1,
                 ReservationLimit = 5
