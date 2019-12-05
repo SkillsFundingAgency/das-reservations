@@ -39,16 +39,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\Provider\ProviderCreateReservation.feature.cs">
-      <DependentUpon>ProviderCreateReservation.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <SpecFlowFeatureFiles Update="Features\Provider\ProviderCreateReservation.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ConfimReservation.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
-
+  <ItemGroup>
+    <Content Include="Features\Provider\ProviderCreateReservation.feature" />
+  </ItemGroup>
 </Project>

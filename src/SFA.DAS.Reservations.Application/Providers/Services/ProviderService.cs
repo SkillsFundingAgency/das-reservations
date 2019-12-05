@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Employers;
@@ -26,6 +27,16 @@ namespace SFA.DAS.Reservations.Application.Providers.Services
             var legalEntity = await _apiClient.Get<AccountLegalEntity>(request);
 
             return legalEntity;
+        }
+
+        public async Task<IEnumerable<AccountLegalEntity>> GetTrustedEmployers(uint ukPrn)
+        {
+            var request = new GetTrustedEmployersRequest(_configuration.Url, ukPrn);
+
+            var legalEntities = await _apiClient.GetAll<AccountLegalEntity>(request);
+
+            return legalEntities;
+
         }
     }
 }

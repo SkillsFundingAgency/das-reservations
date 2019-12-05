@@ -8,7 +8,9 @@ using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Extensions;
+using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
+using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Validation;
 
