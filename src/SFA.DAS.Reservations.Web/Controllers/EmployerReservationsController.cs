@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -128,6 +129,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
                 {
                     var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
+
+                    if (!accountLegalEntity.AgreementSigned)
+                    {
+                        return RedirectToSignAgreement(routeModel, RouteNames.EmployerIndex);
+                    }
+
                     await CacheReservation(routeModel, accountLegalEntity, true);
                     return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
                 }
@@ -171,15 +178,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 if (!selectedAccountLegalEntity.AgreementSigned)
                 {
-                    if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
-                        EmployerUserRole.Owner, User.Claims))
-                    {
-                        routeModel.PreviousPage = RouteNames.EmployerSelectLegalEntity;
-                        return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
-                    }
-
-                    routeModel.PreviousPage = RouteNames.EmployerSelectLegalEntity;
-                    return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
+                    return RedirectToSignAgreement(routeModel, RouteNames.EmployerSelectLegalEntity);
                 }
 
                 await CacheReservation(routeModel, selectedAccountLegalEntity);
@@ -206,9 +205,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("EmployerFundingPaused");
             }
         }
-
         
-
         [HttpGet]
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
@@ -323,6 +320,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
             };
 
             return View("TransactorSignAgreement", model);
+        }
+
+        private RedirectToRouteResult RedirectToSignAgreement(ReservationsRouteModel routeModel, string previousRouteName)
+        {
+            if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+                EmployerUserRole.Owner, User.Claims))
+            {
+                routeModel.PreviousPage = previousRouteName;
+                return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
+            }
+
+            routeModel.PreviousPage = previousRouteName;
+            return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
         }
 
         private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(

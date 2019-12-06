@@ -230,6 +230,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var result = await controller.PostSelectLegalEntity(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.EmployerOwnerSignAgreement);
+            result.RouteValues[nameof(ReservationsRouteModel.PreviousPage)].Should().Be(RouteNames.EmployerSelectLegalEntity);
         }
 
         [Test, MoqAutoData]

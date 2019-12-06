@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -17,6 +19,7 @@ using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
@@ -57,6 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             EmployerReservationsController controller)
         {
             routeModel.Id = null;
+            accountLegalEntity.AgreementSigned = true;
             var getLegalEntitiesResponse = new GetLegalEntitiesResponse
             {
                 AccountLegalEntities = new List<AccountLegalEntity> { accountLegalEntity }
@@ -125,7 +129,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task And_Global_Rule_Exists_Then_Shows_Funding_Paused_Page(
             ReservationsRouteModel routeModel,
-            AccountLegalEntity accountLegalEntity,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
         {
@@ -141,7 +144,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task And_Reservation_Limit_Has_Been_Exceeded_Then_Shows_Reservation_Limit_Reached_Page(
             ReservationsRouteModel routeModel,
-            AccountLegalEntity accountLegalEntity,
             [Frozen] Mock<IMediator> mockMediator,
             EmployerReservationsController controller)
         {
@@ -152,6 +154,74 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             var result = await controller.SelectLegalEntity(routeModel) as ViewResult;
 
             Assert.AreEqual("ReservationLimitReached", result?.ViewName);
+        }
+
+        [Test, MoqAutoData]
+        public async Task
+            And_User_Has_Owner_Role_And_Chosen_Legal_Entity_Has_Not_Signed_Agreement_Then_Redirect_To_Owner_Sign_Route(
+                ReservationsRouteModel routeModel,
+                AccountLegalEntity accountLegalEntity,
+                GetLegalEntitiesResponse getLegalEntitiesResponse,
+                [Frozen] Mock<IMediator> mockMediator,
+                [Frozen] Mock<IUserClaimsService> mockClaimsService,
+                EmployerReservationsController controller)
+        {
+            getLegalEntitiesResponse.AccountLegalEntities =
+                new List<AccountLegalEntity>
+                {
+                    accountLegalEntity
+                };
+            accountLegalEntity.AgreementSigned = false;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetLegalEntitiesQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockClaimsService
+                .Setup(service => service.UserIsInRole(
+                    routeModel.EmployerAccountId,
+                    EmployerUserRole.Owner,
+                    It.IsAny<IEnumerable<Claim>>()))
+                .Returns(true);
+
+            var result = await controller.SelectLegalEntity(routeModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerOwnerSignAgreement);
+            result.RouteValues[nameof(ReservationsRouteModel.PreviousPage)].Should().Be(RouteNames.EmployerIndex);
+        }
+
+        [Test, MoqAutoData]
+        public async Task
+            And_User_Has_Transactor_Role_And_Chosen_Legal_Entity_Has_Not_Signed_Agreement_Then_Redirect_To_Transactor_Sign_Route(
+                ReservationsRouteModel routeModel,
+                AccountLegalEntity accountLegalEntity,
+                GetLegalEntitiesResponse getLegalEntitiesResponse,
+                [Frozen] Mock<IMediator> mockMediator,
+                [Frozen] Mock<IUserClaimsService> mockClaimsService,
+                EmployerReservationsController controller)
+        {
+            getLegalEntitiesResponse.AccountLegalEntities =
+                new List<AccountLegalEntity>
+                {
+                    accountLegalEntity
+                };
+            accountLegalEntity.AgreementSigned = false;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetLegalEntitiesQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(getLegalEntitiesResponse);
+            mockClaimsService
+                .Setup(service => service.UserIsInRole(
+                    routeModel.EmployerAccountId,
+                    EmployerUserRole.Transactor,
+                    It.IsAny<IEnumerable<Claim>>()))
+                .Returns(true);
+
+            var result = await controller.SelectLegalEntity(routeModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.EmployerTransactorSignAgreement);
+            result.RouteValues[nameof(ReservationsRouteModel.PreviousPage)].Should().Be(RouteNames.EmployerIndex);
         }
     }
 }
