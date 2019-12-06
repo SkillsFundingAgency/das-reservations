@@ -1,0 +1,17 @@
+﻿@model SignAgreementViewModel
+@{
+    ViewData["Title"] = "Employer agreement not accepted";
+}
+
+<a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper" id="main-content" role="main">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Employer agreement not accepted</h1>
+            <p class="govuk-body">You must accept your employer agreement with the Education and Skills Funding Agency (ESFA) before you can reserve or manage funding.</p>
+            <p class="govuk-body">You can view the agreement now or find it later in ‘your organisations and agreements’.</p>
+            <a asp-external-controller="agreements" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" draggable="false" class="govuk-button" tabindex="1">View the agreement</a>
+        </div>
+    </div>
+</main>

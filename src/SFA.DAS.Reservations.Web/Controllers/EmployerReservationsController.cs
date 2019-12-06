@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -208,6 +207,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
+        
+
         [HttpGet]
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
@@ -297,11 +298,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl
             };
 
-
             return View("CourseGuidance", model);
         }
 
+        [HttpGet]
+        [Route("owner-sign-agreement", Name = RouteNames.EmployerOwnerSignAgreement)]
+        public IActionResult OwnerSignAgreement(ReservationsRouteModel routeModel)
+        {
+            var model = new SignAgreementViewModel
+            {
+                BackRouteName = routeModel.PreviousPage
+            };
+            
+            return View("OwnerSignAgreement", model);
+        }
 
+        [HttpGet]
+        [Route("transactor-sign-agreement", Name = RouteNames.EmployerTransactorSignAgreement)]
+        public IActionResult TransactorSignAgreement(ReservationsRouteModel routeModel)
+        {
+            var model = new SignAgreementViewModel
+            {
+                BackRouteName = routeModel.PreviousPage
+            };
+
+            return View("TransactorSignAgreement", model);
+        }
 
         private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
             ReservationsRouteModel routeModel,

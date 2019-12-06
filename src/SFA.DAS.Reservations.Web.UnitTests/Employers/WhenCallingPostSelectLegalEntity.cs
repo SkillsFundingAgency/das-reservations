@@ -262,41 +262,5 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             result.RouteName.Should().Be(RouteNames.EmployerTransactorSignAgreement);
             result.RouteValues[nameof(ReservationsRouteModel.PreviousPage)].Should().Be(RouteNames.EmployerSelectLegalEntity);
         }
-
-        private IEnumerable<Claim> BuildClaims(string employerAccountId, EmployerUserRole userRole)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(EmployerClaims.AccountsClaimsTypeIdentifier,
-                    JsonConvert.SerializeObject(
-                        new Dictionary<string, EmployerIdentifier>
-                        {
-                            {
-                                employerAccountId, new EmployerIdentifier
-                                {
-                                    AccountId = employerAccountId,
-                                    EmployerName = "Tests That Pass",
-                                    Role = nameof(userRole)
-                                }
-                            }
-                        }
-                    ))
-            };
-
-            return claims;
-        }
-
-        private ControllerContext BuildControllerContext(IEnumerable<Claim> claims)
-        {
-            var mockContext = new Mock<HttpContext>();
-            mockContext
-                .SetupGet(httpContext => httpContext.User)
-                .Returns(new ClaimsPrincipal(new ClaimsIdentity(claims)));
-
-            return new ControllerContext
-            {
-                HttpContext = mockContext.Object
-            };
-        }
     }
 }
