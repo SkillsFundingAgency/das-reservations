@@ -18,7 +18,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.AppStart;
-using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -100,7 +99,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
         }
 
         [Test, MoqAutoData]
-        public async Task And_Employer_Is_Non_Levy_And_Is_EOI_Then_Executes_Action(
+        public async Task And_Employer_Is_Non_Levy_And_Is_EOI_And_Has_Signed_Agreement_Then_Executes_Action(
             [ArrangeActionContext] ActionExecutingContext context,
             string employerAccountId,
             long decodedEmployerAccountId,
@@ -120,6 +119,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             {
                 accountLegalEntity.IsLevy = false;
                 accountLegalEntity.AgreementType = AgreementType.NonLevyExpressionOfInterest;
+                accountLegalEntity.AgreementSigned = true;
             }
             mockEncodingService
                 .Setup(service => service.Decode(
@@ -136,6 +136,55 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
 
             mockNext.Verify(next => next(), Times.Once);
             context.Result.Should().Be(null);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Employer_Is_Non_Levy_And_Is_EOI_And_Has_Not_Signed_Agreement_Then_Show_EOI_Holding_View(
+            [ArrangeActionContext] ActionExecutingContext context,
+            string homeUrl,
+            string employerAccountId,
+            long decodedEmployerAccountId,
+            GetLegalEntitiesResponse legalEntitiesResponse,
+            Mock<ActionExecutionDelegate> mockNext,
+            [Frozen] ServiceParameters serviceParameters,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            NonEoiNotPermittedFilterAttribute filter)
+        {
+            context.Result = null;
+            context.HttpContext = new DefaultHttpContext();
+            
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            context.RouteData.Values.Add("employerAccountId", employerAccountId);
+            foreach (var accountLegalEntity in legalEntitiesResponse.AccountLegalEntities)
+            {
+                accountLegalEntity.IsLevy = false;
+                accountLegalEntity.AgreementType = AgreementType.NonLevyExpressionOfInterest;
+                accountLegalEntity.AgreementSigned = false;
+            }
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    context.RouteData.Values["employerAccountId"].ToString(),
+                    EncodingType.AccountId))
+                .Returns(decodedEmployerAccountId);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(query => query.AccountId == decodedEmployerAccountId),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(legalEntitiesResponse);
+
+            mockUrlHelper
+                .Setup(helper => helper.GenerateDashboardUrl(employerAccountId))
+                .Returns(homeUrl);
+
+            await filter.OnActionExecutionAsync(context, mockNext.Object);
+
+            mockNext.Verify(next => next(), Times.Never());
+            var result = context.Result as ViewResult;
+            result.ViewName.Should().Be("NonEoiHolding");
+            var model = result.Model as NonEoiHoldingViewModel;
+            model.HomeLink.Should().Be(homeUrl);
         }
 
         [Test, MoqAutoData]

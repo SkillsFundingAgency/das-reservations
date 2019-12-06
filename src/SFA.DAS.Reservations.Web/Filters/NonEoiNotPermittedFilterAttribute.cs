@@ -75,10 +75,12 @@ namespace SFA.DAS.Reservations.Web.Filters
                 AccountId = decodedAccountId
             });
 
-            if (result.AccountLegalEntities.Any(entity =>
+            var legalEntitiesWithSignedAgreements = result.AccountLegalEntities.Where(ale => ale.AgreementSigned).ToList();
+
+            if (!legalEntitiesWithSignedAgreements.Any() ||
+                legalEntitiesWithSignedAgreements.Any(entity =>
                     !entity.IsLevy && 
-                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest) || 
-                !result.AccountLegalEntities.Any())
+                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
             {
                 var homeLink = _urlHelper.GenerateDashboardUrl(employerAccountId?.ToString());
 
