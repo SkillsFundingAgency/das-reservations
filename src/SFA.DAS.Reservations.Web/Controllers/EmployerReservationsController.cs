@@ -326,7 +326,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 });
 
                 var owners = users.AccountUsers
-                    .Where(user => user.Role.Equals("Owner", StringComparison.InvariantCultureIgnoreCase))
+                    .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     .OrderBy(user => user.Name)
                     .Select(user => (EmployerAccountUserViewModel) user);
 
@@ -341,7 +341,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error attempting to show the transactor sign agreement page.");
-                throw;
+                return RedirectToRoute(RouteNames.Error500);
             }
         }
 

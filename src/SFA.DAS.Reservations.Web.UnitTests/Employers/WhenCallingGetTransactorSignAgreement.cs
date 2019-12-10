@@ -10,7 +10,9 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetAccountUsers;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
 
@@ -63,11 +65,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
             var model = result.Model as SignAgreementViewModel;
             model.OwnersOfThisAccount.Should().BeEquivalentTo(usersResponse.AccountUsers
-                .Where(user => user.Role.Equals("Owner", StringComparison.InvariantCultureIgnoreCase))
+                .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(user => user.Name)
                 .Select(user => (EmployerAccountUserViewModel)user));
         }
 
-        // todo: exception
+        [Test, MoqAutoData]
+        public async Task And_Exception_Then_Redirect_To_Error_500(
+            ReservationsRouteModel routeModel,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAccountUsersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .Throws<Exception>();
+
+            var result = await controller.TransactorSignAgreement(routeModel) as RedirectToRouteResult;
+
+            result.RouteName.Should().Be(RouteNames.Error500);
+        }
     }
 }
