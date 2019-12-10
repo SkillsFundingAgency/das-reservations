@@ -17,15 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Views\Home\FeatureNotAvailable.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\Home\FeatureNotAvailable.cshtml" />
-  </ItemGroup>
-
-
-  <ItemGroup>
     <PackageReference Include="MediatR" Version="6.0.0" />
     <PackageReference Include="mediatr.extensions.microsoft.dependencyinjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
