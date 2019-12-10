@@ -16,6 +16,14 @@
     <None Remove="Pages\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Views\Home\FeatureNotAvailable.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Home\FeatureNotAvailable.cshtml" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="6.0.0" />
