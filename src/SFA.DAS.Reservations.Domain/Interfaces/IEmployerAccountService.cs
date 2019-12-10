@@ -12,6 +12,6 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
         Task<IEnumerable<EmployerIdentifier>> GetUserRoles(IEnumerable<EmployerIdentifier> values, string userId);
         Task<Claim> GetClaim(string userId, string claimType);
         Task<IEnumerable<EmployerTransferConnection>> GetTransferConnections(string accountId);
-        Task<IEnumerable<EmployerAccountUser>> GetUsersForAccount(long accountId);
+        Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId);
     }
 }

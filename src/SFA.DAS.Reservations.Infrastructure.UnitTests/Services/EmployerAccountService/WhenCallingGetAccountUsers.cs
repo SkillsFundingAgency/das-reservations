@@ -11,7 +11,7 @@ using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccountService
 {
-    public class WhenCallingGetUsersForAccount
+    public class WhenCallingGetAccountUsers
     {
         [Test, MoqAutoData]
         public async Task Then_Returns_All_Users_For_Account_From_Account_Api(
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
                 .Setup(client => client.GetAccountUsers(accountId))
                 .ReturnsAsync(teamMembers);
 
-            var result = await service.GetUsersForAccount(accountId);
+            var result = await service.GetAccountUsers(accountId);
 
             result.Should().BeEquivalentTo(teamMembers);
         }

@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             }
         }
 
-        public async Task<IEnumerable<EmployerAccountUser>> GetUsersForAccount(long accountId)
+        public async Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId)
         {
             var teamMembers = await _accountApiClient.GetAccountUsers(accountId);
 
