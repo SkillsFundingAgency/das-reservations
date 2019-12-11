@@ -61,8 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             {
                 AccountLegalEntityPublicHashedId = arg.AccountLegalEntityPublicHashedId,
                 AccountId = arg.AccountId,
-                IsLevy = false,
-                AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                IsLevy = false
             }).ToList();
             
             mockMediator
