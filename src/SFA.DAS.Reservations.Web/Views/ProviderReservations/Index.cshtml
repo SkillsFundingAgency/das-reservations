@@ -2,7 +2,9 @@
 @model ProviderStartViewModel
 @{
     ViewData["Title"] = "Reserve funding for non-levy employers";
-    var fromManageRouteData = (new Dictionary<string, string> {{"IsFromManage", "true"}});
+    var fromManageRouteData = (new Dictionary<string, string> { { "IsFromManage", "true" } });
+
+    ViewBag.GaData.Vpv = "/reservations/start";
 }
 
 @if (Model.IsFromManage)
@@ -28,4 +30,4 @@ else
             <a asp-route="provider-choose-employer" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
     </div>
-</main>
+    </main>

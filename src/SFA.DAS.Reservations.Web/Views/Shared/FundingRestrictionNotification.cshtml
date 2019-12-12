@@ -3,6 +3,15 @@
 
 @{
     ViewData["Title"] = "Upcoming change to government-funded training";
+
+    if (Model.IsProvider)
+    {
+        ViewBag.GaData.Vpv = "/reservations/fundingrestrictionnotification";
+    }
+    else
+    {
+        ViewBag.GaData.Vpv = "/accounts/reservations/fundingrestrictionnotification";
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))

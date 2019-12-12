@@ -8,6 +8,8 @@
     {
         {"UkPrn",ViewContext.RouteData.Values["ukPrn"].ToString()}
     };
+
+    ViewBag.GaData.Vpv = "/reservations/choose-employer";
 }
 
 <a asp-action="Index" asp-controller="ProviderReservations" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
