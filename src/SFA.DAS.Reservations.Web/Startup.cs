@@ -19,6 +19,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using SFA.DAS.Reservations.Web.Stubs;
 
@@ -121,6 +122,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddMvc(
                     options =>
                     {
+                        options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()
