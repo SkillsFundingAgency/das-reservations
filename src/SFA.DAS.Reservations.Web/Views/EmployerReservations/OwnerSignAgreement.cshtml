@@ -1,6 +1,8 @@
 ﻿@model SignAgreementViewModel
 @{
     ViewData["Title"] = "Employer agreement not accepted";
+
+    ViewBag.GaData.Vpv = "/accounts/reservations/owner-sign-agreement";
 }
 
 <a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
