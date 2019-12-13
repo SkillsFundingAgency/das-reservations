@@ -67,6 +67,31 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             Assert.AreEqual(accountId.ToString(), viewBagData.Acc);
             Assert.AreEqual(userId.ToString(), viewBagData.UserId);
         }
+        
+        
+        [Test, MoqAutoData]
+        public async Task Then_If_User_Is_Not_Logged_In_Then_Empty_ViewBag_Data_Is_Returned(
+            long accountId,
+            [Frozen] ServiceParameters serviceParameters,
+            [ArrangeActionContext] ActionExecutingContext context,
+            [Frozen] Mock<ActionExecutionDelegate> nextMethod,
+            GoogleAnalyticsFilter filter)
+        {
+            //Arrange
+            context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
+            serviceParameters.AuthenticationType = AuthenticationType.Employer;
+            
+            //Act
+            await filter.OnActionExecutionAsync(context, nextMethod.Object);
+
+            //Assert
+            var actualController = context.Controller as Controller;
+            Assert.IsNotNull(actualController);
+            var viewBagData = actualController.ViewBag.GaData as GaData;
+            Assert.IsNotNull(viewBagData);
+            Assert.IsNull(viewBagData.Acc);
+            Assert.IsNull(viewBagData.UserId);
+        }
 
         [Test, MoqAutoData]
         public async Task Then_If_The_Controller_Is_Not_A_Controller_No_Data_Is_Added_To_ViewBag(

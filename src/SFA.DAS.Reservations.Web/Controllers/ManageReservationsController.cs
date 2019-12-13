@@ -45,7 +45,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _logger = logger;
         }
 
-        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         [Route("accounts/{employerAccountId}/reservations/manage", Name = RouteNames.EmployerManage)]
         public async Task<IActionResult> EmployerManage(ReservationsRouteModel routeModel)
         {
