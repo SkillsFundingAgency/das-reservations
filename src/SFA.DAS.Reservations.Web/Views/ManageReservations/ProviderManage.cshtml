@@ -3,8 +3,9 @@
 @model ManageViewModel
 @{
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
-}
 
+    ViewBag.GaData.Vpv = "/reservations/manage";
+}
 
 @if (Model.TotalReservationCount == 0)
 {
@@ -36,98 +37,98 @@ else
             </div>
             @if (Model.ShowSearch)
             {
-            <form method="get" asp-route="@RouteNames.ProviderManage">
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <div class="govuk-form-group">
-                        <label for="searchTerm" class="govuk-label">Search employer name or course</label>
-                        <div class="das-search-form__group">
-                            <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
-                            <div class="das-search-form__button-wrap">
-                                <button class="govuk-button das-search-form__button" type="submit">Search</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-full">
-                    <div class="das-pane govuk-!-margin-bottom-3">
-                        <div class="govuk-grid-row">
-                            <div class="govuk-grid-column-one-third">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="selectedEmployer">Employer</label>
-                                    <select class="govuk-select govuk-!-width-full" id="selectedEmployer" name="selectedEmployer">
-                                        <option label="All" aria-label="All employers"></option>
-                                        @foreach (var employer in Model.FilterModel.EmployerFilters)
-                                        {
-                                            if (employer.Replace(" ", null) == Model.FilterModel.SelectedEmployer?.Replace(" ", null))
-                                            {
-                                                <option label="@employer" selected="selected">@employer</option>
-                                            }
-                                            else
-                                            {
-                                                <option label="@employer">@employer</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="govuk-grid-column-one-third">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="selectedCourse">Apprenticeship training course</label>
-                                    <select class="govuk-select govuk-!-width-full" id="selectedCourse" name="selectedCourse">
-                                        <option label="All" aria-label="All courses"></option>
-                                        @foreach (var course in Model.FilterModel.CourseFilters)
-                                        {
-                                            if (course.Replace(" ", null) == Model.FilterModel.SelectedCourse?.Replace(" ", null))
-                                            {
-                                                <option label="@course" selected="selected">@course</option>
-                                            }
-                                            else
-                                            {
-                                                <option label="@course">@course</option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="govuk-grid-column-one-third">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="selectedStartDate">Start date</label>
-                                    <select class="govuk-select govuk-!-width-full" id="selectedStartDate" name="selectedStartDate">
-                                        <option label="All" aria-label="All start dates"></option>
-                                        @foreach (var startDate in Model.FilterModel.StartDateFilters)
-                                        {
-                                            if (startDate.Replace(" ", null) == Model.FilterModel.SelectedStartDate?.Replace(" ", null))
-                                            {
-                                                <option label="@startDate" selected="selected">@startDate</option>
-                                            }
-                                            else
-                                            {
-                                                <option label="@startDate">@startDate</option>
-                                            }
-                                        }
-                                    </select>
+                <form method="get" asp-route="@RouteNames.ProviderManage">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-two-thirds">
+                            <div class="govuk-form-group">
+                                <label for="searchTerm" class="govuk-label">Search employer name or course</label>
+                                <div class="das-search-form__group">
+                                    <input class="govuk-input das-search-form__input" id="searchTerm" name="searchTerm" type="text" value="@Model.FilterModel.SearchTerm">
+                                    <div class="das-search-form__button-wrap">
+                                        <button class="govuk-button das-search-form__button" type="submit">Search</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <button class="govuk-button govuk-!-margin-0" type="submit">Apply filters</button>
                     </div>
-                </div>
-            </div>
-            </form>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            <div class="das-pane govuk-!-margin-bottom-3">
+                                <div class="govuk-grid-row">
+                                    <div class="govuk-grid-column-one-third">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="selectedEmployer">Employer</label>
+                                            <select class="govuk-select govuk-!-width-full" id="selectedEmployer" name="selectedEmployer">
+                                                <option label="All" aria-label="All employers"></option>
+                                                @foreach (var employer in Model.FilterModel.EmployerFilters)
+                                                {
+                                                    if (employer.Replace(" ", null) == Model.FilterModel.SelectedEmployer?.Replace(" ", null))
+                                                    {
+                                                        <option label="@employer" selected="selected">@employer</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option label="@employer">@employer</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-grid-column-one-third">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="selectedCourse">Apprenticeship training course</label>
+                                            <select class="govuk-select govuk-!-width-full" id="selectedCourse" name="selectedCourse">
+                                                <option label="All" aria-label="All courses"></option>
+                                                @foreach (var course in Model.FilterModel.CourseFilters)
+                                                {
+                                                    if (course.Replace(" ", null) == Model.FilterModel.SelectedCourse?.Replace(" ", null))
+                                                    {
+                                                        <option label="@course" selected="selected">@course</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option label="@course">@course</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-grid-column-one-third">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="selectedStartDate">Start date</label>
+                                            <select class="govuk-select govuk-!-width-full" id="selectedStartDate" name="selectedStartDate">
+                                                <option label="All" aria-label="All start dates"></option>
+                                                @foreach (var startDate in Model.FilterModel.StartDateFilters)
+                                                {
+                                                    if (startDate.Replace(" ", null) == Model.FilterModel.SelectedStartDate?.Replace(" ", null))
+                                                    {
+                                                        <option label="@startDate" selected="selected">@startDate</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option label="@startDate">@startDate</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="govuk-button govuk-!-margin-0" type="submit">Apply filters</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             }
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     @if (Model.FilterModel.SearchOrFiltersApplied)
                     {
-                        <p class="govuk-body"><a  class="govuk-link" asp-route="@RouteNames.ProviderManage">Clear search and filters</a></p>
+                        <p class="govuk-body"><a class="govuk-link" asp-route="@RouteNames.ProviderManage">Clear search and filters</a></p>
                     }
                     <p class="govuk-body">@Model.FilterModel.NumberOfRecordsFound reservation@(Model.FilterModel.NumberOfRecordsFound != 1 ? "s" : null) @Model.FilterModel.FiltersUsedMessage</p>
                 </div>
             </div>
-            
+
 
             @if (Model.Reservations.Count != 0)
             {

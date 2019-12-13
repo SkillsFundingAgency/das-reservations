@@ -2,6 +2,8 @@
 @model string
 @{
     ViewData["Title"] = "Reservations";
+
+    ViewBag.GaData.Vpv = "/nopermissions";
 }
 @if (!string.IsNullOrEmpty(Model))
 {

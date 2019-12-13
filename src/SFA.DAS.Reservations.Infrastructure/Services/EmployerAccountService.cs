@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             {
                 return null;
             }
-            var teamMember = accounts.FirstOrDefault(c => String.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
+            var teamMember = accounts.FirstOrDefault(c => string.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
             return teamMember?.Role;
         }
 

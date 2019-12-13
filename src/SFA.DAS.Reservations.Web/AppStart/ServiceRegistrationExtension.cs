@@ -19,7 +19,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IHostingEnvironment env)
         {
             services.AddSingleton(serviceParameters);
-            services.AddScoped<NonEoiNotPermittedFilterAttribute>();
             services.AddScoped<LevyNotPermittedFilter>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
