@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Web.Filters
         {
             string hashedAccountId = null;
             
-            var userId = context.HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier)).Value;
+            var userId = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))?.Value;
 
             if (context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
             {
