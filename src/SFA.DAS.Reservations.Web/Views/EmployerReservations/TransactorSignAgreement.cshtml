@@ -4,6 +4,9 @@
 
     ViewBag.GaData.Vpv = "/accounts/reservations/transactor-sign-agreement";
 }
+
+<a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
+
 <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -11,7 +14,21 @@
             <p class="govuk-body">Employers must accept your employer agreement with the Education and Skills Funding Agency (ESFA) before they can reserve or manage funding.</p>
             <h3 class="govuk-heading-m">You do not have permission to accept the agreement</h3>
             <p class="govuk-body">Someone with permission needs to accept the agreement or give you permission to accept it.</p>
-            <!--todo: ul here-->
+            @if (Model.OwnersOfThisAccount.Count() == 1)
+            {
+                var user = Model.OwnersOfThisAccount.First();
+                <p>@user.Name (@user.Email) has permission.</p>
+            }
+            else if (Model.OwnersOfThisAccount.Count() > 1)
+            {
+                <p class="govuk-body">Team members with permission:</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @foreach (var user in Model.OwnersOfThisAccount)
+                    {
+                        <li>@user.Name - @user.Email</li>
+                    }
+                </ul>
+            }
             <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" draggable="false" class="govuk-button" tabindex="1">Return to homepage</a>
         </div>
     </div>

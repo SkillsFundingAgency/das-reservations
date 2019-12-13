@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetAccountUsers;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
@@ -310,14 +310,37 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpGet]
         [Route("transactor-sign-agreement", Name = RouteNames.EmployerTransactorSignAgreement)]
-        public IActionResult TransactorSignAgreement(ReservationsRouteModel routeModel)
+        public async Task<IActionResult> TransactorSignAgreement(ReservationsRouteModel routeModel)
         {
-            var model = new SignAgreementViewModel
+            try
             {
-                BackRouteName = routeModel.PreviousPage
-            };
+                var decodedAccountId = _encodingService.Decode(
+                    routeModel.EmployerAccountId, 
+                    EncodingType.AccountId);
 
-            return View("TransactorSignAgreement", model);
+                var users = await _mediator.Send(new GetAccountUsersQuery
+                {
+                    AccountId = decodedAccountId
+                });
+
+                var owners = users.AccountUsers
+                    .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                    .OrderBy(user => user.Name)
+                    .Select(user => (EmployerAccountUserViewModel) user);
+
+                var model = new SignAgreementViewModel
+                {
+                    BackRouteName = routeModel.PreviousPage,
+                    OwnersOfThisAccount = owners
+                };
+
+                return View("TransactorSignAgreement", model);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error attempting to show the transactor sign agreement page.");
+                return RedirectToRoute(RouteNames.Error500);
+            }
         }
 
         private RedirectToRouteResult RedirectToSignAgreement(ReservationsRouteModel routeModel, string previousRouteName)
