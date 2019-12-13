@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -29,6 +28,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
+    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
     public class EmployerReservationsController : ReservationsBaseController
     {

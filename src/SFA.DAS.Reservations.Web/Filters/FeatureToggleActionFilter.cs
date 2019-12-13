@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace SFA.DAS.Reservations.Web.Filters
 {
-    public class FeatureToggleActionFilter : IActionFilter
+    public class FeatureToggleActionFilter : ActionFilterAttribute
     {
         private readonly bool _featureToggleOn;
 
@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.Filters
             _featureToggleOn = isFeatureEnabled;
         }
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (_featureToggleOn) return;
 
@@ -35,9 +35,6 @@ namespace SFA.DAS.Reservations.Web.Filters
             }
         }
 
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            // do something after the action executes
-        }
+      
     }
 }

@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
+    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     public class HomeController : Controller
     {    
         private readonly ILogger<HomeController> _logger;

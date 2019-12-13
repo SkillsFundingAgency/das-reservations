@@ -123,7 +123,6 @@ namespace SFA.DAS.Reservations.Web
                     options =>
                     {
                         options.AddAuthorization();
-                        options.Filters.Add(new FeatureToggleActionFilter(_configuration));
                     })
                 .AddControllersAsServices()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
