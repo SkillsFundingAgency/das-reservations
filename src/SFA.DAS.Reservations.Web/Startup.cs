@@ -62,8 +62,6 @@ namespace SFA.DAS.Reservations.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            
-
             services.AddOptions();
 
             var isEmployerAuth =
