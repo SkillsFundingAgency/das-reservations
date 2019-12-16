@@ -27,6 +27,15 @@
     {
         {"CohortReference",Model.CohortRef}
     };
+
+    if (Model.IsProvider)
+    {
+        ViewBag.GaData.Vpv = "/reservations/apprenticeship-training";
+    }
+    else
+    {
+        ViewBag.GaData.Vpv = "/accounts/reservations/apprenticeship-training";
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))

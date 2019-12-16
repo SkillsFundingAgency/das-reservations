@@ -52,8 +52,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _config = options.Value;
         }
 
-        // GET
-        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
 

@@ -54,19 +54,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                     result.FailedGlobalRuleValidation = true;
                 }
 
-                // eoi
-                var queryResult = await _mediator.Send(new GetLegalEntitiesQuery
-                {
-                    AccountId = command.AccountId
-                });
-
-                if (queryResult.AccountLegalEntities.Any(entity =>
-                    !entity.IsLevy && 
-                    entity.AgreementType != AgreementType.NonLevyExpressionOfInterest))
-                {
-                    result.FailedEoiCheck = true;
-                    return result;
-                }
             }
 
             if (command.AccountLegalEntityId == default(long))

@@ -42,7 +42,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             _urlHelper = urlHelper;
         }
 
-        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         [ServiceFilter(typeof(NonLevyFeatureToggleActionFilter))]
         [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
@@ -130,17 +129,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (ReservationLimitReachedException)
             {
                 return View("ReservationLimitReached", backUrl);
-            }
-            catch (NonEoiUserAccessDeniedException)
-            {
-                var homeLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
-
-                var model = new NonEoiHoldingViewModel
-                {
-                    HomeLink = homeLink
-                };
-
-                return View("NonEoiHolding", model);
             }
             catch (GlobalReservationRuleException)
             {
