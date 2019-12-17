@@ -61,6 +61,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
             serviceCollection.AddSingleton(accountApiClient.Object);
             serviceCollection.AddSingleton(urlHelper.Object);
+            serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
@@ -123,7 +124,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     sp.GetService<IEncodingService>(),
                     sp.GetService<IOptions<ReservationsWebConfiguration>>(),
                     sp.GetService<IExternalUrlHelper>(),
-                    sp.GetService<ILogger<EmployerReservationsController>>()
+                    sp.GetService<ILogger<EmployerReservationsController>>(),
+                    sp.GetService<IUserClaimsService>()
                 )
                 {
                     ControllerContext = GetControllerContext<EmployerReservationsController>()

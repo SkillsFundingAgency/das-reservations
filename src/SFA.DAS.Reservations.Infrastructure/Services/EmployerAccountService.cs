@@ -30,18 +30,6 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                     new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName });
         }
 
-        private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
-        {
-            var accounts = await _accountApiClient.GetAccountUsers(employerAccount.AccountId);
-
-            if (accounts == null || !accounts.Any())
-            {
-                return null;
-            }
-            var teamMember = accounts.FirstOrDefault(c => string.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
-            return teamMember?.Role;
-        }
-
         public async Task<IEnumerable<EmployerIdentifier>> GetUserRoles(IEnumerable<EmployerIdentifier> values, string userId)
         {
             var employerIdentifiers = values.ToList();
@@ -94,8 +82,27 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                 Console.WriteLine(e);
                 throw;
             }
-            
-            
+        }
+
+        public async Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId)
+        {
+            var teamMembers = await _accountApiClient.GetAccountUsers(accountId);
+
+            var users = teamMembers.Select(model => (EmployerAccountUser)model);
+
+            return users;
+        }
+
+        private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
+        {
+            var accounts = await _accountApiClient.GetAccountUsers(employerAccount.AccountId);
+
+            if (accounts == null || !accounts.Any())
+            {
+                return null;
+            }
+            var teamMember = accounts.FirstOrDefault(c => String.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
+            return teamMember?.Role;
         }
     }
 }
