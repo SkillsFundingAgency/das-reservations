@@ -30,8 +30,6 @@ namespace SFA.DAS.Reservations.Application.Validation
         public bool FailedTransferReceiverCheck { get; set; }
         public bool FailedAutoReservationCheck { get; set; }
 
-        public bool FailedEoiCheck { get; set; }
-
         public bool IsValid()
         {
             if (ValidationDictionary == null)

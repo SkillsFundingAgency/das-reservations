@@ -30,9 +30,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public TestServiceProvider()
+        public TestServiceProvider(string authType)
         {
-            var authType = "employer";
             var serviceCollection = new ServiceCollection();
             var hosting = new HostingEnvironment{EnvironmentName = EnvironmentName.Development, ApplicationName = "SFA.DAS.Reservations.Web"};
 ;            var configuration = GenerateConfiguration(authType);
@@ -40,10 +39,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var startup = new Startup(configuration, hosting);
 
             var encodingService = new Mock<IEncodingService>();
-            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.NonLevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
-            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.NonLevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
-            encodingService.Setup(x => x.Decode(It.Is<string>(s => s.Equals(TestDataValues.LevyHashedAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
-            encodingService.Setup(x => x.Encode(It.Is<long>(l => l.Equals(TestDataValues.LevyAccountId)),It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
+            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyHashedAccountLegalEntityId);
+            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyAccountLegalEntityId);
+
+            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
+            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyHashedAccountLegalEntityId);
+            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyAccountLegalEntityId);
 
             var apiClient = new Mock<IApiClient>();
             var accountApiClient = new Mock<IAccountApiClient>();
@@ -57,6 +61,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
             serviceCollection.AddSingleton(accountApiClient.Object);
             serviceCollection.AddSingleton(urlHelper.Object);
+            serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
@@ -119,10 +124,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     sp.GetService<IEncodingService>(),
                     sp.GetService<IOptions<ReservationsWebConfiguration>>(),
                     sp.GetService<IExternalUrlHelper>(),
-                    sp.GetService<ILogger<EmployerReservationsController>>()
+                    sp.GetService<ILogger<EmployerReservationsController>>(),
+                    sp.GetService<IUserClaimsService>()
                 )
                 {
                     ControllerContext = GetControllerContext<EmployerReservationsController>()
+                });
+            serviceCollection.AddTransient(sp =>
+                new ProviderReservationsController(
+                    sp.GetService<IMediator>(),
+                    sp.GetService<IExternalUrlHelper>(),
+                    sp.GetService<IEncodingService>()
+                )
+                {
+                    ControllerContext = GetControllerContext<ProviderReservationsController>()
                 });
             serviceCollection.AddTransient(sp => 
                 new ManageReservationsController(
@@ -163,6 +178,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var context = new ControllerContext(new ActionContext(httpContext, new RouteData(), descriptor));
 
             return context;
+        }
+    }
+
+    public class EmployerTestServiceProvider : TestServiceProvider
+    {
+        public EmployerTestServiceProvider() : base("employer")
+        {
+        }
+    }
+
+    public class ProviderTestServiceProvider : TestServiceProvider
+    {
+        public ProviderTestServiceProvider() : base("provider")
+        {
         }
     }
 }

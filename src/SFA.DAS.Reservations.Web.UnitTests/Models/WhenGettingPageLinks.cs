@@ -15,6 +15,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             {
                 SearchTerm = "asedfas",
                 SelectedCourse = "iknjso",
+                SelectedEmployer = "asdsad",
+                SelectedStartDate = "asdva",
                 NumberOfRecordsFound = ManageReservationsFilterModel.PageSize * 3
             };
 
@@ -30,6 +32,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                     {
                         {"searchTerm", filterModel.SearchTerm },
                         {"selectedCourse", filterModel.SelectedCourse},
+                        {"selectedEmployer", filterModel.SelectedEmployer},
+                        {"selectedStartDate", filterModel.SelectedStartDate},
                         {"pageNumber", (i+1).ToString() }
                     });
             }

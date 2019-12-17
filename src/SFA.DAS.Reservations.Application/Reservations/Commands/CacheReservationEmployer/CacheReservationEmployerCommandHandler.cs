@@ -7,7 +7,6 @@ using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer
 {
@@ -44,11 +43,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             if (validationResult.FailedGlobalRuleValidation)
             {
                 throw new GlobalReservationRuleException(command.AccountId);
-            }
-
-            if (validationResult.FailedEoiCheck)
-            {
-                throw new NonEoiUserAccessDeniedException(command.AccountId);
             }
 
             var reservation = new CachedReservation

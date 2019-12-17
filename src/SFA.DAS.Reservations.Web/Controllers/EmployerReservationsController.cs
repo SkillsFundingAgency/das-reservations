@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetAccountUsers;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
-using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
@@ -24,6 +24,7 @@ using SFA.DAS.Reservations.Infrastructure.Exceptions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -36,6 +37,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
         private readonly ILogger<EmployerReservationsController> _logger;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ReservationsWebConfiguration _config;
 
         public EmployerReservationsController(
@@ -43,17 +45,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             IEncodingService encodingService, 
             IOptions<ReservationsWebConfiguration> options, 
             IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger) : base(mediator)
+            ILogger<EmployerReservationsController> logger,
+            IUserClaimsService userClaimsService) : base(mediator)
         {
             _mediator = mediator;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
             _logger = logger;
+            _userClaimsService = userClaimsService;
             _config = options.Value;
         }
 
-        // GET
-        [ServiceFilter(typeof(NonEoiNotPermittedFilterAttribute))]
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
 
@@ -125,6 +127,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
                 {
                     var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
+
+                    if (!accountLegalEntity.AgreementSigned)
+                    {
+                        return RedirectToSignAgreement(routeModel, RouteNames.EmployerIndex);
+                    }
+
                     await CacheReservation(routeModel, accountLegalEntity, true);
                     return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
                 }
@@ -145,7 +153,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _logger.LogError(e, e.Message);
                 return RedirectToRoute(RouteNames.Error500);
             }
-
         }
 
         [HttpPost]
@@ -166,6 +173,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
                 var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
                     model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+
+                if (!selectedAccountLegalEntity.AgreementSigned)
+                {
+                    return RedirectToSignAgreement(routeModel, RouteNames.EmployerSelectLegalEntity);
+                }
 
                 await CacheReservation(routeModel, selectedAccountLegalEntity);
 
@@ -191,7 +203,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return View("EmployerFundingPaused");
             }
         }
-
+        
         [HttpGet]
         [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
         public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
@@ -281,8 +293,67 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl
             };
 
-
             return View("CourseGuidance", model);
+        }
+
+        [HttpGet]
+        [Route("owner-sign-agreement", Name = RouteNames.EmployerOwnerSignAgreement)]
+        public IActionResult OwnerSignAgreement(ReservationsRouteModel routeModel)
+        {
+            var model = new SignAgreementViewModel
+            {
+                BackRouteName = routeModel.PreviousPage
+            };
+            
+            return View("OwnerSignAgreement", model);
+        }
+
+        [HttpGet]
+        [Route("transactor-sign-agreement", Name = RouteNames.EmployerTransactorSignAgreement)]
+        public async Task<IActionResult> TransactorSignAgreement(ReservationsRouteModel routeModel)
+        {
+            try
+            {
+                var decodedAccountId = _encodingService.Decode(
+                    routeModel.EmployerAccountId, 
+                    EncodingType.AccountId);
+
+                var users = await _mediator.Send(new GetAccountUsersQuery
+                {
+                    AccountId = decodedAccountId
+                });
+
+                var owners = users.AccountUsers
+                    .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                    .OrderBy(user => user.Name)
+                    .Select(user => (EmployerAccountUserViewModel) user);
+
+                var model = new SignAgreementViewModel
+                {
+                    BackRouteName = routeModel.PreviousPage,
+                    OwnersOfThisAccount = owners
+                };
+
+                return View("TransactorSignAgreement", model);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error attempting to show the transactor sign agreement page.");
+                return RedirectToRoute(RouteNames.Error500);
+            }
+        }
+
+        private RedirectToRouteResult RedirectToSignAgreement(ReservationsRouteModel routeModel, string previousRouteName)
+        {
+            if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+                EmployerUserRole.Owner, User.Claims))
+            {
+                routeModel.PreviousPage = previousRouteName;
+                return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
+            }
+
+            routeModel.PreviousPage = previousRouteName;
+            return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
         }
 
         private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(

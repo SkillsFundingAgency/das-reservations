@@ -8,6 +8,15 @@
     var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
+
+    if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+    {
+        ViewBag.GaData.Vpv = "/accounts/reservations/select";
+    }
+    else
+    {
+        ViewBag.GaData.Vpv = "/reservations/select";
+    }
 }
 
 <a href="@Model.BackLink" class="govuk-back-link">Back</a>
@@ -19,7 +28,7 @@
             <partial name="_PageErrorsOverview" />
 
             <h1 class="govuk-heading-xl">Choose a Reservation</h1>
-            
+
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
                 <input asp-for="AccountId" type="hidden" />

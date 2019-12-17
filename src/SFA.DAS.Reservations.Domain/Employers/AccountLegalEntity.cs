@@ -11,6 +11,8 @@ namespace SFA.DAS.Reservations.Domain.Employers
         public string AccountLegalEntityPublicHashedId { get; set; }
         public int ReservationLimit { get; set; }
         public bool IsLevy { get; set; }
-        public AgreementType AgreementType { get; set; }
+        public bool AgreementSigned { get; set; }
+        public string AccountName { get; set; }
+        public string AccountPublicHashedId { get ; set ; }
     }
 }

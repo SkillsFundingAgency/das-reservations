@@ -182,19 +182,5 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
                     c.EmployerHasSingleLegalEntity.Equals(command.EmployerHasSingleLegalEntity)), 
                 1));
         }
-
-        [Test, AutoData]
-        public void And_If_The_User_Fails_EOI_Check_Then_Throws_Exception(
-            CacheReservationEmployerCommand command)
-        {
-            //Arrange
-            _mockValidator
-                .Setup(validator => validator.ValidateAsync(command))
-                .ReturnsAsync(new ValidationResult{FailedEoiCheck = true,ValidationDictionary = new Dictionary<string, string>()});
-
-            //Act + Assert
-            Assert.ThrowsAsync<NonEoiUserAccessDeniedException>( () => _commandHandler.Handle(command, CancellationToken.None));
-
-        }
     }
 }

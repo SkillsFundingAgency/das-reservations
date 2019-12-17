@@ -19,7 +19,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IHostingEnvironment env)
         {
             services.AddSingleton(serviceParameters);
-            services.AddScoped<NonEoiNotPermittedFilterAttribute>();
             services.AddScoped<LevyNotPermittedFilter>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
@@ -28,6 +27,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IEncodingService, EncodingService>();
             services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
+            services.AddSingleton<IUserClaimsService, UserClaimsService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();

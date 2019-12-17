@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -19,6 +20,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using SFA.DAS.Reservations.Web.Stubs;
 
@@ -54,14 +56,13 @@ namespace SFA.DAS.Reservations.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = true;
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            
 
             services.AddOptions();
 
@@ -121,6 +122,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddMvc(
                     options =>
                     {
+                        options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
                         options.AddAuthorization();
                     })
                 .AddControllersAsServices()

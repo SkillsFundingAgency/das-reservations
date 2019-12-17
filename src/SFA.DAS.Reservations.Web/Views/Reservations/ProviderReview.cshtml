@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Check your reservation information";
     var changeRouteData = (new Dictionary<string, string> {{"fromReview", "true"}});
+
+    ViewBag.GaData.Vpv = "/reservations/review";
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))

@@ -8,6 +8,8 @@
     var customErrorKeys = new Dictionary<string, string> {{ "LegalEntity", $"LegalEntity-{accountLegalEntityPublicHashedId}" }};
 
     ViewData["CustomErrorKeys"] = customErrorKeys;
+
+    ViewBag.GaData.Vpv = "/accounts/reservations/select-course";
 }
 
 <a asp-route="@RouteNames.EmployerIndex" class="govuk-back-link">Back</a>
