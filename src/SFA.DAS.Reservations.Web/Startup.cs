@@ -81,7 +81,11 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            if (_configuration["Environment"] != "DEV")
+            services.AddServices(serviceParameters,_configuration);
+            
+            if (_configuration["Environment"] != "DEV" || (
+                !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
+                && _configuration["IsIntegrationTest"].Equals("true",StringComparison.CurrentCultureIgnoreCase)))
             {
                 if (isEmployerAuth)
                 {
@@ -136,7 +140,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
 
-            services.AddServices(serviceParameters, _environment);
+            
 
             services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
