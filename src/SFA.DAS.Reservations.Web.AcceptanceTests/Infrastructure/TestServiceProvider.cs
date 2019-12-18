@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var startup = new Startup(configuration, hosting);
 
             startup.ConfigureServices(serviceCollection);
-            serviceCollection.ConfigureTestServiceCollection(configuration);
+            serviceCollection.ConfigureTestServiceCollection(configuration, null);
             serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
             RegisterControllers(serviceCollection);
 

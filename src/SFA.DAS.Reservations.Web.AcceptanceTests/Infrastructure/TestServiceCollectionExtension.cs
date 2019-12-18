@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
 {
     public static class TestServiceCollectionExtension
     {
-        public static void ConfigureTestServiceCollection(this IServiceCollection serviceCollection, IConfigurationRoot configuration)
+        public static void ConfigureTestServiceCollection(this IServiceCollection serviceCollection, IConfigurationRoot configuration, TestData data)
         {
             var encodingService = new Mock<IEncodingService>();
             encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
@@ -36,20 +36,16 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyHashedAccountLegalEntityId);
             encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyAccountLegalEntityId);
 
-            //TODO move this
-            var accountLegalEntity = new AccountLegalEntity
-            {
-                AccountId = TestDataValues.NonLevyAccountId,
-                AccountLegalEntityId = TestDataValues.NonLevyAccountLegalEntityId,
-                AccountLegalEntityPublicHashedId = TestDataValues.NonLevyHashedAccountLegalEntityId,
-                AccountLegalEntityName = "Test Legal Entity",
-                IsLevy = false,
-                LegalEntityId = 1,
-                ReservationLimit = 5
-            };
+            
             var apiClient = new Mock<IApiClient>();
-            apiClient.Setup(x => x.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
-                .ReturnsAsync(new List<AccountLegalEntity> {accountLegalEntity});
+            if (data != null)
+            {
+                apiClient.Setup(x => x.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(c=>c.AccountId.Equals(TestDataValues.NonLevyAccountId))))
+                    .ReturnsAsync(new List<AccountLegalEntity> {data.AccountLegalEntity});
+                apiClient.Setup(x => x.GetAll<AccountLegalEntity>(It.Is<GetAccountLegalEntitiesRequest>(c=>c.AccountId.Equals(TestDataValues.LevyAccountId))))
+                    .ReturnsAsync(new List<AccountLegalEntity> {data.AccountLegalEntity});    
+            }
+            
             var accountApiClient = new Mock<IAccountApiClient>();
 
             var urlHelper = new Mock<IUrlHelper>();
