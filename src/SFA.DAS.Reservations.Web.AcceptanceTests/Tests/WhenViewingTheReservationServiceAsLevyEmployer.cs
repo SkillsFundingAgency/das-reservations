@@ -41,8 +41,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Tests
                         _factory.ConfigurationRoot, testData));
                 builder.ConfigureTestServices(services =>
                 {
-                    AuthenticationServiceCollectionExtensions.AddAuthentication(services, "IntegrationTest")
-                        
+                    services.AddAuthentication( "IntegrationTest")
                         .AddScheme<TestAuthenticationSchemeOptions, TestAuthenticationHandler>(
                             "IntegrationTest", options => { options.EmployerAccountId =  TestDataValues.LevyHashedAccountId;});
                 });
