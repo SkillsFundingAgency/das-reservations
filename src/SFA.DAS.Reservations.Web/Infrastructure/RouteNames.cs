@@ -5,7 +5,6 @@
         public const string ProviderIndex = "provider-index";
         public const string ProviderStart = "provider-start";
 		public const string ProviderSaveRuleNotificationChoice = "provider-save-rule-notification-choice";
-
         public const string ProviderSaveRuleNotificationChoiceNoReservation = "provider-save-rule-notification-choice-noreservation";
         public const string ProviderManage = "provider-manage";
         public const string ProviderSelect = "provider-select";
@@ -46,6 +45,8 @@
 		public const string EmployerChangePassword = "employer-change-password";
         public const string EmployerChangeEmail = "employer-change-email";
         public const string EmployerSelectCourseRuleCheck = "employer-select-course-rule-check";
+        public const string EmployerOwnerSignAgreement = "employer-owner-sign-agreement";
+        public const string EmployerTransactorSignAgreement = "employer-transactor-sign-agreement";
 
         public const string Error403 = "403";
         public const string Error404 = "404";

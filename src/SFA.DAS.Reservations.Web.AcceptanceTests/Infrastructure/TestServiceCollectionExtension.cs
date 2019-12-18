@@ -14,6 +14,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
 {
@@ -55,6 +56,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
             serviceCollection.AddSingleton(accountApiClient.Object);
             serviceCollection.AddSingleton(urlHelper.Object);
+            serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));

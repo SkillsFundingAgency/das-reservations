@@ -34,6 +34,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             
             services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
+            services.AddSingleton<IUserClaimsService, UserClaimsService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<ICacheStorageService, CacheStorageService>();
