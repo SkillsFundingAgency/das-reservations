@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,9 +45,17 @@ namespace SFA.DAS.Reservations.Web.AppStart
             IConfiguration configuration,
             IHostingEnvironment environment)
         {
-            var encodingConfigJson = configuration.GetSection(nameof(EncodingConfig)).Value;
-            var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
-            services.AddSingleton(encodingConfig);
+            if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
+            {
+                var encodingConfigJson = configuration.GetSection(nameof(EncodingConfig)).Value;
+                var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
+                services.AddSingleton(encodingConfig);
+            }
+            else
+            {
+                var encodingConfig = new EncodingConfig();
+                services.AddSingleton(encodingConfig);
+            }
 
             services.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);

@@ -20,7 +20,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             if (env.IsDevelopment() && configuration.UseStub())
             {
-                services.AddSingleton<IEncodingService, EncodingService>();
                 services.AddSingleton<IAccountApiClient, EmployerAccountApiClientStub>();
             }
             else
