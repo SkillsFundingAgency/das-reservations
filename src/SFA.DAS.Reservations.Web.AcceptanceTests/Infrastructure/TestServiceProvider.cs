@@ -13,13 +13,9 @@ using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
-using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
@@ -29,56 +25,31 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
     public class TestServiceProvider : IServiceProvider
     {
         private readonly IServiceProvider _serviceProvider;
-
+        
         public TestServiceProvider(string authType)
         {
             var serviceCollection = new ServiceCollection();
             var hosting = new HostingEnvironment{EnvironmentName = EnvironmentName.Development, ApplicationName = "SFA.DAS.Reservations.Web"};
-;            var configuration = GenerateConfiguration(authType);
+            var configuration = GenerateConfiguration(authType);
 
             var startup = new Startup(configuration, hosting);
 
-            var encodingService = new Mock<IEncodingService>();
-            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
-            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
-            encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyHashedAccountLegalEntityId);
-            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyAccountLegalEntityId);
-
-            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
-            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);
-            encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyHashedAccountLegalEntityId);
-            encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.LevyAccountLegalEntityId);
-
-            var apiClient = new Mock<IApiClient>();
-            var accountApiClient = new Mock<IAccountApiClient>();
-
-            var urlHelper = new Mock<IUrlHelper>();
-
             startup.ConfigureServices(serviceCollection);
+            serviceCollection.ConfigureTestServiceCollection(configuration, null);
             serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
-            serviceCollection.AddSingleton(encodingService.Object);
-            serviceCollection.AddSingleton(apiClient.Object);
-            serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
-            serviceCollection.AddSingleton(accountApiClient.Object);
-            serviceCollection.AddSingleton(urlHelper.Object);
-            serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
-
-            serviceCollection.AddSingleton<IConfiguration>(configuration);
-            serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
-            serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
-            serviceCollection.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
-            serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
             RegisterControllers(serviceCollection);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
+
+        
 
         public object GetService(Type serviceType)
         {
             return _serviceProvider.GetService(serviceType);
         }
 
-        private static IConfigurationRoot GenerateConfiguration(string authType)
+        public static IConfigurationRoot GenerateConfiguration(string authType, bool isIntegrationTest = false)
         {
             var configSource = new MemoryConfigurationSource
             {
@@ -90,12 +61,19 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("Version", "1.0"),
                     new KeyValuePair<string, string>("UseStub", "true"),
                     new KeyValuePair<string, string>("AuthType", authType),
+                    new KeyValuePair<string, string>("IsIntegrationTest", isIntegrationTest.ToString()),
                     new KeyValuePair<string, string>("ReservationsApi:url", "https://local.test.com"),
                     new KeyValuePair<string, string>("ReservationsWeb:DashboardUrl", $"https://{TestDataValues.DashboardUrl}"),
                     new KeyValuePair<string, string>("ReservationsWeb:EmployerDashboardUrl", $"https://{TestDataValues.EmployerDashboardUrl}"),
                     new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}"),
                     new KeyValuePair<string, string>("ReservationsWeb:FindApprenticeshipTrainingUrl", $"https://test"),
-                    new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test")
+                    new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test"),
+                    new KeyValuePair<string, string>("Identity:Scopes", ""),
+                    new KeyValuePair<string, string>("Identity:ClientId", "test"),
+                    new KeyValuePair<string, string>("Identity:ClientSecret", "test"),
+                    new KeyValuePair<string, string>("Identity:ChangePasswordUrl", "test/{0}/"),
+                    new KeyValuePair<string, string>("Identity:ChangeEmailUrl", "test/{0}/"),
+                    new KeyValuePair<string, string>("Identity:BaseAddress", "https://test.identity")
                 }
             };
 

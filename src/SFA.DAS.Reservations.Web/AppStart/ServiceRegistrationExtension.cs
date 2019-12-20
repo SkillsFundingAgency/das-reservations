@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
@@ -16,15 +18,20 @@ namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class ServiceRegistrationExtension
     {
-        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IHostingEnvironment env)
+        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IConfiguration configuration)
         {
             services.AddSingleton(serviceParameters);
             services.AddScoped<LevyNotPermittedFilter>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
-            services.AddSingleton<IApiClient, ApiClient>();
-           
-            services.AddSingleton<IEncodingService, EncodingService>();
+            
+
+            if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
+            {
+                services.AddSingleton<IApiClient, ApiClient>();
+                services.AddSingleton<IEncodingService, EncodingService>();    
+            }
+            
             services.AddSingleton<IProviderService, ProviderService>();
             services.AddTransient<ITrainingDateService, TrainingDateService>();
             services.AddSingleton<IUserClaimsService, UserClaimsService>();
