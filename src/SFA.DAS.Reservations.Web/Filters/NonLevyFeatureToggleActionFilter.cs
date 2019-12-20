@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
+using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntity;
 using SFA.DAS.Reservations.Web.AppStart;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Filters
 {
@@ -41,24 +42,26 @@ namespace SFA.DAS.Reservations.Web.Filters
             ActionExecutingContext context,
             ActionExecutionDelegate next)
         {
-            if (_serviceParameters.AuthenticationType == AuthenticationType.Employer && !_featureToggleOn)
+            if (!_featureToggleOn)
             {
-                if (!context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
+                if (!context.RouteData.Values.TryGetValue("accountLegalEntityPublicHashedId", out var legalEntityHashedId))
                 {
                     RedirectToTogglePage(context);
                     return;
                 }
 
-                if (!_encodingService.TryDecode(employerAccountId.ToString(), EncodingType.AccountId,
-                    out var decodedAccountId))
+                var code = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId);
+
+                if (!_encodingService.TryDecode(legalEntityHashedId.ToString(), EncodingType.PublicAccountLegalEntityId,
+                    out var legalEntityId))
                 {
                     RedirectToTogglePage(context);
                     return;
                 }
 
-                var legalEntities = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = decodedAccountId });
+                var response = await _mediator.Send(new GetLegalEntityQuery { Id = legalEntityId });
 
-                if (!legalEntities.AccountLegalEntities.Any(x => x.IsLevy))
+                if (response?.AccountLegalEntity == null || !response.AccountLegalEntity.IsLevy)
                 {
                     RedirectToTogglePage(context);
                     return;
@@ -76,7 +79,18 @@ namespace SFA.DAS.Reservations.Web.Filters
             if (!controllerName.Equals("Home", StringComparison.OrdinalIgnoreCase) ||
                 !actionName.Equals("FeatureNotAvailable", StringComparison.OrdinalIgnoreCase))
             {
-                context.Result = new RedirectToActionResult("FeatureNotAvailable", "Home", new { });
+                if(context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.EmployerFeatureNotAvailable, new {employerAccountId});
+                }
+                else  if(context.RouteData.Values.TryGetValue("ukprn", out var ukprn))
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.ProviderFeatureNotAvailable,new {ukprn});
+                }
+                else
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.Error403);
+                }
             }
         }
     }

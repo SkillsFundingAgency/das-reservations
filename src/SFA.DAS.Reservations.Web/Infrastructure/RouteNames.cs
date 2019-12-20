@@ -22,6 +22,7 @@
         public const string ProviderConfirmEmployer = "provider-confirm-employer";
         public const string ProviderApprenticeshipTrainingRuleCheck = "provider-apprenticeship-training-rule-check";
         public const string ProviderEmployerAgreementNotSigned = "provider-employer-agreement-not-signed";
+        public const string ProviderFeatureNotAvailable = "provider-feature-not-available";
 
         public const string EmployerIndex = "employer-index";
         public const string EmployerStart = "employer-start";
@@ -47,6 +48,8 @@
         public const string EmployerSelectCourseRuleCheck = "employer-select-course-rule-check";
         public const string EmployerOwnerSignAgreement = "employer-owner-sign-agreement";
         public const string EmployerTransactorSignAgreement = "employer-transactor-sign-agreement";
+        public const string EmployerFeatureNotAvailable = "employer-feature-not-available";
+
 
         public const string Error403 = "403";
         public const string Error404 = "404";

@@ -65,8 +65,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             return RedirectToRoute(RouteNames.EmployerIndex,null);
         }
-
-        [Route("notAvailable", Name="FeatureNotAvailable")]
+        
+        [Route("{ukPrn}/notAvailable", Name = RouteNames.ProviderFeatureNotAvailable)]
+        [Route("accounts/{employerAccountId}/notAvailable", Name = RouteNames.EmployerFeatureNotAvailable)]
         public IActionResult FeatureNotAvailable()
         {
             return View();
