@@ -30,7 +30,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId, string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId, bool isEmptyEmployerCohort = false, string transferSenderId = "")
+        public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId,
+            string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
+            bool isEmptyEmployerCohort = false, string transferSenderId = "", string journeyData = "")
         {
             var queryString = $"?reservationId={reservationId}";
 
@@ -55,6 +57,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             if (!string.IsNullOrWhiteSpace(courseId))
             {
                 queryString += $"&courseCode={courseId}";
+            }
+            
+            if (!string.IsNullOrWhiteSpace(journeyData))
+            {
+                queryString += $"&journeyData={journeyData}";
             }
 
             var isLevyAccount = string.IsNullOrWhiteSpace(courseId) && !startDate.HasValue;
@@ -119,15 +126,30 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
-        public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false)
+        public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false, 
+            string journeyData = "")
         {
+            var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : "";
+
+            if (!string.IsNullOrWhiteSpace(journeyData))
+            {
+                if (string.IsNullOrWhiteSpace(journeyData))
+                {
+                    queryString = $"?journeyData={journeyData}";
+                }
+                else
+                {
+                    queryString += $"&journeyData={journeyData}";
+                }
+            }
+
             var urlParameters = new UrlParameters
             {
                 Id = ukprn.HasValue && !isEmptyCohort ? ukprn.Value.ToString() : accountId,
                 Controller = string.IsNullOrEmpty(cohortRef) ? "unapproved/add" : $"apprentices/{cohortRef}",
                 Action = isEmptyCohort ? "" : string.IsNullOrEmpty(cohortRef) ? "assign" : "details",
                 Folder = ukprn.HasValue && !isEmptyCohort ? "" : "commitments/accounts",
-                QueryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : ""
+                QueryString = queryString
             };
 
             var baseUrl = GetBaseUrl();

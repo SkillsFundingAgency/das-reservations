@@ -56,7 +56,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 CohortRef = command.CohortRef,
                 UkPrn = command.UkPrn,
                 EmployerHasSingleLegalEntity = command.EmployerHasSingleLegalEntity,
-                IsEmptyCohortFromSelect = command.IsEmptyCohortFromSelect
+                IsEmptyCohortFromSelect = command.IsEmptyCohortFromSelect,
+                JourneyData =  command.JourneyData
             };
 
             await _cacheStorageService.SaveToCache(reservation.Id.ToString(), reservation, 1);

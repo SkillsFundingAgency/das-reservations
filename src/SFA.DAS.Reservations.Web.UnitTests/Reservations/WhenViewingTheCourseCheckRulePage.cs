@@ -46,7 +46,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(c=>c.Id.Equals(expectedUserId)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
             externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId,
-                routeModel.CohortReference, routeModel.CohortReference == string.Empty)).Returns(expectedBackUrl);
+                routeModel.CohortReference, routeModel.CohortReference == string.Empty,
+                It.IsAny<string>())).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;
@@ -112,7 +113,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator.Setup(x => x.Send(It.Is<GetNextUnreadGlobalFundingRuleQuery>(c=>c.Id.Equals(expectedUkprn)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
             externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                routeModel.CohortReference, routeModel.CohortReference == string.Empty)).Returns(expectedBackUrl);
+                routeModel.CohortReference, routeModel.CohortReference == string.Empty,
+                It.IsAny<string>())).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;

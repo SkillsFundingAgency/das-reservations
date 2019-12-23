@@ -167,6 +167,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 routeModel.CohortReference,
                 routeModel.EmployerAccountId,
                 false,
+                "",
                 ""))
                 .Returns(expectedUrl);
 

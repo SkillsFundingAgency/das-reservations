@@ -18,5 +18,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public string CohortRef { get; set; }
         public bool EmployerHasSingleLegalEntity { get; set; }
         public bool IsEmptyCohortFromSelect { get; set; }
+        public string JourneyData { get; set; }
     }
 }
