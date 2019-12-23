@@ -93,7 +93,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                 AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId,
                 CohortRef = cachedReservation.CohortRef,
                 IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect,
-                ProviderId = cachedReservation.UkPrn
+                ProviderId = cachedReservation.UkPrn,
+                JourneyData = cachedReservation.JourneyData
             };
         }
     }

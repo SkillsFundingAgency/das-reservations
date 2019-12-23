@@ -14,6 +14,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string CourseId { get; set; }
         public uint? UkPrn { get; set; }
         public string CohortRef { get; set; }
+        public string JourneyData { get; set; }
     }
 
     public enum CompletedReservationWhatsNext

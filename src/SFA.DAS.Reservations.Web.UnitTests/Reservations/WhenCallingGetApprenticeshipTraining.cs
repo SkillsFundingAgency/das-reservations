@@ -140,7 +140,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(getCoursesResult);
             routeModel.FromReview = true;
             mockUrlHelper
-                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,routeModel.EmployerAccountId,cachedReservationResult.CohortRef, false))
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,routeModel.EmployerAccountId,
+                    cachedReservationResult.CohortRef, false, It.IsAny<string>()))
                 .Returns(cohortDetailsUrl);
 
             var result = await controller.ApprenticeshipTraining(routeModel);

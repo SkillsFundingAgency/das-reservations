@@ -312,6 +312,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var result = await _mediator.Send(command);
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
                 routeModel.CohortReference = result.CohortRef;
+                routeModel.JourneyData = result.JourneyData;
+                
+
                 if (result.IsEmptyCohortFromSelect)
                 {
                     routeModel.ProviderId = result.ProviderId;
@@ -361,7 +364,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 StartDate = queryResult.StartDate,
                 CourseId = queryResult.Course?.Id,
                 UkPrn = queryResult.UkPrn ?? routeModel.ProviderId,
-                CohortRef = routeModel.CohortReference
+                CohortRef = routeModel.CohortReference,
+                JourneyData = routeModel.JourneyData
             };
 
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
@@ -402,7 +406,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 case CompletedReservationWhatsNext.AddAnApprentice:
                     var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                         routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
-                        model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null);
+                        model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
+                        journeyData: model.JourneyData);
                     return Redirect(addApprenticeUrl);
 
                 default:

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -45,6 +45,10 @@
     </SpecFlowFeatureFiles>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Features\Employer\EmployerCreateReservation.feature" />
+    <Content Include="Features\Employer\EmployerManageReservation.feature" />
+    <Content Include="Features\Employer\EmployerRestrictions.feature" />
+    <Content Include="Features\Employer\EmployerSelect.feature" />
     <Content Include="Features\Provider\ProviderCreateReservation.feature" />
   </ItemGroup>
 </Project>

@@ -76,8 +76,9 @@
                 <input type="hidden" name="CourseDescription" value="@Model.CourseDescription" />
                 <input type="hidden" name="StartDate" value="@Model.StartDate" />
                 <input type="hidden" name="CourseId" value="@Model.CourseId" />
-                <input asp-for="CohortRef" type="hidden"/>
-                <input asp-for="UkPrn" type="hidden"/>
+                <input asp-for="CohortRef" type="hidden" />
+                <input asp-for="UkPrn" type="hidden" />
+                <input asp-for="JourneyData" type="hidden" />
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
