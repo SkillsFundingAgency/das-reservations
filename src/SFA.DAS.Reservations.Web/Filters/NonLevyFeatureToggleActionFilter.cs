@@ -50,8 +50,6 @@ namespace SFA.DAS.Reservations.Web.Filters
                     return;
                 }
 
-                var code = _encodingService.Encode(789, EncodingType.PublicAccountLegalEntityId);
-
                 if (!_encodingService.TryDecode(legalEntityHashedId.ToString(), EncodingType.PublicAccountLegalEntityId,
                     out var legalEntityId))
                 {
@@ -89,7 +87,7 @@ namespace SFA.DAS.Reservations.Web.Filters
                 }
                 else
                 {
-                    context.Result = new RedirectToRouteResult(RouteNames.Error403);
+                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
                 }
             }
         }

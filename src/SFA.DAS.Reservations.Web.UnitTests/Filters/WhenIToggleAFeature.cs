@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Filters
@@ -34,32 +35,108 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
         }
 
         [Test, MoqAutoData]
-        public void Then_If_Toggled_Off_Request_Is_Redirected(
-            [Frozen] Mock<IConfiguration> configuration,
-            Mock<ActionExecutingContext> context)
+        public void Then_If_Toggled_Off_For_An_Employer_The_Request_Is_Redirected(
+            string accountId,
+            HttpContext httpContext,
+            ActionDescriptor actionDescriptor,
+            IList<IFilterMetadata> filters,
+            Dictionary<string, object> actionArguments,
+            object controller,
+            [Frozen] Mock<IConfiguration> configuration)
         {
-            //Assign
-            IActionResult result = null;
-            
+            // Arrange
             configuration.SetupGet(c => c["FeatureToggleOn"]).Returns("False");
-            context.SetupSet(c => c.Result = It.IsAny<IActionResult>())
-                .Callback<IActionResult>(r =>
+            var routeData = new RouteData();
+            routeData.Values.Add("employerAccountId", accountId);
+            
+            
+            var actionContext = new ActionContext(httpContext, routeData, actionDescriptor);
+            var context =
+                new ActionExecutingContext(actionContext, filters, actionArguments, controller)
                 {
-                    result = r;
-                });
+                    Result = new ContentResult()
+                };
 
             var filter = new FeatureToggleActionFilter(configuration.Object);
 
-            ////Act
-            filter.OnActionExecuting(context.Object);
+            // Act
+            filter.OnActionExecuting(context);
 
-            var redirect = result as RedirectToActionResult;
+            var redirect = context.Result as RedirectToRouteResult;
 
-            //Assert
+            // Assert
             Assert.IsNotNull(redirect);
-            Assert.AreEqual("Home", redirect.ControllerName);
-            Assert.AreEqual("FeatureNotAvailable", redirect.ActionName);
+            Assert.AreEqual(RouteNames.EmployerFeatureNotAvailable, redirect.RouteName);
+            Assert.AreEqual(accountId, redirect.RouteValues["employerAccountId"]);
 
+        }
+        [Test, MoqAutoData]
+        public void Then_If_Toggled_Off_For_A_Provider_The_Request_Is_Redirected(
+            string ukprn,
+            HttpContext httpContext,
+            ActionDescriptor actionDescriptor,
+            IList<IFilterMetadata> filters,
+            Dictionary<string, object> actionArguments,
+            object controller,
+            [Frozen] Mock<IConfiguration> configuration)
+        {
+            // Arrange
+            configuration.SetupGet(c => c["FeatureToggleOn"]).Returns("False");
+            var routeData = new RouteData();
+            routeData.Values.Add("ukPrn", ukprn);
+            
+            
+            var actionContext = new ActionContext(httpContext, routeData, actionDescriptor);
+            var context =
+                new ActionExecutingContext(actionContext, filters, actionArguments, controller)
+                {
+                    Result = new ContentResult()
+                };
+
+            var filter = new FeatureToggleActionFilter(configuration.Object);
+
+            // Act
+            filter.OnActionExecuting(context);
+
+            var redirect = context.Result as RedirectToRouteResult;
+
+            // Assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual(RouteNames.ProviderFeatureNotAvailable, redirect.RouteName);
+            Assert.AreEqual(ukprn, redirect.RouteValues["ukPrn"]);
+
+        }
+
+        [Test, MoqAutoData]
+        public void Then_If_Toggled_Off_And_No_Employer_Or_Provider_Route_Data_An_Unauhtorised_Page_Is_Shown(
+            HttpContext httpContext,
+            ActionDescriptor actionDescriptor,
+            IList<IFilterMetadata> filters,
+            Dictionary<string, object> actionArguments,
+            object controller,
+            [Frozen] Mock<IConfiguration> configuration)
+        {
+            // Arrange
+            configuration.SetupGet(c => c["FeatureToggleOn"]).Returns("False");
+            var routeData = new RouteData();
+            var actionContext = new ActionContext(httpContext, routeData, actionDescriptor);
+            var context =
+                new ActionExecutingContext(actionContext, filters, actionArguments, controller)
+                {
+                    Result = new ContentResult()
+                };
+
+            var filter = new FeatureToggleActionFilter(configuration.Object);
+
+            // Act
+            filter.OnActionExecuting(context);
+
+            var redirect = context.Result as RedirectToRouteResult;
+
+            // Assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual(RouteNames.Error403, redirect.RouteName);
+            
         }
 
         [Test, MoqAutoData]

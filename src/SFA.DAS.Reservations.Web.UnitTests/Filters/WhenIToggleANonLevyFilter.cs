@@ -311,6 +311,51 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             Assert.IsNotNull(redirect);
             Assert.AreEqual(RouteNames.ProviderFeatureNotAvailable, redirect.RouteName);
         }
+        
+        [Test, MoqAutoData]
+        public async Task Then_If_No_Route_Values_Access_Denied_Page_Is_Shown(
+            [Frozen] Mock<IConfiguration> configuration, 
+            [Frozen] ServiceParameters serviceParameters,
+            [Frozen] Mock<IMediator> mockMediator,
+            GetLegalEntityResponse legalEntityResponse,
+            AccountLegalEntity legalEntity,
+            string legalEntityHashedId,
+            string ukprn,
+            long decodedId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<ActionExecutionDelegate> nextMethod,
+            ActionExecutingContext context)
+        {
+            //Assign
+            legalEntityResponse.AccountLegalEntity = legalEntity;
+            legalEntityResponse.AccountLegalEntity.IsLevy = false;
+
+            mockEncodingService
+                .Setup(x => x.TryDecode(legalEntityHashedId, EncodingType.PublicAccountLegalEntityId, out decodedId))
+                .Returns(true);
+
+            mockMediator
+                .Setup(x => x.Send(It.Is<GetLegalEntityQuery>(y => y.Id == decodedId), 
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetLegalEntityResponse());
+            
+            configuration.SetupGet(c => c["FeatureToggleOn"]).Returns("False");
+           
+            var filter = new NonLevyFeatureToggleActionFilter(
+                configuration.Object, 
+                serviceParameters, 
+                mockEncodingService.Object, 
+                mockMediator.Object);
+
+            ////Act
+            await filter.OnActionExecutionAsync(context,nextMethod.Object);
+
+            var redirect = context.Result as RedirectToRouteResult;
+
+            //Assert
+            Assert.IsNotNull(redirect);
+            Assert.AreEqual(RouteNames.Error403, redirect.RouteName);
+        }
 
         private static void MockGetLegalEntityCall(Mock<IMediator> mockMediator,
             GetLegalEntityResponse legalEntityResponse, AccountLegalEntity legalEntity, 

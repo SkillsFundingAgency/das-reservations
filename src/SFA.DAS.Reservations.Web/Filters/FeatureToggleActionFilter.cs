@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Filters
 {
@@ -23,7 +24,10 @@ namespace SFA.DAS.Reservations.Web.Filters
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_featureToggleOn) return;
+            if (_featureToggleOn)
+            {
+                return;
+            }
 
             var controllerName = context.RouteData.Values["controller"] as string ?? string.Empty;
             var actionName = context.RouteData.Values["action"] as string ?? string.Empty;
@@ -31,7 +35,18 @@ namespace SFA.DAS.Reservations.Web.Filters
             if (!controllerName.Equals("Home", StringComparison.OrdinalIgnoreCase) ||
                 !actionName.Equals("FeatureNotAvailable", StringComparison.OrdinalIgnoreCase))
             {
-                context.Result = new RedirectToActionResult("FeatureNotAvailable", "Home", new { });
+                if(context.RouteData.Values.TryGetValue("employerAccountId", out var employerAccountId))
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.EmployerFeatureNotAvailable, new {employerAccountId});
+                }
+                else  if(context.RouteData.Values.TryGetValue("ukprn", out var ukprn))
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.ProviderFeatureNotAvailable,new {ukprn});
+                }
+                else
+                {
+                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
+                }
             }
         }
 

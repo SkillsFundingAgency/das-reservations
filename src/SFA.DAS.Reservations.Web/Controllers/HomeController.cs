@@ -10,7 +10,6 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
-    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     public class HomeController : Controller
     {    
         private readonly ILogger<HomeController> _logger;
