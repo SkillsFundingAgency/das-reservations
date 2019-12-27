@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Authorization.CommitmentPermissions.Options;
 using SFA.DAS.Authorization.Mvc.Attributes;
@@ -30,19 +31,21 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly ILogger<ReservationsController> _logger;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
+        private readonly IConfiguration _configuration;
 
         public SelectReservationsController(IMediator mediator,
             ILogger<ReservationsController> logger,
             IEncodingService encodingService,
-            IExternalUrlHelper urlHelper)
+            IExternalUrlHelper urlHelper, 
+            IConfiguration configuration)
         {
             _mediator = mediator;
             _logger = logger;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
+            _configuration = configuration;
         }
 
-        [ServiceFilter(typeof(NonLevyFeatureToggleActionFilter))]
         [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
@@ -50,6 +53,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
+            //TODO - Remove after launch
+            var isFeatureEnabled = true;
+            if (_configuration["FeatureToggleOn"] != null)
+            {
+                bool.TryParse(_configuration["FeatureToggleOn"], out isFeatureEnabled);    
+            }
+            
+            
             var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
                 viewModel.CohortReference, journeyData:viewModel.JourneyData);
             try
@@ -95,6 +106,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     return Redirect(redirectResult);
                 }
 
+                //TODO - Remove after launch
+                if (!isFeatureEnabled)
+                {
+                    if (routeModel.UkPrn == null)
+                    {
+                        return RedirectToRoute(RouteNames.EmployerFeatureNotAvailable);    
+                    }
+
+                    return RedirectToRoute(RouteNames.ProviderFeatureNotAvailable);
+                }
+                
                 var availableReservationsResult = await _mediator.Send(
                     new GetAvailableReservationsQuery {AccountId = cacheReservationEmployerCommand.AccountId});
 
