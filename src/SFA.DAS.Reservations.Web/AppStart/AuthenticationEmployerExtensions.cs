@@ -44,6 +44,16 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     }
                     options.ClaimActions.MapUniqueJsonKey("sub", "id");
                     options.Events.OnTokenValidated = async (ctx) => await PopulateAccountsClaim(ctx, accountsSvc);
+                    options.Events.OnRemoteFailure = c =>
+                    {
+                        if (c.Failure.Message.Contains("Correlation failed"))
+                        {
+                            c.Response.Redirect("/");
+                            c.HandleResponse();
+                        }
+    
+                        return Task.CompletedTask;
+                    };
                 })
                 .AddCookie(options =>
                 {
