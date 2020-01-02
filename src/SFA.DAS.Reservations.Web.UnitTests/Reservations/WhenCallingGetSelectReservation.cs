@@ -16,7 +16,6 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Reservations.Application.Reservations.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
@@ -572,16 +571,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         CohortRef = routeModel.CohortReference,
                         UkPrn = routeModel.UkPrn.Value
                     }
-                });
-
-            
-            mockMediator.Setup(x => x.Send(It.Is<GetAccountReservationStatusQuery>(c =>
-                    c.AccountId.Equals(expectedAccountId) &&
-                    c.HashedEmployerAccountId.Equals(expectedAccountPublicHashedId) &&
-                    c.TransferSenderAccountId.Equals(string.Empty)), CancellationToken.None))
-                .ReturnsAsync(new GetAccountReservationStatusResponse
-                {
-                    CanAutoCreateReservations = true
                 });
 
             mockMediator.Setup(x => x.Send(It.Is<CreateReservationLevyEmployerCommand>(c =>
