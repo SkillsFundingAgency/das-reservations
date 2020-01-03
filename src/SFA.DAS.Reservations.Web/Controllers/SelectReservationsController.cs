@@ -16,10 +16,12 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLe
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.Controllers
 {
@@ -30,16 +32,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly ILogger<ReservationsController> _logger;
         private readonly IEncodingService _encodingService;
         private readonly IExternalUrlHelper _urlHelper;
+        private readonly IUserClaimsService _userClaimsService;
 
         public SelectReservationsController(IMediator mediator,
             ILogger<ReservationsController> logger,
             IEncodingService encodingService,
-            IExternalUrlHelper urlHelper)
+            IExternalUrlHelper urlHelper,
+            IUserClaimsService userClaimsService)
         {
             _mediator = mediator;
             _logger = logger;
             _encodingService = encodingService;
             _urlHelper = urlHelper;
+            _userClaimsService = userClaimsService;
         }
 
         [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
@@ -72,7 +77,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
                 else
                 {
-                    var userAccountIdClaim = HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
+                    var userAccountIdClaim = HttpContext.User.Claims.First(c =>
+                        c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
                     userId = Guid.Parse(userAccountIdClaim.Value);
 
                     cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
@@ -81,8 +87,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 }
 
                 var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
-                    viewModel.TransferSenderId, viewModel.JourneyData, cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
-                    routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference, 
+                    viewModel.TransferSenderId, viewModel.JourneyData,
+                    cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
+                    routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
                     routeModel.EmployerAccountId, userId);
                 if (!string.IsNullOrEmpty(redirectResult))
                 {
@@ -134,6 +141,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     return View("ProviderFundingPaused", backUrl);
                 }
+
                 return View("EmployerFundingPaused", backUrl);
             }
             catch (AccountLegalEntityNotFoundException e)
@@ -148,8 +156,29 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
             catch (TransferSenderNotAllowedException e)
             {
-                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+                _logger.LogWarning(e,
+                    $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
                 return RedirectToRoute(RouteNames.Error500);
+            }
+            catch (EmployerAgreementNotSignedException e)
+            {
+                _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
+                
+                var routeName = RouteNames.EmployerTransactorSignAgreement;
+                if (routeModel.UkPrn.HasValue)
+                {
+                    routeName = RouteNames.ProviderEmployerAgreementNotSigned;
+                }
+                else
+                {
+                    if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+                        EmployerUserRole.Owner, User.Claims))
+                    {
+                        routeName = RouteNames.EmployerOwnerSignAgreement;
+                    }    
+                }
+
+                return RedirectToRoute(routeName, routeModel);
             }
             catch (Exception e)
             {

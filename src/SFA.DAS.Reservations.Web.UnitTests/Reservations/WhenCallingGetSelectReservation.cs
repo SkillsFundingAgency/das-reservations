@@ -25,6 +25,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
+using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
@@ -975,5 +976,148 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Model.Should().Be(cohortDetailsUrl);
         }
 
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Employer_Is_An_Owner_Non_Levy_And_Has_Not_Signed_An_Agreement_They_Are_Redirected_To_The_Agreement_Not_Signed_Page_For_Owner(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            long expectedAccountId,
+            long expectedAccountLegalEntityId,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IUserClaimsService> userClaimsService,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ThrowsAsync(new EmployerAgreementNotSignedException(expectedAccountId,expectedAccountLegalEntityId));
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new GlobalReservationRuleException(expectedAccountId));
+            userClaimsService.Setup(x => x.UserIsInRole(routeModel.EmployerAccountId, EmployerUserRole.Owner,
+                controller.HttpContext.User.Claims)).Returns(true);
+            
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            result.RouteName.Should().Be(RouteNames.EmployerOwnerSignAgreement);
+            
+        }
+         [Test, MoqAutoData]
+        public async Task Then_If_The_Employer_Is_An_Transactor_Non_Levy_And_Has_Not_Signed_An_Agreement_They_Are_Redirected_To_The_Agreement_Not_Signed_Page_For_Transactor(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            long expectedAccountId,
+            long expectedAccountLegalEntityId,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IUserClaimsService> userClaimsService,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ThrowsAsync(new EmployerAgreementNotSignedException(expectedAccountId,expectedAccountLegalEntityId));
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new GlobalReservationRuleException(expectedAccountId));
+            userClaimsService.Setup(x => x.UserIsInRole(routeModel.EmployerAccountId, EmployerUserRole.Owner,
+                controller.HttpContext.User.Claims)).Returns(false);
+            
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            result.RouteName.Should().Be(RouteNames.EmployerTransactorSignAgreement);
+            
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Provider_Is_Created_A_Reservation_For_A_Non_Levy_Employer_And_Has_Not_Signed_An_Agreement_They_Are_Redirected_To_The_Agreement_Not_Signed_Page(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetTrustedEmployersResponse employersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ThrowsAsync(new EmployerAgreementNotSignedException(1,1));
+            
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = matchedEmployer.AccountId,
+                        AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = matchedEmployer.AccountLegalEntityId,
+                        AccountLegalEntityName = matchedEmployer.AccountLegalEntityName,
+                        AccountName = matchedEmployer.AccountName,
+                        CohortRef = viewModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAvailableReservationsQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult {Reservations = new List<Reservation>()});
+            
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            result.RouteName.Should().Be(RouteNames.ProviderEmployerAgreementNotSigned);
+        }
     }
 }
