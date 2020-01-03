@@ -16,7 +16,6 @@
     <None Remove="Pages\**" />
   </ItemGroup>
 
-
   <ItemGroup>
     <PackageReference Include="MediatR" Version="6.0.0" />
     <PackageReference Include="mediatr.extensions.microsoft.dependencyinjection" Version="6.0.1" />

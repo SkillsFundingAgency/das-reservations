@@ -9,6 +9,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
@@ -986,5 +987,100 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Model.Should().Be(cohortDetailsUrl);
         }
 
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Employer_Is_Non_Levy_Then_And_The_Feature_Is_Not_Available_Then_FeatureNotAvailable_View_Is_Shown(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            GetAvailableReservationsResult reservationsResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            long expectedAccountId,
+            long expectedAccountLegalEntityId,
+            string cohortDetailsUrl,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IConfiguration> configuration,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            configuration.Setup(x => x["FeatureToggleOn"]).Returns("false");
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c=>c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c=>c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult { Reservations = new List<Reservation>() });
+            
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RouteNames.EmployerFeatureNotAvailable, result.RouteName);
+        }
+        
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Provider_Has_A_Non_Levy_Employer_And_The_Feature_Is_Not_Available_Then_FeatureNotAvailable_View_Is_Shown(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetTrustedEmployersResponse employersResponse,
+            GetAvailableReservationsResult reservationsResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            long expectedAccountId,
+            long expectedAccountLegalEntityId,
+            string cohortDetailsUrl,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IConfiguration> configuration,
+            SelectReservationsController controller)
+        {
+            //Arrange
+            configuration.Setup(x => x["FeatureToggleOn"]).Returns("false");
+            routeModel.Id = Guid.Empty;
+            var matchedEmployer = employersResponse.Employers.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = matchedEmployer.AccountId,
+                        AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = matchedEmployer.AccountLegalEntityId,
+                        AccountLegalEntityName = matchedEmployer.AccountLegalEntityName,
+                        AccountName = matchedEmployer.AccountName,
+                        CohortRef = viewModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAvailableReservationsQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult {Reservations = new List<Reservation>()});
+            
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(RouteNames.ProviderFeatureNotAvailable, result.RouteName);
+        }
     }
 }

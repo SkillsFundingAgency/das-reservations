@@ -30,6 +30,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
+    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
     public class EmployerReservationsController : ReservationsBaseController
     {

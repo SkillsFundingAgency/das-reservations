@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -62,6 +63,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public IActionResult ChangeEmail(ReservationsRouteModel model, bool userCancelled = false)
         {
             return RedirectToRoute(RouteNames.EmployerIndex,null);
+        }
+        
+        [Route("{ukPrn}/notAvailable", Name = RouteNames.ProviderFeatureNotAvailable)]
+        [Route("accounts/{employerAccountId}/notAvailable", Name = RouteNames.EmployerFeatureNotAvailable)]
+        public IActionResult FeatureNotAvailable()
+        {
+            return View();
         }
     }
 }

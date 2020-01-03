@@ -59,9 +59,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             legalEntitiesResponse.AccountLegalEntities = legalEntities;
             context.RouteData.Values.Add("employerAccountId", employerAccountId);
             foreach (var legalEntity in legalEntitiesResponse.AccountLegalEntities) { legalEntity.IsLevy = false;}
+            
             mockEncodingService
                 .Setup(x => x.TryDecode(employerAccountId, EncodingType.AccountId, out decodedId))
                 .Returns(true);
+            
             mockMediator
                 .Setup(x => x.Send(It.Is<GetLegalEntitiesQuery>(y => y.AccountId == decodedId),It.IsAny<CancellationToken>()))
                 .ReturnsAsync(legalEntitiesResponse);

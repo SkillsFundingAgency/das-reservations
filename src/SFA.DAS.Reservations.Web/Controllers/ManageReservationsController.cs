@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -23,6 +22,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerViewerUserRoleOrIsProvider))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
+    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     public class ManageReservationsController : Controller
     {
         private readonly IMediator _mediator;
