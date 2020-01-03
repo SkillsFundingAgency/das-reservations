@@ -178,6 +178,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     }    
                 }
 
+                routeModel.IsFromSelect = true;
+                routeModel.PreviousPage = backUrl;
+                
                 return RedirectToRoute(routeName, routeModel);
             }
             catch (Exception e)

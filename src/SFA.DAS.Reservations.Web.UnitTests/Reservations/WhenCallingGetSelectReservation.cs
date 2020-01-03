@@ -982,10 +982,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
+            string cohortDetailsUrl,
             long expectedAccountId,
             long expectedAccountLegalEntityId,
             [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] Mock<IUserClaimsService> userClaimsService,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             SelectReservationsController controller)
         {
             //Arrange
@@ -1016,6 +1018,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new GlobalReservationRuleException(expectedAccountId));
             userClaimsService.Setup(x => x.UserIsInRole(routeModel.EmployerAccountId, EmployerUserRole.Owner,
                 controller.HttpContext.User.Claims)).Returns(true);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                    viewModel.CohortReference, false, viewModel.JourneyData))
+                .Returns(cohortDetailsUrl);
             
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
@@ -1023,6 +1029,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             Assert.IsNotNull(result);
             result.RouteName.Should().Be(RouteNames.EmployerOwnerSignAgreement);
+            result.RouteValues["PreviousPage"].Should().Be(cohortDetailsUrl);
+            result.RouteValues["IsFromSelect"].Should().Be(true);
             
         }
          [Test, MoqAutoData]
@@ -1031,10 +1039,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
+            string cohortDetailsUrl,
             long expectedAccountId,
             long expectedAccountLegalEntityId,
             [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] Mock<IUserClaimsService> userClaimsService,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             SelectReservationsController controller)
         {
             //Arrange
@@ -1065,6 +1075,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new GlobalReservationRuleException(expectedAccountId));
             userClaimsService.Setup(x => x.UserIsInRole(routeModel.EmployerAccountId, EmployerUserRole.Owner,
                 controller.HttpContext.User.Claims)).Returns(false);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                    viewModel.CohortReference, false, viewModel.JourneyData))
+                .Returns(cohortDetailsUrl);
             
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
@@ -1072,15 +1086,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             Assert.IsNotNull(result);
             result.RouteName.Should().Be(RouteNames.EmployerTransactorSignAgreement);
+            result.RouteValues["PreviousPage"].Should().Be(cohortDetailsUrl);
+            result.RouteValues["IsFromSelect"].Should().Be(true);
             
         }
 
         [Test, MoqAutoData]
         public async Task Then_If_The_Provider_Is_Created_A_Reservation_For_A_Non_Levy_Employer_And_Has_Not_Signed_An_Agreement_They_Are_Redirected_To_The_Agreement_Not_Signed_Page(
+            string cohortDetailsUrl,
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             SelectReservationsController controller)
         {
             //Arrange
@@ -1110,7 +1128,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.IsAny<GetAvailableReservationsQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAvailableReservationsResult {Reservations = new List<Reservation>()});
-            
+            mockUrlHelper
+                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                    viewModel.CohortReference, false, viewModel.JourneyData))
+                .Returns(cohortDetailsUrl);
 
             //Act
             var result = await controller.SelectReservation(routeModel, viewModel) as RedirectToRouteResult;
@@ -1118,6 +1139,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             Assert.IsNotNull(result);
             result.RouteName.Should().Be(RouteNames.ProviderEmployerAgreementNotSigned);
+            result.RouteValues["PreviousPage"].Should().Be(cohortDetailsUrl);
+            result.RouteValues["IsFromSelect"].Should().Be(true);
         }
     }
 }
