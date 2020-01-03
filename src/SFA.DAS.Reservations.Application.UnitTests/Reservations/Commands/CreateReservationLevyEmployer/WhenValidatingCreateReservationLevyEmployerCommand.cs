@@ -23,6 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         private Mock<IEncodingService> _encodingService;
         private const string ExpectedTransferSenderEmployerAccountId = "TGB456";
         private const long ExpectedAccountId = 432;
+        private const long ExpectedAccountLegalEntityId = 9895;
         private const string ExpectedAccountHashedId = "CSQ212K";
         private const string ExpectedUrl = "https://test.local";
 
@@ -34,14 +35,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _apiClient.Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
                 .ReturnsAsync(new AccountReservationStatusResponse
                 {
-                    CanAutoCreateReservations = false
+                    CanAutoCreateReservations = false,
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{
+                    {
+                        ExpectedAccountLegalEntityId,false
+                    }}
                 });
             _apiClient.Setup(x => x.Get<AccountReservationStatusResponse>
                 (It.Is<AccountReservationStatusRequest>(c =>
                     c.BaseUrl.Equals(ExpectedUrl) && c.AccountId.Equals(ExpectedAccountId))))
                 .ReturnsAsync(new AccountReservationStatusResponse
                 {
-                    CanAutoCreateReservations = true
+                    CanAutoCreateReservations = true,
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{
+                    {
+                        ExpectedAccountLegalEntityId,false
+                    }}
                 });
             _config = new Mock<IOptions<ReservationsApiConfiguration>>();
             _config.Setup(x => x.Value.Url).Returns(ExpectedUrl);
@@ -78,7 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var command = new CreateReservationLevyEmployerCommand
             {
                 AccountId = ExpectedAccountId,
-                AccountLegalEntityId = 324234
+                AccountLegalEntityId = ExpectedAccountLegalEntityId
             };
 
             //Act
@@ -186,14 +195,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         }
 
         [Test]
-        public async Task Then_The_AccountId_Is_Checked_If_There_Is_No_TransferId_To_Make_Sure_It_Is_Able_To_Create_Levy_Reservations()
+        public async Task Then_The_AccountId_Is_Checked_If_There_Is_No_TransferId_To_Make_Sure_It_Is_Able_To_Create_Levy_Reservations_And_Agreement_Status()
         {
             //Arrange
-            
             var command = new CreateReservationLevyEmployerCommand
             {
                 AccountId = ExpectedAccountId,
-                AccountLegalEntityId = 234
+                AccountLegalEntityId = ExpectedAccountLegalEntityId
             };
 
             //Act
@@ -204,8 +212,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                 It.Is<AccountReservationStatusRequest>(c=>c.BaseUrl.Equals(ExpectedUrl) 
                  && c.AccountId.Equals(ExpectedAccountId))), Times.Once);
             Assert.IsFalse(result.FailedAutoReservationCheck);
+            Assert.IsTrue(result.FailedAgreementSignedCheck);
         }
-
 
         [Test]
         public async Task Then_The_AccountId_Is_Unable_To_Create_Auto_Reservations_A_Flag_Is_Set()
@@ -214,7 +222,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var command = new CreateReservationLevyEmployerCommand
             {
                 AccountId = 123,
-                AccountLegalEntityId = 234
+                AccountLegalEntityId = ExpectedAccountLegalEntityId
             };
 
             //Act
