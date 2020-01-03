@@ -15,15 +15,7 @@ Scenario: Reservations not available to select
 	And an employer web app is running
 	When I view the select reservation screen
 	Then I am redirected to the create reservation page
-
-Scenario: Employer selects reservation and is redirected to add apprentice page
-	Given I am a non levy employer
-	And I have 1 Pending reservation	
-	And I view the select reservation screen
-	And 1 reservations are selectable
-	When I select that pending reservation
-	Then I am redirected to the add apprentice page
-
+	
 Scenario: Employer comes through via transfer journey and ignores selection
 	Given I am a non levy employer
 	And an employer web app is running

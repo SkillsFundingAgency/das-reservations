@@ -134,6 +134,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     sp.GetService<IMediator>(),
                     sp.GetService<ILogger<ReservationsController>>(),
                     sp.GetService<IEncodingService>(),
+                    
+                    sp.GetService<IConfiguration>(),
                     sp.GetService<IExternalUrlHelper>(),
                     sp.GetService<IUserClaimsService>()
                 )
