@@ -5,7 +5,15 @@
     ViewBag.GaData.Vpv = "/accounts/reservations/transactor-sign-agreement";
 }
 
-<a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
+@if (Model.IsUrl)
+{
+    <a href="@Model.BackRouteName" class="govuk-back-link">Back</a>    
+}
+else
+{
+    <a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>    
+}
+
 
 <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-grid-row">

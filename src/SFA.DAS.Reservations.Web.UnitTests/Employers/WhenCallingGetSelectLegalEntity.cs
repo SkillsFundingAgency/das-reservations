@@ -214,9 +214,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             mockClaimsService
                 .Setup(service => service.UserIsInRole(
                     routeModel.EmployerAccountId,
-                    EmployerUserRole.Transactor,
+                    EmployerUserRole.Owner,
                     It.IsAny<IEnumerable<Claim>>()))
-                .Returns(true);
+                .Returns(false);
 
             var result = await controller.SelectLegalEntity(routeModel) as RedirectToRouteResult;
 
