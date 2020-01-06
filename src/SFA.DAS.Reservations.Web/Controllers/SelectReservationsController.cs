@@ -187,6 +187,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
                 
+                //TODO - Remove after launch
+                if (!isFeatureEnabled)
+                {
+                    if (routeModel.UkPrn == null)
+                    {
+                        return RedirectToRoute(RouteNames.EmployerFeatureNotAvailable);    
+                    }
+
+                    return RedirectToRoute(RouteNames.ProviderFeatureNotAvailable);
+                }
+                
                 var routeName = RouteNames.EmployerTransactorSignAgreement;
                 if (routeModel.UkPrn.HasValue)
                 {
