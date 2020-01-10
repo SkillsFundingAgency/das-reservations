@@ -194,7 +194,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("employer-agreement-not-signed/{id?}", Name=RouteNames.ProviderEmployerAgreementNotSigned)]
         public async Task<IActionResult> EmployerAgreementNotSigned(ReservationsRouteModel routeModel, string id)
         {
-        
+
+            if (string.IsNullOrEmpty(id))
+            {
+                id = routeModel.AccountLegalEntityPublicHashedId;
+            }
+            
             var result = await _mediator.Send(new GetAccountLegalEntityQuery {AccountLegalEntityPublicHashedId = id});
             var viewModel = new EmployerAgreementNotSignedViewModel
             {
