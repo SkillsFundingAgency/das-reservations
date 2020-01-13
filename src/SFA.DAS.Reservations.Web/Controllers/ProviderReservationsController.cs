@@ -204,7 +204,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewModel = new EmployerAgreementNotSignedViewModel
             {
                 AccountName = result.LegalEntity.AccountLegalEntityName, 
-                DashboardUrl = _externalUrlHelper.GenerateDashboardUrl(null)
+                DashboardUrl = _externalUrlHelper.GenerateDashboardUrl(null),
+                BackUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value ? routeModel.PreviousPage : "",
+                IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
             };
 
             return View(viewModel);

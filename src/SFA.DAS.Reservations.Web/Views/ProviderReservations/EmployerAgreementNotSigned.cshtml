@@ -4,8 +4,14 @@
 @{
     ViewBag.Title = "Employers agreement is not signed";
 }
-
-<a asp-route="@RouteNames.ProviderChooseEmployer" class="govuk-back-link">Back</a>
+@if (Model.IsUrl)
+{
+    <a href="@Model.BackUrl" class="govuk-back-link">Back</a>    
+}
+else
+{
+    <a asp-route="@RouteNames.ProviderChooseEmployer" class="govuk-back-link">Back</a>
+}
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
