@@ -13,6 +13,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get; set; }
         public bool? FromReview { get; set; }
         public bool? IsFromManage { get; set; }
+        public bool? IsFromSelect { get; set; }
         public string PreviousPage { get; set; }
 
         [FromQuery]

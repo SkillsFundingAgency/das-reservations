@@ -32,12 +32,36 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     It.IsAny<GetAccountUsersQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(usersResponse);
+            routeModel.IsFromSelect = null;
 
             var result = await controller.TransactorSignAgreement(routeModel) as ViewResult;
 
             result.ViewName.Should().Be("TransactorSignAgreement");
             var model = result.Model as SignAgreementViewModel;
             model.BackRouteName.Should().Be(routeModel.PreviousPage);
+            model.IsUrl.Should().BeFalse();
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Sets_The_IsUrl_Property_If_Come_From_Select_Reservation(
+            ReservationsRouteModel routeModel,
+            GetAccountUsersResponse usersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            EmployerReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAccountUsersQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(usersResponse);
+            routeModel.IsFromSelect = true;
+
+            var result = await controller.TransactorSignAgreement(routeModel) as ViewResult;
+            
+            result.ViewName.Should().Be("TransactorSignAgreement");
+            var model = result.Model as SignAgreementViewModel;
+            model.BackRouteName.Should().Be(routeModel.PreviousPage);
+            model.IsUrl.Should().BeTrue();
         }
 
         [Test, MoqAutoData]

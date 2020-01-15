@@ -303,7 +303,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var model = new SignAgreementViewModel
             {
-                BackRouteName = routeModel.PreviousPage
+                BackRouteName = routeModel.PreviousPage,
+                IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
             };
             
             return View("OwnerSignAgreement", model);
@@ -332,7 +333,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = new SignAgreementViewModel
                 {
                     BackRouteName = routeModel.PreviousPage,
-                    OwnersOfThisAccount = owners
+                    OwnersOfThisAccount = owners,
+                    IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
                 };
 
                 return View("TransactorSignAgreement", model);

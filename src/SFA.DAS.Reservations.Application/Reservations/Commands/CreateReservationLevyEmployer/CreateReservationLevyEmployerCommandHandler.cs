@@ -39,6 +39,10 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (validationResult.FailedAutoReservationCheck)
             {
+                if (validationResult.FailedAgreementSignedCheck)
+                {
+                    throw new EmployerAgreementNotSignedException(request.AccountId, request.AccountLegalEntityId);
+                }
                 return null;
             }
 

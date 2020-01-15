@@ -60,7 +60,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                     new AccountReservationStatusRequest(_config.Url, query.AccountId));
 
             validationResult.FailedAutoReservationCheck = !response.CanAutoCreateReservations;
-
+            validationResult.FailedAgreementSignedCheck = !response.AccountLegalEntityAgreementStatus[query.AccountLegalEntityId];
+            
             return validationResult;
         }
     }

@@ -44,14 +44,20 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
         {
             mock.Setup(x => x.Get<AccountReservationStatusResponse>(It.Is<AccountReservationStatusRequest>(c => c.AccountId.Equals(TestDataValues.LevyAccountId))))
                 .ReturnsAsync(new AccountReservationStatusResponse
-                    { CanAutoCreateReservations = true });
+                {
+                    CanAutoCreateReservations = true,
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{{TestDataValues.LevyAccountLegalEntityId,true}}
+                });
         }
 
         private void SetupNonLevyApiClientResponses(Mock<IApiClient> mock)
         {
             mock.Setup(x => x.Get<AccountReservationStatusResponse>(It.Is<AccountReservationStatusRequest>(c => c.AccountId.Equals(TestDataValues.NonLevyAccountId))))
                 .ReturnsAsync(new AccountReservationStatusResponse
-                    { CanAutoCreateReservations = false });
+                {
+                    CanAutoCreateReservations = false,
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{{TestDataValues.NonLevyAccountLegalEntityId,true}}
+                });
         }
 
         private void SetupSharedApiClientResponses(Mock<IApiClient> mock)

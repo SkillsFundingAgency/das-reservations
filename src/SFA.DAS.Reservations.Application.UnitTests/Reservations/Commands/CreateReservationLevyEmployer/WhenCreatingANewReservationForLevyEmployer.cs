@@ -80,6 +80,31 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<Guid?>()), Times.Never);
             Assert.IsNull(result);
         }
+        
+        [Test, MoqAutoData]
+        public async Task Then_If_The_Account_Is_Not_A_Levy_Account_And_The_Agreement_Is_Not_Signed_Then_An_Exception_Is_Thrown(
+            CreateReservationLevyEmployerCommand request,
+            Guid id,
+            [Frozen] Mock<IValidator<CreateReservationLevyEmployerCommand>> validator,
+            [Frozen] Mock<IReservationService> service,
+            CreateReservationLevyEmployerCommandHandler handler
+        )
+        {
+            //Arrange
+            request.TransferSenderId = null;
+            validator.Setup(x => x.ValidateAsync(request))
+                .ReturnsAsync(new ValidationResult
+                {ValidationDictionary = new Dictionary<string, string>(),
+                    FailedAutoReservationCheck = true, FailedAgreementSignedCheck = true});
+            service.Setup(x =>
+                    x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
+                .ReturnsAsync(new CreateReservationResponse { Id = id });
+
+            //Act Assert
+            Assert.ThrowsAsync<EmployerAgreementNotSignedException>(() =>
+                handler.Handle(request, CancellationToken.None));
+            service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<Guid?>()), Times.Never);
+        }
 
         [Test, MoqAutoData]
         public async Task ThenCallsReservationServiceToCreateReservation(
