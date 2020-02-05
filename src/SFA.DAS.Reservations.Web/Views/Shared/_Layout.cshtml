@@ -52,6 +52,8 @@
 
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
+    @Html.Partial("CookieBannerPartial")
+
     <header class="govuk-header das-header--no-border @(Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase) ? "das-header--provider-legacy" : "")" role="banner" data-module="header">
         <div class="govuk-header__container govuk-width-container">
 
@@ -114,7 +116,7 @@
         <partial name="_ProviderFooter" />
     }
 
-    <partial name="GoogleAnalyticsInfo"/>
+    <partial name="GoogleAnalyticsInfo" />
 
     <script src="libs/govuk-frontend/all.js"></script>
     <script src="libs/jquery/jquery.min.js"></script>
@@ -126,7 +128,7 @@
         window.GOVUKFrontend.initAll();
         window.DASFrontend.initAll();
     </script>
-    <partial name="_ZendeskWidget"/>
+    <partial name="_ZendeskWidget" />
 
 
 </body>
