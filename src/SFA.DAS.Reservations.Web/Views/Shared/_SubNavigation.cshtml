@@ -14,14 +14,7 @@
                         <a asp-external-action="Cohorts" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Your cohorts</a>
                     </li>
                     <li class="das-navigation__list-item">
-                        @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
-                        }
-                        else
-                        {
-                            <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage funding</a>
-                        }
+                        <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-action="manage/all" asp-external-controller="apprentices" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage your apprentices</a>
