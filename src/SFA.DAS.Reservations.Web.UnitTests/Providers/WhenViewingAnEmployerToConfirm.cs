@@ -19,9 +19,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         
         [Test, MoqAutoData]
-        public async Task Then_If_There_The_ViewModel_Is_Passed_To_The_View_With_Encoded_Ids(
-            string hashedAccountId,
-            long accountId,
+        public async Task Then_The_ViewModel_Is_Passed_To_The_View(
             [Frozen] Mock<IMediator> mediator,
             ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
