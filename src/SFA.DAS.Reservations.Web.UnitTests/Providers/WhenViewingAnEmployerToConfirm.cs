@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
@@ -18,7 +19,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         
         [Test, MoqAutoData]
-        public async Task Then_If_There_The_ViewModel_Is_Passed_To_The_View(
+        public async Task Then_If_There_The_ViewModel_Is_Passed_To_The_View_With_Encoded_Ids(
+            string hashedAccountId,
+            long accountId,
             [Frozen] Mock<IMediator> mediator,
             ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
@@ -39,8 +42,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         }
 
         [Test, MoqAutoData]
-        public async Task Then_If_The_ViewModel_Is_Null_It_Is_Read_From_The_Cache(
+        public async Task Then_If_The_ViewModel_Is_Null_It_Is_Read_From_The_Cache_And_Account_Id_Is_Hashed(
+            string hashedAccountId,
             [Frozen] Mock<IMediator> mediator,
+            [Frozen] Mock<IEncodingService> encodingService,
             ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel,
             GetCachedReservationResult cachedResult)
@@ -51,6 +56,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                     It.Is<GetCachedReservationQuery>(c => c.Id.Equals(viewModel.Id) && c.UkPrn.Equals(viewModel.UkPrn)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cachedResult);
+            encodingService.Setup(x => x.Encode(cachedResult.AccountId, EncodingType.AccountId)).Returns(hashedAccountId);
 
             //Act
             var actual = await controller.ConfirmEmployer(new ConfirmEmployerViewModel{Id=viewModel.Id,UkPrn = viewModel.UkPrn});
@@ -62,8 +68,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             var model = viewResult.Model as ConfirmEmployerViewModel;
             Assert.IsNotNull(model);
             Assert.AreEqual(cachedResult.AccountLegalEntityName, model.AccountLegalEntityName);
-            Assert.AreEqual(cachedResult.AccountId, model.AccountId);
-            Assert.AreEqual(cachedResult.AccountLegalEntityId, model.AccountLegalEntityId);
+            Assert.AreEqual(hashedAccountId, model.AccountPublicHashedId);
             Assert.AreEqual(cachedResult.AccountLegalEntityPublicHashedId, model.AccountLegalEntityPublicHashedId);
             Assert.AreEqual(viewModel.UkPrn, model.UkPrn);
         }

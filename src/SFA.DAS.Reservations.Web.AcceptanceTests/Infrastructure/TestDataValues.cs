@@ -4,11 +4,13 @@
     {
         public const long NonLevyAccountId = 1;
         public const long NonLevyAccountLegalEntityId = 123;
+        public const string NonLevyPublicHashedAccountId = "FEA456";
         public const string NonLevyHashedAccountId = "ABC123";
         public const string NonLevyHashedAccountLegalEntityId = "5UM71N6";
 
         public const long LevyAccountId = 2;
         public const long LevyAccountLegalEntityId = 456;
+        public const string LevyPublicHashedAccountId = "AEF456";
         public const string LevyHashedAccountId = "DEF456";
         public const string LevyHashedAccountLegalEntityId = "N077H15";
 

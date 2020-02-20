@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Validation;
@@ -25,11 +26,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [Test, MoqAutoData]
         public async Task Then_If_Confirmed_The_Choosen_Employer_Is_Stored(
             uint ukPrn,
+            long accountId,
+            long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
             ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
+            encodingService.Setup(x => x.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId))
+                .Returns(accountId);
+            encodingService.Setup(x => x.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
@@ -37,8 +45,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             await controller.ProcessConfirmEmployer(viewModel);
 
             mockMediator.Verify(m => m.Send(It.Is<CacheReservationEmployerCommand>(c =>
-                c.AccountId.Equals(viewModel.AccountId) &&
-                c.AccountLegalEntityId.Equals(viewModel.AccountLegalEntityId) &&
+                c.AccountId.Equals(accountId) &&
+                c.AccountLegalEntityId.Equals(accountLegalEntityId) &&
                 c.AccountLegalEntityPublicHashedId.Equals(viewModel.AccountLegalEntityPublicHashedId) &&
                 c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName) &&
                 c.AccountName.Equals(viewModel.AccountName) &&
@@ -101,7 +109,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             viewModel.Confirm = true;
 
             var validationResult = new Application.Validation.ValidationResult();
-            validationResult.AddError(nameof(viewModel.AccountId), "Reservation limit has been reached for this account");
+            validationResult.AddError(nameof(viewModel.AccountPublicHashedId), "Reservation limit has been reached for this account");
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ReservationLimitReachedException(It.IsAny<long>()));
