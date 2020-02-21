@@ -26,11 +26,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyAccountId);
             var nonLevyOutVariable = TestDataValues.NonLevyAccountId;
             encodingService.Setup(x => x.TryDecode(TestDataValues.NonLevyHashedAccountId,It.IsAny<EncodingType>(), out nonLevyOutVariable)).Returns(true);
+            encodingService.Setup(x => x.Decode(TestDataValues.NonLevyPublicHashedAccountId,EncodingType.PublicAccountId)).Returns(TestDataValues.NonLevyAccountId);
             encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.NonLevyHashedAccountId);
             encodingService.Setup(x => x.Encode(TestDataValues.NonLevyAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyHashedAccountLegalEntityId);
             encodingService.Setup(x => x.Decode(TestDataValues.NonLevyHashedAccountLegalEntityId, EncodingType.PublicAccountLegalEntityId)).Returns(TestDataValues.NonLevyAccountLegalEntityId);
 
             var levyOutVariable = TestDataValues.LevyAccountId;
+            encodingService.Setup(x => x.Decode(TestDataValues.LevyPublicHashedAccountId,EncodingType.PublicAccountId)).Returns(TestDataValues.LevyAccountId);
             encodingService.Setup(x => x.TryDecode(TestDataValues.LevyHashedAccountId,It.IsAny<EncodingType>(), out levyOutVariable)).Returns(true);
             encodingService.Setup(x => x.Decode(TestDataValues.LevyHashedAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyAccountId);
             encodingService.Setup(x => x.Encode(TestDataValues.LevyAccountId,It.IsAny<EncodingType>())).Returns(TestDataValues.LevyHashedAccountId);

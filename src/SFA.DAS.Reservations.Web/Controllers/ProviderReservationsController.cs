@@ -122,8 +122,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 });
 
                 viewModel.AccountLegalEntityName = result.AccountLegalEntityName;
-                viewModel.AccountId = result.AccountId;
-                viewModel.AccountLegalEntityId = result.AccountLegalEntityId;
+                viewModel.AccountPublicHashedId = _encodingService.Encode(result.AccountId, EncodingType.AccountId);
                 viewModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
                 viewModel.AccountName = result.AccountName;
                 return View(viewModel);
@@ -159,8 +158,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 await _mediator.Send(new CacheReservationEmployerCommand
                 {
                     Id = reservationId,
-                    AccountId = viewModel.AccountId,
-                    AccountLegalEntityId = viewModel.AccountLegalEntityId,
+                    AccountId = _encodingService.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId),
+                    AccountLegalEntityId = _encodingService.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId),
                     AccountLegalEntityName = viewModel.AccountLegalEntityName,
                     AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
                     UkPrn = viewModel.UkPrn,

@@ -35,8 +35,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
             var confirmEmployerViewModel = new ConfirmEmployerViewModel
             {
                 Confirm = true,
-                AccountId = TestData.AccountLegalEntity.AccountId,
-                AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
+                AccountPublicHashedId = TestData.AccountLegalEntity.AccountPublicHashedId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
                 AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId,
                 UkPrn = TestData.ReservationRouteModel.UkPrn.Value
