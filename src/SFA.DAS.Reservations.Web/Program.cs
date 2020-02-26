@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Threading;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using NLog.Web;
 
@@ -8,6 +9,7 @@ namespace SFA.DAS.Reservations.Web
     {
         public static void Main(string[] args)
         {
+            ThreadPool.SetMinThreads(200, 200);
             CreateWebHostBuilder(args).Build().Run();
         }
 
