@@ -1,15 +1,35 @@
-﻿<script type="text/javascript">
+﻿@using static SFA.DAS.Reservations.Web.Extensions.ZenDeskLabelExtensions
+
+@{
+    var sectionId = "360002328100";
+}
+
+@if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+{
+    sectionId = "360001841359";
+}
+
+<script type="text/javascript">
     window.zESettings = {
         webWidget: {
             contactForm: {
                 attachments: false
             },
-            chat: { 
+            chat: {
                 menuOptions: {
                     emailTranscript: false
+                }
+            },
+            helpCenter: { 
+                filter: {
+                  section: "@sectionId"
                 }
             }
         }
     };
 </script>
-<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=1b1ce288-39ea-4d40-a5e1-3a5e08aadd89"> </script>
+<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=1b1ce288-39ea-4d40-a5e1-3a5e08aadd89"></script>
+<script id="co-snippet" src="https://embed-euw1.rcrsv.io/h6255jcoYuIOGsFnsagb3xgrbKz9mHeBGjifWcngdcP05WZQu46kKykuID1LpD9d?zwwi=1"></script>
+
+
+@Html.SetZenDeskLabels($"rsrv-{ViewBag.Title}")
