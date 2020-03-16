@@ -16,6 +16,14 @@ variables:
 pool:
   name: 'DAS - Continuous Integration'
 
+resources:
+  repositories:
+  - repository: das-platform-building-blocks
+    type: github
+    name: SkillsFundingAgency/das-platform-building-blocks
+    ref: refs/heads/master
+    endpoint: "GitHub (SFA)"
+
 steps:
 - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
   displayName: GitVersion
@@ -49,6 +57,8 @@ steps:
     command: test
     projects: '**/*.AcceptanceTests.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build'
+
+- template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish Website'
