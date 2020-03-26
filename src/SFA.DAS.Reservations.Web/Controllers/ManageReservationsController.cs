@@ -22,7 +22,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasEmployerViewerUserRoleOrIsProvider))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
-    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     public class ManageReservationsController : Controller
     {
         private readonly IMediator _mediator;

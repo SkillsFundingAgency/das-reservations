@@ -22,8 +22,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             services.AddSingleton(serviceParameters);
             services.AddScoped<LevyNotPermittedFilter>();
-            services.AddScoped<FeatureToggleActionFilter>();
-            services.AddScoped<NonLevyFeatureToggleActionFilter>();
             services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
             services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
             
