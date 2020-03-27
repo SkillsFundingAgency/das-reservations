@@ -58,14 +58,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            //TODO - Remove after launch
-            var isFeatureEnabled = true;
-            if (_configuration["FeatureToggleOn"] != null)
-            {
-                bool.TryParse(_configuration["FeatureToggleOn"], out isFeatureEnabled);    
-            }
-            
-            
             var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
                 viewModel.CohortReference, journeyData:viewModel.JourneyData);
             try
@@ -111,17 +103,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     }
 
                     return Redirect(redirectResult);
-                }
-
-                //TODO - Remove after launch
-                if (!isFeatureEnabled)
-                {
-                    if (routeModel.UkPrn == null)
-                    {
-                        return RedirectToRoute(RouteNames.EmployerFeatureNotAvailable);    
-                    }
-
-                    return RedirectToRoute(RouteNames.ProviderFeatureNotAvailable);
                 }
                 
                 var availableReservationsResult = await _mediator.Send(
@@ -187,17 +168,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
                 
-                //TODO - Remove after launch
-                if (!isFeatureEnabled)
-                {
-                    if (routeModel.UkPrn == null)
-                    {
-                        return RedirectToRoute(RouteNames.EmployerFeatureNotAvailable);    
-                    }
-
-                    return RedirectToRoute(RouteNames.ProviderFeatureNotAvailable);
-                }
-                
                 var routeName = RouteNames.EmployerTransactorSignAgreement;
                 if (routeModel.UkPrn.HasValue)
                 {
@@ -226,7 +196,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ServiceFilter(typeof(NonLevyFeatureToggleActionFilter))]
         [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
         [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
         [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]

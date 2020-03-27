@@ -23,7 +23,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
     [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
-    [ServiceFilter(typeof(FeatureToggleActionFilter))]
     public class ProviderReservationsController : ReservationsBaseController
     {
         private readonly IMediator _mediator;
