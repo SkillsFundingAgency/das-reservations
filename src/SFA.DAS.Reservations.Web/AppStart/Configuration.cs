@@ -15,6 +15,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class ConfigurationExtensions
     {
+        private const string EncodingConfigKey = "SFA.DAS.Encoding";
+        
         public static void AddEmployerConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
@@ -47,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {
-                var encodingConfigJson = configuration.GetSection(nameof(EncodingConfig)).Value;
+                var encodingConfigJson = configuration.GetSection(EncodingConfigKey).Value;
                 var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
                 services.AddSingleton(encodingConfig);
             }
@@ -62,7 +64,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
-
+            services.AddSingleton(config => config.GetService<IOptions<AccountApiConfiguration>>().Value);
+            
             services.Configure<CommitmentPermissionsApiClientConfiguration>(configuration.GetSection("CommitmentsApiClient"));
             services.AddSingleton(config => config.GetService<IOptions<CommitmentPermissionsApiClientConfiguration>>().Value);
 
