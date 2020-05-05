@@ -128,7 +128,6 @@ namespace SFA.DAS.Reservations.Web
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
-            var otherConfig = serviceProvider.GetService<AccountApiConfiguration>();
             
             services.AddMvc(
                     options =>
