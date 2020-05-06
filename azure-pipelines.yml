@@ -4,14 +4,17 @@ trigger:
     include:
       - "*"
 
-pr: none
-
 workspace:
     clean: all
 
 variables:
-  buildConfiguration: 'release'
-  buildPlatform: 'anycpu'
+  - group: "ESFA - SonarCloud"
+  - name: sonarCloudProjectKey
+    value: "SkillsFundingAgency_das-reservations"
+  - name: buildConfiguration
+    value: 'release'
+  - name: buildPlatform
+    value: 'anycpu'
 
 pool:
   name: 'DAS - Continuous Integration'
@@ -30,6 +33,15 @@ steps:
   inputs:
     configFilePath: GitVersion.yml
     updateAssemblyInfo: true
+
+- task: SonarCloudPrepare@1
+  displayName: 'Prepare Sonarcloud analysis configuration'
+  inputs:
+    SonarCloud: "$(SonarCloudConnectionId)"
+    organization: "$(SonarCloudOrganisationKey)"
+    scannerMode: 'MSBuild'
+    projectName: "$(Build.DefinitionName)"
+    projectKey: "$(sonarCloudProjectKey)"
 
 - task: DotNetCoreCLI@2
   displayName: Restore
@@ -57,6 +69,14 @@ steps:
     command: test
     projects: '**/*.AcceptanceTests.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build'
+
+- task: SonarCloudAnalyze@1
+  displayName: 'Run SonarCloud analysis'
+  
+- task: SonarCloudPublish@1
+  displayName: 'Publish results on build summary'
+  inputs:
+    pollingTimeoutSec: '300'
 
 - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
 

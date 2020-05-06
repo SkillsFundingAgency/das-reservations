@@ -4,6 +4,10 @@
 
 ![Build Status](https://sfa-gov-uk.visualstudio.com/Digital%20Apprenticeship%20Service/_apis/build/status/Manage%20Funding/das-reservations?branchName=master)
 
+## Sonar Cloud Status
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SkillsFundingAgency_das-reservations&metric=alert_status)](https://sonarcloud.io/dashboard?id=SkillsFundingAgency_das-reservations)
+
 ## Requirements
 
 DotNet Core 2.2 and any supported IDE for DEV running.
