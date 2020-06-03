@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -12,22 +13,21 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
-using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Infrastructure.AzureConfigurationProvider;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using SFA.DAS.Reservations.Web.Stubs;
 
 namespace SFA.DAS.Reservations.Web
 {
     public class Startup
     {
-        private const string EncodingConfigKey = "SFA.DAS.Encoding";
-        
         private readonly IHostingEnvironment _environment;
         private readonly IConfiguration _configuration;
 
@@ -41,22 +41,16 @@ namespace SFA.DAS.Reservations.Web
                 .AddJsonFile("appsettings.json", true)
                 .AddJsonFile("appsettings.Development.json", true)
 #endif
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .AddAzureTableStorageConfiguration(
+                    configuration["ConfigurationStorageConnectionString"],
+                    configuration["ConfigNames"].Split(","),
+                    configuration["Environment"],
+                    configuration["Version"]
+                )
+                .Build();
 
-            if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                config.AddAzureTableStorage(options =>
-                    {
-                        options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-                        options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                        options.EnvironmentName = configuration["Environment"];
-                        options.PreFixConfigurationKeys = false;
-                        options.ConfigurationKeysRawJsonResult = new[] {EncodingConfigKey};
-                    }
-                );
-            }
-            
-            _configuration = config.Build();
+            _configuration = config;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -128,7 +122,7 @@ namespace SFA.DAS.Reservations.Web
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
-            
+
             services.AddMvc(
                     options =>
                     {
