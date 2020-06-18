@@ -46,7 +46,7 @@ else
                         <a asp-external-controller="balance" asp-external-subdomain="finance" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Finance</a>
                     </li>
                     <li class="das-navigation__list-item">
-                        <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Recruitment</a>
+                        <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Adverts</a>
                     </li>
                     <li class="das-navigation__list-item">
                         @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
