@@ -91,7 +91,7 @@ values
 (newid(), 123, 456, 789, 'stubs r us', null, 1, 1, 0)
 
 Insert into [SFA.DAS.Reservations].[dbo].[Account] (Id, Name, IsLevy, ReservationLimit)
-Values (123, 'DummyAccount', 0,10)
+Values (123, 'Account1', 0,10)
 ```
 
 Likewise you if you are running in provider mode you will need to ensure you have db records that match values provided in provider permissions api stub, i.e. something like this: 
