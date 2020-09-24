@@ -112,5 +112,6 @@ values
 ## Authorization
 
 The API uses AzureAD for authentication. When running in DEV or LOCAL modes, the authentication attribute is not added. If you do enable authentication you will need to add the ```Authorization Bearer [TOKEN]``` header attribute to all requests. 
-Note:
+
+#### Note:
 To run it locally - I had to replace method GetAccessTokenAsync of class ApiClient with one that returns an empty string. 
