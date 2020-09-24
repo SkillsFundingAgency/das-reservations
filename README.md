@@ -82,6 +82,8 @@ Reservations Web depends on several other API's. To facilitate local development
 
 So, you'll also need an account legal entity to match with the account id: 
 
+If `"UseStub": true` then the starting url be https://localhost:5001/accounts/WM6XRM/reservations (If reservation.web is running on port 5001)
+
 ```
 use [SFA.DAS.Reservations]
 
