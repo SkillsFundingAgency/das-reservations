@@ -54,7 +54,11 @@
 
     @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
     {
-        @Html.Partial("CookieBannerPartial")
+        <partial name="_EmployerCookieBanner" /> 
+    }
+    else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+    {
+        <partial name="_ProviderCookieBanner" />
     }
 
         <header class="govuk-header das-header--no-border @(Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase) ? "das-header--provider-legacy" : "")" role="banner" data-module="header">
