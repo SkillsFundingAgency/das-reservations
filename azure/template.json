@@ -26,6 +26,12 @@
     "sharedFrontEndSubnetResourceId": {
       "type": "string"
     },
+    "sharedKeyVaultName": {
+      "type": "string"
+    },
+    "sharedManagementResourceGroup": {
+      "type": "string"
+    },
     "appServiceAllowedIPs": {
       "type": "array",
       "defaultValue": []
@@ -58,12 +64,6 @@
       "type": "string"
     },
     "providerCertificateName": {
-      "type": "string"
-    },
-    "keyVaultName": {
-      "type": "string"
-    },
-    "keyVaultResourceGroup": {
       "type": "string"
     },
     "loggingRedisConnectionString": {
@@ -106,10 +106,10 @@
             "value": "[parameters('employerCertificateName')]"
           },
           "keyVaultName": {
-            "value": "[parameters('keyVaultName')]"
+            "value": "[parameters('sharedKeyVaultName')]"
           },
           "keyVaultResourceGroup": {
-            "value": "[parameters('keyVaultResourceGroup')]"
+            "value": "[parameters('sharedManagementResourceGroup')]"
           }
         }
       }
@@ -130,10 +130,10 @@
             "value": "[parameters('providerCertificateName')]"
           },
           "keyVaultName": {
-            "value": "[parameters('keyVaultName')]"
+            "value": "[parameters('sharedKeyVaultName')]"
           },
           "keyVaultResourceGroup": {
-            "value": "[parameters('keyVaultResourceGroup')]"
+            "value": "[parameters('sharedManagementResourceGroup')]"
           }
         }
       },
