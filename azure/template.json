@@ -20,8 +20,7 @@
     },
     "configNames": {
       "type": "string",
-      "defaultValue":
-        "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding"
+      "defaultValue": "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding"
     },
     "version": {
       "type": "string",
@@ -59,10 +58,8 @@
     }
   },
   "variables": {
-    "deploymentUrlBase":
-      "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "resourceNamePrefix":
-      "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+    "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
     "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]",
     "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-asp')]"
@@ -167,7 +164,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'app-service-v2.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -181,48 +178,50 @@
             "value": "[resourceGroup().name]"
           },
           "appServiceAppSettings": {
-            "value": [
-              {
-                "name": "Environment",
-                "value": "[parameters('environmentName')]"
-              },
-              {
-                "name": "ConfigurationStorageConnectionString",
-                "value": "[parameters('configurationStorageConnectionString')]"
-              },
-              {
-                "name": "ConfigNames",
-                "value": "[parameters('configNames')]"
-              },
-              {
-                "name": "Version",
-                "value": "[parameters('version')]"
-              },
-              {
-                "name": "Cdn:Url",
-                "value": "[parameters('cdnUrl')]"
-              },
-              {
-                "name": "LoggingRedisConnectionString",
-                "value": "[parameters('loggingRedisConnectionString')]"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference('employer-application-insights').outputs.InstrumentationKey.value]"
-              },
-              {
-                "name": "AuthType",
-                "value": "employer"
-              },
-              {
-                "name": "WEBSITE_LOAD_CERTIFICATES",
-                "value": "[parameters('certificateThumbprintsToLoad')]"
-              },
-              {
-                "name": "FeatureToggleOn",
-                "value": "[parameters('featureToggleOn')]"
-              }
-            ]
+            "value": {
+              "array": [
+                {
+                  "name": "Environment",
+                  "value": "[parameters('environmentName')]"
+                },
+                {
+                  "name": "ConfigurationStorageConnectionString",
+                  "value": "[parameters('configurationStorageConnectionString')]"
+                },
+                {
+                  "name": "ConfigNames",
+                  "value": "[parameters('configNames')]"
+                },
+                {
+                  "name": "Version",
+                  "value": "[parameters('version')]"
+                },
+                {
+                  "name": "Cdn:Url",
+                  "value": "[parameters('cdnUrl')]"
+                },
+                {
+                  "name": "LoggingRedisConnectionString",
+                  "value": "[parameters('loggingRedisConnectionString')]"
+                },
+                {
+                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                  "value": "[reference('employer-application-insights').outputs.InstrumentationKey.value]"
+                },
+                {
+                  "name": "AuthType",
+                  "value": "employer"
+                },
+                {
+                  "name": "WEBSITE_LOAD_CERTIFICATES",
+                  "value": "[parameters('certificateThumbprintsToLoad')]"
+                },
+                {
+                  "name": "FeatureToggleOn",
+                  "value": "[parameters('featureToggleOn')]"
+                }
+              ]
+            }
           },
           "customHostName": {
             "value": "[parameters('employerCustomHostname')]"
@@ -263,7 +262,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'app-service-v2.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -277,44 +276,46 @@
             "value": "[resourceGroup().name]"
           },
           "appServiceAppSettings": {
-            "value": [
-              {
-                "name": "Environment",
-                "value": "[parameters('environmentName')]"
-              },
-              {
-                "name": "ConfigurationStorageConnectionString",
-                "value": "[parameters('configurationStorageConnectionString')]"
-              },
-              {
-                "name": "ConfigNames",
-                "value": "[parameters('configNames')]"
-              },
-              {
-                "name": "Version",
-                "value": "[parameters('version')]"
-              },
-              {
-                "name": "Cdn:Url",
-                "value": "[parameters('cdnUrl')]"
-              },
-              {
-                "name": "LoggingRedisConnectionString",
-                "value": "[parameters('loggingRedisConnectionString')]"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
-              },
-              {
-                "name": "AuthType",
-                "value": "provider"
-              },
-              {
-                "name": "FeatureToggleOn",
-                "value": "[parameters('featureToggleOn')]"
-              }
-            ]
+            "value": {
+              "array": [
+                {
+                  "name": "Environment",
+                  "value": "[parameters('environmentName')]"
+                },
+                {
+                  "name": "ConfigurationStorageConnectionString",
+                  "value": "[parameters('configurationStorageConnectionString')]"
+                },
+                {
+                  "name": "ConfigNames",
+                  "value": "[parameters('configNames')]"
+                },
+                {
+                  "name": "Version",
+                  "value": "[parameters('version')]"
+                },
+                {
+                  "name": "Cdn:Url",
+                  "value": "[parameters('cdnUrl')]"
+                },
+                {
+                  "name": "LoggingRedisConnectionString",
+                  "value": "[parameters('loggingRedisConnectionString')]"
+                },
+                {
+                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                  "value": "[reference('provider-application-insights').outputs.InstrumentationKey.value]"
+                },
+                {
+                  "name": "AuthType",
+                  "value": "provider"
+                },
+                {
+                  "name": "FeatureToggleOn",
+                  "value": "[parameters('featureToggleOn')]"
+                }
+              ]
+            }
           },
           "customHostName": {
             "value": "[parameters('providerCustomHostname')]"
