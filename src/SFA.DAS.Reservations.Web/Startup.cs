@@ -19,6 +19,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
 
@@ -172,7 +173,9 @@ namespace SFA.DAS.Reservations.Web
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.IsEssential = true;
             });
-            
+
+            services.AddDataProtection(_configuration, _environment);
+
             if (!_environment.IsDevelopment())
             {
                 services.AddHealthChecks()

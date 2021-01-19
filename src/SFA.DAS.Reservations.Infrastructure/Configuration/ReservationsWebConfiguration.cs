@@ -6,11 +6,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
     {
         public double SessionTimeoutHours { get; set; }
         
-        public string RedisCacheConnectionString
-        {
-            get; set;
-
-        }
+        public string RedisCacheConnectionString { get; set; }
+        public string DataProtectionKeysDatabase { get; set; }
         public virtual string ApprenticeUrl { get; set; }
         public virtual string EmployerApprenticeUrl { get; set; }
         public virtual string DashboardUrl { get; set; }
