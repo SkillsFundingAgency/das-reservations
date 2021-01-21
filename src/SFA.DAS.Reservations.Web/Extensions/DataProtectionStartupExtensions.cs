@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.Extensions
         {
             if (!environment.IsDevelopment())
             {
-                var config = configuration.GetSection("ReservationsWebConfiguration").Get<ReservationsWebConfiguration>();
+                var config = services.BuildServiceProvider().GetService<ReservationsWebConfiguration>();
 
                 if (config != null)
                 {
