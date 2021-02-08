@@ -50,7 +50,7 @@
         public const string EmployerTransactorSignAgreement = "employer-transactor-sign-agreement";
         public const string EmployerFeatureNotAvailable = "employer-feature-not-available";
 
-
+        public const string ErrorAccessDenied = "AccessDenied";
         public const string Error403 = "403";
         public const string Error404 = "404";
         public const string Error500 = "500";

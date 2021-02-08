@@ -8,6 +8,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {
 
         [Route("403", Name = RouteNames.Error403)]
+        public IActionResult UnAuthorised()
+        {
+            return View("403");
+        }
+
+        [Route("AccessDenied", Name = RouteNames.ErrorAccessDenied)]
         public IActionResult AccessDenied()
         {
             return View();

@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.Filters
                 if (!_encodingService.TryDecode(employerAccountId.ToString(), EncodingType.AccountId,
                     out var decodedAccountId))
                 {
-                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
+                    context.Result = new RedirectToRouteResult(RouteNames.ErrorAccessDenied, null);
                     return;
                 }
 
@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.Filters
 
                 if (legalEntities.AccountLegalEntities.Any(x => x.IsLevy))
                 {
-                    context.Result = new RedirectToRouteResult(RouteNames.Error403, null);
+                    context.Result = new RedirectToRouteResult(RouteNames.ErrorAccessDenied, null);
                     return;
                 }
             }

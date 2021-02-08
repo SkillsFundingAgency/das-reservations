@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             //Assert
             Assert.NotNull(context.Result);
             Assert.True(context.Result is RedirectToRouteResult);
-            Assert.AreEqual((context.Result as RedirectToRouteResult).RouteName, RouteNames.Error403);
+            Assert.AreEqual((context.Result as RedirectToRouteResult).RouteName, RouteNames.ErrorAccessDenied);
             nextMethod.Verify(x => x(), Times.Never);
         }
     }
