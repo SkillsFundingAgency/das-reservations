@@ -55,3 +55,34 @@ var slugify = function (text) {
         .replace(/^-+/, '')
         .replace(/-+$/, '');
 };
+
+
+var pageTitle = document.querySelector('h1.govuk-heading-xl').innerText;
+
+// Radio button selection - dataLayer pushes
+var radioWrapper = document.querySelector('.govuk-radios');
+if (radioWrapper !== null) {
+    var radios = radioWrapper.querySelectorAll('input[type=radio]');
+    var labelText;
+    var dataLayerObj;
+    nodeListForEach(radios, function(radio) {
+        radio.addEventListener('change', function() {
+            labelText = this.nextElementSibling.innerText;
+            dataLayerObj = {
+                event: 'radio button selected',
+                page: pageTitle,
+                radio: labelText
+            }
+            window.dataLayer.push(dataLayerObj)
+        })
+    })
+}
+
+function nodeListForEach(nodes, callback) {
+    if (window.NodeList.prototype.forEach) {
+        return nodes.forEach(callback)
+    }
+    for (var i = 0; i < nodes.length; i++) {
+        callback.call(window, nodes[i], i, nodes);
+    }
+}
