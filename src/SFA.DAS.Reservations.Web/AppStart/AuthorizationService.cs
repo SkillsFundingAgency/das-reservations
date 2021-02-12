@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -7,7 +9,10 @@ namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class AuthorizationService
     {
-        private const string ProviderDaa = "DAA";
+        private const string ProviderAccountOwner = "DAA";
+        private const string ProviderContributorWithApproval = "DAB";
+        private const string ProviderContributor = "DAC";
+        private const string ProviderViewer = "DAV";
 
         public static void AddAuthorizationService(this IServiceCollection services)
         {
@@ -29,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(ProviderClaims.ProviderUkprn);
-                        policy.RequireClaim(ProviderClaims.Service, ProviderDaa);
+                        policy.RequireAssertion(HasValidServiceClaim);
                         policy.Requirements.Add(new ProviderUkPrnRequirement());
                     });
                 options.AddPolicy(
@@ -47,6 +52,22 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
                     });
+                options.AddPolicy(
+                    PolicyNames.HasProviderGotViewerOrHigherRole
+                    , policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        ProviderOrEmployerAssertion(policy);
+                        policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAV));
+                    });
+                options.AddPolicy(
+                   PolicyNames.HasProviderGotContributorOrHigherRole
+                   , policy =>
+                   {
+                       policy.RequireAuthenticatedUser();
+                       ProviderOrEmployerAssertion(policy);
+                       policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAC));
+                   });
             });
         }
 
@@ -56,9 +77,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             {
                 var hasUkprn = context.User.HasClaim(claim =>
                     claim.Type.Equals(ProviderClaims.ProviderUkprn));
-                var hasDaa = HasDaaClaim(context);
-
-                
+                var hasDaa = HasValidServiceClaim(context);
 
                 var hasEmployerAccountId = context.User.HasClaim(claim =>
                     claim.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
@@ -66,18 +85,22 @@ namespace SFA.DAS.Reservations.Web.AppStart
             });
         }
 
-        private static bool HasDaaClaim(AuthorizationHandlerContext context)
+        private static bool HasValidServiceClaim(AuthorizationHandlerContext context)
         {
-            var hasDaaClaim = context.User.HasClaim(claim =>
+            
+            var validClaimsList =  Enum.GetNames(typeof(ServiceClaim)).ToList();
+            //var validClaims = new List<string> { ProviderAccountOwner, ProviderContributor, ProviderContributorWithApproval, ProviderViewer };
+            var hasValidClaim = context.User.HasClaim(claim =>
                 claim.Type.Equals(ProviderClaims.Service) &&
-                claim.Value.Equals(ProviderDaa));
+                validClaimsList.Any(x => claim.Value.Equals(x)));
 
-            if (!hasDaaClaim)
+            if (!hasValidClaim)
             {
-                hasDaaClaim = context.User.FindAll(ProviderClaims.Service)
-                    .Select(c => c.Value).ToList().Any();
+                // It was before looking for any service claim with any value - now changed it to only the valid list.
+                hasValidClaim = context.User.FindAll(ProviderClaims.Service)
+                    .Select(c => c.Value).Any(x => x.Equals(x));
             }
-            return hasDaaClaim;
+            return hasValidClaim;
         }
     }
 }
