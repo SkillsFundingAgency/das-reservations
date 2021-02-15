@@ -60,7 +60,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
             {
                 return true;
             }
-            else if (highestServiceClaim == ServiceClaim.DAB && requirement.MinimumServieClaim != ServiceClaim.DAA)
+            else if (highestServiceClaim == ServiceClaim.DAB && (requirement.MinimumServieClaim == ServiceClaim.DAB || 
+                requirement.MinimumServieClaim == ServiceClaim.DAC || requirement.MinimumServieClaim == ServiceClaim.DAV))
             {
                 return true;
             }
