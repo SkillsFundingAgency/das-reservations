@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             });
         }
 
-        [Authorize(Policy = nameof(PolicyNames.HasProviderGotViewerOrHigherRole))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer))]
         [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
         public async Task<IActionResult> ProviderManage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
         {
@@ -161,7 +161,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRole))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
         public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
@@ -194,7 +194,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRole))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
@@ -238,7 +238,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRole))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
         [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete-completed", Name = RouteNames.EmployerDeleteCompleted)]
         public IActionResult DeleteCompleted(ReservationsRouteModel routeModel)
@@ -248,7 +248,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(viewName);
         }
 
-        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRole))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/delete-completed", Name = RouteNames.ProviderDeleteCompleted)]

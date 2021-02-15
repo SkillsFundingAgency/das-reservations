@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                     _logger.LogDebug("claim that user has:" + highestServiceClaim);
                     _logger.LogDebug("minimum claim required: " + requirement.MinimumServieClaim);
 
-                    if (hasValidServiceClaim(highestServiceClaim.Value, requirement))
+                    if (HasValidServiceClaim(highestServiceClaim.Value, requirement))
                     {
                         _logger.LogDebug("verified minimum claim requirement");
                         context.Succeed(requirement);
@@ -50,31 +50,12 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 }
             }
 
-
             return Task.CompletedTask;
         }
 
-        private bool hasValidServiceClaim(ServiceClaim highestServiceClaim, MinimumServiceClaimRequirement requirement)
+        private bool HasValidServiceClaim(ServiceClaim highestServiceClaim, MinimumServiceClaimRequirement requirement)
         {
-            if (highestServiceClaim == ServiceClaim.DAA)
-            {
-                return true;
-            }
-            else if (highestServiceClaim == ServiceClaim.DAB && (requirement.MinimumServieClaim == ServiceClaim.DAB || 
-                requirement.MinimumServieClaim == ServiceClaim.DAC || requirement.MinimumServieClaim == ServiceClaim.DAV))
-            {
-                return true;
-            }
-            else if (highestServiceClaim == ServiceClaim.DAC && (requirement.MinimumServieClaim == ServiceClaim.DAC || requirement.MinimumServieClaim == ServiceClaim.DAV))
-            {
-                return true;
-            }
-            else if (highestServiceClaim == ServiceClaim.DAV && requirement.MinimumServieClaim == ServiceClaim.DAV)
-            {
-                return true;
-            }
-
-            return false;
+            return highestServiceClaim >= requirement.MinimumServieClaim;
         }
 
         private ServiceClaim? GetHighetServiceClaim(AuthorizationHandlerContext context)

@@ -86,12 +86,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.MinimumServiceClaimR
             await fixture.Handle(context);
 
             //Assert
-            if (hasSucceeded) {
-                context.HasSucceeded.Should().BeTrue();
-            }
-            else {
-                context.HasSucceeded.Should().BeFalse(); 
-            } 
+            context.HasSucceeded.Should().Equals(hasSucceeded);
         }
 
         [Test]

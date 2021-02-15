@@ -2,9 +2,9 @@
 {
     public enum ServiceClaim
     {
-        DAA,
-        DAB,
-        DAC,
-        DAV
+        DAA = 40,
+        DAB = 30,
+        DAC = 20,
+        DAV = 10
     }
 }

@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
                     });
                 options.AddPolicy(
-                    PolicyNames.HasProviderGotViewerOrHigherRole
+                    PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer
                     , policy =>
                     {
                         policy.RequireAuthenticatedUser();
@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAV));
                     });
                 options.AddPolicy(
-                   PolicyNames.HasProviderGotContributorOrHigherRole
+                   PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer
                    , policy =>
                    {
                        policy.RequireAuthenticatedUser();

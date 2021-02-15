@@ -22,7 +22,7 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-    [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRole))]
+    [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
     [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
     public class ProviderReservationsController : ReservationsBaseController
     {
