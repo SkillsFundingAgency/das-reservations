@@ -9,14 +9,10 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
     public class MinimumServiceClaimRequirementHandler : AuthorizationHandler<MinimumServiceClaimRequirement>
     {
         private readonly ILogger<MinimumServiceClaimRequirementHandler> _logger;
-       // private readonly IEmployerAccountAuthorisationHandler _employerAccountAuthorizationHandler;
 
         public MinimumServiceClaimRequirementHandler(ILogger<MinimumServiceClaimRequirementHandler> logger)
-             //IEmployerAccountAuthorisationHandler employerAccountAuthorizationHandler)
-        
         {
             _logger = logger;
-         //   _employerAccountAuthorizationHandler = employerAccountAuthorizationHandler;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumServiceClaimRequirement requirement)
@@ -28,10 +24,6 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 _logger.LogDebug("It is for employer, bypassing the rules for provider service claim");
                 // Marking this as succeeded as there are other handler which checks for whether employer is authorized.
                 context.Succeed(requirement);
-                //if (_employerAccountAuthorizationHandler.IsEmployerAuthorised(context, false))
-                //{
-                //    context.Succeed(requirement);
-                //}
             }
             else
             {
@@ -39,17 +31,18 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
                 if (highestServiceClaim.HasValue)
                 {
-
-                    _logger.LogDebug("Highetst service claim " + highestServiceClaim);
-                    _logger.LogDebug("minimum claim required " + requirement.MinimumServieClaim);
+                    _logger.LogDebug("claim that user has:" + highestServiceClaim);
+                    _logger.LogDebug("minimum claim required: " + requirement.MinimumServieClaim);
 
                     if (hasValidServiceClaim(highestServiceClaim.Value, requirement))
                     {
                         _logger.LogDebug("verified minimum claim requirement");
                         context.Succeed(requirement);
                     }
-
-                    _logger.LogDebug("failed minimum claim requirement");
+                    else
+                    {
+                        _logger.LogDebug("failed minimum claim requirement");
+                    }
                 }
                 else
                 {
