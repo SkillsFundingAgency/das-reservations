@@ -9,11 +9,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class AuthorizationService
     {
-        private const string ProviderAccountOwner = "DAA";
-        private const string ProviderContributorWithApproval = "DAB";
-        private const string ProviderContributor = "DAC";
-        private const string ProviderViewer = "DAV";
-
         public static void AddAuthorizationService(this IServiceCollection services)
         {
             services.AddAuthorization(options =>
@@ -87,18 +82,16 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
         private static bool HasValidServiceClaim(AuthorizationHandlerContext context)
         {
-            
             var validClaimsList =  Enum.GetNames(typeof(ServiceClaim)).ToList();
-            //var validClaims = new List<string> { ProviderAccountOwner, ProviderContributor, ProviderContributorWithApproval, ProviderViewer };
             var hasValidClaim = context.User.HasClaim(claim =>
                 claim.Type.Equals(ProviderClaims.Service) &&
                 validClaimsList.Any(x => claim.Value.Equals(x)));
 
             if (!hasValidClaim)
             {
-                // It was before looking for any service claim with any value - now changed it to only the valid list.
+                // It is looking for any service claim - without verifying the value.
                 hasValidClaim = context.User.FindAll(ProviderClaims.Service)
-                    .Select(c => c.Value).Any(x => x.Equals(x));
+                    .Select(c => c.Value).ToList().Any();
             }
             return hasValidClaim;
         }

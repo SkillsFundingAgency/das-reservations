@@ -145,15 +145,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.MinimumServiceClaimR
                 dictionary.Add(RouteValues.EmployerAccountId, "somevalue");
                 var routeData = new RouteData(dictionary);
 
-
                 ActionContext fakeActionContext =
-new ActionContext(Mock.Of<HttpContext>(),
-  routeData,
-  new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
+                    new ActionContext(Mock.Of<HttpContext>(),
+                    routeData,
+                    new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
 
                 AuthorizationFilterContext fakeAuthFilterContext =
-new AuthorizationFilterContext(fakeActionContext,
-  new List<IFilterMetadata> { });
+                    new AuthorizationFilterContext(fakeActionContext,
+                    new List<IFilterMetadata> { });
 
                 var claims = new List<Claim>();
                 
