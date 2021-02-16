@@ -87,12 +87,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 claim.Type.Equals(ProviderClaims.Service) &&
                 validClaimsList.Any(x => claim.Value.Equals(x)));
 
-            if (!hasValidClaim)
-            {
-                // It is looking for any service claim - without verifying the value.
-                hasValidClaim = context.User.FindAll(ProviderClaims.Service)
-                    .Select(c => c.Value).ToList().Any();
-            }
             return hasValidClaim;
         }
     }
