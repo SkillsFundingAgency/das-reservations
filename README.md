@@ -86,10 +86,14 @@ So, you'll also need an account legal entity to match with the account id:
 use [SFA.DAS.Reservations]
 
 insert into AccountLegalEntity
-(Id, AccountId, LegalEntityId, AccountLegalEntityId, AccountLegalEntityName, ReservationLimit, AgreementSigned, IsLevy, AgreementType)
+(Id, AccountId, LegalEntityId, AccountLegalEntityId, AccountLegalEntityName, ReservationLimit, AgreementSigned, IsLevy)
 values
-(newid(), 123, 456, 789, 'stubs r us', null, 1, 1, 0)
+(newid(), 123, 456, 789, 'stubs r us', null, 1, 1)
+
+Insert into [SFA.DAS.Reservations].[dbo].[Account] (Id, Name, IsLevy, ReservationLimit)
+Values (123, 'Account1', 0,10)
 ```
+If `"UseStub": true` then the starting url will be https://localhost:5001/accounts/WM6XRM/reservations (If reservation.web is running on port 5001)
 
 Likewise you if you are running in provider mode you will need to ensure you have db records that match values provided in provider permissions api stub, i.e. something like this: 
 
@@ -99,14 +103,18 @@ use [SFA.DAS.Reservations]
 insert into AccountLegalEntity
 (Id, AccountId, LegalEntityId, AccountLegalEntityId, AccountLegalEntityName, ReservationLimit, AgreementSigned, IsLevy, AgreementType)
 values
-(newid(), 1, 1, 123, 'Legal Entity 2', null, 1, 1, 0),
-(newid(), 1, 2, 456, 'Legal Entity 2', null, 1, 1, 0),
-(newid(), 1, 3, 789, 'Legal Entity 3', null, 1, 1, 0)
+(newid(), 123, 3, 789, 'Legal Entity 3', null, 1, 1)
 ```
 
-
+```
+  insert into [SFA.DAS.Reservations].[dbo].[ProviderPermission] (AccountId,AccountLegalEntityId, Ukprn, CanCreateCohort)
+  Values (123,789,10005077, 1)
+```
+For provider the starting url will be https://localhost:5001/{UKPRN}/reservations i.e. https://localhost:5001/{UKPRN}/reservations
 
 ## Authorization
 
 The API uses AzureAD for authentication. When running in DEV or LOCAL modes, the authentication attribute is not added. If you do enable authentication you will need to add the ```Authorization Bearer [TOKEN]``` header attribute to all requests. 
 
+#### Note:
+To run it locally - I had to replace method GetAccessTokenAsync of class ApiClient with one that returns an empty string. 
