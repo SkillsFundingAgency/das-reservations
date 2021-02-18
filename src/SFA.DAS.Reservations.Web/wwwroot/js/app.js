@@ -57,7 +57,15 @@ var slugify = function (text) {
 };
 
 
-var pageTitle = document.querySelector('h1.govuk-heading-xl').innerText;
+var pageTitle = document.querySelector('h1.govuk-heading-xl');
+var panelTitle = document.querySelector('h1.govuk-panel__title')
+var pageTitleText = null
+
+if (pageTitle !== null) {
+    pageTitleText = pageTitle.innerHTML.trim()
+} else if (panelTitle !== null) {
+    pageTitleText = panelTitle.innerHTML.trim()
+}
 
 // Radio button selection - dataLayer pushes
 var radioWrapper = document.querySelector('.govuk-radios');
@@ -67,13 +75,13 @@ if (radioWrapper !== null) {
     var dataLayerObj;
     nodeListForEach(radios, function(radio) {
         radio.addEventListener('change', function() {
-            labelText = this.nextElementSibling.innerText;
-            dataLayerObj = {
-                event: 'radio button selected',
-                page: pageTitle,
-                radio: labelText
-            }
-            window.dataLayer.push(dataLayerObj)
+        labelText = this.nextElementSibling.innerText;
+        dataLayerObj = {
+            event: 'radio button selected',
+            page: pageTitleText,
+            radio: labelText
+        }
+        window.dataLayer.push(dataLayerObj)
         })
     })
 }
