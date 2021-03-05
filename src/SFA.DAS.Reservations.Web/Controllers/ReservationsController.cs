@@ -30,6 +30,7 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.Controllers
 {
     [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
+    [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
     [ServiceFilter(typeof(LevyNotPermittedFilter))]
     public class ReservationsController : ReservationsBaseController
     {
@@ -370,7 +371,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
             return View(viewName, model);
         }
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]

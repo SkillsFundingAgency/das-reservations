@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -7,8 +9,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class AuthorizationService
     {
-        private const string ProviderDaa = "DAA";
-
         public static void AddAuthorizationService(this IServiceCollection services)
         {
             services.AddAuthorization(options =>
@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     {
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(ProviderClaims.ProviderUkprn);
-                        policy.RequireClaim(ProviderClaims.Service, ProviderDaa);
+                        policy.RequireAssertion(HasValidServiceClaim);
                         policy.Requirements.Add(new ProviderUkPrnRequirement());
                     });
                 options.AddPolicy(
@@ -47,6 +47,22 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
                     });
+                options.AddPolicy(
+                    PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer
+                    , policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
+                        ProviderOrEmployerAssertion(policy);
+                        policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAV));
+                    });
+                options.AddPolicy(
+                   PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer
+                   , policy =>
+                   {
+                       policy.RequireAuthenticatedUser();
+                       ProviderOrEmployerAssertion(policy);
+                       policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAC));
+                   });
             });
         }
 
@@ -56,9 +72,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             {
                 var hasUkprn = context.User.HasClaim(claim =>
                     claim.Type.Equals(ProviderClaims.ProviderUkprn));
-                var hasDaa = HasDaaClaim(context);
-
-                
+                var hasDaa = HasValidServiceClaim(context);
 
                 var hasEmployerAccountId = context.User.HasClaim(claim =>
                     claim.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
@@ -66,18 +80,14 @@ namespace SFA.DAS.Reservations.Web.AppStart
             });
         }
 
-        private static bool HasDaaClaim(AuthorizationHandlerContext context)
+        private static bool HasValidServiceClaim(AuthorizationHandlerContext context)
         {
-            var hasDaaClaim = context.User.HasClaim(claim =>
+            var validClaimsList =  Enum.GetNames(typeof(ServiceClaim)).ToList();
+            var hasValidClaim = context.User.HasClaim(claim =>
                 claim.Type.Equals(ProviderClaims.Service) &&
-                claim.Value.Equals(ProviderDaa));
+                validClaimsList.Any(x => claim.Value.Equals(x)));
 
-            if (!hasDaaClaim)
-            {
-                hasDaaClaim = context.User.FindAll(ProviderClaims.Service)
-                    .Select(c => c.Value).ToList().Any();
-            }
-            return hasDaaClaim;
+            return hasValidClaim;
         }
     }
 }
