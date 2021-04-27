@@ -1,4 +1,12 @@
 ﻿@{
+    @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+    {
+        ViewData["Title"] = "You do not have permission to access this page";
+    }
+    else
+    {
+        ViewData["Title"] = "Access denied";
+    }
     ViewBag.GaData.Vpv = "/error/403";
 }
 <main class="govuk-main-wrapper " id="main-content" role="main">
@@ -13,7 +21,7 @@
                 </h1>
 
                 <p class="gov-body">
-                    If you think you should have permission to access this page or want to confirm what permissions you have, contact an account owner.
+                    If you think you should have permission to access this page or want to confirm what permissions you have, contact an IdAMS super user.
                 </p>
 
                 <br>
