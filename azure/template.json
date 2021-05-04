@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceEnvironmentName": {
@@ -11,14 +11,22 @@
     "environmentName": {
       "type": "string"
     },
-    "appServiceAllowedIPs": {
-      "type": "array",
-      "defaultValue": []
+    "tags": {
+      "type": "object"
+    },
+    "resourceGroupLocation": {
+      "type": "string"
+    },
+    "frontEndAccessRestrictions": {
+      "type": "array"
     },
     "sharedEnvResourceGroup": {
       "type": "string"
     },
     "sharedFrontEndAppServicePlanName": {
+      "type": "string"
+    },
+    "sharedFrontEndSubnetResourceId": {
       "type": "string"
     },
     "configurationStorageConnectionString": {
@@ -53,7 +61,7 @@
     "keyVaultName": {
       "type": "string"
     },
-    "keyVaultResourceGroup": {
+    "sharedManagementResourceGroup": {
       "type": "string"
     },
     "loggingRedisConnectionString": {
@@ -66,12 +74,21 @@
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+    "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
     "employerAppServiceName": "[concat(variables('resourceNamePrefix'), 'emp-as')]",
     "providerAppServiceName": "[concat(variables('resourceNamePrefix'), 'prv-as')]"
   },
   "resources": [
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
+      "name": "[variables('resourceGroupName')]",
+      "type": "Microsoft.Resources/resourceGroups",
+      "location": "[parameters('resourceGroupLocation')]",
+      "tags": "[parameters('tags')]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2020-10-01",
       "name": "employer-app-service-certificate",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -89,13 +106,13 @@
             "value": "[parameters('keyVaultName')]"
           },
           "keyVaultResourceGroup": {
-            "value": "[parameters('keyVaultResourceGroup')]"
+            "value": "[parameters('sharedManagementResourceGroup')]"
           }
         }
       }
     },
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
       "name": "provider-app-service-certificate",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -113,7 +130,7 @@
             "value": "[parameters('keyVaultName')]"
           },
           "keyVaultResourceGroup": {
-            "value": "[parameters('keyVaultResourceGroup')]"
+            "value": "[parameters('sharedManagementResourceGroup')]"
           }
         }
       },
@@ -121,9 +138,10 @@
       ]
     },
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
       "name": "employer-application-insights",
       "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -138,12 +156,16 @@
             "value": "[variables('employerAppServiceName')]"
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[variables('resourceGroupName')]"
+      ]
     },
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
       "name": "employer-app-service",
       "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -159,6 +181,9 @@
           },
           "appServicePlanResourceGroup": {
             "value": "[parameters('sharedEnvResourceGroup')]"
+          },
+          "subnetResourceId": {
+            "value": "[parameters('sharedFrontEndSubnetResourceId')]"
           },
           "appServiceAppSettings": {
             "value": {
@@ -213,15 +238,19 @@
             "value": "[reference('employer-app-service-certificate').outputs.certificateThumbprint.value]"
           },
           "ipSecurityRestrictions": {
-            "value": "[parameters('appServiceAllowedIPs')]"
+            "value": "[parameters('frontEndAccessRestrictions')]"
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[variables('resourceGroupName')]"
+      ]
     },
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
       "name": "provider-application-insights",
       "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -236,12 +265,16 @@
             "value": "[variables('providerAppServiceName')]"
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[variables('resourceGroupName')]"
+      ]
     },
     {
-      "apiVersion": "2017-05-10",
+      "apiVersion": "2020-10-01",
       "name": "provider-app-service",
       "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -257,6 +290,9 @@
           },
           "appServicePlanResourceGroup": {
             "value": "[parameters('sharedEnvResourceGroup')]"
+          },
+          "subnetResourceId": {
+            "value": "[parameters('sharedFrontEndSubnetResourceId')]"
           },
           "appServiceAppSettings": {
             "value": {
@@ -307,18 +343,25 @@
             "value": "[reference('provider-app-service-certificate').outputs.certificateThumbprint.value]"
           },
           "ipSecurityRestrictions": {
-            "value": "[parameters('appServiceAllowedIPs')]"
+            "value": "[parameters('frontEndAccessRestrictions')]"
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[variables('resourceGroupName')]"
+      ]
     }
   ],
   "outputs": {
-    "employerAppServiceName": {
+    "ResourceGroupName": {
+      "type": "string",
+      "value": "[variables('resourceGroupName')]"
+    },
+    "EmployerAppServiceName": {
       "type": "string",
       "value": "[variables('employerAppServiceName')]"
     },
-    "providerAppServiceName": {
+    "ProviderAppServiceName": {
       "type": "string",
       "value": "[variables('providerAppServiceName')]"
     }
