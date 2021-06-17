@@ -28,8 +28,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Tests
                     AccountLegalEntityPublicHashedId = TestDataValues.LevyHashedAccountLegalEntityId,
                     AccountLegalEntityName = "Test Legal Entity",
                     IsLevy = true,
-                    LegalEntityId = 1,
-                    ReservationLimit = 5
+                    LegalEntityId = 1
                 }
             };
 
