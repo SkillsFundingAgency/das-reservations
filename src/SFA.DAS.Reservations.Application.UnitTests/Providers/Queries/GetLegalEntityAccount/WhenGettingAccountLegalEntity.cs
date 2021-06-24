@@ -33,8 +33,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalE
                 AccountLegalEntityId = 2,
                 AccountLegalEntityName = "Test entity",
                 AccountLegalEntityPublicHashedId = "ABC123",
-                LegalEntityId = 3,
-                ReservationLimit = 10
+                LegalEntityId = 3
             };
 
             _query = new GetAccountLegalEntityQuery();

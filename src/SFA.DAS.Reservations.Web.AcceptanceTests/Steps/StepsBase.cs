@@ -132,8 +132,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountPublicHashedId = TestDataValues.NonLevyPublicHashedAccountId,
                 AgreementSigned = true,
                 IsLevy = false,
-                LegalEntityId = 1,
-                ReservationLimit = 5
+                LegalEntityId = 1
             };
             TestData.Course = new Course("1", "Test Course", 1);
 
@@ -165,8 +164,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementSigned = true,
                 IsLevy = true,
-                LegalEntityId = 1,
-                ReservationLimit = 5
+                LegalEntityId = 1
             };
             TestData.Course = new Course("1", "Test Course", 1);
 
@@ -197,8 +195,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 AccountLegalEntityName = "Test Legal Entity",
                 AgreementSigned = true,
                 IsLevy = false,
-                LegalEntityId = 1,
-                ReservationLimit = 5
+                LegalEntityId = 1
             };
             TestData.Course = new Course("1", "Test Course", 1);
 

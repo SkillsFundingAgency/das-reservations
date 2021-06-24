@@ -62,8 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                 AccountLegalEntityPublicHashedId = _query.AccountLegalEntityPublicHashedId,
                 AccountLegalEntityName = "Test Employer",
                 AccountLegalEntityId = 123,
-                LegalEntityId = 456,
-                ReservationLimit = 3
+                LegalEntityId = 456
             };
 
             _expectedCohort = new Cohort()
