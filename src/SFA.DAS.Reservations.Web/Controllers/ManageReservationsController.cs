@@ -162,6 +162,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
 
         [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
+        [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
         [Route("{ukPrn}/reservations/{id}/delete", Name = RouteNames.ProviderDelete)]
         [Route("accounts/{employerAccountId}/reservations/{id}/delete", Name = RouteNames.EmployerDelete)]
         public async Task<IActionResult> Delete(ReservationsRouteModel routeModel)
