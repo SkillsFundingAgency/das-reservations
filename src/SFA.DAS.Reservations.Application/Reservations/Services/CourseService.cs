@@ -53,7 +53,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Services
 
         private async Task<IDictionary<string, Course>> GetCachedLookup()
         {
-            var lookup = await _cacheService.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)) ?? await CacheCoursesFromApi();
+          var lookup =  await CacheCoursesFromApi();
+            //var lookup = await _cacheService.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)) ?? await CacheCoursesFromApi();
             
             return lookup;
         }

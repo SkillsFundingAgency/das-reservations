@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,8 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
@@ -145,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    routeModel.CohortReference,false, It.IsAny<string>()))
+                    viewModel.CohortReference,false, It.IsAny<string>()))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -241,7 +244,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId,routeModel.UkPrn.Value));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    routeModel.CohortReference, false, It.IsAny<string>()))
+                    viewModel.CohortReference, false, It.IsAny<string>()))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -315,8 +318,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IConfiguration> configuration,
             SelectReservationsController controller)
         {
+            configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.CohortReference = string.Empty;
             viewModel.CohortReference = string.Empty;
             mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
@@ -335,6 +340,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Url.Should().Be(addApprenticeUrl);
         }
 
+
+
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_ReservationId_And_Not_CohortRef_Then_Redirects_To_AddApprentice_With_Reservation_Details(
             ReservationsRouteModel routeModel,
@@ -342,9 +349,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetReservationResult reservationResult,
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IConfiguration> configuration,
             [Frozen] Mock<IMediator> mockMediator,
             SelectReservationsController controller)
         {
+            configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.CohortReference = string.Empty;
             viewModel.CohortReference = string.Empty;
             mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),

@@ -157,6 +157,22 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             return FormatUrl(baseUrl, urlParameters);
         }
 
+        public string GenerateConfirmEmployerUrl(uint ukprn, string employerAccountLegalEntityPublicHashedId)
+        {
+            var queryString = $"?employerAccountLegalEntityPublicHashedId={employerAccountLegalEntityPublicHashedId}";
+
+            var urlParameters = new UrlParameters
+            {
+                Id = ukprn.ToString(),
+                Controller = "unapproved/add",
+                Action = "confirm-employer",
+                Folder = "",
+                QueryString = queryString
+            };
+
+            return FormatUrl(_options.ApprenticeUrl, urlParameters);
+        }
+
         private static string FormatUrl(string baseUrl, UrlParameters urlParameters)
         {
             var urlString = new StringBuilder();

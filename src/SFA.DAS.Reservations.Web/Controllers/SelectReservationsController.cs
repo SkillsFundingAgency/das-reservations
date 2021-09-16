@@ -58,8 +58,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
-                viewModel.CohortReference, journeyData:viewModel.JourneyData);
+            var backUrl = GetBackUrl(routeModel, viewModel);
             try
             {
                 var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
@@ -71,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
+                        CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
                         UkPrn = routeModel.UkPrn.Value
                     });
 
@@ -104,9 +103,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                     return Redirect(redirectResult);
                 }
-                
+
                 var availableReservationsResult = await _mediator.Send(
-                    new GetAvailableReservationsQuery {AccountId = cacheReservationEmployerCommand.AccountId});
+                    new GetAvailableReservationsQuery { AccountId = cacheReservationEmployerCommand.AccountId });
 
                 if (availableReservationsResult.Reservations != null &&
                     availableReservationsResult.Reservations.Any())
@@ -167,7 +166,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             catch (EmployerAgreementNotSignedException e)
             {
                 _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
-                
+
                 var routeName = RouteNames.EmployerTransactorSignAgreement;
                 if (routeModel.UkPrn.HasValue)
                 {
@@ -179,18 +178,33 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         EmployerUserRole.Owner, User.Claims))
                     {
                         routeName = RouteNames.EmployerOwnerSignAgreement;
-                    }    
+                    }
                 }
 
                 routeModel.IsFromSelect = true;
                 routeModel.PreviousPage = backUrl;
-                
+
                 return RedirectToRoute(routeName, routeModel);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error trying to render select reservation.");
                 return RedirectToRoute(RouteNames.Error500);
+            }
+        }
+
+        private string GetBackUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
+        {
+            if (_configuration["AuthType"] != null &&
+                _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase)
+                && string.IsNullOrWhiteSpace(viewModel.CohortReference) && routeModel.UkPrn.HasValue)
+            {
+                return _urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
+            }
+            else
+            {
+              return  _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                  viewModel.CohortReference, journeyData: viewModel.JourneyData);
             }
         }
 
@@ -203,8 +217,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel)
         {
-            var backUrl = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
-                routeModel.CohortReference, journeyData:viewModel.JourneyData);
+            var backUrl = GetBackUrl(routeModel, viewModel);
+            var isEmployerSelect = _configuration["AuthType"] != null &&
+                _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
 
             if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
             {
@@ -228,7 +243,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
                 var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
-                    viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference), journeyData: viewModel.JourneyData);
+                    viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect, journeyData: viewModel.JourneyData);
 
                 var addApprenticeUrl = url;
 
@@ -245,7 +260,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference),
+                        CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
                         UkPrn = routeModel.UkPrn.Value
                     });
 

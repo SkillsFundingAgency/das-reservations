@@ -53,13 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             
             var result = await validator.ValidateAsync(query);
 
-            result.IsValid().Should().BeFalse();
-            result.ValidationDictionary.Count.Should().Be(1);
-          
-            result.ValidationDictionary
-                .Should().ContainKey(nameof(GetProviderCacheReservationCommandQuery.CohortRef))
-                .WhichValue.Should()
-                .Be($"{nameof(GetProviderCacheReservationCommandQuery.CohortRef)} has not been supplied");
+            result.IsValid().Should().BeTrue();
         }
 
         [Test, AutoData]

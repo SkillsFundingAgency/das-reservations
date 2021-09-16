@@ -19,11 +19,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                 validationResult.AddError(nameof(query.AccountLegalEntityPublicHashedId));
             }
 
-            if (string.IsNullOrEmpty(query.CohortRef))
-            {
-                validationResult.AddError(nameof(query.CohortRef));
-            }
-
             return Task.FromResult(validationResult);
         }
     }
