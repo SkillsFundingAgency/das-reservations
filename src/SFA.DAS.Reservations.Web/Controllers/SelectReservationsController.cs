@@ -70,8 +70,9 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = (long?)( !string.IsNullOrEmpty(routeModel.CohortReference) ? 
-                        _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null),
+                        CohortId = 0,
+                        //(long?)( !string.IsNullOrEmpty(routeModel.CohortReference) ? 
+                        //_encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
@@ -261,7 +262,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
+                        //CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
                         UkPrn = routeModel.UkPrn.Value
                     });
 
