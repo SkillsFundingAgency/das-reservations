@@ -70,9 +70,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = null,
-                        //(long?)( !string.IsNullOrEmpty(routeModel.CohortReference) ? 
-                        //_encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null),
+                        CohortId = GetCohortId(routeModel.CohortReference),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
@@ -195,6 +193,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
+        private long? GetCohortId(string cohortReference)
+        {
+            long? result = null;
+            if (!string.IsNullOrEmpty(cohortReference))
+            {
+                result = _encodingService.Decode(cohortReference, EncodingType.CohortReference);
+            }
+
+            return result;
+        }
+
         private string GetBackUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
         {
             if (_configuration["AuthType"] != null &&
@@ -262,7 +271,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        //CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
+                        CohortId = GetCohortId(routeModel.CohortReference),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
