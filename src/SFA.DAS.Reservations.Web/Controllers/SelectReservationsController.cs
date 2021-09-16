@@ -70,7 +70,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     {
                         AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                         CohortRef = routeModel.CohortReference,
-                        CohortId = !string.IsNullOrEmpty(routeModel.CohortReference) ? _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null,
+                        CohortId = (long?)( !string.IsNullOrEmpty(routeModel.CohortReference) ? 
+                        _encodingService.Decode(routeModel.CohortReference, EncodingType.CohortReference) : null),
                         UkPrn = routeModel.UkPrn.Value
                     });
 
