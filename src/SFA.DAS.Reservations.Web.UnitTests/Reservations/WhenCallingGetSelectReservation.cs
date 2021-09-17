@@ -1142,5 +1142,64 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.RouteValues["PreviousPage"].Should().Be(cohortDetailsUrl);
             result.RouteValues["IsFromSelect"].Should().Be(true);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_The_Back_Link_Is_Select_Employer(
+       string confirmEmployerUrl,
+       ReservationsRouteModel routeModel,
+       SelectReservationViewModel viewModel,
+       Employer employer,
+       GetAvailableReservationsResult reservationsResult,
+       [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+       [Frozen] Mock<IMediator> mockMediator,
+       [Frozen] Mock<IConfiguration> configuration,
+       SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.CohortReference = string.Empty;
+            viewModel.CohortReference = string.Empty;
+            configuration.Setup(x => x["AuthType"]).Returns("provider");
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
+                        CohortRef = routeModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAvailableReservationsQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationsResult);
+            mockUrlHelper
+                .Setup(helper => helper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId))
+                .Returns(confirmEmployerUrl);
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be(ViewNames.Select);
+            var actualModel = result.Model as SelectReservationViewModel;
+            actualModel.Should().NotBeNull();
+            actualModel.CohortReference.Should().Be(viewModel.CohortReference);
+            actualModel.TransferSenderId.Should().Be(viewModel.TransferSenderId);
+            actualModel.BackLink.Should().Be(confirmEmployerUrl);
+            actualModel.AvailableReservations.Should().BeEquivalentTo(
+                reservationsResult.Reservations
+                    .Select(reservation => new AvailableReservationViewModel(reservation)));
+        }
     }
 }
