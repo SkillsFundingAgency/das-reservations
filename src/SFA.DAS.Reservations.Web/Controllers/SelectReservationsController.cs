@@ -193,32 +193,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        private long? GetCohortId(string cohortReference)
-        {
-            long? result = null;
-            if (!string.IsNullOrEmpty(cohortReference))
-            {
-                result = _encodingService.Decode(cohortReference, EncodingType.CohortReference);
-            }
-
-            return result;
-        }
-
-        private string GetBackUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
-        {
-            if (_configuration["AuthType"] != null &&
-                _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase)
-                && string.IsNullOrWhiteSpace(viewModel.CohortReference) && routeModel.UkPrn.HasValue)
-            {
-                return _urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
-            }
-            else
-            {
-              return  _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                  viewModel.CohortReference, journeyData: viewModel.JourneyData);
-            }
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
@@ -364,6 +338,32 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 IsEmptyCohortFromSelect = string.IsNullOrEmpty(cohortRef),
                 JourneyData = journeyData
             };
+        }
+
+        private long? GetCohortId(string cohortReference)
+        {
+            long? result = null;
+            if (!string.IsNullOrEmpty(cohortReference))
+            {
+                result = _encodingService.Decode(cohortReference, EncodingType.CohortReference);
+            }
+
+            return result;
+        }
+
+        private string GetBackUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
+        {
+            if (_configuration["AuthType"] != null &&
+                _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase)
+                && string.IsNullOrWhiteSpace(viewModel.CohortReference) && routeModel.UkPrn.HasValue)
+            {
+                return _urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
+            }
+            else
+            {
+                return _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+                    viewModel.CohortReference, journeyData: viewModel.JourneyData);
+            }
         }
 
     }
