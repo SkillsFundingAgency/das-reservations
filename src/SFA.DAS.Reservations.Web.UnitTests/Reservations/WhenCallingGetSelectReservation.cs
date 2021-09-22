@@ -477,10 +477,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen]Mock<IEncodingService> encodingService,
             [Frozen]Mock<IMediator> mediator,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
+            [Frozen] Mock<IConfiguration> config,
             SelectReservationsController controller
         )
         {
             //Arrange
+            config.Setup(x => x["AuthType"]).Returns("employer");
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             routeModel.UkPrn = null;
             viewModel.CohortReference = string.Empty;

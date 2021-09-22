@@ -303,9 +303,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (levyReservation != null)
             {
+                var isEmployerSelect = _configuration["AuthType"] != null &&
+                                      _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+
                 return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                     accountLegalEntityPublicHashedId, "", ukPrn, null,
-                    cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef),
+                    cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
                     transferSenderId, journeyData);
             }
             
