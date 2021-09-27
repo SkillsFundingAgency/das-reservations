@@ -24,5 +24,6 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
         string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false,
             string journeyData = "");
         string GenerateDashboardUrl(string accountId = null);
+        string GenerateConfirmEmployerUrl(uint ukprn, string employerAccountLegalEntityPublicHashedId);
     }
 }

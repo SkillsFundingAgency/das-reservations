@@ -75,11 +75,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                 throw new AccountLegalEntityNotFoundException(query.AccountLegalEntityPublicHashedId);
             }
 
-            var cohort = await _mediator.Send(new GetCohortQuery {CohortId = query.CohortId}, cancellationToken);
-
-            if (cohort.Cohort.AccountLegalEntityId != legalEntity.AccountLegalEntityId)
+            if (query.CohortId.HasValue)
             {
-                throw new ProviderNotAuthorisedException(legalEntity.AccountId, query.UkPrn);
+                var cohort = await _mediator.Send(new GetCohortQuery { CohortId = query.CohortId.Value }, cancellationToken);
+
+                if (cohort.Cohort.AccountLegalEntityId != legalEntity.AccountLegalEntityId)
+                {
+                    throw new ProviderNotAuthorisedException(legalEntity.AccountId, query.UkPrn);
+                }
             }
 
             return new GetProviderCacheReservationCommandResponse

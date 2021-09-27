@@ -41,7 +41,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             {
                 UkPrn = 12,
                 AccountLegalEntityPublicHashedId = "ABC123",
-                CohortRef = "1234"
+                CohortRef = "1234",
+                CohortId = 123
             };
 
             _handler = new GetProviderCacheReservationCommandQueryHandler(_mediator.Object, _validator.Object);
