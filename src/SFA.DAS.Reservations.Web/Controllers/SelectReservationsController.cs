@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     viewModel.TransferSenderId, viewModel.JourneyData,
                     cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                     routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
-                    routeModel.EmployerAccountId, userId);
+                    routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId);
                 if (!string.IsNullOrEmpty(redirectResult))
                 {
                     if (redirectResult == RouteNames.Error500)
@@ -288,7 +288,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return RedirectToRoute(routeName, routeModel);
         }
 
-        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId)
+        private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
         {  
             var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
             {
@@ -298,7 +298,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 UserId = userId,
                 AccountLegalEntityId = _encodingService.Decode(
                     accountLegalEntityPublicHashedId,
-                    EncodingType.PublicAccountLegalEntityId)
+                    EncodingType.PublicAccountLegalEntityId),
+                EncodedPledgeApplicationId = encodedPledgeApplicationId
             });
 
             if (levyReservation != null)

@@ -51,12 +51,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             
             var accountApiClient = new Mock<IAccountApiClient>();
 
+            var reservationsService = new Mock<IReservationsService>();
+
             var urlHelper = new Mock<IUrlHelper>();
             
             serviceCollection.AddSingleton(encodingService.Object);
             serviceCollection.AddSingleton(apiClient.Object);
             serviceCollection.AddSingleton<IEmployerAccountService, EmployerAccountService>();
             serviceCollection.AddSingleton(accountApiClient.Object);
+            serviceCollection.AddSingleton(reservationsService.Object);
             serviceCollection.AddSingleton(urlHelper.Object);
             serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
 
@@ -67,6 +70,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
             serviceCollection.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<IdentityServerConfiguration>>().Value);
+            serviceCollection.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
+            serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
+
 
             var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             serviceCollection.AddSingleton<IFileProvider>(physicalProvider);

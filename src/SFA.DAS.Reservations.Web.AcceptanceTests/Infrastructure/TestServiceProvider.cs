@@ -73,7 +73,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("Identity:ClientSecret", "test"),
                     new KeyValuePair<string, string>("Identity:ChangePasswordUrl", "test/{0}/"),
                     new KeyValuePair<string, string>("Identity:ChangeEmailUrl", "test/{0}/"),
-                    new KeyValuePair<string, string>("Identity:BaseAddress", "https://test.identity")
+                    new KeyValuePair<string, string>("Identity:BaseAddress", "https://test.identity"),
+                    new KeyValuePair<string, string>("ReservationsOuterApi:ApiBaseUrl", "https://local.test.com"),
+                    new KeyValuePair<string, string>("ReservationsOuterApi:SubscriptionKey", ""),
+                    new KeyValuePair<string, string>("ReservationsOuterApi:Version", "1.0"),
                 }
             };
 

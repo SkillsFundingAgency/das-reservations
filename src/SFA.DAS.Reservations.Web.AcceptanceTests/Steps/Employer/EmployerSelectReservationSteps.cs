@@ -9,6 +9,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.EAS.Account.Api.Types;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
@@ -41,20 +43,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             _viewModel.TransferSenderId = transferSenderPublicHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
 
-            var accountApiClient = Services.GetService<IAccountApiClient>();
-            var mock = Mock.Get(accountApiClient);
-
-            mock.Setup(x => x.GetTransferConnections(It.IsAny<string>()))
-                .ReturnsAsync(new List<TransferConnectionViewModel>
-                {
-                    new TransferConnectionViewModel
-                    {
-                        FundingEmployerAccountId = transferSenderAccountId,
-                        FundingEmployerAccountName = "Sender Transfer Account",
-                        FundingEmployerHashedAccountId = transferSenderHashedAccountId,
-                        FundingEmployerPublicHashedAccountId = transferSenderPublicHashedAccountId
-                    }
-                });
+            var reservationsClient = Services.GetService<IReservationsService>();
+            var mockReservations = Mock.Get(reservationsClient);
+            mockReservations.Setup(x => x.GetTransferValidity(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<int?>()))
+                .ReturnsAsync(() => new GetTransferValidityResponse{ IsValid = true });
         }
         
         [Given(@"I am a levy employer")]

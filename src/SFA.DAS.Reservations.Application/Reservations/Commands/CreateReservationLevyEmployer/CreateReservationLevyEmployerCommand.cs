@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
         public long? TransferSenderId { get; set; }
         public string TransferSenderEmployerAccountId { get; set; }
         public Guid? UserId { get; set; }
+        public string EncodedPledgeApplicationId { get; set; }
     }
 }

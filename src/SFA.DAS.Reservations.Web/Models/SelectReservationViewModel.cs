@@ -7,6 +7,7 @@ namespace SFA.DAS.Reservations.Web.Models
     {
         public string CohortReference { get; set; }
         public string TransferSenderId { get; set; }
+        public string EncodedPledgeApplicationId { get; set; }
         public string JourneyData { get; set; }
         public Guid? SelectedReservationId { get; set; }
         public IEnumerable<AvailableReservationViewModel> AvailableReservations { get; set; }

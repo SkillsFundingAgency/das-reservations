@@ -14,15 +14,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     {
         private readonly IEmployerAccountService _employerAccountService;
         private readonly IApiClient _apiClient;
+        private readonly IReservationsService _reservationsService;
         private readonly IEncodingService _encodingService;
         private readonly ReservationsApiConfiguration _config;
 
         public CreateReservationLevyEmployerCommandValidator(IEmployerAccountService employerAccountService,
-            IApiClient apiClient, IOptions<ReservationsApiConfiguration> config, IEncodingService encodingService)
+            IApiClient apiClient, IOptions<ReservationsApiConfiguration> config, IEncodingService encodingService, IReservationsService reservationsService)
         {
             _employerAccountService = employerAccountService;
             _apiClient = apiClient;
             _encodingService = encodingService;
+            _reservationsService = reservationsService;
             _config = config.Value;
         }
 
@@ -47,14 +49,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 
             if (!string.IsNullOrEmpty(query.TransferSenderEmployerAccountId))
             {
-                var transferConnections = await _employerAccountService.GetTransferConnections(_encodingService.Encode(query.AccountId,EncodingType.AccountId));
-                var connection = transferConnections.ToList().Find(c => c.FundingEmployerPublicHashedAccountId.Equals(query.TransferSenderEmployerAccountId));
-                if (connection == null)
-                {
-                    validationResult.FailedTransferReceiverCheck = true;
-                }
+                var pledgeApplicationId = string.IsNullOrWhiteSpace(query.EncodedPledgeApplicationId)
+                    ? default(int?)
+                    : (int) _encodingService.Decode(query.EncodedPledgeApplicationId, EncodingType.PledgeApplicationId);
+
+                var transferValidationResult = await _reservationsService.GetTransferValidity(query.TransferSenderId.Value, query.AccountId, pledgeApplicationId);
+
+                validationResult.FailedTransferReceiverCheck = !transferValidationResult.IsValid;
                 return validationResult;
             }
+
             var response =
                 await _apiClient.Get<AccountReservationStatusResponse>(
                     new AccountReservationStatusRequest(_config.Url, query.AccountId));
