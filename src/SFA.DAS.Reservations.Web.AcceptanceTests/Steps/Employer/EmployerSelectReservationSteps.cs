@@ -36,8 +36,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         [Given(@"I have a transfer receiver")]
         public void GivenIHaveATransferReceiver()
         {
-            const int transferSenderAccountId = 11;
-            const string transferSenderHashedAccountId = "AAA555";
             const string transferSenderPublicHashedAccountId = "BBB222";
 
             _viewModel.TransferSenderId = transferSenderPublicHashedAccountId;

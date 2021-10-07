@@ -17,7 +17,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
     public class WhenValidatingCreateReservationLevyEmployerCommand
     {
         private CreateReservationLevyEmployerCommandValidator _validator;
-        private Mock<IEmployerAccountService> _employerAccountService;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _config;
         private Mock<IEncodingService> _encodingService;
@@ -27,7 +26,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         private const long ExpectedAccountLegalEntityId = 9895;
         private const string ExpectedAccountHashedId = "CSQ212K";
         private const string ExpectedUrl = "https://test.local";
-        private CreateReservationLevyEmployerCommand CreateReservationLevyEmployerCommand;
         private GetTransferValidityResponse TransferValidityResponse;
 
         [SetUp]
@@ -40,7 +38,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                     x.GetTransferValidity(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<int?>()))
                 .ReturnsAsync(TransferValidityResponse);
 
-            _employerAccountService = new Mock<IEmployerAccountService>();
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
                 .ReturnsAsync(new AccountReservationStatusResponse
@@ -68,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _encodingService = new Mock<IEncodingService>();
             _encodingService.Setup(x => x.Encode(ExpectedAccountId, EncodingType.AccountId)).Returns(ExpectedAccountHashedId);
 
-            _validator = new CreateReservationLevyEmployerCommandValidator(_employerAccountService.Object, _apiClient.Object, _config.Object, _encodingService.Object, _reservationsService.Object);
+            _validator = new CreateReservationLevyEmployerCommandValidator(_apiClient.Object, _config.Object, _encodingService.Object, _reservationsService.Object);
         }
 
         [Test]

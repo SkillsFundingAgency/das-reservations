@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Validation;
@@ -12,16 +11,16 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
 {
     public class CreateReservationLevyEmployerCommandValidator : IValidator<CreateReservationLevyEmployerCommand>
     {
-        private readonly IEmployerAccountService _employerAccountService;
         private readonly IApiClient _apiClient;
         private readonly IReservationsService _reservationsService;
         private readonly IEncodingService _encodingService;
         private readonly ReservationsApiConfiguration _config;
 
-        public CreateReservationLevyEmployerCommandValidator(IEmployerAccountService employerAccountService,
-            IApiClient apiClient, IOptions<ReservationsApiConfiguration> config, IEncodingService encodingService, IReservationsService reservationsService)
+        public CreateReservationLevyEmployerCommandValidator(IApiClient apiClient,
+            IOptions<ReservationsApiConfiguration> config,
+            IEncodingService encodingService,
+            IReservationsService reservationsService)
         {
-            _employerAccountService = employerAccountService;
             _apiClient = apiClient;
             _encodingService = encodingService;
             _reservationsService = reservationsService;
