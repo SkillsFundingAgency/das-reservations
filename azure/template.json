@@ -29,6 +29,12 @@
     "sharedFrontEndSubnetResourceId": {
       "type": "string"
     },
+    "sharedApimResourceGroup": {
+      "type": "string"
+    },
+    "sharedApimName": {
+      "type": "string"
+    },    
     "configurationStorageConnectionString": {
       "type": "securestring"
     },
@@ -350,7 +356,55 @@
       "dependsOn": [
         "[variables('resourceGroupName')]"
       ]
-    }
+    },
+    {
+      "apiVersion": "2020-06-01",
+      "name": "apim-product-subscription-rsrv-emp",
+      "resourceGroup": "[parameters('sharedApimResourceGroup')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'apim/apim-subscription.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimName": {
+            "value": "[parameters('sharedApimName')]"
+          },
+          "subscriptionName": {
+            "value": "[variables('employerAppServiceName')]"
+          },
+          "subscriptionScope": {
+            "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('sharedApimResourceGroup'), '/providers/Microsoft.ApiManagement/service/', parameters('sharedApimName'), '/products/ReservationsOuterApi')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2020-06-01",
+      "name": "apim-product-subscription-rsrv-prv",
+      "resourceGroup": "[parameters('sharedApimResourceGroup')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'apim/apim-subscription.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimName": {
+            "value": "[parameters('sharedApimName')]"
+          },
+          "subscriptionName": {
+            "value": "[variables('providerAppServiceName')]"
+          },
+          "subscriptionScope": {
+            "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('sharedApimResourceGroup'), '/providers/Microsoft.ApiManagement/service/', parameters('sharedApimName'), '/products/ReservationsOuterApi')]"
+          }
+        }
+      }
+    }    
   ],
   "outputs": {
     "ResourceGroupName": {
