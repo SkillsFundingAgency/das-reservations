@@ -310,7 +310,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                     accountLegalEntityPublicHashedId, "", ukPrn, null,
                     cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
-                    transferSenderId, journeyData);
+                    transferSenderId, encodedPledgeApplicationId, journeyData);
             }
             
             return string.Empty;

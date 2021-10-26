@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
 
         public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId,
             string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
-            bool isEmptyEmployerCohort = false, string transferSenderId = "", string journeyData = "")
+            bool isEmptyEmployerCohort = false, string transferSenderId = "", string encodedPledgeApplicationId= "", string journeyData = "")
         {
             var queryString = $"?reservationId={reservationId}";
 
@@ -74,6 +74,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             if (!string.IsNullOrEmpty(transferSenderId))
             {
                 queryString += $"&transferSenderId={transferSenderId}";
+            }
+
+            if (!string.IsNullOrEmpty(encodedPledgeApplicationId))
+            {
+                queryString += $"&encodedPledgeApplicationId={encodedPledgeApplicationId}";
             }
 
             string controller = "unapproved", action, id;
