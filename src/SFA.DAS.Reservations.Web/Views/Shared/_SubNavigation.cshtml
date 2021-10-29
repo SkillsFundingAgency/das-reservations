@@ -59,7 +59,7 @@ else
                         }
                     </li>
                     <li class="das-navigation__list-item">
-                        <a asp-external-controller="apprentices" asp-external-folder="commitments/accounts" asp-external-action="home" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
+                        <a asp-external-controller="" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your team</a>
