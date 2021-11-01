@@ -5,8 +5,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
-using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -17,20 +17,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
     public class WhenValidatingCreateReservationLevyEmployerCommand
     {
         private CreateReservationLevyEmployerCommandValidator _validator;
-        private Mock<IEmployerAccountService> _employerAccountService;
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _config;
         private Mock<IEncodingService> _encodingService;
+        private Mock<IReservationsService> _reservationsService;
         private const string ExpectedTransferSenderEmployerAccountId = "TGB456";
         private const long ExpectedAccountId = 432;
         private const long ExpectedAccountLegalEntityId = 9895;
         private const string ExpectedAccountHashedId = "CSQ212K";
         private const string ExpectedUrl = "https://test.local";
+        private GetTransferValidityResponse TransferValidityResponse;
 
         [SetUp]
         public void Arrange()
         {
-            _employerAccountService = new Mock<IEmployerAccountService>();
+            TransferValidityResponse = new GetTransferValidityResponse{ IsValid = true };
+
+            _reservationsService = new Mock<IReservationsService>();
+            _reservationsService.Setup(x =>
+                    x.GetTransferValidity(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<int?>()))
+                .ReturnsAsync(TransferValidityResponse);
+
             _apiClient = new Mock<IApiClient>();
             _apiClient.Setup(x => x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()))
                 .ReturnsAsync(new AccountReservationStatusResponse
@@ -58,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _encodingService = new Mock<IEncodingService>();
             _encodingService.Setup(x => x.Encode(ExpectedAccountId, EncodingType.AccountId)).Returns(ExpectedAccountHashedId);
 
-            _validator = new CreateReservationLevyEmployerCommandValidator(_employerAccountService.Object, _apiClient.Object, _config.Object, _encodingService.Object);
+            _validator = new CreateReservationLevyEmployerCommandValidator(_apiClient.Object, _config.Object, _encodingService.Object, _reservationsService.Object);
         }
 
         [Test]
@@ -135,19 +142,41 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             Assert.True(result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)));
         }
 
-        [Test]
-        public async Task Then_If_There_Is_A_Transfer_Id_It_Is_Checked_To_See_If_It_Is_A_Valid_Receiver_And_The_Api_Is_Not_Checked_And_FailedAutoReservationCheck_Is_False()
+        [TestCase(null)]
+        [TestCase(789)]
+        public async Task Then_If_There_Is_A_Transfer_Sender_Then_Transfer_Is_Validated(int? pledgeApplicationId)
         {
             //Arrange
-            _employerAccountService.Setup(x =>
-                    x.GetTransferConnections(ExpectedAccountHashedId))
-                .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
-                {
-                    FundingEmployerAccountId = 78954,
-                    FundingEmployerAccountName = "Test",
-                    FundingEmployerHashedAccountId = "123EDC",
-                    FundingEmployerPublicHashedAccountId = ExpectedTransferSenderEmployerAccountId
-                }});
+            TransferValidityResponse.IsValid = false;
+
+            if (pledgeApplicationId.HasValue)
+            {
+                _encodingService.Setup(x => x.Decode("EncodedPledgeApplicationId", EncodingType.PledgeApplicationId))
+                    .Returns(pledgeApplicationId.Value);
+            }
+
+            var command = new CreateReservationLevyEmployerCommand
+            {
+                AccountId = ExpectedAccountId,
+                AccountLegalEntityId = 234,
+                TransferSenderId = 345,
+                TransferSenderEmployerAccountId = ExpectedTransferSenderEmployerAccountId,
+                EncodedPledgeApplicationId = pledgeApplicationId.HasValue ? "EncodedPledgeApplicationId" : string.Empty
+            };
+
+            //Act
+            await _validator.ValidateAsync(command);
+
+            //Assert
+            _reservationsService.Verify(x => x.GetTransferValidity(It.Is<long>(s => s == 345), It.Is<long>(r => r == ExpectedAccountId), It.Is<int?>(a => a == pledgeApplicationId)));
+        }
+
+        [Test]
+        public async Task Then_If_There_Is_A_Transfer_Sender_Then_Validation_Fails_If_Transfer_Is_Invalid()
+        {
+            //Arrange
+            TransferValidityResponse.IsValid = false;
+
             var command = new CreateReservationLevyEmployerCommand
             {
                 AccountId = ExpectedAccountId,
@@ -160,38 +189,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            _employerAccountService.Verify(x=>x.GetTransferConnections(ExpectedAccountHashedId));
-            Assert.IsFalse(result.FailedTransferReceiverCheck);
-            _apiClient.Verify(x=> x.Get<AccountReservationStatusResponse>(It.IsAny<AccountReservationStatusRequest>()), Times.Never);
-            Assert.IsFalse(result.FailedAutoReservationCheck);
+            Assert.IsTrue(result.FailedTransferReceiverCheck);
         }
 
         [Test]
-        public async Task Then_If_It_Is_Not_A_Valid_Receiver_The_FailedTransferReceiver_Flag_Is_Set()
+        public async Task Then_If_There_Is_A_Transfer_Sender_Then_Validation_Succeeds_If_Transfer_Is_Valid()
         {
             //Arrange
-            _employerAccountService.Setup(x =>
-                    x.GetTransferConnections(ExpectedTransferSenderEmployerAccountId))
-                .ReturnsAsync(new List<EmployerTransferConnection>{new EmployerTransferConnection
-                {
-                    FundingEmployerAccountId = 1,
-                    FundingEmployerAccountName = "Test",
-                    FundingEmployerHashedAccountId = "123EDC",
-                    FundingEmployerPublicHashedAccountId = "YTR34"
-                }});
+            TransferValidityResponse.IsValid = true;
+
             var command = new CreateReservationLevyEmployerCommand
             {
-                TransferSenderEmployerAccountId = ExpectedTransferSenderEmployerAccountId,
                 AccountId = ExpectedAccountId,
                 AccountLegalEntityId = 234,
-                TransferSenderId = 245
+                TransferSenderId = 345,
+                TransferSenderEmployerAccountId = ExpectedTransferSenderEmployerAccountId
             };
 
             //Act
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsTrue(result.FailedTransferReceiverCheck);
+            Assert.IsFalse(result.FailedTransferReceiverCheck);
         }
 
         [Test]

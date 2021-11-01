@@ -273,7 +273,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    false, string.Empty, viewModel.JourneyData))
+                    false, string.Empty, string.Empty, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -301,7 +301,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, viewModel.ProviderId,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    false, string.Empty, viewModel.JourneyData))
+                    false, string.Empty, string.Empty, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -332,7 +332,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, string.Empty, routeModel.EmployerAccountId,
-                    true, string.Empty, viewModel.JourneyData))
+                    true, string.Empty, string.Empty, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -363,7 +363,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    true, string.Empty, viewModel.JourneyData))
+                    true, string.Empty, string.Empty, viewModel.JourneyData))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;

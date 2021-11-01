@@ -81,6 +81,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>()))
                 .Returns(expectedUrl);
 
@@ -144,6 +145,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 routeModel.CohortReference,
                 routeModel.EmployerAccountId,
                 false,
+                "",
                 "",
                 ""))
                 .Returns(expectedUrl);
