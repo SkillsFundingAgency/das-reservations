@@ -24,5 +24,14 @@ namespace SFA.DAS.Reservations.Web.Models
         [FromQuery]
         public string JourneyData { get; set; }
 
+        [FromQuery]
+        public string searchTerm { get; set; }
+
+        [FromQuery]
+        public string SortField { get; set; }
+
+        [FromQuery]
+        public bool ReverseSort { get; set; }
+
     }
 }

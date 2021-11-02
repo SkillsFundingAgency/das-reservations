@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmp
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -90,22 +90,71 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
 
             var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
-            
-            
+          
             var eoiEmployers = new List<AccountLegalEntity>();
             foreach (var employer in getTrustedEmployersResponse.Employers)
             {
-                employer.AccountLegalEntityPublicHashedId = _encodingService.Encode(employer.AccountLegalEntityId,
-                    EncodingType.PublicAccountLegalEntityId);
-                eoiEmployers.Add(employer);
+                employer.AccountLegalEntityPublicHashedId = _encodingService.Encode(employer.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+
+                if (string.IsNullOrWhiteSpace(routeModel.searchTerm) ||
+                    employer.AccountName.Contains(routeModel.searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                    employer.AccountLegalEntityName.Contains(routeModel.searchTerm, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    eoiEmployers.Add(employer);
+                }
+            }
+
+            var sortModel = new SortModel
+            {
+                ReverseSort = routeModel.ReverseSort,
+                SortField = routeModel.SortField
+            };
+
+            if (string.IsNullOrWhiteSpace(sortModel.SortField))
+            {
+                
+            }
+            else
+            {
+                var prop = TypeDescriptor
+                    .GetProperties(typeof(AccountLegalEntity))
+                    .Find(sortModel.SortField, true);
+
+                eoiEmployers = sortModel.ReverseSort
+                    ? eoiEmployers.OrderByDescending(z => prop.GetValue(z)).ToList()
+                    : eoiEmployers.OrderBy(z => prop.GetValue(z)).ToList();
             }
 
             var viewModel = new ChooseEmployerViewModel
             {
-                Employers = eoiEmployers
+                Employers = eoiEmployers,
+                SearchTerm = routeModel.searchTerm,
+                SortModel = sortModel
             };
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        [Route("choose-employer-search", Name = RouteNames.ProviderChooseEmployerSearch)]
+        public async Task<JsonResult> ChooseEmployerSearch(ReservationsRouteModel routeModel, string searchTerm)
+        {
+            if (!routeModel.UkPrn.HasValue)
+            {
+                throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
+            }
+
+            var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+
+            var eoiEmployersAccount = getTrustedEmployersResponse.Employers
+                .Where(eoi => eoi.AccountName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
+                .Select(eoi => eoi.AccountName.ToUpper());
+
+            var eoiEmployersEmployer = getTrustedEmployersResponse.Employers
+                .Where(eoi => eoi.AccountLegalEntityName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
+                .Select(eoi => eoi.AccountLegalEntityName.ToUpper());
+
+            return Json(eoiEmployersAccount.Concat(eoiEmployersEmployer).Distinct().OrderBy(eoi => eoi));
         }
 
         [HttpGet]
@@ -126,7 +175,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 viewModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
                 viewModel.AccountName = result.AccountName;
                 return View(viewModel);
-
             }
 
             return View(viewModel);

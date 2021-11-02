@@ -1,12 +1,12 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
+﻿@using SFA.DAS.Reservations.Domain.Employers
+@using SFA.DAS.Reservations.Web.Infrastructure
 @model ChooseEmployerViewModel
-
 
 @{
     ViewBag.Title = "Choose which employer you’ll be reserving funding for";
     var routeData = new Dictionary<string, string>
     {
-        {"UkPrn",ViewContext.RouteData.Values["ukPrn"].ToString()}
+        {"UkPrn", ViewContext.RouteData.Values["ukPrn"].ToString()}
     };
 
     ViewBag.GaData.Vpv = "/reservations/choose-employer";
@@ -15,20 +15,51 @@
 <a asp-action="Index" asp-controller="ProviderReservations" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
-
-
-
         <div class="govuk-grid-column-two-thirds">
-
             <h1 class="govuk-heading-xl">Choose an employer</h1>
             <p>This is the employer you are reserving funds on behalf of.</p>
 
-            <p>@Model.Employers.Count() result@(Model.Employers.Count() != 1 ? "s" : null) found.</p>
-            <table class="govuk-table">
+            <form method="get" action="@Url.RouteUrl(RouteNames.ProviderChooseEmployer)">
+                <div class="app-search-form">
+                    <label for="search-form" class="govuk-body">
+                        Search employer name or account name
+                    </label>
+                    <div class="app-search-form__group">
+                        <input id="search-form" title="Search" name="searchTerm" value="@Model.SearchTerm" class="form-control app-search-form__input app-autocomplete" type="text" data-autocomplete-url="@Url.RouteUrl(RouteNames.ProviderChooseEmployerSearch)">
+                        <a href="search"><span class="icon search"></span></a>
+                        <div class="app-search-form__button-wrap">
+                            <button class="button app-search-form__button" type="submit">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            @if (!string.IsNullOrEmpty(@Model.SearchTerm))
+            {
+                <p><a href="@Url.RouteUrl(RouteNames.ProviderChooseEmployer)">Clear search</a></p>
+            }
+
+            <table class="govuk-table das-table--double-arrows">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="col">Employer</th>
-                        <th class="govuk-table__header" scope="col">Account name</th>
+                        <th class="govuk-table__header" scope="col">
+                            <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                               asp-route="@RouteNames.ProviderChooseEmployer"
+                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountLegalEntityName), Model.SearchTerm)"
+                               title="Sort the table by Employer">
+                                Employer
+                            </a>
+                        </th>
+                        <th class="govuk-table__header" scope="col">
+                            <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                               asp-route="@RouteNames.ProviderChooseEmployer"
+                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountName), Model.SearchTerm)"
+                               title="Sort the table by Employer">
+                                Account name
+                            </a>
+                        </th>
                         <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
                         <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>
                     </tr>
@@ -47,34 +78,33 @@
                             AccountLegalEntityName = employer.AccountLegalEntityName
                         };
 
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
-                        <td class="govuk-table__cell">@employer.AccountName</td>
-                        @if (employer.AgreementSigned)
-                        {
-                            <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
-                        }
-                        else
-                        {
-                            <td class="govuk-table__cell">Agreement not accepted</td>
-                        }
-                        <td class="govuk-table__cell govuk-table__cell--numeric">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
+                            <td class="govuk-table__cell">@employer.AccountName</td>
                             @if (employer.AgreementSigned)
                             {
-                                <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderConfirmEmployer, viewModel)">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                                <td class="govuk-table__cell">@employer.AccountLegalEntityPublicHashedId</td>
                             }
                             else
                             {
-                                <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderEmployerAgreementNotSigned, new {id = employer.AccountLegalEntityPublicHashedId})">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                                <td class="govuk-table__cell">Agreement not accepted</td>
                             }
-
-                        </td>
-                    </tr>
-            }
-            </tbody>
-        </table>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">
+                                @if (employer.AgreementSigned)
+                                {
+                                    <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderConfirmEmployer, viewModel)">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                                }
+                                else
+                                {
+                                    <a class="govuk-link" href="@Url.RouteUrl(RouteNames.ProviderEmployerAgreementNotSigned, new {id = employer.AccountLegalEntityPublicHashedId})">Select <span class="govuk-visually-hidden">@employer.AccountLegalEntityName</span></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 </main>
 
 
