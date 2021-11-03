@@ -55,6 +55,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IMediator> mockMediator,
             ProviderReservationsController controller)
         {
+            routeModel.searchTerm = null;
+            routeModel.SortField = null;
+
             encodingService.Setup(x => x.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
                 .Returns(accountLegalEntityPublicHashedId);
             expectedEmployers = expectedEmployers.Select(arg => new AccountLegalEntity
