@@ -40,9 +40,15 @@
             {
                 <p><a href="@Url.RouteUrl(RouteNames.ProviderChooseEmployer)">Clear search</a></p>
             }
-
-            <table class="govuk-table das-table--double-arrows">
-                <thead class="govuk-table__head">
+            
+            @if (Model.Employers.Count() == 0) 
+            {
+                <p>0 employers match <span class="govuk-!-font-weight-bold">'@Model.SearchTerm'</span></p>    
+            }
+            else
+            {
+                <table class="govuk-table das-table--double-arrows">
+                    <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="col">
                             <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
@@ -63,8 +69,8 @@
                         <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
                         <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>
                     </tr>
-                </thead>
-                <tbody class="govuk-table__body">
+                    </thead>
+                    <tbody class="govuk-table__body">
                     @foreach (var employer in Model.Employers)
                     {
                         uint.TryParse(ViewContext.RouteData.Values["ukPrn"].ToString(), out var ukPrn);
@@ -101,8 +107,9 @@
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
 </main>

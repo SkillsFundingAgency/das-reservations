@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
@@ -30,6 +31,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             IEnumerable<AccountLegalEntity> expectedEmployers,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<ISessionStorageService<GetTrustedEmployersResponse>> sessionStorageService,
             ProviderReservationsController controller)
         {
             mockMediator
@@ -40,7 +42,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = expectedEmployers});
-   
+        
+            sessionStorageService.Setup(x => x.Get()).Returns((GetTrustedEmployersResponse)null);
+
             await controller.ChooseEmployer(routeModel);
 
             mockMediator.Verify(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(),  It.IsAny<CancellationToken>()), Times.Once);
@@ -53,9 +57,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             List<AccountLegalEntity> expectedEmployers,
             [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<ISessionStorageService<GetTrustedEmployersResponse>> sessionStorageService,
             ProviderReservationsController controller)
         {
-            routeModel.searchTerm = null;
+            routeModel.SearchTerm = null;
             routeModel.SortField = null;
 
             encodingService.Setup(x => x.Encode(It.IsAny<long>(), EncodingType.PublicAccountLegalEntityId))
@@ -70,7 +75,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             mockMediator
                 .Setup(service => service.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse{Employers = expectedEmployers});
-            
+
+            sessionStorageService.Setup(x => x.Get()).Returns((GetTrustedEmployersResponse)null);
+
             var result = await controller.ChooseEmployer(routeModel);
 
             var viewModel = result.Should().BeOfType<ViewResult>()

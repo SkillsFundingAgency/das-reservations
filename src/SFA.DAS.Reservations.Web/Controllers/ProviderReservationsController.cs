@@ -29,12 +29,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IExternalUrlHelper _externalUrlHelper;
         private readonly IEncodingService _encodingService;
+        private readonly ISessionStorageService<GetTrustedEmployersResponse> _sessionStorageService;
 
-        public ProviderReservationsController(IMediator mediator, IExternalUrlHelper externalUrlHelper, IEncodingService encodingService) : base(mediator)
+        public ProviderReservationsController(
+            IMediator mediator, 
+            IExternalUrlHelper externalUrlHelper, 
+            IEncodingService encodingService,
+            ISessionStorageService<GetTrustedEmployersResponse> sessionStorageService) : base(mediator)
         {
             _mediator = mediator;
             _externalUrlHelper = externalUrlHelper;
             _encodingService = encodingService;
+            _sessionStorageService = sessionStorageService;
         }
 
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
@@ -89,16 +95,22 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
             }
 
-            var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
-          
+            var getTrustedEmployersResponse = _sessionStorageService.Get(); 
+
+            if (getTrustedEmployersResponse == null)
+            {
+                getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+                _sessionStorageService.Store(getTrustedEmployersResponse);
+            }
+
             var eoiEmployers = new List<AccountLegalEntity>();
             foreach (var employer in getTrustedEmployersResponse.Employers)
             {
                 employer.AccountLegalEntityPublicHashedId = _encodingService.Encode(employer.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
 
-                if (string.IsNullOrWhiteSpace(routeModel.searchTerm) ||
-                    employer.AccountName.Contains(routeModel.searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                    employer.AccountLegalEntityName.Contains(routeModel.searchTerm, StringComparison.CurrentCultureIgnoreCase))
+                if (string.IsNullOrWhiteSpace(routeModel.SearchTerm) ||
+                    employer.AccountName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                    employer.AccountLegalEntityName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase))
                 {
                     eoiEmployers.Add(employer);
                 }
@@ -110,25 +122,34 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 SortField = routeModel.SortField
             };
 
-            if (string.IsNullOrWhiteSpace(sortModel.SortField))
+            if (!string.IsNullOrWhiteSpace(sortModel.SortField))
             {
-                
-            }
-            else
-            {
-                var prop = TypeDescriptor
-                    .GetProperties(typeof(AccountLegalEntity))
-                    .Find(sortModel.SortField, true);
-
-                eoiEmployers = sortModel.ReverseSort
-                    ? eoiEmployers.OrderByDescending(z => prop.GetValue(z)).ToList()
-                    : eoiEmployers.OrderBy(z => prop.GetValue(z)).ToList();
+                if (sortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName))
+                {
+                    eoiEmployers = (sortModel.ReverseSort
+                        ? eoiEmployers.OrderByDescending(eoi => eoi.AccountLegalEntityName)
+                            .ThenBy(eoi => eoi.AccountName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)
+                        : eoiEmployers.OrderBy(eoi => eoi.AccountLegalEntityName)
+                            .ThenBy(eoi => eoi.AccountName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)).ToList();
+                }
+                else
+                {
+                    eoiEmployers = (sortModel.ReverseSort
+                        ? eoiEmployers.OrderByDescending(eoi => eoi.AccountName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)
+                        : eoiEmployers.OrderBy(eoi => eoi.AccountName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityName)
+                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)).ToList();
+                }
             }
 
             var viewModel = new ChooseEmployerViewModel
             {
                 Employers = eoiEmployers,
-                SearchTerm = routeModel.searchTerm,
+                SearchTerm = routeModel.SearchTerm,
                 SortModel = sortModel
             };
 
@@ -144,7 +165,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
             }
 
-            var getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
+            var getTrustedEmployersResponse = _sessionStorageService.Get();
 
             var eoiEmployersAccount = getTrustedEmployersResponse.Employers
                 .Where(eoi => eoi.AccountName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase))
