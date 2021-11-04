@@ -182,6 +182,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("confirm-employer/{id?}", Name=RouteNames.ProviderConfirmEmployer)]
         public async Task<IActionResult> ConfirmEmployer(ConfirmEmployerViewModel viewModel)
         {
+            _sessionStorageService.Delete();
 
             if (viewModel.Id.HasValue)
             {
