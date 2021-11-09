@@ -108,8 +108,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .Subject;
 
             viewModel.Employers.Count().Should().Be(expectedResults);
-            
-            viewModel.Employers.All(c => c.AccountLegalEntityPublicHashedId.Equals(accountLegalEntityPublicHashedId)).Should().BeTrue();
 
             if (viewModel.Employers.Any() && !string.IsNullOrWhiteSpace(sortField))
             {

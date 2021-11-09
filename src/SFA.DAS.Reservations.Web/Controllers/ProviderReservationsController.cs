@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmp
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -103,48 +103,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 _sessionStorageService.Store(getTrustedEmployersResponse);
             }
 
-            var eoiEmployers = new List<AccountLegalEntity>();
-            foreach (var employer in getTrustedEmployersResponse.Employers)
-            {
-                employer.AccountLegalEntityPublicHashedId = _encodingService.Encode(employer.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
-
-                if (string.IsNullOrWhiteSpace(routeModel.SearchTerm) ||
-                    employer.AccountName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                    employer.AccountLegalEntityName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    eoiEmployers.Add(employer);
-                }
-            }
-
             var sortModel = new SortModel
             {
                 ReverseSort = routeModel.ReverseSort,
                 SortField = routeModel.SortField
             };
 
-            if (!string.IsNullOrWhiteSpace(sortModel.SortField))
-            {
-                if (sortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName))
-                {
-                    eoiEmployers = (sortModel.ReverseSort
-                        ? eoiEmployers.OrderByDescending(eoi => eoi.AccountLegalEntityName)
-                            .ThenBy(eoi => eoi.AccountName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)
-                        : eoiEmployers.OrderBy(eoi => eoi.AccountLegalEntityName)
-                            .ThenBy(eoi => eoi.AccountName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)).ToList();
-                }
-                else
-                {
-                    eoiEmployers = (sortModel.ReverseSort
-                        ? eoiEmployers.OrderByDescending(eoi => eoi.AccountName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)
-                        : eoiEmployers.OrderBy(eoi => eoi.AccountName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityName)
-                            .ThenBy(eoi => eoi.AccountLegalEntityPublicHashedId)).ToList();
-                }
-            }
+            var eoiEmployers = getTrustedEmployersResponse.Employers
+                .Where(e => string.IsNullOrWhiteSpace(routeModel.SearchTerm) ||
+                            e.AccountName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                            e.AccountLegalEntityName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase))
+                .ToList();
+
+            eoiEmployers = eoiEmployers.Order(sortModel);
 
             var viewModel = new ChooseEmployerViewModel
             {
@@ -279,7 +250,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             };
 
             return View(viewModel);
-        
         }
     }
 }
