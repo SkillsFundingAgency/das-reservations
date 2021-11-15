@@ -111,9 +111,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var eoiEmployers = getTrustedEmployersResponse.Employers
                 .Where(e => string.IsNullOrWhiteSpace(routeModel.SearchTerm) ||
-                            e.AccountName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                            e.AccountLegalEntityName.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase))
+                            e.AccountName.Replace(" ", string.Empty).Contains(routeModel.SearchTerm.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase) ||
+                            e.AccountLegalEntityName.Replace(" ", string.Empty).Contains(routeModel.SearchTerm.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase))
                 .ToList();
+
 
             eoiEmployers = eoiEmployers.Order(sortModel);
 
