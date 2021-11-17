@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -115,7 +116,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 new ProviderReservationsController(
                     sp.GetService<IMediator>(),
                     sp.GetService<IExternalUrlHelper>(),
-                    sp.GetService<IEncodingService>()
+                    sp.GetService<IEncodingService>(),
+                    sp.GetService<ISessionStorageService<GetTrustedEmployersResponse>>()
                 )
                 {
                     ControllerContext = GetControllerContext<ProviderReservationsController>()

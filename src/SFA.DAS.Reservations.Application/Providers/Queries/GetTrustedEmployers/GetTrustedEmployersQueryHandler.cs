@@ -7,8 +7,6 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
 {
@@ -48,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers
             
             return new GetTrustedEmployersResponse
             {
-                Employers = trustedEmployers
+                Employers = trustedEmployers.OrderBy(te => te.AccountLegalEntityName).ThenBy(te => te.AccountName)
             };
         }
     }
