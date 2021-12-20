@@ -441,7 +441,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var possibleDates = globalRule == null
                 ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
-                : dates.Where(d => d.StartDate < globalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
+                : dates.Where(d => d.StartDate >= globalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
