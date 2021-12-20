@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
@@ -50,7 +53,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var reservations = new List<ReservationViewModel>();
 
             var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+            var globalRules = await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = decodedAccountId });
             var reservationsResult = await _mediator.Send(new GetReservationsQuery{AccountId = decodedAccountId});
+            var hasReservationDatesAvailable = true;
+
+            if(globalRules.ActiveRule.HasValue && globalRules.ActiveRule.Value == Domain.Rules.GlobalRuleType.DynamicPause)
+            {
+                var availableDates = await _mediator.Send(new GetAvailableDatesQuery());
+                var globalRule = globalRules.AccountFundingRules.GlobalRules.Where(r => r != null).OrderBy(x => x.ActiveFrom).First();
+
+                hasReservationDatesAvailable = globalRule.ActiveTo < availableDates.AvailableDates.First().EndDate;
+            }
 
             foreach (var reservation in reservationsResult.Reservations)
             {
@@ -74,6 +87,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return View(ViewNames.EmployerManage, new ManageViewModel
             {
+                HasReservationDatesAvailable = hasReservationDatesAvailable,
                 Reservations = reservations,
                 BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId)
             });

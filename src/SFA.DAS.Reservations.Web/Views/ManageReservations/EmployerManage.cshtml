@@ -36,7 +36,20 @@ else
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">Your funding reservations</h1>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
+                    @if (!Model.HasReservationDatesAvailable)
+                    {
+                        <div class="govuk-inset-text">
+                            Reserving government funding for apprenticeship training and assessment is currently paused.
+                            <br><br>
+                            For apprenticeships with a planned start date in April 2022 you will be able to reserve funding, from your 2022 to 2023 funding allowance from 1 February 2022.
+                            <br><br>
+                            Any funding you've already secured is unaffected by this change.
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="govuk-heading-m"><a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
+                    }
                 </div>
             </div>
 
@@ -66,7 +79,9 @@ else
                                 {
                                     @if (reservation.Status == ReservationStatusViewModel.Pending)
                                     {
-                                        <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a><br />
+                                        <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+
+                                        <br />
                                         <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                     }
                                     else

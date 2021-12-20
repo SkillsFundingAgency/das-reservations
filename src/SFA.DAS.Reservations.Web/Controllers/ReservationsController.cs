@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -431,14 +432,23 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var accountLegalEntityId = _encodingService.Decode(
                 accountLegalEntityPublicHashedId,
                 EncodingType.PublicAccountLegalEntityId);
+            var decodedAccountId = _encodingService.Decode(accountId, EncodingType.AccountId);
+
+            var globalRules = await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = decodedAccountId });
+            var globalRule = globalRules.AccountFundingRules.GlobalRules.Where(r => r != null).OrderBy(x => x.ActiveFrom).FirstOrDefault();
+
             var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
+
+            var possibleDates = globalRule == null
+                ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
+                : dates.Where(d => d.StartDate < globalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
             return new ApprenticeshipTrainingViewModel
             {
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
-                PossibleStartDates = dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate),
+                PossibleStartDates = possibleDates,
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,

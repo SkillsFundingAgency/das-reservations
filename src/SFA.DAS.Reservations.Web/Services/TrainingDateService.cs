@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.Services
             var datesToUse = await _mediator.Send(new GetAvailableDatesQuery
                 {AccountLegalEntityId = accountLegalEntityId});
             
-            return await Task.FromResult(datesToUse.AvailableDates);
+            return datesToUse.AvailableDates;
         }
     }
 }
