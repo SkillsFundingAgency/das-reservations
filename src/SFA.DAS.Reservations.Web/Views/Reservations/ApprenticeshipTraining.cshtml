@@ -105,18 +105,13 @@
                                     When will the apprenticeship training start?
                                 </h2>
                             </legend>
-                            <span id="choose-start-date-hint" class="govuk-hint">
-                                The apprenticeship training can start anytime in the month you choose or the following 2 months.
-                            </span>
-                        }
-                        else
-                        {
-                            <span id="choose-start-date-hint" class="govuk-hint">
-                                The apprentice can start their apprenticeship training anytime in the month you choose, or the following 2 months.
-                            </span>
                         }
 
-                        @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
+                        <span id="choose-start-date-hint" class="govuk-hint">
+                            Select the month for the planned start date of the apprenticeship.
+                        </span>
+
+                        @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule)
 
                         @if (startDateInvalid)
                         {
