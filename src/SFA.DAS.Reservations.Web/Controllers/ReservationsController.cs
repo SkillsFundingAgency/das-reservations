@@ -435,7 +435,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var accountLegalEntityId = _encodingService.Decode(
                 accountLegalEntityPublicHashedId,
                 EncodingType.PublicAccountLegalEntityId);
-            var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
@@ -450,11 +449,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
 
+            var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
+
+            var possibleDates = activeGlobalRule == null
+                ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
+                : dates.Where(d => d.StartDate >= activeGlobalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
+
             return new ApprenticeshipTrainingViewModel
             {
                 ActiveGlobalRule = activeGlobalRule,
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
-                PossibleStartDates = dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate),
+                PossibleStartDates = possibleDates,
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,
