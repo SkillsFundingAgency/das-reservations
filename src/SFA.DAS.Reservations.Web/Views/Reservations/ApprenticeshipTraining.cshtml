@@ -94,7 +94,7 @@
                 }
                 else
                 {
-                    <input asp-for="CourseId" name="SelectedCourseId" type="hidden"/>
+                    <input asp-for="CourseId" name="SelectedCourseId" type="hidden" />
                 }
                 <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset">
@@ -115,6 +115,12 @@
                                 The apprentice can start their apprenticeship training anytime in the month you choose, or the following 2 months.
                             </span>
                         }
+
+                        <div class="govuk-inset-text">
+                            <p>Reserving government funding for apprenticeship training and assessment is currently paused.</p>
+                            <p>You will be able to reserve apprenticeship funding for @Model.ActiveRuleActiveToDateText apprenticeship starts from February 2022.</p>
+                            <p>Any funding you've already secured (transfers or reservations) is unaffected by this change.</p>
+                        </div>
 
                         @if (startDateInvalid)
                         {

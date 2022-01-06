@@ -60,7 +60,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _testRule = new GlobalRule
             {
                 Id = 2,
-                ActiveFrom = DateTime.Now.AddDays(-2),
+                ActiveFrom = new DateTime(2022, 1, 1),
+                ActiveTo = new DateTime(2022, 4, 1),
                 RuleType = GlobalRuleType.FundingPaused
             };
         }
@@ -138,6 +139,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "Index");
             Assert.AreEqual(GlobalRuleType.DynamicPause, vm.ActiveGlobalRule.RuleType);
+            Assert.AreEqual("April 2022", vm.ActiveRuleActiveToDateText);
         }
 
         [Test]

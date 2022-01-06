@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public GlobalRule ActiveGlobalRule { get; set; }
         public string FindApprenticeshipTrainingUrl { get; set; }
         public string ApprenticeshipFundingRulesUrl { get; set; }
+        public string ActiveRuleActiveToDateText => ActiveGlobalRule.ActiveTo?.ToString("MMMM yyyy");
     }
 }

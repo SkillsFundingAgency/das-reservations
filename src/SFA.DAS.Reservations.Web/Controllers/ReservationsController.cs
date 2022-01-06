@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -42,12 +44,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private readonly IExternalUrlHelper _urlHelper;
 
         public ReservationsController(
-            IMediator mediator, 
-            ITrainingDateService trainingDateService, 
+            IMediator mediator,
+            ITrainingDateService trainingDateService,
             IOptions<ReservationsWebConfiguration> configuration,
             ILogger<ReservationsController> logger,
             IEncodingService encodingService,
-            IExternalUrlHelper urlHelper) :base(mediator)
+            IExternalUrlHelper urlHelper) : base(mediator)
         {
             _mediator = mediator;
             _trainingDateService = trainingDateService;
@@ -97,8 +99,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(viewModel.RouteName);
             }
 
-            var claim = routeModel.UkPrn != null ? 
-                HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)) : 
+            var claim = routeModel.UkPrn != null ?
+                HttpContext.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)) :
                 HttpContext.User.Claims.First(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier));
 
             var claimValue = claim.Value;
@@ -123,15 +125,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (routeModel.Id.HasValue)
             {
-                cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
+                cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.GetValueOrDefault() });
                 //todo: error handling if fails validation e.g. id not found, redirect to index.
             }
-            
+
             var viewModel = await BuildApprenticeshipTrainingViewModel(
-                routeModel.UkPrn != null, 
-                cachedReservation?.AccountLegalEntityPublicHashedId, 
-                cachedReservation?.CourseId, 
-                cachedReservation?.TrainingDate, 
+                routeModel.UkPrn != null,
+                cachedReservation?.AccountLegalEntityPublicHashedId,
+                cachedReservation?.CourseId,
+                cachedReservation?.TrainingDate,
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
                 routeModel.UkPrn,
@@ -148,7 +150,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             TrainingDateModel trainingDateModel = null;
-            
+
             try
             {
                 if (!string.IsNullOrWhiteSpace(formModel.StartDate))
@@ -157,31 +159,31 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     var model = await BuildApprenticeshipTrainingViewModel(
-                        isProvider, 
-                        formModel.AccountLegalEntityPublicHashedId, 
-                        formModel.SelectedCourseId, 
+                        isProvider,
+                        formModel.AccountLegalEntityPublicHashedId,
+                        formModel.SelectedCourseId,
                         trainingDateModel,
                         formModel.FromReview,
                         formModel.CohortRef,
                         routeModel.UkPrn,
                         routeModel.EmployerAccountId);
-                       
+
                     return View("ApprenticeshipTraining", model);
                 }
-                
-                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.GetValueOrDefault()});
 
-                if(isProvider)
-				{             
-	                var courseCommand = new CacheReservationCourseCommand
-	                {
-	                    Id = cachedReservation.Id,
-	                    SelectedCourseId = formModel.SelectedCourseId,
-	                    UkPrn = routeModel.UkPrn
-	                };
+                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.GetValueOrDefault() });
 
-	                await _mediator.Send(courseCommand);
-				}
+                if (isProvider)
+                {
+                    var courseCommand = new CacheReservationCourseCommand
+                    {
+                        Id = cachedReservation.Id,
+                        SelectedCourseId = formModel.SelectedCourseId,
+                        UkPrn = routeModel.UkPrn
+                    };
+
+                    await _mediator.Send(courseCommand);
+                }
 
                 var startDateCommand = new CacheReservationStartDateCommand
                 {
@@ -198,15 +200,15 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 {
                     ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
                 }
-                
+
                 var model = await BuildApprenticeshipTrainingViewModel(
-                    isProvider, 
-                    formModel.AccountLegalEntityPublicHashedId, 
+                    isProvider,
+                    formModel.AccountLegalEntityPublicHashedId,
                     formModel.SelectedCourseId,
-                    trainingDateModel, 
+                    trainingDateModel,
                     formModel.FromReview,
                     formModel.CohortRef,
-                    routeModel.UkPrn, 
+                    routeModel.UkPrn,
                     routeModel.EmployerAccountId);
                 return View("ApprenticeshipTraining", model);
             }
@@ -216,7 +218,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
             }
 
-            var reviewRouteName = isProvider ? 
+            var reviewRouteName = isProvider ?
                 RouteNames.ProviderReview :
                 RouteNames.EmployerReview;
 
@@ -261,11 +263,11 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var viewModel = new ReviewViewModel(
                 routeModel,
-                cachedReservation.TrainingDate, 
-                cachedReservation.CourseDescription, 
-                cachedReservation.AccountLegalEntityName, 
+                cachedReservation.TrainingDate,
+                cachedReservation.CourseDescription,
+                cachedReservation.AccountLegalEntityName,
                 cachedReservation.AccountLegalEntityPublicHashedId);
-            
+
             return View(viewModel.ViewName, viewModel);
         }
 
@@ -313,7 +315,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 routeModel.AccountLegalEntityPublicHashedId = result.AccountLegalEntityPublicHashedId;
                 routeModel.CohortReference = result.CohortRef;
                 routeModel.JourneyData = result.JourneyData;
-                
+
 
                 if (result.IsEmptyCohortFromSelect)
                 {
@@ -371,7 +373,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
             return View(viewName, model);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
@@ -388,16 +390,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 case CompletedReservationWhatsNext.RecruitAnApprentice:
                     var recruitUrl = routeModel.UkPrn.HasValue
-                        ? _urlHelper.GenerateUrl(new UrlParameters {
-                            SubDomain = "recruit", 
+                        ? _urlHelper.GenerateUrl(new UrlParameters
+                        {
+                            SubDomain = "recruit",
                             Id = routeModel.UkPrn.ToString()
                         })
-                        : _urlHelper.GenerateUrl(new UrlParameters {
-                            SubDomain = "recruit", 
+                        : _urlHelper.GenerateUrl(new UrlParameters
+                        {
+                            SubDomain = "recruit",
                             Folder = "accounts",
                             Id = routeModel.EmployerAccountId
                         });
-                        
+
                     return Redirect(recruitUrl);
 
                 case CompletedReservationWhatsNext.FindApprenticeshipTraining:
@@ -416,12 +420,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
             }
         }
 
-        
+
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
-            string courseId = null, 
-            TrainingDateModel selectedTrainingDate = null, 
+            string courseId = null,
+            TrainingDateModel selectedTrainingDate = null,
             bool? routeModelFromReview = false,
             string cohortRef = "",
             uint? ukPrn = null,
@@ -435,8 +439,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
+            long? decodedEmployerAccountId = null;
+
+            if (!string.IsNullOrEmpty(accountId))
+            {
+                decodedEmployerAccountId = _encodingService.Decode(
+                    accountId,
+                    EncodingType.AccountId);
+            }
+
+            var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
+
             return new ApprenticeshipTrainingViewModel
             {
+                ActiveGlobalRule = activeGlobalRule,
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
                 PossibleStartDates = dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate),
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
@@ -446,8 +462,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CohortRef = cohortRef,
                 FromReview = routeModelFromReview,
                 BackLink = isProvider ?
-                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, accountId) 
-                    : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse 
+                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, accountId)
+                    : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse
             };
         }
 
@@ -460,6 +476,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return _urlHelper.GenerateCohortDetailsUrl(ukPrn, accountId, cohortRef);
 
+        }
+
+        private async Task<GlobalRule> GetActiveGlobalRule(long? employerAccountId = null)
+        {
+            if (employerAccountId.HasValue)
+            {
+                return (await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = employerAccountId.Value })).ActiveRule;
+            }
+
+            var response = await _mediator.Send(new GetFundingRulesQuery());
+            return response.ActiveGlobalRules.OrderBy(x => x.ActiveFrom).FirstOrDefault();
         }
     }
 }
