@@ -20,11 +20,7 @@
                 <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">apprenticeship training course</a> the apprentice will take, which can be changed later</li>
             </ul>
 
-            <div class="govuk-inset-text">
-                <p>Reserving government funding for apprenticeship training and assessment is currently paused.</p>
-                <p>You will be able to reserve apprenticeship funding for @Model.ActiveRuleActiveToDateText apprenticeship starts.</p>
-                <p>Any funding you've already secured (transfers or reservations) is unaffected by this change.</p>
-            </div>
+            @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
 
             <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>

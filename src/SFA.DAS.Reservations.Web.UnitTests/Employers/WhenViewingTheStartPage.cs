@@ -139,7 +139,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             Assert.IsNotNull(view);
             Assert.AreEqual(view.ViewName, "Index");
             Assert.AreEqual(GlobalRuleType.DynamicPause, vm.ActiveGlobalRule.RuleType);
-            Assert.AreEqual("April 2022", vm.ActiveRuleActiveToDateText);
+            Assert.AreEqual("April 2022", vm.ActiveGlobalRule.ActiveRuleActiveToDateText);
         }
 
         [Test]

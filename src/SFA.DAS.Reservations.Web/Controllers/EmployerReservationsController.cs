@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case GlobalRuleType.ReservationLimit:
                         return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
                     default:
-                        viewModel.ActiveGlobalRule = activeGlobalRule; 
+                        viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule); 
                         return View("Index", viewModel);
                 }
             }

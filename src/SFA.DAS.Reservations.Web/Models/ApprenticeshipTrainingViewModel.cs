@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -12,7 +11,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get; set; }
         public string CohortRef { get; set; }
         public bool? FromReview { get; set; }
-        public GlobalRule ActiveGlobalRule { get; set; }
-        public string ActiveRuleActiveToDateText => ActiveGlobalRule.ActiveTo?.ToString("MMMM yyyy");
+        public GlobalRuleViewModel ActiveGlobalRule { get; set; }
     }
 }

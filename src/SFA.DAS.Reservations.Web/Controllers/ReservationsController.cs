@@ -457,7 +457,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             return new ApprenticeshipTrainingViewModel
             {
-                ActiveGlobalRule = activeGlobalRule,
+                ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule),
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
                 PossibleStartDates = possibleDates,
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
@@ -487,7 +487,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (employerAccountId.HasValue)
             {
-                return (await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = employerAccountId.Value })).ActiveRule;
+                return (await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = employerAccountId.Value }))?.ActiveRule;
             }
 
             var response = await _mediator.Send(new GetFundingRulesQuery());
