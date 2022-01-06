@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundin
             var rules = await _fundingRulesService.GetAccountFundingRules(request.AccountId);
             result.AccountFundingRules = rules;
 
-            result.ActiveRule = rules?.GlobalRules?.FirstOrDefault(x => x != null)?.RuleType;
+            result.ActiveRule = rules?.GlobalRules.Where(r => r != null).OrderBy(x => x.ActiveFrom).FirstOrDefault();
 
 
             return result;

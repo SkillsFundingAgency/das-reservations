@@ -33,6 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         private Mock<IExternalUrlHelper> _externalUrlHelper;
         private Mock<IUrlHelper> _urlHelper;
         private ReservationsRouteModel _routeModel;
+        private GlobalRule _testRule;
         
         [SetUp]
         public void Arrange()
@@ -55,6 +56,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _controller = fixture.Create<EmployerReservationsController>();
 
             _controller.Url = _urlHelper.Object;
+
+            _testRule = new GlobalRule
+            {
+                Id = 2,
+                ActiveFrom = DateTime.Now.AddDays(-2),
+                RuleType = GlobalRuleType.FundingPaused
+            };
         }
 
         [Test]
@@ -68,7 +76,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     {
                         GlobalRules = new List<GlobalRule>()
                     },
-                    ActiveRule = GlobalRuleType.None
+                    ActiveRule = null
                 });
 
             //act 
@@ -90,15 +98,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 {
                     GlobalRules = new List<GlobalRule>
                     {
-                        new GlobalRule 
-                        {
-                            Id = 2, 
-                            ActiveFrom = DateTime.Now.AddDays(-2),
-                            RuleType = GlobalRuleType.FundingPaused
-                        }
+                        _testRule
                     }
                 },
-                ActiveRule = GlobalRuleType.FundingPaused
+                ActiveRule = _testRule
             });
 
             //act 
@@ -113,6 +116,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage()
         {
             //arrange
+            _testRule.RuleType = GlobalRuleType.ReservationLimit;
+
             _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAccountFundingRulesResult
                 {
@@ -120,15 +125,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     {
                         GlobalRules = new List<GlobalRule>
                         {
-                            new GlobalRule 
-                            {
-                                Id = 2, 
-                                ActiveFrom = DateTime.Now.AddDays(-2),
-                                RuleType = GlobalRuleType.ReservationLimit
-                            }
+                            _testRule
                         }
                     },
-                    ActiveRule = GlobalRuleType.ReservationLimit
+                    ActiveRule = _testRule
                 });
 
             //act
@@ -144,6 +144,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task IfReservationLimitRuleExists_AndNoCohortIsAvailable_ThenUseEmployerManagePageAsBackLink()
         {
             //arrange
+            _testRule.RuleType = GlobalRuleType.ReservationLimit;
             _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAccountFundingRulesResult
                 {
@@ -151,15 +152,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     {
                         GlobalRules = new List<GlobalRule>
                         {
-                            new GlobalRule 
-                            {
-                                Id = 2, 
-                                ActiveFrom = DateTime.Now.AddDays(-2),
-                                RuleType = GlobalRuleType.ReservationLimit
-                            }
+                            _testRule
                         }
                     },
-                    ActiveRule = GlobalRuleType.ReservationLimit
+                    ActiveRule = _testRule
                 });
 
             //No cohort means request came from manage reservations page
@@ -185,6 +181,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task IfReservationLimitRuleExists_AndCohortIsAvailable_ThenUseCohortDetailsPageAsBackLink()
         {
             //arrange
+            _testRule.RuleType = GlobalRuleType.ReservationLimit;
+
             _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAccountFundingRulesResult
                 {
@@ -192,15 +190,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     {
                         GlobalRules = new List<GlobalRule>
                         {
-                            new GlobalRule 
-                            {
-                                Id = 2, 
-                                ActiveFrom = DateTime.Now.AddDays(-2),
-                                RuleType = GlobalRuleType.ReservationLimit
-                            }
+                            _testRule
                         }
                     },
-                    ActiveRule = GlobalRuleType.ReservationLimit
+                    ActiveRule = _testRule
                 });
 
             

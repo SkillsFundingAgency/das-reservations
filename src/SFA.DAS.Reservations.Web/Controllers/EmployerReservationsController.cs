@@ -85,14 +85,14 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var accountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
 
                 var response = await _mediator.Send(new GetAccountFundingRulesQuery{ AccountId = accountId});
-                var activeGlobalRuleType = response?.ActiveRule;
+                var activeGlobalRule = response?.ActiveRule;
 
-	            if (activeGlobalRuleType == null)
+	            if (activeGlobalRule == null)
 	            {
 	                return View("Index", viewModel);
 	            }
 
-                switch (activeGlobalRuleType)
+                switch (activeGlobalRule.RuleType)
                 {
                     case GlobalRuleType.FundingPaused:
                         return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
@@ -100,6 +100,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case GlobalRuleType.ReservationLimit:
                         return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
                     default:
+                        viewModel.ActiveGlobalRule = activeGlobalRule; 
                         return View("Index", viewModel);
                 }
             }
