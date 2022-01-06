@@ -113,6 +113,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         }
 
         [Test]
+        public async Task ThenContinueWithActiveRuleSet_IfDynamicPauseFundingRulesExist()
+        {
+            //arrange
+            _testRule.RuleType = GlobalRuleType.DynamicPause;
+            _mockMediator.Setup(x => x.Send(It.Is<GetAccountFundingRulesQuery>(q => q.AccountId.Equals(ExpectedAccountId)), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAccountFundingRulesResult
+                {
+                    AccountFundingRules = new GetAccountFundingRulesApiResponse
+                    {
+                        GlobalRules = new List<GlobalRule>
+                    {
+                        _testRule
+                    }
+                    },
+                    ActiveRule = _testRule
+                });
+
+            //act 
+            var view = await _controller.Start(_routeModel) as ViewResult;
+            var vm = view.Model as EmployerStartViewModel;
+
+            //assert
+            Assert.IsNotNull(view);
+            Assert.AreEqual(view.ViewName, "Index");
+            Assert.AreEqual(GlobalRuleType.DynamicPause, vm.ActiveGlobalRule.RuleType);
+        }
+
+        [Test]
         public async Task IfReservationLimitRuleExists_ThenRedirectToReservationLimitReachedPage()
         {
             //arrange
