@@ -10,9 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.Employers.Queries;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
-using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -32,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [SetUp]
         public void Arrange()
         {
-            var fixture = new Fixture().Customize(new AutoMoqCustomization {ConfigureMembers = true});
+            var fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
             _mediator = fixture.Freeze<Mock<IMediator>>();
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetFundingRulesResult
@@ -71,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         }
 
         [Test]
-        public async Task ThenWillBeRedirectedToFundingStoppedPageIfGlobalRuleExists()
+        public async Task ThenWillBeRedirectedToFundingStoppedPageIfFindingPausedGlobalRuleExists()
         {
             //Arrange
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
@@ -80,7 +78,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                     AccountRules = new List<ReservationRule>(),
                     GlobalRules = new List<GlobalRule>
                     {
-                        new GlobalRule{ActiveFrom = DateTime.Now.AddDays(-2)}
+                        new GlobalRule
+                        {
+                            ActiveFrom = DateTime.Now.AddDays(-2),
+                            RuleType = GlobalRuleType.FundingPaused
+                        }
                     }
                 });
 
@@ -93,13 +95,39 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         }
 
         [Test]
+        public async Task ThenWillBeRedirectedToStartPageIfDynamicPauseGlobalRuleExists()
+        {
+            //Arrange
+            _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetFundingRulesResult
+                {
+                    AccountRules = new List<ReservationRule>(),
+                    GlobalRules = new List<GlobalRule>
+                    {
+                        new GlobalRule
+                        {
+                            ActiveFrom = DateTime.Now.AddDays(-2),
+                            RuleType = GlobalRuleType.DynamicPause
+                        }
+                    }
+                });
+
+            //Act
+            var result = await _controller.Start(123, true) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ViewName);
+        }
+
+        [Test]
         public async Task Then_The_No_Permissions_View_Is_Shown_If_You_Have_No_Employers_To_Act_On_Behalf_Of()
         {
             //Arrange
             _mediator.Setup(m => m.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetTrustedEmployersResponse
                 {
-                    Employers = new List<AccountLegalEntity> ()
+                    Employers = new List<AccountLegalEntity>()
                 });
 
             //Act
@@ -115,16 +143,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             string expectedBackLink,
             uint ukprn,
             [Frozen] Mock<IMediator> mockMediator,
-            GetFundingRulesResult result,
             [Frozen] Mock<IUrlHelper> mockUrlHelper,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            GlobalRule rule,
             ProviderReservationsController controller)
         {
             //Arrange
-            rule.ActiveFrom = DateTime.UtcNow.AddDays(-5);
-            result.GlobalRules.Add(rule);
-            
+            var result = new GetFundingRulesResult
+            {
+                GlobalRules = new List<GlobalRule>
+                {
+                    new GlobalRule
+                    {
+                        ActiveFrom = DateTime.UtcNow.AddDays(-5),
+                        ActiveTo = DateTime.UtcNow.AddDays(35),
+                        RuleType = GlobalRuleType.FundingPaused
+                    }
+                }
+            };
+
             mockMediator
                 .Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), CancellationToken.None))
                 .ReturnsAsync(result);
@@ -142,7 +178,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.NotNull(viewResult);
             Assert.NotNull(viewResult.Model as string);
             Assert.AreEqual(expectedBackLink, viewResult.Model as string);
-            mockUrlHelper.Verify(x => x.RouteUrl(It.Is<UrlRouteContext>(y => y.RouteName == RouteNames.ProviderManage)),Times.Once);
+            mockUrlHelper.Verify(x => x.RouteUrl(It.Is<UrlRouteContext>(y => y.RouteName == RouteNames.ProviderManage)), Times.Once);
             mockExternalUrlHelper.Verify(x => x.GenerateDashboardUrl(It.IsAny<string>()), Times.Never);
         }
 
@@ -151,16 +187,23 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IMediator> mockMediator,
             string expectedBackLink,
             uint ukPrn,
-            GetFundingRulesResult result,
             [Frozen] Mock<IUrlHelper> mockUrlHelper,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            GlobalRule rule,
             ProviderReservationsController controller)
         {
             //Arrange
-            
-            rule.ActiveFrom = DateTime.UtcNow.AddDays(-5);
-            result.GlobalRules.Add(rule);
+            var result = new GetFundingRulesResult
+            {
+                GlobalRules = new List<GlobalRule>
+                { 
+                    new GlobalRule
+                    {
+                        ActiveFrom = DateTime.UtcNow.AddDays(-5),
+                        ActiveTo = DateTime.UtcNow.AddDays(35),
+                        RuleType = GlobalRuleType.FundingPaused
+                    }
+                }
+            };
 
             mockMediator
                 .Setup(x => x.Send(It.IsAny<GetFundingRulesQuery>(), CancellationToken.None))

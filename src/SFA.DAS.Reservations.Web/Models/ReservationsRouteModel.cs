@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.Authorization.ModelBinding;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
@@ -9,6 +8,7 @@ namespace SFA.DAS.Reservations.Web.Models
         [FromRoute]
         public uint? UkPrn { get; set; }
         public string EmployerAccountId { get; set; }
+        public string PublicHashedEmployerAccountId { get; set; }
         public Guid? Id { get; set; }
         public string AccountLegalEntityPublicHashedId { get; set; }
         public bool? FromReview { get; set; }

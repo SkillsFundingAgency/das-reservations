@@ -12,6 +12,6 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules
 
         public IEnumerable<ReservationRule> ActiveAccountRules => AccountRules?.Where(rule =>
             rule.ActiveFrom <= DateTime.Now && rule.ActiveTo >= DateTime.Now) ?? new List<ReservationRule>();
-        public IEnumerable<GlobalRule> ActiveGlobalRules  => GlobalRules?.Where(rule => rule.ActiveFrom <= DateTime.Now) ?? new List<GlobalRule>();
+        public IEnumerable<GlobalRule> ActiveGlobalRules  => GlobalRules?.Where(rule => rule.ActiveFrom <= DateTime.Now && (rule.ActiveTo == null || rule.ActiveTo >= DateTime.Now)) ?? new List<GlobalRule>();
     }
 }

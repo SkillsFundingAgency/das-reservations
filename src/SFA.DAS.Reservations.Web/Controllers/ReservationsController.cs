@@ -137,7 +137,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
                 routeModel.UkPrn,
-                routeModel.EmployerAccountId);
+                routeModel.EmployerAccountId,
+                routeModel.PublicHashedEmployerAccountId);
 
             return View(viewModel);
         }
@@ -429,7 +430,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             bool? routeModelFromReview = false,
             string cohortRef = "",
             uint? ukPrn = null,
-            string accountId = "")
+            string hashedEmployerAccountId = "",
+            string publicHashedEmployerAccountId = "")
 
         {
             var accountLegalEntityId = _encodingService.Decode(
@@ -440,11 +442,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             long? decodedEmployerAccountId = null;
 
-            if (!string.IsNullOrEmpty(accountId))
+            if (!string.IsNullOrEmpty(hashedEmployerAccountId))
             {
                 decodedEmployerAccountId = _encodingService.Decode(
-                    accountId,
+                    hashedEmployerAccountId,
                     EncodingType.AccountId);
+            }
+            else if (!string.IsNullOrEmpty(publicHashedEmployerAccountId))
+            {
+                decodedEmployerAccountId = _encodingService.Decode(
+                    publicHashedEmployerAccountId,
+                    EncodingType.PublicAccountId);
             }
 
             var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
@@ -467,7 +475,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 CohortRef = cohortRef,
                 FromReview = routeModelFromReview,
                 BackLink = isProvider ?
-                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, accountId)
+                    GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, hashedEmployerAccountId)
                     : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse
             };
         }
@@ -490,8 +498,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return (await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = employerAccountId.Value }))?.ActiveRule;
             }
 
-            var response = await _mediator.Send(new GetFundingRulesQuery());
-            return response.ActiveGlobalRules.OrderBy(x => x.ActiveFrom).FirstOrDefault();
+            return null;
         }
     }
 }

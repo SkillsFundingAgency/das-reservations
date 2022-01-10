@@ -112,7 +112,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockMediator.Verify(provider => provider.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockMediator.Verify(provider => provider.Send(It.IsAny<GetAccountFundingRulesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]
