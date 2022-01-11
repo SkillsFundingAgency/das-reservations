@@ -85,7 +85,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     case GlobalRuleType.DynamicPause:
                         viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule);
                         break;
-                        // TODO: Set globalrule same as employer side
                 }               
             }
 
