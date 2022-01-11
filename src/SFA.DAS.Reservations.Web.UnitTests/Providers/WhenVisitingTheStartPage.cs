@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         }
 
         [Test]
-        public async Task ThenWillBeRedirectedToFundingStoppedPageIfFindingPausedGlobalRuleExists()
+        public async Task ThenWillBeRedirectedToFundingStoppedPageIfFundingPausedGlobalRuleExists()
         {
             //Arrange
             _mediator.Setup(m => m.Send(It.IsAny<GetFundingRulesQuery>(), It.IsAny<CancellationToken>()))
