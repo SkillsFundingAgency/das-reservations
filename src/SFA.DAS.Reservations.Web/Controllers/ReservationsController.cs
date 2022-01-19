@@ -132,12 +132,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var viewModel = await BuildApprenticeshipTrainingViewModel(
                 routeModel.UkPrn != null,
                 cachedReservation?.AccountLegalEntityPublicHashedId,
-                cachedReservation?.AccountId ?? _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId),
                 cachedReservation?.CourseId,
                 cachedReservation?.TrainingDate,
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
-                routeModel.UkPrn);
+                routeModel.UkPrn,
+                routeModel.EmployerAccountId,
+                routeModel.PublicHashedEmployerAccountId);
 
             return View(viewModel);
         }
@@ -150,7 +151,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             TrainingDateModel trainingDateModel = null;
-            var employerAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
 
             try
             {
@@ -162,12 +162,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     var model = await BuildApprenticeshipTrainingViewModel(
                         isProvider,
                         formModel.AccountLegalEntityPublicHashedId,
-                        employerAccountId,
                         formModel.SelectedCourseId,
                         trainingDateModel,
                         formModel.FromReview,
                         formModel.CohortRef,
-                        routeModel.UkPrn);
+                        routeModel.UkPrn,
+                        routeModel.EmployerAccountId);
 
                     return View("ApprenticeshipTraining", model);
                 }
@@ -205,13 +205,12 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 var model = await BuildApprenticeshipTrainingViewModel(
                     isProvider,
                     formModel.AccountLegalEntityPublicHashedId,
-                    employerAccountId,
                     formModel.SelectedCourseId,
                     trainingDateModel,
                     formModel.FromReview,
                     formModel.CohortRef,
-                    routeModel.UkPrn);
-
+                    routeModel.UkPrn,
+                    routeModel.EmployerAccountId);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
@@ -426,22 +425,37 @@ namespace SFA.DAS.Reservations.Web.Controllers
         private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
             bool isProvider,
             string accountLegalEntityPublicHashedId,
-            long accountId,
             string courseId = null,
             TrainingDateModel selectedTrainingDate = null,
             bool? routeModelFromReview = false,
             string cohortRef = "",
-            uint? ukPrn = null)
+            uint? ukPrn = null,
+            string hashedEmployerAccountId = "",
+            string publicHashedEmployerAccountId = "")
 
         {
-            var hashedEmployerAccountId = _encodingService.Encode(accountId, EncodingType.AccountId);
             var accountLegalEntityId = _encodingService.Decode(
                 accountLegalEntityPublicHashedId,
                 EncodingType.PublicAccountLegalEntityId);
 
             var coursesResult = await _mediator.Send(new GetCoursesQuery());
 
-            var activeGlobalRule = await GetActiveGlobalRule(accountId);
+            long? decodedEmployerAccountId = null;
+
+            if (!string.IsNullOrEmpty(hashedEmployerAccountId))
+            {
+                decodedEmployerAccountId = _encodingService.Decode(
+                    hashedEmployerAccountId,
+                    EncodingType.AccountId);
+            }
+            else if (!string.IsNullOrEmpty(publicHashedEmployerAccountId))
+            {
+                decodedEmployerAccountId = _encodingService.Decode(
+                    publicHashedEmployerAccountId,
+                    EncodingType.PublicAccountId);
+            }
+
+            var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
 
             var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
 
