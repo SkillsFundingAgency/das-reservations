@@ -25,13 +25,9 @@ else
 <main class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Reserving government funding for apprenticeship training and assessment is currently paused</h1>
-            <p class="govuk-body">You will be able to reserve apprenticeship funding for April 2022 apprenticeship starts from February 2022.</p>
-            <p class="govuk-body">Any funding you've already secured (transfers or reservations) is unaffected by this change.</p>
-
             @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
             {
-                @*<h1 class="govuk-heading-xl">Funding restrictions</h1>
+                <h1 class="govuk-heading-xl">Funding restrictions</h1>
                 <div class="govuk-warning-text">
                     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
                     <strong class="govuk-warning-text__text">
@@ -39,15 +35,16 @@ else
                         This employer has reached their limit for active funding reservations and cannot reserve any more funding at this time.
                     </strong>
                 </div>
-                <p class="govuk-body">Any funding you have previously reserved for this employer is unaffected by this restriction.</p>*@
+                <p class="govuk-body">Any funding you have previously reserved for this employer is unaffected by this restriction.</p>
                 <a asp-external-controller="Account" role="button" draggable="false" tabindex="1" class="govuk-button">Return to account</a>
             }
             else
             {
-               @* <h1 class="govuk-heading-xl">Reservation limit reached</h1>
-                <p class="govuk-body">You have reached the limit of the number of funding reservations you can make.</p>*@
+                <h1 class="govuk-heading-xl">Reservation limit reached</h1>
+                <p class="govuk-body">You have reached the limit of the number of funding reservations you can make.</p>
                 <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" tabindex="1" class="govuk-button">Return to account</a>
             }
+
         </div>
     </div>
 </main>
