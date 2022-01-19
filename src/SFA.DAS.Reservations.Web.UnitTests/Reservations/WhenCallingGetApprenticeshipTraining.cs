@@ -83,15 +83,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task If_Provider_Then_It_Calls_To_Get_Account_Global_Rules(
+        public async Task If_Provider_Then_It_Calls_To_Get_Account_Global_Rules_With_Cached_Reservation_Account_Id(
             ReservationsRouteModel routeModel,
             GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,
             long accountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            [Frozen] Mock<ITrainingDateService> mockStartDateService,
-            ReservationsController controller)
+            ReservationsController controller,
+            string hashedAccountId)
         {
             routeModel.EmployerAccountId = string.Empty;
 
@@ -105,14 +105,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Returns(accountLegalEntityId);
 
             mockEncodingService
-                .Setup(service => service.Decode(
-                    routeModel.EmployerAccountId,
+                .Setup(service => service.Encode(
+                    cachedReservationResult.AccountId,
                     EncodingType.AccountId))
-                .Returns(accountId);
+                .Returns(hashedAccountId);
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    hashedAccountId,
+                    EncodingType.AccountId))
+                .Returns(cachedReservationResult.AccountId);
 
             await controller.ApprenticeshipTraining(routeModel);
 
-            mockMediator.Verify(provider => provider.Send(It.IsAny<GetAccountFundingRulesQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockMediator.Verify(provider => provider.Send(It.Is<GetAccountFundingRulesQuery>(x => x.AccountId == cachedReservationResult.AccountId), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test, MoqAutoData]

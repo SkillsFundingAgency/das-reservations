@@ -129,6 +129,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found, redirect to index.
             }
 
+            var hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId) 
+                ? routeModel.EmployerAccountId
+                : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
+
             var viewModel = await BuildApprenticeshipTrainingViewModel(
                 routeModel.UkPrn != null,
                 cachedReservation?.AccountLegalEntityPublicHashedId,
@@ -137,8 +141,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 routeModel.FromReview ?? false,
                 cachedReservation?.CohortRef,
                 routeModel.UkPrn,
-                routeModel.EmployerAccountId,
-                routeModel.PublicHashedEmployerAccountId);
+                hashedEmployerAccountId);
 
             return View(viewModel);
         }
