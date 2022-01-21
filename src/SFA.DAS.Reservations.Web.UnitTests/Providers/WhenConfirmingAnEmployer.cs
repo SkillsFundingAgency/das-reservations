@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             Assert.IsNotNull(redirectResult);
             Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, redirectResult.RouteName);
             Assert.AreEqual(viewModel.UkPrn,redirectResult.RouteValues["UkPrn"]);
-            Assert.AreEqual(viewModel.AccountPublicHashedId,redirectResult.RouteValues["EmployerAccountId"]);
+            Assert.AreEqual(viewModel.AccountPublicHashedId,redirectResult.RouteValues["PublicHashedEmployerAccountId"]);
         }
 
         [Test, MoqAutoData]

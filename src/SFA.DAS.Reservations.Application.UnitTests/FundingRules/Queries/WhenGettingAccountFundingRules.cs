@@ -130,7 +130,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedRules.GlobalRules.First().RuleType,result.ActiveRule);
+            Assert.AreEqual(expectedRules.GlobalRules.First().RuleType, result.ActiveRule.RuleType);
 
         }
 
@@ -166,8 +166,47 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedRules.GlobalRules.First(x=>x!=null).RuleType, result.ActiveRule);
+            Assert.AreEqual(expectedRules.GlobalRules.First(x=>x!=null).RuleType, result.ActiveRule.RuleType);
+        }
 
+        [Test, MoqAutoData]
+        public async Task If_Multiple_GlobalRulesReturned_ThenSetsTheEarliestStartingRuleAsActive(
+            [Frozen] long accountId)
+
+        {
+            //Arrange
+            var expectedRules = new GetAccountFundingRulesApiResponse()
+            {
+                GlobalRules = new List<GlobalRule>()
+                {
+                    new GlobalRule
+                    {
+                        Id = accountId,
+                        ActiveFrom = System.DateTime.Now.AddDays(-1),
+                        RuleType = GlobalRuleType.ReservationLimit,
+                    },
+                    new GlobalRule
+                    {
+                        Id = accountId,
+                        ActiveFrom = System.DateTime.Now.AddDays(-20),
+                        RuleType = GlobalRuleType.DynamicPause,
+                    }
+                }
+
+            };
+            _query = new GetAccountFundingRulesQuery { AccountId = accountId };
+
+            _validator.Setup(m => m.ValidateAsync(_query))
+                .ReturnsAsync(new ValidationResult());
+
+            _fundingRulesService.Setup(m => m.GetAccountFundingRules(accountId)).ReturnsAsync(expectedRules);
+            _handler = new GetAccountFundingRulesQueryHandler(_fundingRulesService.Object, _validator.Object);
+
+            //Act
+            var result = await _handler.Handle(_query, CancellationToken.None);
+
+            //Assert
+            Assert.AreEqual(GlobalRuleType.DynamicPause, result.ActiveRule.RuleType);
         }
 
         [Test, MoqAutoData]

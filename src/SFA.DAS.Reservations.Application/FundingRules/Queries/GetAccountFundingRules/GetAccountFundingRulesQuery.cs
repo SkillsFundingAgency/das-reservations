@@ -5,6 +5,5 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundin
     public class GetAccountFundingRulesQuery : IRequest<GetAccountFundingRulesResult>
     {
         public long AccountId { get; set; }
-        
     }
 }

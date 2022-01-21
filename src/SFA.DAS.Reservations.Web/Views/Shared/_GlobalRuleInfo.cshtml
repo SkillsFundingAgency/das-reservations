@@ -1,0 +1,12 @@
+@using SFA.DAS.Reservations.Domain.Rules;
+
+@model GlobalRuleViewModel
+
+@if (Model != null && Model.RuleType == GlobalRuleType.DynamicPause)
+{
+    <div class="govuk-inset-text">
+        <p>Reserving government funding for apprenticeship training and assessment is currently paused.</p>
+        <p>You will be able to reserve apprenticeship funding for @Model.ActiveRuleActiveToDateText apprenticeship starts.</p>
+        <p>Any funding you've already secured (transfers or reservations) is unaffected by this change.</p>
+    </div>
+}

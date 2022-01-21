@@ -94,7 +94,7 @@
                 }
                 else
                 {
-                    <input asp-for="CourseId" name="SelectedCourseId" type="hidden"/>
+                    <input asp-for="CourseId" name="SelectedCourseId" type="hidden" />
                 }
                 <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset">
@@ -105,16 +105,13 @@
                                     When will the apprenticeship training start?
                                 </h2>
                             </legend>
-                            <span id="choose-start-date-hint" class="govuk-hint">
-                                The apprenticeship training can start anytime in the month you choose or the following 2 months.
-                            </span>
                         }
-                        else
-                        {
-                            <span id="choose-start-date-hint" class="govuk-hint">
-                                The apprentice can start their apprenticeship training anytime in the month you choose, or the following 2 months.
-                            </span>
-                        }
+
+                        <span id="choose-start-date-hint" class="govuk-hint">
+                            Select the month for the planned start date of the apprenticeship.
+                        </span>
+
+                        @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule)
 
                         @if (startDateInvalid)
                         {

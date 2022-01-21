@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,8 +13,8 @@ using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
-using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -64,12 +64,28 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var response = await _mediator.Send(new GetFundingRulesQuery());
 
-            if (response?.ActiveGlobalRules != null && response.ActiveGlobalRules.Any())
+            var activeGlobalRule = response?.ActiveGlobalRules?.OrderBy(x => x.ActiveFrom).FirstOrDefault();
+
+            var viewModel = new ProviderStartViewModel
+            {
+                IsFromManage = isFromManage
+            };
+
+            if (activeGlobalRule != null)
             {
                 var backLink = isFromManage
                     ? Url.RouteUrl(RouteNames.ProviderManage, new {ukPrn, isFromManage})
                     : _externalUrlHelper.GenerateDashboardUrl(); 
-                return View( "ProviderFundingPaused", backLink);
+
+                switch(activeGlobalRule.RuleType)
+                {
+                    case GlobalRuleType.FundingPaused: 
+                        return View("ProviderFundingPaused", backLink);
+
+                    case GlobalRuleType.DynamicPause:
+                        viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule);
+                        break;
+                }               
             }
 
             var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();
@@ -78,11 +94,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             {
                 return View("NoPermissions");
             }
-            
-            var viewModel = new ProviderStartViewModel
-            {
-                IsFromManage = isFromManage
-            };
+
             return View("Index", viewModel);
         }
 
@@ -211,7 +223,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new
                 {
                     Id = reservationId,
-                    EmployerAccountId = viewModel.AccountPublicHashedId,
+                    PublicHashedEmployerAccountId = viewModel.AccountPublicHashedId,
                     viewModel.UkPrn
                 });
 

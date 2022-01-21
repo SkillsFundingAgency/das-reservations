@@ -2,6 +2,7 @@
 {
     public class EmployerStartViewModel
     {
+        public GlobalRuleViewModel ActiveGlobalRule { get; set; }
         public string FindApprenticeshipTrainingUrl { get; set; }
         public string ApprenticeshipFundingRulesUrl { get; set; }
     }

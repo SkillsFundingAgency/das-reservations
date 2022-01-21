@@ -6,7 +6,7 @@
     ViewData["Title"] = "Reserve funding to train and assess an apprentice";
 
     ViewBag.GaData.Vpv = "/accounts/reservations";
- }
+}
 
 <a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
 
@@ -19,7 +19,10 @@
                 <li>the month you expect the apprenticeship training to start</li>
                 <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">apprenticeship training course</a> the apprentice will take, which can be changed later</li>
             </ul>
+
+            @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
+
             <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
     </div>
- </main>
+</main>
