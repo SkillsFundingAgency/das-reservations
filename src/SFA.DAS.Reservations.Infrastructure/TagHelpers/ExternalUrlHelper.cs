@@ -132,9 +132,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         }
 
         public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false, 
-            string journeyData = "")
+            string journeyData = "", string accountLegalEntityHashedId = "")
         {
-            var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : "";
+            var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}&accountLegalEntityHashedId={accountLegalEntityHashedId}" : "";
 
             if (!string.IsNullOrWhiteSpace(journeyData))
             {
@@ -151,9 +151,9 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
             var urlParameters = new UrlParameters
             {
                 Id = ukprn.HasValue && !isEmptyCohort ? ukprn.Value.ToString() : accountId,
-                Controller = string.IsNullOrEmpty(cohortRef) ? "unapproved/add" : $"apprentices/{cohortRef}",
-                Action = isEmptyCohort ? "" : string.IsNullOrEmpty(cohortRef) ? "assign" : "details",
-                Folder = ukprn.HasValue && !isEmptyCohort ? "" : "commitments/accounts",
+                Controller = "unapproved",
+                Action = isEmptyCohort ? "add/assign" : string.IsNullOrEmpty(cohortRef) ? "assign" : cohortRef,
+                Folder = "",
                 QueryString = queryString
             };
 
@@ -230,7 +230,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         private string GetBaseUrl()
         {
             return _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
-                ? _options.EmployerDashboardUrl
+                ? _options.EmployerApprenticeUrl
                 : _options.DashboardUrl;
         }
 

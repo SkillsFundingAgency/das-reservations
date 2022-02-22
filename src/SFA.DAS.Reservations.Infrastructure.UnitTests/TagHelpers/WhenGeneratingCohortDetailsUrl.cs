@@ -37,12 +37,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
-            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+            options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
 
-            var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, "");
+            var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, "", true);
 
             Assert.AreEqual(
-                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add/assign",
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign",
                 actualUrl);
         }
 
@@ -55,12 +55,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
-            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+            options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, cohortRef);
 
             Assert.AreEqual(
-                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/apprentices/{cohortRef}/details",
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/{cohortRef}",
                 actualUrl);
         }
 

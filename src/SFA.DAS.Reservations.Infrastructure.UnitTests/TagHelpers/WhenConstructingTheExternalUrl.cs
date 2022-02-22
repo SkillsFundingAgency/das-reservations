@@ -125,7 +125,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var folder = "test-folder";
             _reservationsConfig = new Mock<IOptions<ReservationsWebConfiguration>>();
             _reservationsConfig.Setup(x => x.Value.DashboardUrl).Returns("https://test.local/account");
-            _reservationsConfig.Setup(x => x.Value.EmployerDashboardUrl).Returns("https://test.local.dashboard/");
+            _reservationsConfig.Setup(x => x.Value.EmployerApprenticeUrl).Returns("https://test.local.approvals/");
             _config = new Mock<IConfiguration>();
             _config.Setup(x => x["AuthType"]).Returns("employer");
             _helper = new ExternalUrlHelper(_reservationsConfig.Object, _config.Object);
@@ -139,7 +139,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             //Assert
             Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://{subDomain}.test.local.dashboard/{folder}/{controller}", actual);
+            Assert.AreEqual($"https://{subDomain}.test.local.approvals/{folder}/{controller}", actual);
         }
 
         [Test]
