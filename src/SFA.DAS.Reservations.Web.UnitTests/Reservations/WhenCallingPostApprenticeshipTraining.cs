@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -81,6 +83,214 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                         _course
                     }
                 });
+        }
+
+        [Test, MoqAutoData]
+        public async Task When_Model_Error_Then_It_Calls_Start_Date_Service_To_Get_Start_Dates(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel apprenticeshipTrainingFormModel,
+            TrainingDateModel trainingDateModel,
+            long accountLegalEntityId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            apprenticeshipTrainingFormModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    apprenticeshipTrainingFormModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
+
+            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task When_Model_Error_And_Is_Employer_Then_It_Calls_To_Get_Account_Global_Rules(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel apprenticeshipTrainingFormModel,
+            TrainingDateModel trainingDateModel,
+            long accountLegalEntityId,
+            long accountId,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            apprenticeshipTrainingFormModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            controller.ModelState.AddModelError("StartDate", "StartDate");
+            
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    apprenticeshipTrainingFormModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    routeModel.EmployerAccountId,
+                    EncodingType.AccountId))
+                .Returns(accountId);
+
+            await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
+
+            mockMediator.Verify(provider => provider.Send(It.Is<GetAccountFundingRulesQuery>(x => x.AccountId == accountId), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task When_Model_Error_If_Provider_Then_It_Calls_To_Get_Account_Global_Rules_With_Cached_Reservation_Account_Id(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel apprenticeshipTrainingFormModel,
+            TrainingDateModel trainingDateModel,
+            GetCachedReservationResult cachedReservationResult,
+            long accountLegalEntityId,
+            long accountId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            ReservationsController controller,
+            string hashedAccountId)
+        {
+            apprenticeshipTrainingFormModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            controller.ModelState.AddModelError("StartDate", "StartDate");
+            routeModel.EmployerAccountId = string.Empty;
+
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    apprenticeshipTrainingFormModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            mockEncodingService
+                .Setup(service => service.Encode(
+                    cachedReservationResult.AccountId,
+                    EncodingType.AccountId))
+                .Returns(hashedAccountId);
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    hashedAccountId,
+                    EncodingType.AccountId))
+                .Returns(cachedReservationResult.AccountId);
+
+            await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
+
+            mockMediator.Verify(provider => provider.Send(It.Is<GetAccountFundingRulesQuery>(x => x.AccountId == cachedReservationResult.AccountId), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task When_Model_Error_If_Rule_Ends_After_Available_Dates_Show_None(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel apprenticeshipTrainingFormModel,
+            TrainingDateModel trainingDateModel,
+            GetCachedReservationResult cachedReservationResult,
+            long accountLegalEntityId,
+            long accountId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
+            ReservationsController controller)
+        {
+            apprenticeshipTrainingFormModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    apprenticeshipTrainingFormModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    routeModel.EmployerAccountId,
+                    EncodingType.AccountId))
+                .Returns(accountId);
+
+            mockMediator.Setup(mediator => mediator.Send(It.Is<GetAccountFundingRulesQuery>(x => x.AccountId == accountId), It.IsAny<CancellationToken>())).ReturnsAsync(new GetAccountFundingRulesResult
+            {
+                ActiveRule = new GlobalRule
+                {
+                    RuleType = GlobalRuleType.DynamicPause,
+                    ActiveFrom = DateTime.Now.AddMonths(-1),
+                    ActiveTo = DateTime.Now.AddMonths(3)
+                }
+            });
+
+            mockStartDateService
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .ReturnsAsync(GetMockTrainingDates());
+
+            var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
+
+            var viewModel = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
+                .Subject;
+
+            viewModel.PossibleStartDates.Should().BeEmpty();
+        }
+
+        [Test, MoqAutoData]
+        public async Task When_Model_Error_If_Rule_Ends_Before_Available_Dates_Show(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel apprenticeshipTrainingFormModel,
+            TrainingDateModel trainingDateModel,
+            GetCachedReservationResult cachedReservationResult,
+            long accountLegalEntityId,
+            long accountId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> mockEncodingService,
+            [Frozen] Mock<ITrainingDateService> mockStartDateService,
+            ReservationsController controller)
+        {
+            apprenticeshipTrainingFormModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            controller.ModelState.AddModelError("StartDate", "StartDate");
+
+            mockMediator
+                .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cachedReservationResult);
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    apprenticeshipTrainingFormModel.AccountLegalEntityPublicHashedId,
+                    EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            mockEncodingService
+                .Setup(service => service.Decode(
+                    routeModel.EmployerAccountId,
+                    EncodingType.AccountId))
+                .Returns(accountId);
+
+            mockMediator.Setup(mediator => mediator.Send(It.Is<GetAccountFundingRulesQuery>(x => x.AccountId == accountId), It.IsAny<CancellationToken>())).ReturnsAsync(new GetAccountFundingRulesResult
+            {
+                ActiveRule = new GlobalRule
+                {
+                    RuleType = GlobalRuleType.DynamicPause,
+                    ActiveFrom = DateTime.Now.AddMonths(-1),
+                    ActiveTo = DateTime.Now.AddMonths(1)
+                }
+            });
+
+            mockStartDateService
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .ReturnsAsync(GetMockTrainingDates());
+
+            var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
+
+            var viewModel = result.Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<ApprenticeshipTrainingViewModel>()
+                .Subject;
+
+            viewModel.PossibleStartDates.Should().HaveCount(2);
         }
 
         [Test, AutoData]
@@ -286,7 +496,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Assert.AreEqual(cohortDetailsUrl, actualModel.BackLink);
         }
 
-
         [Test, AutoData]
         public async Task Then_If_There_Is_An_Error_The_Model_Is_Correctly_Built_And_Returned_To_The_View_And_The_Back_Link_Is_Correct(
             string cohortDetailsUrl,
@@ -349,6 +558,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             actual.Should().NotBeNull();
             actual.RouteName.Should().Be(RouteNames.EmployerIndex);
+        }
+
+        private IEnumerable<TrainingDateModel> GetMockTrainingDates()
+        {
+            var trainingDates = new List<TrainingDateModel>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var startDate = DateTime.Now.AddMonths(i);
+                var endDate = startDate.AddMonths(2);
+                trainingDates.Add(new TrainingDateModel
+                {
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+            }
+
+            return trainingDates;
         }
     }
 }

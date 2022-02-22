@@ -154,11 +154,18 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             var isProvider = routeModel.UkPrn != null;
             TrainingDateModel trainingDateModel = null;
+            string hashedEmployerAccountId = routeModel.EmployerAccountId;
 
             try
             {
                 if (!string.IsNullOrWhiteSpace(formModel.StartDate))
                     trainingDateModel = JsonConvert.DeserializeObject<TrainingDateModel>(formModel.StartDate);
+
+                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.GetValueOrDefault() });
+
+                hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId)
+                ? routeModel.EmployerAccountId
+                : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
 
                 if (!ModelState.IsValid)
                 {
@@ -170,12 +177,10 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         formModel.FromReview,
                         formModel.CohortRef,
                         routeModel.UkPrn,
-                        routeModel.EmployerAccountId);
+                        hashedEmployerAccountId);
 
                     return View("ApprenticeshipTraining", model);
-                }
-
-                var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.GetValueOrDefault() });
+                }                
 
                 if (isProvider)
                 {
@@ -213,7 +218,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     formModel.FromReview,
                     formModel.CohortRef,
                     routeModel.UkPrn,
-                    routeModel.EmployerAccountId);
+                    hashedEmployerAccountId);
                 return View("ApprenticeshipTraining", model);
             }
             catch (CachedReservationNotFoundException ex)
