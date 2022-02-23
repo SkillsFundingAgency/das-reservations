@@ -20,12 +20,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("provider");
-            options.DashboardUrl = $"https://{options.DashboardUrl}";
+            options.ApprenticeUrl = $"https://{options.ApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn,"",cohortRef);
 
             Assert.AreEqual(
-                $"{options.DashboardUrl}/{ukprn}/apprentices/{cohortRef}/details",
+                $"{options.ApprenticeUrl}/{ukprn}/unapproved/{cohortRef}/details",
                 actualUrl);
         }
 
@@ -67,18 +67,19 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         [Test, MoqAutoData]
         public void Then_Uses_Folder_When_There_Is_A_Ukprn_And_Is_Empty_Cohort_Journey(
             string accountId,
+            string hashedAccountLegalEntityId,
             uint ukprn,
             [Frozen] ReservationsWebConfiguration options,
             [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
-            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+            options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
 
-            var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true);
+            var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, string.Empty, hashedAccountLegalEntityId);
 
             Assert.AreEqual(
-                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add?providerId={ukprn}",
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?providerId={ukprn}&accountLegalEntityHashedId={hashedAccountLegalEntityId}",
                 actualUrl);
         }
         
@@ -92,12 +93,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
-            options.EmployerDashboardUrl = $"https://{options.EmployerDashboardUrl}";
+            options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, journeyData);
 
             Assert.AreEqual(
-                $"{options.EmployerDashboardUrl}/commitments/accounts/{accountId}/unapproved/add?" +
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?" +
                          $"providerId={ukprn}&journeyData={journeyData}",
                 actualUrl);
         }
