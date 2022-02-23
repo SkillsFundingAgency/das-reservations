@@ -224,7 +224,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(reservationsResult);
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData, routeModel.AccountLegalEntityPublicHashedId))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
