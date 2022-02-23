@@ -236,7 +236,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                     _routeModel.EmployerAccountId,
                     _routeModel.CohortReference, false,
                     It.IsAny<string>(),
-                    _routeModel.AccountLegalEntityPublicHashedId))
+                    string.Empty))
                 .Returns(expectedBackUrl);
 
             //act
