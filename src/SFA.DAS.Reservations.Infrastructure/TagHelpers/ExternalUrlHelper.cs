@@ -134,11 +134,11 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false, 
             string journeyData = "", string accountLegalEntityHashedId = "")
         {
-            var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}&accountLegalEntityHashedId={accountLegalEntityHashedId}" : "";
+            var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : "";
 
             if (!string.IsNullOrWhiteSpace(journeyData))
             {
-                if (string.IsNullOrWhiteSpace(journeyData))
+                if (string.IsNullOrWhiteSpace(queryString))
                 {
                     queryString = $"?journeyData={journeyData}";
                 }
@@ -148,18 +148,28 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(accountLegalEntityHashedId))
+            {
+                if (string.IsNullOrWhiteSpace(queryString))
+                {
+                    queryString = $"?accountLegalEntityHashedId={accountLegalEntityHashedId}";
+                }
+                else
+                {
+                    queryString += $"&accountLegalEntityHashedId={accountLegalEntityHashedId}";
+                }
+            }
+
             var urlParameters = new UrlParameters
             {
                 Id = ukprn.HasValue && !isEmptyCohort ? ukprn.Value.ToString() : accountId,
                 Controller = "unapproved",
-                Action = isEmptyCohort ? "add/assign" : string.IsNullOrEmpty(cohortRef) ? "assign" : cohortRef,
+                Action = isEmptyCohort ? "add/assign" : string.IsNullOrEmpty(accountId) ? $"{cohortRef}/details" : cohortRef,
                 Folder = "",
                 QueryString = queryString
             };
 
-            var baseUrl = GetBaseUrl();
-
-            return FormatUrl(baseUrl, urlParameters);
+            return GenerateAddApprenticeUrl(urlParameters);
         }
 
         public string GenerateConfirmEmployerUrl(uint ukprn, string employerAccountLegalEntityPublicHashedId)
@@ -230,7 +240,7 @@ namespace SFA.DAS.Reservations.Infrastructure.TagHelpers
         private string GetBaseUrl()
         {
             return _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase)
-                ? _options.EmployerApprenticeUrl
+                ? _options.EmployerDashboardUrl
                 : _options.DashboardUrl;
         }
 
