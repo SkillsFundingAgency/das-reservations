@@ -409,7 +409,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             if (!string.IsNullOrEmpty(result.CohortRef) || result.IsEmptyCohortFromSelect)
             {
-                return _urlHelper.GenerateCohortDetailsUrl(result.UkPrn, routeModel.EmployerAccountId, result.CohortRef, result.IsEmptyCohortFromSelect);
+                return _urlHelper.GenerateCohortDetailsUrl(result.UkPrn, routeModel.EmployerAccountId, result.CohortRef, result.IsEmptyCohortFromSelect, string.Empty, result.AccountLegalEntityPublicHashedId);
             }
 
             if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)

@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
             bool isEmptyEmployerCohort = false, string transferSenderId = "", string encodedPledgeApplicationId = "",
             string journeyData = "");
         string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false,
-            string journeyData = "");
+            string journeyData = "", string accountLegalEntityPublicHashedId = "");
         string GenerateDashboardUrl(string accountId = null);
         string GenerateConfirmEmployerUrl(uint ukprn, string employerAccountLegalEntityPublicHashedId);
     }

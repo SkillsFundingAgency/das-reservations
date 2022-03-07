@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             postSelectCourseViewModel.ApprenticeTrainingKnown = true;
             _externalUrlHelper
                 .Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, _cachedReservationResult.CohortRef, false,
-                    It.IsAny<string>()))
+                    It.IsAny<string>(), _cachedReservationResult.AccountLegalEntityPublicHashedId))
                 .Returns(cohortUrl);
 
             //Act

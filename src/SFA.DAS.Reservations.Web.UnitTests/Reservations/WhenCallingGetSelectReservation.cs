@@ -224,7 +224,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(reservationsResult);
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -814,7 +814,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ReservationLimitReachedException(expectedAccountId));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
-                    viewModel.CohortReference, false, It.IsAny<string>()))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -970,7 +970,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ProviderNotAuthorisedException(expectedAccountId, routeModel.UkPrn.Value));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId, 
-                    viewModel.CohortReference, false, It.IsAny<string>()))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -1026,7 +1026,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 controller.HttpContext.User.Claims)).Returns(true);
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty))
                 .Returns(cohortDetailsUrl);
             
             //Act
@@ -1083,7 +1083,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 controller.HttpContext.User.Claims)).Returns(false);
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty))
                 .Returns(cohortDetailsUrl);
             
             //Act
@@ -1136,7 +1136,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(new GetAvailableReservationsResult {Reservations = new List<Reservation>()});
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act

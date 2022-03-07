@@ -495,7 +495,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 return routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer;
             }
 
-            return _urlHelper.GenerateCohortDetailsUrl(ukPrn, accountId, cohortRef);
+            return _urlHelper.GenerateCohortDetailsUrl(ukPrn, string.Empty, cohortRef);
 
         }
 

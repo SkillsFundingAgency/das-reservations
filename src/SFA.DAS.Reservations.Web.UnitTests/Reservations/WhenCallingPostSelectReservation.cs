@@ -148,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>()))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -244,7 +244,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId, routeModel.UkPrn.Value));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>()))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
                 .Returns(cohortDetailsUrl);
 
             //Act
