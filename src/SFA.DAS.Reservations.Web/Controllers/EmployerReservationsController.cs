@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 	                return View("Index", viewModel);
 	            }
 
-                switch (activeGlobalRule.RuleType)
+                switch (activeGlobalRule.    RuleType)
                 {
                     case GlobalRuleType.FundingPaused:
                         return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
