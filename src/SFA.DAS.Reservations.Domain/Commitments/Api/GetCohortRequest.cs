@@ -18,9 +18,6 @@ namespace SFA.DAS.Reservations.Domain.Commitments.Api
                 var backslash = BaseUrl.EndsWith("/") ? "" : "/";
                 return $"{BaseUrl}{backslash}cohorts/{CohortId}";
             }
-
         }
-
-
     }
 }
