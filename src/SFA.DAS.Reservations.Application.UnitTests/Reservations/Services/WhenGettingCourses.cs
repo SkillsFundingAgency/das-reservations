@@ -56,8 +56,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             _cacheService = new Mock<ICacheStorageService>();
 
+            var config = new ReservationsApiConfiguration
+            {
+                Url = ExpectedBaseUrl
+            };
+
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
+            _options.Setup(opt => opt.Value).Returns(config);
 
             _service = new CourseService(_apiClient.Object, _options.Object, _cacheService.Object);
         }
