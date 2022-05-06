@@ -45,10 +45,11 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddTransient<IFundingRulesService, FundingRulesService>();
             services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
 
+            services.AddTransient<HttpClient>();
+            services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
+
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
-
             services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
-
             services.AddApimClient<IReservationsService>((c,s) => new ReservationsService(c));
         }
 

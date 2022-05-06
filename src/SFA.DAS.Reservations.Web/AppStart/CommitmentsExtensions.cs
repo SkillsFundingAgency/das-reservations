@@ -18,31 +18,16 @@ namespace SFA.DAS.Reservations.Web.AppStart
     public static class CommitmentsExtensions
     {
         public static void AddCommitmentsApi(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration,
             IHostingEnvironment env)
         {
-            if (env.IsDevelopment() && configuration.UseStub())
-            {
-                services.AddSingleton<CommitmentsApiClientStub>();
-
-                services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
-                    provider.GetService<CommitmentsApiClientStub>(),
-                    provider.GetService<IOptions<CommitmentsApiConfiguration>>()));
-            }
-            else
-            {
-                services.AddSingleton<CommitmentsApiClient>();
-
-                services.AddTransient<ICommitmentService, CommitmentService>(provider => new CommitmentService(
-                    provider.GetService<CommitmentsApiClient>(),
-                    provider.GetService<IOptions<CommitmentsApiConfiguration>>()));
-            }
+            services.AddTransient<ICommitmentService, CommitmentService>();
         }
 
         public static void AddCommitmentsPermissionsApi(
             this IServiceCollection services,
-            IConfiguration configuration, 
+            IConfiguration configuration,
             IHostingEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStub())
