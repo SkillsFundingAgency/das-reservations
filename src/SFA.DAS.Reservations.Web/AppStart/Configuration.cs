@@ -69,9 +69,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<CommitmentPermissionsApiClientConfiguration>(configuration.GetSection("CommitmentsApiClient"));
             services.AddSingleton(config => config.GetService<IOptions<CommitmentPermissionsApiClientConfiguration>>().Value);
 
-            services.Configure<CommitmentsApiConfiguration>(configuration.GetSection("CommitmentsApiClient"));
-            services.AddSingleton(config => config.GetService<IOptions<CommitmentsApiConfiguration>>().Value);
-
             services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 

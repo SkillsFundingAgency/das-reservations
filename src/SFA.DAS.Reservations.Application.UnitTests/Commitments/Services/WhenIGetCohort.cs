@@ -18,8 +18,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
     {
         [Test, MoqAutoData]
         public async Task ThenWillGetCohortFromCommitmentsApi(
-            [Frozen] Mock<IApiClient> mockApiClient,
-            [Frozen] Mock<IOptions<CommitmentsApiConfiguration>> mockOptions,
+            [Frozen] Mock<IReservationsOuterApiClient> mockApiClient,
+            [Frozen] Mock<IOptions<ReservationsOuterApiConfiguration>> mockOptions,
             CommitmentService service,
             long cohortId )
         {
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
 
         [Test, MoqAutoData]
         public async Task ThenWillReturnCohortFromCommitmentsApi(
-            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IReservationsOuterApiClient> mockApiClient,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
             CommitmentService service,
             Cohort cohort)
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
 
         [Test, MoqAutoData]
         public void ThenWillThrowExceptionIFOneOccurs(
-            [Frozen] Mock<IApiClient> mockApiClient,
+            [Frozen] Mock<IReservationsOuterApiClient> mockApiClient,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockOptions,
             CommitmentService service,
             Cohort cohort,
