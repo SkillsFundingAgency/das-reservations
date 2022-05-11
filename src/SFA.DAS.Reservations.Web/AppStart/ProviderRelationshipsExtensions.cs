@@ -1,13 +1,11 @@
-﻿using System.Net.Http;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
-using SFA.DAS.ProviderRelationships.Api.Client.Http;
+using SFA.DAS.ProviderRelationships.Api.Client.DependencyResolution.Microsoft;
 using SFA.DAS.Reservations.Web.Stubs;
-using HttpClientFactory = SFA.DAS.ProviderRelationships.Api.Client.Http.HttpClientFactory;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -16,26 +14,16 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderRelationsApi(this IServiceCollection services, IConfiguration configuration,
             IHostingEnvironment env)
         {
-            if (env.IsDevelopment() && configuration.UseStub())
+            if (env.IsDevelopment() && configuration.UseStubs())
             {
-                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>();
+                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>(); // there is STUB here!!
             }
             else
             {
-                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClient>();
-                services.AddScoped<IRestHttpClient, RestHttpClient>();
+                services.AddProviderRelationshipsApiClient();
 
-                services.AddSingleton<HttpClient>(provider =>
-                    new HttpClientFactory(provider.GetService<ProviderRelationshipsApiClientConfiguration>()
-                        .AzureActiveDirectoryClient).CreateHttpClient());
-
-                services.Configure<AzureActiveDirectoryClientConfiguration>(
-                    configuration.GetSection("AzureActiveDirectoryClient"));
-                services.AddSingleton(config => new ProviderRelationshipsApiClientConfiguration
-                {
-                    AzureActiveDirectoryClient =
-                        config.GetService<IOptions<AzureActiveDirectoryClientConfiguration>>().Value
-                });
+                services.Configure<ProviderRelationshipsApiConfiguration>(configuration.GetSection("ProviderRelationshipsApi"));
+                services.AddSingleton(serviceProvider => serviceProvider.GetService<IOptions<ProviderRelationshipsApiConfiguration>>().Value);
             }
         }
     }

@@ -4,9 +4,9 @@ namespace SFA.DAS.Reservations.Web.Stubs
 {
     public static class ConfigurationExtensions
     {
-        public static bool UseStub(this IConfiguration config)
+        public static bool UseStubs(this IConfiguration config)
         {
-            return config.GetValue<bool>("UseStub");
+            return config.GetValue<bool>("UseStubs");
         }
     }
 }
