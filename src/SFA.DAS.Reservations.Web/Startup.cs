@@ -63,10 +63,6 @@ namespace SFA.DAS.Reservations.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // TEMP
-            IdentityModelEventSource.ShowPII = true;
-            // TEMP
-
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -224,7 +220,7 @@ namespace SFA.DAS.Reservations.Web
                 }
 
                 context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-                
+
                 await next();
 
                 if (context.Response.StatusCode == 404 && !context.Response.HasStarted)

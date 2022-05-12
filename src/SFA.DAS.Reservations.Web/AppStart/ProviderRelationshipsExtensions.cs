@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {
-                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>(); // there is STUB here!!
+                services.AddScoped<IProviderRelationshipsApiClient, ProviderRelationshipsApiClientStub>();
             }
             else
             {
