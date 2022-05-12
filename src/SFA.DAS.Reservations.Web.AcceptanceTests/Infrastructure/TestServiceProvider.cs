@@ -78,6 +78,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("ReservationsOuterApi:ApiBaseUrl", "https://local.test.com"),
                     new KeyValuePair<string, string>("ReservationsOuterApi:SubscriptionKey", ""),
                     new KeyValuePair<string, string>("ReservationsOuterApi:Version", "1.0"),
+                    new KeyValuePair<string, string>("ProviderRelationshipsApi:ApiBaseUrl", "https://local.test.com"),
+                    new KeyValuePair<string, string>("CommitmentsApiClient:ApiBaseUrl", "https://local.test.com")
                 }
             };
 
