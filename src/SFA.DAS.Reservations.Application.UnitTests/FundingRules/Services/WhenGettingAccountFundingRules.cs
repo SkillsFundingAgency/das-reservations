@@ -43,9 +43,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
                     GlobalRules = _expectedGlobalRules
                 });
 
-            _options = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
+            var config = new ReservationsApiConfiguration
+            {
+                Url = ExpectedBaseUrl
+            };
 
+            _options = new Mock<IOptions<ReservationsApiConfiguration>>();
+            _options.Setup(opt => opt.Value).Returns(config);
             _service = new FundingRulesService(_apiClient.Object, _options.Object);
         }
 

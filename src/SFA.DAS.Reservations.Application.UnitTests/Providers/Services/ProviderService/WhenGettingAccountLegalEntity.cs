@@ -25,8 +25,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Services.Provider
             _expectedLegalEntity = new AccountLegalEntity();
 
             _apiClient = new Mock<IApiClient>();
+            var config = new ReservationsApiConfiguration
+            {
+                Url = ExpectedBaseUrl
+            };
+
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
+            _options.Setup(opt => opt.Value).Returns(config);
 
             _service = new Application.Providers.Services.ProviderService(_apiClient.Object, _options.Object);
 
