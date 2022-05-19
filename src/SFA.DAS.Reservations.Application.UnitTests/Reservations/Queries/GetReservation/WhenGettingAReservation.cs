@@ -61,8 +61,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
                                 $"{ExpectedBaseUrl}api/reservations/{_expectedReservationId}"))))
                 .ReturnsAsync(_response);
 
+            var config = new ReservationsApiConfiguration
+            {
+                Url = ExpectedBaseUrl
+            };
+
             _options = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _options.Setup(x => x.Value.Url).Returns(ExpectedBaseUrl);
+            _options.Setup(opt => opt.Value).Returns(config);
 
             _reservationAuthorisationService = new Mock<IReservationAuthorisationService>();
             _reservationAuthorisationService.Setup(s =>

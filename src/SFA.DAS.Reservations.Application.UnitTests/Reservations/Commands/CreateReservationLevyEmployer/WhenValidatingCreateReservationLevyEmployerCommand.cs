@@ -59,8 +59,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
                         ExpectedAccountLegalEntityId,false
                     }}
                 });
+
+            var config = new ReservationsApiConfiguration
+            {
+                Url = ExpectedUrl
+            };
+
             _config = new Mock<IOptions<ReservationsApiConfiguration>>();
-            _config.Setup(x => x.Value.Url).Returns(ExpectedUrl);
+            _config.Setup(opt => opt.Value).Returns(config);
 
             _encodingService = new Mock<IEncodingService>();
             _encodingService.Setup(x => x.Encode(ExpectedAccountId, EncodingType.AccountId)).Returns(ExpectedAccountHashedId);
