@@ -24,14 +24,16 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             _logger = logger;
             _httpClient = httpClient;
             _asyncRetryPolicy = GetRetryPolicy();
-
-            AddHeaders();
         }
 
         public async Task<TResponse> Get<TResponse>(IGetApiRequest request) 
         {
-
             _logger.LogInformation("Calling Outer API base {0}, url {1}", _config.ApiBaseUrl, request.GetUrl);
+
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, request.GetUrl);
+
+            AddHeaders(httpRequestMessage);
+
             var response = await _httpClient.GetAsync(request.GetUrl).ConfigureAwait(false);
 
             if (response.StatusCode.Equals(HttpStatusCode.NotFound))
@@ -58,10 +60,10 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
             return await _asyncRetryPolicy.ExecuteAsync(async() => await Get<TResponse>(request));
         }
 
-        private void AddHeaders()
+        private void AddHeaders(HttpRequestMessage httpRequestMessage)
         {
-            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _config.SubscriptionKey);
-            _httpClient.DefaultRequestHeaders.Add("X-Version", "1");
+            httpRequestMessage.Headers.Add("Ocp-Apim-Subscription-Key", _config.SubscriptionKey);
+            httpRequestMessage.Headers.Add("X-Version", "1");
         }
 
         private AsyncRetryPolicy GetRetryPolicy()
