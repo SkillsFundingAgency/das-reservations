@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                 options.AccessDeniedPath = "/error/403";
             });
 
-            if (env.IsDevelopment() && config.UseStub())
+            if (env.IsDevelopment() && config.UseStubs())
             {
                 services.AddProviderIdamsStubAuthentication(cookieOptions, new OpenIdConnectEvents
                 {

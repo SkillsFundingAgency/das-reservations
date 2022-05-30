@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             IConfiguration configuration,
             IHostingEnvironment env)
         {
-            if (env.IsDevelopment() && configuration.UseStub())
+            if (env.IsDevelopment() && configuration.UseStubs())
             {
                 services.AddSingleton<IAccountApiClient, EmployerAccountApiClientStub>();
             }

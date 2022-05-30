@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using SFA.DAS.Http;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Extensions;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.ProviderRelationships.Api.Client.Http;
-using SFA.DAS.Reservations.Infrastructure.Api;
-using SFA.DAS.Reservations.Infrastructure.Extensions;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
 {

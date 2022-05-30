@@ -79,6 +79,16 @@ namespace SFA.DAS.Reservations.Web.Stubs
         {
             throw new NotImplementedException();
         }
+
+        public Task Ping(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RevokePermissions(RevokePermissionsRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }
