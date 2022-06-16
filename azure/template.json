@@ -258,7 +258,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "[concat(variables('providerAppServiceName'), '-certificate-', parameters('utcValue'))]",
+      "name": "[concat(variables('providerAppServiceName'), '-application-insights-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
