@@ -17,8 +17,6 @@ jobs:
       SonarCloud: true
       SonarCloudProjectKey: SkillsFundingAgency_das-reservations
 
-  - template: azure-pipelines-templates/build/step/dependency-check.yml@das-platform-building-blocks
-
   - task: DotNetCoreCLI@2
     displayName: 'Publish Website'
     inputs:
