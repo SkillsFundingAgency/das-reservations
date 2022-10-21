@@ -1,26 +1,33 @@
 ﻿@model SignAgreementViewModel
 @{
     ViewData["Title"] = "Employer agreement not accepted";
-
     ViewBag.GaData.Vpv = "/accounts/reservations/owner-sign-agreement";
 }
 
 @if (Model.IsUrl)
 {
-    <a href="@Model.BackRouteName" class="govuk-back-link">Back</a>    
+    <a href="@Model.BackRouteName" class="govuk-back-link">Back</a>
 }
 else
 {
-    <a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>    
+    <a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
 }
 
 <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Employer agreement not accepted</h1>
-            <p class="govuk-body">You must accept your employer agreement with the Education and Skills Funding Agency (ESFA) before you can reserve or manage funding.</p>
-            <p class="govuk-body">You can view the agreement now or find it later in ‘your organisations and agreements’.</p>
-            <a asp-external-controller="agreements" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" draggable="false" class="govuk-button" tabindex="1">View the agreement</a>
+            <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <div class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    <p>You must accept your employer agreement with the Department for Education (<abbr>DfE</abbr>) before you can reserve or manage funding.</p>
+                    <p>You can view the agreement now or find it later in 'your organisations and agreements'.</p>
+                </div>
+            </div>
+            <div class="govuk-button-group">
+                <a asp-external-controller="agreements" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" role="button" draggable="false" class="govuk-button" tabindex="1">View agreement</a>
+            </div>
         </div>
     </div>
 </main>
