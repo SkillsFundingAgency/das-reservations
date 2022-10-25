@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.GovUK.Auth.AppStart;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -21,6 +23,7 @@ using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
 
 namespace SFA.DAS.Reservations.Web
@@ -112,9 +115,18 @@ namespace SFA.DAS.Reservations.Web
            
             if (isEmployerAuth)
             {
-                services.AddAndConfigureEmployerAuthentication(
-                    serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
-                    serviceProvider.GetService<IEmployerAccountService>());
+                if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
+                        .Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
+                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth",typeof(EmployerAccountPostAuthenticationClaimsHandler));
+                }
+                else
+                {
+                    services.AddAndConfigureEmployerAuthentication(
+                        serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
+                        serviceProvider.GetService<IEmployerAccountService>());    
+                }
             }
 
             if (isProviderAuth)
