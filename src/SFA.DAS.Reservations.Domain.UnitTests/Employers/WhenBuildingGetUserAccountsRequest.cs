@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Employers
             
             var actual = new GetUserAccountsRequest(baseUrl, userId, email);
 
-            actual.GetUrl.Should().Be($"{baseUrl}api/accountusers/{HttpUtility.UrlEncode(userId)}/accounts?email={HttpUtility.UrlEncode(email)}");
+            actual.GetUrl.Should().Be($"{baseUrl}/accountusers/{HttpUtility.UrlEncode(userId)}/accounts?email={HttpUtility.UrlEncode(email)}");
         }
     }
 }

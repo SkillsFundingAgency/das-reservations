@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Domain.Employers.Api
             _email = HttpUtility.UrlEncode(email);
         }
 
-        public string GetUrl => $"{BaseUrl}api/accountusers/{_userId}/accounts?email={_email}";
+        public string GetUrl => $"{BaseUrl}/accountusers/{_userId}/accounts?email={_email}";
         public string BaseUrl { get; }
     }
 }
