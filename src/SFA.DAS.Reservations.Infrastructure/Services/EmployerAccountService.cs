@@ -4,21 +4,57 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.EAS.Account.Api.Client;
-using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
+using EmployerIdentifier = SFA.DAS.Reservations.Domain.Authentication.EmployerIdentifier;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class EmployerAccountService : IEmployerAccountService
     {
         private readonly IAccountApiClient _accountApiClient;
-        
-        public EmployerAccountService(IAccountApiClient accountApiClient)
+        private readonly IReservationsOuterApiClient _reservationsOuterApiClient;
+        private readonly ReservationsOuterApiConfiguration _outerApiConfiguration;
+        private readonly ReservationsWebConfiguration _configuration;
+
+        public EmployerAccountService(IAccountApiClient accountApiClient, IOptions<ReservationsWebConfiguration> configuration, IReservationsOuterApiClient reservationsOuterApiClient,IOptions<ReservationsOuterApiConfiguration> outerApiConfiguration)
         {
             _accountApiClient = accountApiClient;
+            _reservationsOuterApiClient = reservationsOuterApiClient;
+            _outerApiConfiguration = outerApiConfiguration.Value;
+            _configuration = configuration.Value;
+        }
+
+        public async Task<Claim> GetClaim(string userId, string claimType, string email)
+        {
+            IEnumerable<EmployerIdentifier> accounts;
+            if (_configuration.UseGovSignIn)
+            {
+                var apiResponse =
+                    await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email));
+                accounts = apiResponse.UserAccounts.Select(c => new EmployerIdentifier
+                {
+                    Role = c.Role,
+                    AccountId = c.AccountId,
+                    EmployerName = c.EmployerName
+                });
+            }
+            else
+            {
+                accounts = await GetEmployerIdentifiersAsync(userId);
+                accounts = await GetUserRoles(accounts, userId);    
+            }
+            
+
+            var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
+            var associatedAccountsClaim = new Claim(claimType, accountsAsJson, JsonClaimValueTypes.Json);
+            return associatedAccountsClaim;
         }
 
         public async Task<IEnumerable<EmployerIdentifier>> GetEmployerIdentifiersAsync(string userId)
@@ -30,7 +66,17 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                     new EmployerIdentifier { AccountId = acc.HashedAccountId, EmployerName = acc.DasAccountName });
         }
 
-        public async Task<IEnumerable<EmployerIdentifier>> GetUserRoles(IEnumerable<EmployerIdentifier> values, string userId)
+
+        public async Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId)
+        {
+            var teamMembers = await _accountApiClient.GetAccountUsers(accountId);
+
+            var users = teamMembers.Select(model => (EmployerAccountUser)model);
+
+            return users;
+        }
+
+        private async Task<IEnumerable<EmployerIdentifier>> GetUserRoles(IEnumerable<EmployerIdentifier> values, string userId)
         {
             var employerIdentifiers = values.ToList();
 
@@ -53,46 +99,6 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             return employerIdentifiers.Except(identifiersToRemove);
         }
 
-        public async Task<Claim> GetClaim(string userId, string claimType)
-        {
-            var accounts = await GetEmployerIdentifiersAsync(userId);
-
-            accounts = await GetUserRoles(accounts, userId);
-
-            var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
-            var associatedAccountsClaim = new Claim(claimType, accountsAsJson, JsonClaimValueTypes.Json);
-            return associatedAccountsClaim;
-        }
-
-        public async Task<IEnumerable<EmployerTransferConnection>> GetTransferConnections(string accountId)
-        {
-            try
-            {
-                var transferConnections = await _accountApiClient.GetTransferConnections(accountId);
-                return transferConnections.Select(acc => new EmployerTransferConnection
-                {
-                    FundingEmployerPublicHashedAccountId = acc.FundingEmployerPublicHashedAccountId,
-                    FundingEmployerAccountName = acc.FundingEmployerAccountName,
-                    FundingEmployerHashedAccountId = acc.FundingEmployerHashedAccountId,
-                    FundingEmployerAccountId = acc.FundingEmployerAccountId
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId)
-        {
-            var teamMembers = await _accountApiClient.GetAccountUsers(accountId);
-
-            var users = teamMembers.Select(model => (EmployerAccountUser)model);
-
-            return users;
-        }
-
         private async Task<string> GetUserRole(EmployerIdentifier employerAccount, string userId)
         {
             var accounts = await _accountApiClient.GetAccountUsers(employerAccount.AccountId);
@@ -101,7 +107,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             {
                 return null;
             }
-            var teamMember = accounts.FirstOrDefault(c => String.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
+            var teamMember = accounts.FirstOrDefault(c => string.Equals(c.UserRef, userId, StringComparison.CurrentCultureIgnoreCase));
             return teamMember?.Role;
         }
     }
