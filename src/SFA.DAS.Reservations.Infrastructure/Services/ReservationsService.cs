@@ -1,30 +1,30 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services
 {
-    public class ReservationsService : IReservationsService
+    public class ReservationsOuterService : IReservationsOuterService
     {
-        private readonly HttpClient _client;
+        private readonly IReservationsOuterApiClient _apiClient;
+        private readonly ReservationsOuterApiConfiguration _config;
 
-        public ReservationsService(HttpClient client)
+        public ReservationsOuterService(IReservationsOuterApiClient apiClient, IOptions<ReservationsOuterApiConfiguration> options)
         {
-            _client = client;
+            _apiClient = apiClient;
+            _config = options.Value;
         }
 
         public async Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null)
         {
-            var url = pledgeApplicationId.HasValue
-                ? $"transfers/validity?senderId={senderId}&receiverId={receiverId}&pledgeApplicationId={pledgeApplicationId}"
-                : $"transfers/validity?senderId={senderId}&receiverId={receiverId}";
+            var request = new GetTransferValidityRequest(_config.ApiBaseUrl, senderId, receiverId, pledgeApplicationId);
+            var response = await _apiClient.Get<GetTransferValidityResponse>(request);
 
-            var response = await _client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-
-            return JsonConvert.DeserializeObject<GetTransferValidityResponse>(await response.Content.ReadAsStringAsync());
+            return response;
         }
     }
 }
