@@ -6,13 +6,14 @@ using SFA.DAS.ProviderRelationships.Api.Client;
 using SFA.DAS.ProviderRelationships.Api.Client.Configuration;
 using SFA.DAS.ProviderRelationships.Api.Client.DependencyResolution.Microsoft;
 using SFA.DAS.Reservations.Web.Stubs;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
     public static class ProviderRelationshipsExtensions
     {
         public static void AddProviderRelationsApi(this IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {

@@ -14,6 +14,7 @@ using SFA.DAS.Provider.Idams.Stub.Extensions;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Stubs;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -23,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             this IServiceCollection services, 
             IOptions<ProviderIdamsConfiguration> idamsConfiguration, 
             IConfiguration config, 
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
             {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.StartupConfig
 {
@@ -11,7 +12,7 @@ namespace SFA.DAS.Reservations.Web.StartupConfig
     {
         public static IApplicationBuilder UseDasHsts(this IApplicationBuilder app)
         {
-            var hostingEnvironment = app.ApplicationServices.GetService<IHostingEnvironment>();
+            var hostingEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
             
             if (!hostingEnvironment.IsDevelopment())
             {

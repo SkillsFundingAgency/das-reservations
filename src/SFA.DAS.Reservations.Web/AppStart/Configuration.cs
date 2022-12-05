@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         private static void AddSharedConfiguration(
             IServiceCollection services,
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {

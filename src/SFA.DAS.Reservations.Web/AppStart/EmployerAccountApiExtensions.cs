@@ -8,6 +8,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Stubs;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -16,7 +17,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerAccountApi(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {
