@@ -92,11 +92,11 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            services.AddServices(serviceParameters,_configuration);
-            
+            services.AddServices(serviceParameters, _configuration);
+
             if (_configuration["Environment"] != "DEV" || (
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
-                && _configuration["IsIntegrationTest"].Equals("true",StringComparison.CurrentCultureIgnoreCase)))
+                && _configuration["IsIntegrationTest"].Equals("true", StringComparison.CurrentCultureIgnoreCase)))
             {
                 if (isEmployerAuth)
                 {
@@ -114,7 +114,7 @@ namespace SFA.DAS.Reservations.Web
             services.AddAuthorization<AuthorizationContextProvider>();
 
             services.AddCommitmentsPermissionsApi(_configuration, _environment);
-           
+
             if (isEmployerAuth)
             {
                 if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
@@ -122,13 +122,13 @@ namespace SFA.DAS.Reservations.Web
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
                     services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
-                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth",typeof(EmployerAccountPostAuthenticationClaimsHandler));
+                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth", typeof(EmployerAccountPostAuthenticationClaimsHandler));
                 }
                 else
                 {
                     services.AddAndConfigureEmployerAuthentication(
                         serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
-                        serviceProvider.GetService<IEmployerAccountService>());    
+                        serviceProvider.GetService<IEmployerAccountService>());
                 }
             }
 
@@ -136,22 +136,31 @@ namespace SFA.DAS.Reservations.Web
             {
                 services.AddAndConfigureProviderAuthentication(
                     serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>(),
-                    _configuration, 
+                    _configuration,
                     _environment);
             }
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
-            
-            services.AddMvc(
-                    options =>
+
+            //services.AddMvc(
+            //        options =>
+            //        {
+            //            options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
+            //            options.AddAuthorization();
+            //        })
+            //    .AddControllersAsServices()
+            //    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options =>
                     {
-                        options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
+                        //options.EnableEndpointRouting = false;
                         options.AddAuthorization();
+                        options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
                     })
-                .AddControllersAsServices()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .AddControllersAsServices();
 
             services.AddHttpsRedirection(options =>
             {
@@ -163,7 +172,7 @@ namespace SFA.DAS.Reservations.Web
 
             
 
-            services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+          //  services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
             services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
@@ -226,7 +235,7 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.Use(async (context, next) =>
             {
                 if (context.Response.Headers.ContainsKey("X-Frame-Options"))
@@ -256,12 +265,19 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseSession();
 
-            app.UseMvc(routes =>
+            app.UseRouting();
+             app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
+
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Home}/{action=Index}/{id?}");
+            //});
         }
     }
 }
