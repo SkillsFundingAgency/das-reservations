@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetAccountUsersResponse usersResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetAccountUsersResponse usersResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             usersResponse.AccountUsers.First().Role = "Owner";
             mockEncodingService
@@ -98,7 +98,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task And_Exception_Then_Redirect_To_Error_500(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(

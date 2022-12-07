@@ -43,8 +43,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
                 .Returns(new TryGetReturns((string cohortRef, EncodingType encodingType, ref long val) => true));
 
             _routingFeature.Setup(f => f.RouteData).Returns(_routeData);
-            
-            _httpContextAccessor.Setup(c => c.HttpContext.Features[typeof(IRoutingFeature)])
+
+            //_httpContextAccessor.Setup(c => c.HttpContext.Features[typeof(IRoutingFeature)])
+            //    .Returns(_routingFeature.Object);
+
+            _httpContextAccessor.Setup(c => c.HttpContext.Features.Get<IRoutingFeature>())
                 .Returns(_routingFeature.Object);
 
             var queryParams = new Dictionary<string, StringValues>
@@ -53,6 +56,26 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
             };
 
             _httpContextAccessor.Setup(c => c.HttpContext.Request.Query).Returns(new QueryCollection(queryParams));
+        }
+
+        [Test]
+        public void ThenAddsAccountIdToContext()
+        {
+            //Arrange
+            _routeData.Values.Remove("ukprn");
+            _routeData.Values.Add("employerAccountId", EmployerAccountId);
+
+            _encodingService
+                .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.AccountId, out It.Ref<long>.IsAny))
+                .Callback(new TryGetCallback((string accountId, EncodingType encodingType, ref long val) => val = EmployerAccountId))
+                .Returns(new TryGetReturns((string accountId, EncodingType encodingType, ref long val) => true));
+
+            //Act
+            var context = _contextProvider.GetAuthorizationContext();
+
+            //Assert
+            Assert.IsTrue(context.TryGet<long>("PartyId", out var actualAccountId));
+            Assert.AreEqual(EmployerAccountId, actualAccountId);
         }
 
         [Test]
@@ -77,25 +100,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
             Assert.AreEqual(UkPrn, actualUkPrn);
         }
 
-        [Test]
-        public void ThenAddsAccountIdToContext()
-        {
-            //Arrange
-            _routeData.Values.Remove("ukprn");
-            _routeData.Values.Add("employerAccountId", EmployerAccountId);
-
-            _encodingService
-                .Setup(x => x.TryDecode(It.IsAny<string>(), EncodingType.AccountId, out It.Ref<long>.IsAny))
-                .Callback(new TryGetCallback((string accountId, EncodingType encodingType, ref long val) => val = EmployerAccountId))
-                .Returns(new TryGetReturns((string accountId, EncodingType encodingType, ref long val) => true));
-
-            //Act
-            var context = _contextProvider.GetAuthorizationContext();
-
-            //Assert
-            Assert.IsTrue(context.TryGet<long>("PartyId", out var actualAccountId));
-            Assert.AreEqual(EmployerAccountId, actualAccountId);
-        }
+     
 
         [Test]
         public void ThenIfAnEmptyCohortIsAvailableItWillNotBeCollected()
