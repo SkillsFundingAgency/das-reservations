@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsFilterModel filterModel,
             SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             string hashedId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -121,7 +121,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             string hashedId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -148,7 +148,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -186,7 +186,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ReservationsRouteModel routeModel,
             ManageReservationsFilterModel filterModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             filterModel.SearchTerm = string.Empty;
             mockMediator
@@ -204,7 +204,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsFilterModel filterModel,
             SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<SearchReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -225,7 +225,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsFilterModelBase baseFilterModel,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<ISessionStorageService<ManageReservationsFilterModelBase>> sessionStorageService,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.IsFromManage = true;
             mockMediator
@@ -255,7 +255,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ManageReservationsFilterModelBase baseFilterModel,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<ISessionStorageService<ManageReservationsFilterModelBase>> sessionStorageService,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             filterModel.SearchTerm = string.Empty;
             routeModel.IsFromManage = true;
@@ -280,7 +280,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<ISessionStorageService<ManageReservationsFilterModelBase>> sessionStorageService,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.IsFromManage = false;
             mockMediator
@@ -303,7 +303,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             SearchReservationsResult searchResult,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen]Mock<ISessionStorageService<ManageReservationsFilterModelBase>> sessionStorageService,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.IsFromManage = false;
             filterModel.SearchTerm = string.Empty;

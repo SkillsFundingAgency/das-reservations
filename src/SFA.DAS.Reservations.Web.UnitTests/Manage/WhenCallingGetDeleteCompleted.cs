@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -14,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public void And_Has_Ukprn_Then_Returns_Provider_Delete_Completed_View(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             var result = controller.DeleteCompleted(routeModel) as ViewResult;
 
@@ -25,7 +26,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public void And_No_Ukprn_Then_Returns_Employer_Delete_Completed_View(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
 

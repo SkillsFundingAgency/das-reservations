@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_Delete_Invalid_And_Has_Ukprn_Then_Shows_Provider_Delete_View_Again(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             controller.ModelState.AddModelError("key", "error message");
 
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_Delete_Invalid_And_No_Ukprn_Then_Shows_Employer_Delete_View_Again(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             controller.ModelState.AddModelError("key", "error message");
@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_Has_Ukprn_And_No_Id_Then_Redirect_To_Provider_Manage(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             routeModel.Id = null;
@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_No_Ukprn_And_No_Id_Then_Redirect_To_Employer_Manage(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             routeModel.UkPrn = null;
@@ -83,7 +83,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             mockMediator
@@ -101,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             routeModel.UkPrn = null;
@@ -120,7 +120,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             Exception exception,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             mockMediator
@@ -138,7 +138,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             Exception exception,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             viewModel.Delete = true;
@@ -156,7 +156,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
 
@@ -174,7 +174,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             viewModel.Delete = true;
             routeModel.UkPrn = null;
@@ -192,7 +192,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_Delete_False_And_Has_Ukprn_Then_Redirects_To_Provider_Manage_Route(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.IsFromManage = null;
             routeModel.UkPrn = 12345;
@@ -209,7 +209,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task And_Delete_False_And_No_Ukprn_Then_Redirects_To_Employer_Manage_Route(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             routeModel.IsFromManage = null;

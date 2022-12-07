@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IMediator> mediator,
             ReservationsRouteModel routeModel,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             EmployerAgreementNotSignedViewModel viewModel)
         {
             //Arrange
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IMediator> mediator,
             ReservationsRouteModel routeModel,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             EmployerAgreementNotSignedViewModel viewModel)
         {
             //Arrange
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] Mock<IMediator> mediator,
             ReservationsRouteModel routeModel,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             EmployerAgreementNotSignedViewModel viewModel)
         {
             //Arrange

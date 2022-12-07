@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> mockConfig,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
@@ -77,7 +77,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetReservationResult mediatorResult,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             routeModel.UkPrn = null;
             mediatorResult.UkPrn = null;
@@ -97,7 +97,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public void Then_If_No_ReservationId_Given_An_Error_Is_Throw(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             routeModel.Id = null;
 

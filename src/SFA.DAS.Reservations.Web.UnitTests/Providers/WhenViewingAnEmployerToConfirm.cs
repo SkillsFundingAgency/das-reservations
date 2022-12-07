@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [Test, MoqAutoData]
         public async Task Then_The_ViewModel_Is_Passed_To_The_View(
             [Frozen] Mock<IMediator> mediator,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             //Arrange
@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             string hashedAccountId,
             [Frozen] Mock<IMediator> mediator,
             [Frozen] Mock<IEncodingService> encodingService,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel,
             GetCachedReservationResult cachedResult)
         {

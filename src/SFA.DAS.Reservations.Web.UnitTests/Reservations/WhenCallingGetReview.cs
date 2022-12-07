@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task Then_It_Gets_Reservation_From_Cache(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             await controller.Review(routeModel);
 
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_Uses_Provider_Route_And_View(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             var result = await controller.Review(routeModel) as ViewResult;
 
@@ -81,7 +81,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_Uses_Employer_Route_And_View(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             routeModel.UkPrn = null;
             var result = await controller.Review(routeModel) as ViewResult;
@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Validation_Error_Then_Redirects_To_500(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -114,7 +114,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Other_Error_Then_Redirects_To_500(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))

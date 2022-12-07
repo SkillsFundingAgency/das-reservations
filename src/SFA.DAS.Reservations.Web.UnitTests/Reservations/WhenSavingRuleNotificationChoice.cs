@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string expectedUkprn,
             uint? ukprn,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             //arrange
             viewModel.RouteName = RouteNames.ProviderApprenticeshipTraining;
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             //arrange
             viewModel.RouteName = RouteNames.ProviderApprenticeshipTraining;
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             //Arrange
             viewModel.MarkRuleAsRead = false;

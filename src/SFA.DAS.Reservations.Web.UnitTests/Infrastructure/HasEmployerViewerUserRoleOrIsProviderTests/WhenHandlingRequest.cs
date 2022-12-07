@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUserRoleOrIsProviderTests
@@ -16,7 +17,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenChecksIfProviderIsAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenChecksIfEmployerIsAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
@@ -54,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenFailsCheckIfProviderIsNotAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
@@ -77,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenFailsCheckIfEmployerIsNotAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
@@ -100,7 +101,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenPassesCheckIfProviderIsNotAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
@@ -123,7 +124,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenPassesCheckIfEmployerIsNotAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign

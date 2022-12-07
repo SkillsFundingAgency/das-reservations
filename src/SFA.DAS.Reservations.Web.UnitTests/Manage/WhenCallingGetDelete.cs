@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_No_Id_Then_Redirects_To_Provider_Manage(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.Id = null;
 
@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_And_No_Id_Then_Redirects_To_Employer_Manage(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
             routeModel.Id = null;
@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         public async Task Then_Gets_Reservation_Details(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             await controller.Delete(routeModel);
 
@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             ReservationsRouteModel routeModel,
             GetReservationResult getReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_No_Ukprn_Then_ViewName_Is_EmployerDelete(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.UkPrn = null;
 
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_Then_ViewName_Is_ProviderDelete(
             ReservationsRouteModel routeModel,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             var result = await controller.Delete(routeModel) as ViewResult;
 

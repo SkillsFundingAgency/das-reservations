@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string expectedBackUrl,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             //Arrange
             routeModel.UkPrn = null;
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             routeModel.UkPrn = null;
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
@@ -97,7 +97,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string expectedBackUrl,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             //Arrange
             var expectedRule = new GlobalRule
@@ -138,7 +138,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             string expectedUkprn,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
