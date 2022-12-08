@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -97,8 +98,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             viewModel.Reserve = true;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
-            
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+
             await controller.PostReview(routeModel, viewModel);
 
             mockMediator.Verify(mediator =>
@@ -116,7 +122,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
@@ -140,7 +151,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             createReservationResult.IsEmptyCohortFromSelect = true;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
@@ -170,7 +186,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             createReservationResult.IsEmptyCohortFromSelect = true;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
@@ -237,7 +258,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             viewModel.Reserve = true;
             mockMediator
                 .Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
@@ -280,7 +306,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             viewModel.Reserve = true;
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(notFoundException);

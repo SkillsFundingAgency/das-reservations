@@ -27,6 +27,8 @@ using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -139,8 +141,7 @@ namespace SFA.DAS.Reservations.Web
                     _configuration,
                     _environment);
             }
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
@@ -159,6 +160,7 @@ namespace SFA.DAS.Reservations.Web
                         //options.EnableEndpointRouting = false;
                         options.AddAuthorization();
                         options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
+                        //options.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>();
                     })
                 .AddControllersAsServices();
 

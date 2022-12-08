@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -32,8 +34,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.MarkRuleAsRead = true;
 
             var claim = new Claim(ProviderClaims.ProviderUkprn, expectedUkprn);
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] {claim}));
-            
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+
             //act
             var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel) as RedirectToRouteResult;
 
@@ -61,7 +68,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.MarkRuleAsRead = true;
 
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId);
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
 
             //act
             var actual = await controller.SaveRuleNotificationChoice(routeModel, viewModel) as RedirectToRouteResult;

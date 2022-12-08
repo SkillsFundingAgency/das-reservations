@@ -8,6 +8,7 @@ using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -167,6 +168,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
                 [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             getLegalEntitiesResponse.AccountLegalEntities =
                 new List<AccountLegalEntity>
                 {
@@ -201,6 +208,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
                 [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             getLegalEntitiesResponse.AccountLegalEntities =
                 new List<AccountLegalEntity>
                 {

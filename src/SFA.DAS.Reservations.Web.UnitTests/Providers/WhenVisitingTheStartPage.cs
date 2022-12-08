@@ -45,6 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 });
 
             _controller = fixture.Build<ProviderReservationsController>().OmitAutoProperties().Create();
+            _controller.Url = Mock.Of<IUrlHelper>();
         }
 
         [Test]

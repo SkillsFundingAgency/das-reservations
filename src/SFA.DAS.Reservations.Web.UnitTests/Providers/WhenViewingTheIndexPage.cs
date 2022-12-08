@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 .Returns(ExpectedManageUrl);
 
             _controller = fixture.Build<ProviderReservationsController>().OmitAutoProperties().Create();
-            _controller.Url = Mock.Of<IUrlHelper>();
+            _controller.Url = _urlHelper.Object;
             var claim = new Claim(ProviderClaims.ProviderUkprn, ExpectedUkPrn);
             _controller.ControllerContext.HttpContext = new DefaultHttpContext
             {
