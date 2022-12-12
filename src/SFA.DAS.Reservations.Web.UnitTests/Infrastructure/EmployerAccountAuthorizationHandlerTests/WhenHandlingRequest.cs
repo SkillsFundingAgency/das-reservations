@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
         [Test, MoqAutoData]
         public async Task ThenSucceedsIfEmployerIsAuthorised(
             EmployerAccountRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+             DefaultHttpContext contextFilter,
             EmployerAccountAuthorizationHandler handler)
         {
             //Assign
@@ -39,8 +40,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {claim})});
 
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
 
             //Act
             await handler.HandleAsync(context);
@@ -232,7 +233,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             [Frozen] Mock<IEmployerAccountService> employerAccountService, 
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration, 
             EmployerAccountRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            DefaultHttpContext contextFilter,
             EmployerAccountAuthorizationHandler handler)
         {
             //Assign
@@ -246,9 +247,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {employerAccountClaim, userClaim})});
 
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
-
+            var filter = context.Resource as DefaultHttpContext;
+            filter.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
 
             var employerIdentifier = new EmployerIdentifier
             {
@@ -275,7 +275,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             [Frozen] Mock<IEmployerAccountService> employerAccountService, 
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration, 
             EmployerAccountRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            DefaultHttpContext contextFilter,
             EmployerAccountAuthorizationHandler handler)
         {
             //Assign
@@ -290,8 +290,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {employerAccountClaim, userClaim, emailClaim})});
 
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
             var employerIdentifier = new EmployerIdentifier
             {
                 AccountId = "1234", 

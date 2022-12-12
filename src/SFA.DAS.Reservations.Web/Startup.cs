@@ -147,20 +147,10 @@ namespace SFA.DAS.Reservations.Web
 
             var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
 
-            //services.AddMvc(
-            //        options =>
-            //        {
-            //            options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
-            //            options.AddAuthorization();
-            //        })
-            //    .AddControllersAsServices()
-            //    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvc(options =>
                     {
-                        //options.EnableEndpointRouting = false;
-                        options.AddAuthorization();
                         options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
-                        //options.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>();
+                        options.AddAuthorization();
                     })
                 .AddControllersAsServices();
 
@@ -171,11 +161,6 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
-
-            
-
-          //  services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-
             services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
 
@@ -266,12 +251,12 @@ namespace SFA.DAS.Reservations.Web
             }
 
             app.UseSession();
-
             app.UseRouting();
-             app.UseAuthorization();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                //endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
 
             //app.UseMvc(routes =>
