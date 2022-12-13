@@ -44,9 +44,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Authorization
 
             _routingFeature.Setup(f => f.RouteData).Returns(_routeData);
 
-            //_httpContextAccessor.Setup(c => c.HttpContext.Features[typeof(IRoutingFeature)])
-            //    .Returns(_routingFeature.Object);
-
             _httpContextAccessor.Setup(c => c.HttpContext.Features.Get<IRoutingFeature>())
                 .Returns(_routingFeature.Object);
 
