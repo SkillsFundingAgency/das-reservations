@@ -10,7 +10,6 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Testing.AutoFixture;
 
-
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.ReservationOuterService
 {
     public class WhenGettingTransferValidity
