@@ -3,7 +3,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Domain.Interfaces
 {
-    public interface IReservationsService
+    public interface IReservationsOuterService
     {
         Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId=null);
     }

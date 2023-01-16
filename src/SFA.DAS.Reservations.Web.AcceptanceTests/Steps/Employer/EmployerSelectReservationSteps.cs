@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EAS.Account.Api.Client;
-using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
@@ -41,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             _viewModel.TransferSenderId = transferSenderPublicHashedAccountId;
             _viewModel.CohortReference = TestDataValues.CohortReference;
 
-            var reservationsClient = Services.GetService<IReservationsService>();
+            var reservationsClient = Services.GetService<IReservationsOuterService>();
             var mockReservations = Mock.Get(reservationsClient);
             mockReservations.Setup(x => x.GetTransferValidity(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<int?>()))
                 .ReturnsAsync(() => new GetTransferValidityResponse{ IsValid = true });

@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             
             var accountApiClient = new Mock<IAccountApiClient>();
 
-            var reservationsService = new Mock<IReservationsService>();
+            var reservationsService = new Mock<IReservationsOuterService>();
 
             var urlHelper = new Mock<IUrlHelper>();
             
