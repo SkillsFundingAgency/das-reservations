@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         private Mock<IApiClient> _apiClient;
         private Mock<IOptions<ReservationsApiConfiguration>> _config;
         private Mock<IEncodingService> _encodingService;
-        private Mock<IReservationsService> _reservationsService;
+        private Mock<IReservationsOuterService> _reservationsService;
         private const string ExpectedTransferSenderEmployerAccountId = "TGB456";
         private const long ExpectedAccountId = 432;
         private const long ExpectedAccountLegalEntityId = 9895;
@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             TransferValidityResponse = new GetTransferValidityResponse{ IsValid = true };
 
-            _reservationsService = new Mock<IReservationsService>();
+            _reservationsService = new Mock<IReservationsOuterService>();
             _reservationsService.Setup(x =>
                     x.GetTransferValidity(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<int?>()))
                 .ReturnsAsync(TransferValidityResponse);

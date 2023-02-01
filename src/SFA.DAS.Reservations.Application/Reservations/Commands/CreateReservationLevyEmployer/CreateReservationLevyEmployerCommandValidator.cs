@@ -12,14 +12,14 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
     public class CreateReservationLevyEmployerCommandValidator : IValidator<CreateReservationLevyEmployerCommand>
     {
         private readonly IApiClient _apiClient;
-        private readonly IReservationsService _reservationsService;
+        private readonly IReservationsOuterService _reservationsService;
         private readonly IEncodingService _encodingService;
         private readonly ReservationsApiConfiguration _config;
 
         public CreateReservationLevyEmployerCommandValidator(IApiClient apiClient,
             IOptions<ReservationsApiConfiguration> config,
             IEncodingService encodingService,
-            IReservationsService reservationsService)
+            IReservationsOuterService reservationsService)
         {
             _apiClient = apiClient;
             _encodingService = encodingService;
