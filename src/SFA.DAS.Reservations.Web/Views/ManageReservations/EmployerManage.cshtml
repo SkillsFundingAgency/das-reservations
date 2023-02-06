@@ -5,7 +5,7 @@
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/manage";
-    var employerAccountId = ViewContext.RouteData.Values["employerAccountId"];
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
 @if (!Model.Reservations.Any())

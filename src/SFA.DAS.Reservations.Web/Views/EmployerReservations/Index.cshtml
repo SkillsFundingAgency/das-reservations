@@ -1,14 +1,13 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
-
-@model SFA.DAS.Reservations.Web.Models.EmployerStartViewModel
+﻿@model SFA.DAS.Reservations.Web.Models.EmployerStartViewModel
 
 @{
     ViewData["Title"] = "Reserve funding to train and assess an apprentice";
 
     ViewBag.GaData.Vpv = "/accounts/reservations";
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
-<a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.EmployerManage" asp-route-employerAccountId="@employerAccountId" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
@@ -22,7 +21,7 @@
 
             @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
 
-            <a asp-route="@RouteNames.EmployerSelectLegalEntity" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
+            <a asp-route="@RouteNames.EmployerSelectLegalEntity" asp-route-employerAccountId="@employerAccountId" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
     </div>
 </main>
