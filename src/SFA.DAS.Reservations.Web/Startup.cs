@@ -254,16 +254,8 @@ namespace SFA.DAS.Reservations.Web
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
-
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        name: "default",
-            //        template: "{controller=Home}/{action=Index}/{id?}");
-            //});
         }
     }
 }
