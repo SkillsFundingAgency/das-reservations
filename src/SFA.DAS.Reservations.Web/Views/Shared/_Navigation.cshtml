@@ -12,9 +12,13 @@
                     <li role="menuitem" class="das-user-navigation__list-item das-user-navigation__list-item--has-sub-menu">
                         <a href="#" class="das-user-navigation__link">Settings</a>
                         <ul role="menu" class="das-user-navigation__sub-menu js-hidden" aria-expanded="false">
-                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                <a asp-external-controller="change-signin-details" class="das-user-navigation__link">Change your sign-in details</a>
-                            </li>
+                            @if (Configuration["ReservationsWeb:UseDfESignIn"] != null && Configuration["ReservationsWeb:UseDfESignIn"]
+                            .Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
+                                    <a asp-external-controller="change-signin-details" class="das-user-navigation__link">Change your sign-in details</a>
+                                </li>
+                            }
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
                                 <a asp-external-controller="notification-settings" class="das-user-navigation__link">Notification settings</a>
                             </li>
@@ -44,7 +48,6 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
                         <ul role="menu" class="das-user-navigation__sub-menu js-hidden" aria-expanded="false">
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service" class="das-user-navigation__sub-menu-link">Your accounts</a></li>
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="rename" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Rename account</a></li>
-                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="change-signin-details" class="das-user-navigation__sub-menu-link">Change your sign-in details</a></li>
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="notifications" class="das-user-navigation__sub-menu-link">Notification settings</a></li>
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="" asp-external-action="notifications-manage" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Manage your advert notifications</a></li>
                         </ul>
