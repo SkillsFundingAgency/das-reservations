@@ -33,37 +33,6 @@
             </nav>
         </div>
     </div>
-
-    @*<div class="das-account-header das-account-header--provider">
-        <div class="govuk-width-container">
-            <p class="das-account-header__title">Your training provider account</p>
-            <nav class="das-user-navigation" id="user-nav">
-                <ul class="das-user-navigation__list" role="menu">
-                    <li role="menuitem" class="das-user-navigation__list-item">
-                        <a asp-external-controller="" class="das-user-navigation__link">@Context.User.Identity.Name</a>
-                    </li>
-                    <li role="menuitem" class="das-user-navigation__list-item das-user-navigation__list-item--has-sub-menu">
-                        <a href="#" class="das-user-navigation__link">Settings</a>
-                        <ul role="menu" class="das-user-navigation__sub-menu js-hidden" aria-expanded="false">
-                            @if (Configuration["ReservationsWeb:UseDfESignIn"] != null && Configuration["ReservationsWeb:UseDfESignIn"]
-                            .Equals("true", StringComparison.CurrentCultureIgnoreCase))
-                            {
-                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                    <a asp-external-controller="change-signin-details" class="das-user-navigation__link">Change your sign-in details</a>
-                                </li>
-                            }
-                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                <a asp-external-controller="notification-settings" class="das-user-navigation__link">Notification settings</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li role="menuitem" class="das-user-navigation__list-item">
-                        <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>*@
 }
 else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCultureIgnoreCase))
 {
