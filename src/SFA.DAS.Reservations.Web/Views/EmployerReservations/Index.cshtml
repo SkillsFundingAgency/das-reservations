@@ -19,7 +19,7 @@
                 <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">apprenticeship training course</a> the apprentice will take, which can be changed later</li>
             </ul>
 
-            @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
+            <partial name="_GlobalRuleInfo" model="@Model.ActiveGlobalRule"/>
 
             <a asp-route="@RouteNames.EmployerSelectLegalEntity" asp-route-employerAccountId="@employerAccountId" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
