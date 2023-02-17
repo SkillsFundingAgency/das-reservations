@@ -27,7 +27,7 @@ else
                 <li>the apprenticeship training course the apprentice will take</li>
             </ul>
 
-            @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule);
+            <partial name="_GlobalRuleInfo" model="@Model.ActiveGlobalRule" />
 
             <a asp-route="provider-choose-employer" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
