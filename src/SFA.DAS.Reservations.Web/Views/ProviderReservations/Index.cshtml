@@ -5,6 +5,8 @@
     var fromManageRouteData = (new Dictionary<string, string> { { "IsFromManage", "true" } });
 
     ViewBag.GaData.Vpv = "/reservations/start";
+    
+    string ukPrn = (string)ViewContext.RouteData.Values["ukPrn"];
 }
 
 @if (Model.IsFromManage)
@@ -29,7 +31,7 @@ else
 
             <partial name="_GlobalRuleInfo" model="@Model.ActiveGlobalRule" />
 
-            <a asp-route="provider-choose-employer" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
+            <a asp-route="provider-choose-employer" asp-route-ukPrn="@ukPrn" role="button" draggable="false" class="govuk-button" tabindex="1">Reserve funding</a>
         </div>
     </div>
     </main>
