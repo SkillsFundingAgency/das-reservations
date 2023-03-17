@@ -219,7 +219,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
 
             employerAccountService.Setup(s => s.GetClaim(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(employerAccountClaim);
+                .ReturnsAsync(new List<Claim>{employerAccountClaim});
 
             //Act
             await handler.HandleAsync(context);
@@ -260,7 +260,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var refreshedEmployerAccountClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(refreshedEmployerAccounts));
             
             employerAccountService.Setup(s => s.GetClaim(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(refreshedEmployerAccountClaim);
+                .ReturnsAsync(new List<Claim>{refreshedEmployerAccountClaim});
 
             //Act
             await handler.HandleAsync(context);
@@ -302,7 +302,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var refreshedEmployerAccountClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(refreshedEmployerAccounts));
             
             employerAccountService.Setup(s => s.GetClaim(userId, It.IsAny<string>(), email))
-                .ReturnsAsync(refreshedEmployerAccountClaim);
+                .ReturnsAsync(new List<Claim>{refreshedEmployerAccountClaim});
 
             //Act
             await handler.HandleAsync(context);
