@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.GovUK.Auth.Authentication;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.AppStart
@@ -21,6 +22,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireAuthenticatedUser();
                         policy.RequireClaim(EmployerClaims.AccountsClaimsTypeIdentifier);
                         policy.Requirements.Add(new EmployerAccountRequirement());
+                        policy.Requirements.Add(new AccountActiveRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames
@@ -38,6 +40,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireAuthenticatedUser();
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
+                        policy.Requirements.Add(new AccountActiveRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames.HasEmployerViewerUserRoleOrIsProvider
@@ -46,6 +49,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireAuthenticatedUser();
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
+                        policy.Requirements.Add(new AccountActiveRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer
@@ -54,6 +58,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireAuthenticatedUser();
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAV));
+                        policy.Requirements.Add(new AccountActiveRequirement());
                     });
                 options.AddPolicy(
                    PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer
@@ -62,6 +67,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                        policy.RequireAuthenticatedUser();
                        ProviderOrEmployerAssertion(policy);
                        policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAC));
+                       policy.Requirements.Add(new AccountActiveRequirement());
                    });
             });
         }
