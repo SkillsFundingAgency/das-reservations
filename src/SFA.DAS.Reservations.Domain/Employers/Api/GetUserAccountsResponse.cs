@@ -5,6 +5,8 @@ namespace SFA.DAS.Reservations.Domain.Employers.Api
 {
     public class GetUserAccountsResponse
     {
+        [JsonProperty]
+        public bool IsSuspended { get; set; }
         [JsonProperty("UserAccounts")]
         public List<EmployerIdentifier> UserAccounts { get; set; }
     }

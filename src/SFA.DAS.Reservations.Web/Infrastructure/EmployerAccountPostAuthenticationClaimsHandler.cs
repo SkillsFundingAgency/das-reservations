@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
             var result = await _employerAccountService.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier, email);
 
-            return new List<Claim> { result };
+            return result;
         }
     }
 }

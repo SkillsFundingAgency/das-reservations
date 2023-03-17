@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var accountData = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, claimValue);
             apimWebConfiguration.Object.Value.UseGovSignIn = true;
             var tokenValidatedContext = ArrangeTokenValidatedContext(nameIdentifier, idamsIdentifier, emailAddress);
-            accountService.Setup(x => x.GetClaim(nameIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress)).ReturnsAsync(accountData);
+            accountService.Setup(x => x.GetClaim(nameIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress)).ReturnsAsync(new List<Claim>{accountData});
             
             var actual = await handler.GetClaims(tokenValidatedContext);
             
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
         {
             var accountData = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, claimValue);
             var tokenValidatedContext = ArrangeTokenValidatedContext(nameIdentifier, idamsIdentifier, string.Empty);
-            accountService.Setup(x => x.GetClaim(idamsIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier, "")).ReturnsAsync(accountData);
+            accountService.Setup(x => x.GetClaim(idamsIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier, "")).ReturnsAsync(new List<Claim>{accountData});
             apimDeveloperWebConfiguration.Object.Value.UseGovSignIn = false;
             
             var actual = await handler.GetClaims(tokenValidatedContext);
