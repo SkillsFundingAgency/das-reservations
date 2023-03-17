@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,14 +43,13 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
         public bool IsEmployerAuthorised(AuthorizationHandlerContext context, bool allowAllUserRoles)
         {
-            if (!(context.Resource is AuthorizationFilterContext mvcContext) || !mvcContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId)) 
+            if (!(context.Resource is HttpContext mvcContext) || !mvcContext.Request.RouteValues.ContainsKey(RouteValues.EmployerAccountId))
                 return false;
 
-            
-            var accountIdFromUrl = mvcContext.RouteData.Values[RouteValues.EmployerAccountId].ToString().ToUpper();
-            var employerAccountClaim = context.User.FindFirst(c=>c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+            var accountIdFromUrl = mvcContext.Request.RouteValues[RouteValues.EmployerAccountId].ToString().ToUpper();
+            var employerAccountClaim = context.User.FindFirst(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
-            if(employerAccountClaim?.Value == null)
+            if (employerAccountClaim?.Value == null)
                 return false;
 
             Dictionary<string, EmployerIdentifier> employerAccounts;
@@ -68,15 +68,15 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
             if (employerAccounts != null)
             {
-                employerIdentifier = employerAccounts.ContainsKey(accountIdFromUrl) 
+                employerIdentifier = employerAccounts.ContainsKey(accountIdFromUrl)
                     ? employerAccounts[accountIdFromUrl] : null;
             }
 
             if (employerAccounts == null || !employerAccounts.ContainsKey(accountIdFromUrl))
             {
-                var requiredIdClaim =_configuration.UseGovSignIn 
+                var requiredIdClaim = _configuration.UseGovSignIn
                     ? ClaimTypes.NameIdentifier : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
-                
+
                 if (!context.User.HasClaim(c => c.Type.Equals(requiredIdClaim)))
                     return false;
 
@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 var updatedEmployerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(updatedAccountClaim?.Value);
 
                 userClaim.Subject.AddClaim(updatedAccountClaim);
-                
+
                 if (!updatedEmployerAccounts.ContainsKey(accountIdFromUrl))
                 {
                     return false;
@@ -100,16 +100,16 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 employerIdentifier = updatedEmployerAccounts[accountIdFromUrl];
             }
 
-            if (!mvcContext.HttpContext.Items.ContainsKey(ContextItemKeys.EmployerIdentifier))
+            if (!mvcContext.Items.ContainsKey(ContextItemKeys.EmployerIdentifier))
             {
-                mvcContext.HttpContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
+                mvcContext.Items.Add(ContextItemKeys.EmployerIdentifier, employerAccounts.GetValueOrDefault(accountIdFromUrl));
             }
-            
-            if (!allowAllUserRoles && !CheckUserRoleForAccess(employerIdentifier)) 
+
+            if (!allowAllUserRoles && !CheckUserRoleForAccess(employerIdentifier))
             {
                 return false;
             }
-            
+
             return true;
         }
 

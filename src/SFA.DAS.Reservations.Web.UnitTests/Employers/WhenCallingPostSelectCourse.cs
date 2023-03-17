@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _externalUrlHelper = fixture.Freeze<Mock<IExternalUrlHelper>>();
             _mediator = fixture.Freeze<Mock<IMediator>>();
             
-            _controller = fixture.Create<EmployerReservationsController>();
+            _controller = fixture.Build<EmployerReservationsController>().OmitAutoProperties().Create();
 
             _mediator.Setup(mediator => mediator.Send(
                     It.IsAny<GetCachedReservationQuery>(),
@@ -171,10 +171,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task Then_The_BackLink_Is_Set_To_Return_To_ReviewPage_If_There_Is_FromReview_Flag(
-            ICollection<Course> courses,
-            [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller,
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
@@ -199,10 +196,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 
         [Test, MoqAutoData]
         public async Task Then_The_BackLink_Is_Set_To_Return_To_SelectLegalEntityView_When_Validation_Error(
-            ICollection<Course> courses,
-            [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller,
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
@@ -229,7 +223,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task WhenApprenticeshipTrainingNotKnown_ThenRedirectsToGuidancePage(
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller,
+            [NoAutoProperties] EmployerReservationsController controller,
             PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
@@ -247,9 +241,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
         public async Task WhenApprenticeshipTrainingIsNull_ThenRedirectsToSelectCourse(
             ReservationsRouteModel routeModel, 
-            PostSelectCourseViewModel postSelectCourseViewModel,
-            [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            PostSelectCourseViewModel postSelectCourseViewModel)
         {
             //Arrange
             postSelectCourseViewModel.ApprenticeTrainingKnown = null;

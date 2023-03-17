@@ -4,9 +4,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -34,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             routeModel.Id = null;
             mockEncodingService
@@ -57,7 +59,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             AccountLegalEntity accountLegalEntity,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             routeModel.Id = null;
             accountLegalEntity.AgreementSigned = true;
@@ -90,7 +92,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             routeModel.Id = null;
 
@@ -112,7 +114,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
@@ -130,7 +132,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task And_Global_Rule_Exists_Then_Shows_Funding_Paused_Page(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
@@ -145,7 +147,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task And_Reservation_Limit_Has_Been_Exceeded_Then_Shows_Reservation_Limit_Reached_Page(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
@@ -164,8 +166,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 GetLegalEntitiesResponse getLegalEntitiesResponse,
                 [Frozen] Mock<IMediator> mockMediator,
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
-                EmployerReservationsController controller)
+                [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             getLegalEntitiesResponse.AccountLegalEntities =
                 new List<AccountLegalEntity>
                 {
@@ -198,8 +206,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 GetLegalEntitiesResponse getLegalEntitiesResponse,
                 [Frozen] Mock<IMediator> mockMediator,
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
-                EmployerReservationsController controller)
+                [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             getLegalEntitiesResponse.AccountLegalEntities =
                 new List<AccountLegalEntity>
                 {

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -36,6 +35,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.Authority = configuration.Value.BaseAddress;
                     options.MetadataAddress = $"{configuration.Value.BaseAddress}/.well-known/openid-configuration";
                     options.ResponseType = "code";
+                    options.UsePkce = false;
                     
                     var scopes = configuration.Value.Scopes.Split(' ');
                     foreach (var scope in scopes)

@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             [Frozen] ServiceParameters serviceParameters,
             [ArrangeActionContext] ActionExecutingContext context,
             [Frozen] Mock<ActionExecutionDelegate> nextMethod,
-            GoogleAnalyticsFilter filter)
+            [NoAutoProperties] GoogleAnalyticsFilter filter)
         {
             //Arrange
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, userId.ToString());

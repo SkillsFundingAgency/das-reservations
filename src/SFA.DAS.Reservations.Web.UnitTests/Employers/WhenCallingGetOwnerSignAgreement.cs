@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -12,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         [Test, MoqAutoData]
          public void Then_Sets_ViewModel(
              ReservationsRouteModel routeModel,
-             EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
          {
              routeModel.IsFromSelect = null;
              
@@ -27,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
          [Test, MoqAutoData]
          public void Then_Sets_IsUrl_If_From_SelectReservation_On_ViewModel(
              ReservationsRouteModel routeModel,
-             EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
          {
              routeModel.IsFromSelect = true;
                      

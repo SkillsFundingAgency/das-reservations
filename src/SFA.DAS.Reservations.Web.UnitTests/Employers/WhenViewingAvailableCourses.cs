@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetCoursesResult coursesResult,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetCoursesResult coursesResult,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_All_Available_Courses_Are_Viewable(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller,
+            [NoAutoProperties] EmployerReservationsController controller,
             ReservationsRouteModel routeModel)
         {
             //Assign
@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             GetCoursesResult coursesResult,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             cachedReservationResult.CourseId = coursesResult.Courses.First().Id;
             mockMediator
@@ -109,7 +109,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
         public async Task Then_ReservationId_Will_Be_In_View_Model(
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller,
+            [NoAutoProperties] EmployerReservationsController controller,
             ReservationsRouteModel routeModel)
         {
             //Assign
@@ -137,7 +137,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetCachedReservationResult cachedReservationResult,
             string cohortUrl,
-            EmployerReservationsController controller
+            [NoAutoProperties] EmployerReservationsController controller
             )
         {
             //Arrange
@@ -179,7 +179,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             GetCachedReservationResult cachedReservationResult,
             string cohortUrl,
-            EmployerReservationsController controller
+            [NoAutoProperties] EmployerReservationsController controller
         )
         {
             //Arrange
@@ -216,7 +216,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ICollection<Course> courses,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
             routeModel.FromReview = true;
@@ -241,7 +241,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ICollection<Course> courses,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
             routeModel.FromReview = false;
@@ -271,7 +271,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ICollection<Course> courses,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
             routeModel.FromReview = false;

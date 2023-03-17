@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
@@ -30,14 +31,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         public TestServiceProvider(string authType)
         {
             var serviceCollection = new ServiceCollection();
-            var hosting = new HostingEnvironment{EnvironmentName = EnvironmentName.Development, ApplicationName = "SFA.DAS.Reservations.Web"};
             var configuration = GenerateConfiguration(authType);
 
-            var startup = new Startup(configuration, hosting);
+            var startup = new Startup(configuration, new TestHostEnvironment());
 
             startup.ConfigureServices(serviceCollection);
             serviceCollection.ConfigureTestServiceCollection(configuration, null);
-            serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
+            serviceCollection.AddTransient<IWebHostEnvironment, TestHostEnvironment>();
             RegisterControllers(serviceCollection);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -169,6 +169,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         }
     }
 
+    public class TestHostEnvironment : IWebHostEnvironment
+    {
+        public IFileProvider WebRootFileProvider { get; set; }
+        public string WebRootPath { get; set; }
+        public string ApplicationName { get => "SFA.DAS.Reservations.Web"; set { } }
+        public IFileProvider ContentRootFileProvider { get; set; }
+        public string ContentRootPath { get; set; }
+        public string EnvironmentName { get => "Development"; set { } }
+    }
     public class EmployerTestServiceProvider : TestServiceProvider
     {
         public EmployerTestServiceProvider() : base("employer")

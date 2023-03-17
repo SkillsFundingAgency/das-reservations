@@ -44,7 +44,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                     Employers = new List<AccountLegalEntity> { new AccountLegalEntity() }
                 });
 
-            _controller = fixture.Create<ProviderReservationsController>();
+            _controller = fixture.Build<ProviderReservationsController>().OmitAutoProperties().Create();
+            _controller.Url = Mock.Of<IUrlHelper>();
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IUrlHelper> mockUrlHelper,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            ProviderReservationsController controller)
+            [NoAutoProperties] ProviderReservationsController controller)
         {
             //Arrange
             var result = new GetFundingRulesResult
@@ -189,7 +190,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             uint ukPrn,
             [Frozen] Mock<IUrlHelper> mockUrlHelper,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            ProviderReservationsController controller)
+            [NoAutoProperties] ProviderReservationsController controller)
         {
             //Arrange
             var result = new GetFundingRulesResult

@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> encodingService,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         public async Task Then_If_Not_Confirmed_The_Choosen_Employer_Is_Not_Stored(
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = false;
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IFundingRulesService> mockFundingRulesService,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
@@ -103,7 +103,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         public async Task Then_If_Confirmed_And_Funding_Limit_Is_Reached_User_Is_Redirected_To_ReservationLimitReached_Page(
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
@@ -131,7 +131,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         public async Task Then_If_Not_Confirmed_User_Is_Redirected_Back_To_Start_Step(
             uint ukPrn,
             [Frozen] Mock<IMediator> mockMediator,
-            ProviderReservationsController controller,
+            [NoAutoProperties] ProviderReservationsController controller,
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = false;
