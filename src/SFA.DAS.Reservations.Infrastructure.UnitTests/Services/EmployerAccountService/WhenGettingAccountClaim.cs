@@ -91,13 +91,20 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             string userId,
             string claimType,
             string email,
-            List<AccountDetailViewModel> accountDetailViewModel,
+            string hashedId,
+            string accountName,
             List<TeamMemberViewModel> teamMemberViewModels,
             [Frozen] Mock<IAccountApiClient> accountsApi,
             [Frozen] Mock<IReservationsOuterApiClient> reservationsOuterApiClient,
             [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
             Infrastructure.Services.EmployerAccountService employerAccountService)
         {
+            var accountDetailViewModel = new List<AccountDetailViewModel>();
+            accountDetailViewModel.Add(new AccountDetailViewModel
+            {
+                HashedAccountId = hashedId,
+                DasAccountName = accountName,
+            });
             configuration.Object.Value.UseGovSignIn = false;
             teamMemberViewModels.First().UserRef = userId;
             accountsApi.Setup(x => x.GetUserAccounts(userId)).ReturnsAsync(accountDetailViewModel);
