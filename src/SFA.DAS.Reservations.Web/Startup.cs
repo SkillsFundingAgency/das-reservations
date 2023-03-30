@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Web
     public class Startup
     {
         private const string EncodingConfigKey = "SFA.DAS.Encoding";
-        
+
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
 
@@ -56,11 +56,11 @@ namespace SFA.DAS.Reservations.Web
                         options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                         options.EnvironmentName = configuration["Environment"];
                         options.PreFixConfigurationKeys = false;
-                        options.ConfigurationKeysRawJsonResult = new[] {EncodingConfigKey};
+                        options.ConfigurationKeysRawJsonResult = new[] { EncodingConfigKey };
                     }
                 );
             }
-            
+
             _configuration = config.Build();
         }
 
@@ -174,7 +174,7 @@ namespace SFA.DAS.Reservations.Web
                     options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
                 });
             }
-            
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -191,18 +191,18 @@ namespace SFA.DAS.Reservations.Web
                     .AddCheck<ReservationsApiHealthCheck>(
                         "Reservation Api",
                         failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
+                        tags: new[] { "ready" })
                     .AddCheck<ProviderRelationshipsApiHealthCheck>(
                         "ProviderRelationships Api",
                         failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
+                        tags: new[] { "ready" })
                     .AddCheck<AccountApiHealthCheck>(
                         "Accounts Api",
                         failureStatus: HealthStatus.Unhealthy,
                         tags: new[] { "ready" });
             }
-            
-            
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
