@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Web.Filters;
+using Microsoft.Extensions.Configuration;
+using SFA.DAS.GovUK.Auth.Models;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -12,13 +15,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
 {
     public class HomeController : Controller
     {    
-        private readonly ILogger<HomeController> _logger;
-        private readonly IExternalUrlHelper _urlHelper;
+        private readonly IConfiguration _config;
+        private readonly IStubAuthenticationService _stubAuthenticationService;
 
-        public HomeController(ILogger<HomeController> logger, IExternalUrlHelper urlHelper)
+        public HomeController(IConfiguration config, IStubAuthenticationService stubAuthenticationService)
         {
-            _logger = logger;
-            _urlHelper = urlHelper;
+            _config = config;
+            _stubAuthenticationService = stubAuthenticationService;
         }
 
         [Route("signout",Name = RouteNames.ProviderSignOut)]
@@ -71,5 +74,35 @@ namespace SFA.DAS.Reservations.Web.Controllers
         {
             return View();
         }
+        
+#if DEBUG
+        [HttpGet]
+        [Route("SignIn-Stub")]
+        public IActionResult SigninStub()
+        {
+            return View("SigninStub", new List<string>{_config["StubId"],_config["StubEmail"]});
+        }
+        [HttpPost]
+        [Route("SignIn-Stub")]
+        public IActionResult SigninStubPost()
+        {
+            var model =  new StubAuthUserDetails
+            {
+                Email = _config["StubEmail"],
+                Id = _config["StubId"]
+            };
+            _stubAuthenticationService.AddStubEmployerAuth(Response.Cookies, model, true);
+
+            return RedirectToRoute("Signed-in-stub");
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("signed-in-stub", Name = "Signed-in-stub")]
+        public IActionResult SignedInStub()
+        {
+            return View();
+        }
+#endif
     }
 }
