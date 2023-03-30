@@ -10,9 +10,10 @@
     ViewData["CustomErrorKeys"] = customErrorKeys;
 
     ViewBag.GaData.Vpv = "/accounts/reservations/select-course";
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
-<a asp-route="@RouteNames.EmployerIndex" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.EmployerIndex" asp-route-employerAccountId="@employerAccountId" class="govuk-back-link">Back</a>
 <main class="govuk-main-wrapper " id="main-content" role="main">
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -21,7 +22,7 @@
 
         <h1 class="govuk-heading-xl">Choose organisation</h1>
 
-        <form method="post" asp-route="@RouteNames.EmployerSelectLegalEntity" class="validate-auto-complete">
+            <form method="post" asp-route="@RouteNames.EmployerSelectLegalEntity" asp-route-employerAccountId="@employerAccountId" class="validate-auto-complete">
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
                     Which organisation is named on the contract with the training provider for the apprentices you'd like to add?
