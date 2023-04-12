@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
