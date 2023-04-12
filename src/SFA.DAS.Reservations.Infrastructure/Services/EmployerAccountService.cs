@@ -44,6 +44,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                     claims.Add(new Claim(ClaimTypes.AuthorizationDecision, "Suspended"));
                 }
                 
+                claims.Add(new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, apiResponse.UserId));
+                
                 accounts = apiResponse.UserAccounts.Select(c => new EmployerIdentifier
                 {
                     Role = c.Role,
