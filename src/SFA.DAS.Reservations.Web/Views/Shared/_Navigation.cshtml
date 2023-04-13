@@ -66,8 +66,20 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
                         <ul role="menu" class="das-user-navigation__sub-menu js-hidden" aria-expanded="false">
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service" class="das-user-navigation__sub-menu-link">Your accounts</a></li>
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="rename" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Rename account</a></li>
-                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-pwd="true" asp-identity-server-chg-email="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your password</a></li>
-                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-email="true" asp-identity-server-chg-pwd="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your email address</a></li>
+                            
+                            @if (ReservationsWebConfig.Value.UseGovSignIn)
+                            {
+                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
+                                    <a asp-external-controller="user"  asp-external-subdomain="employerprofiles" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" asp-external-action="change-sign-in-details" >Change your sign-in details</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-pwd="true" asp-identity-server-chg-email="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your password</a></li>
+                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-identity-server-chg-email="true" asp-identity-server-chg-pwd="" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Change your email address</a></li>    
+                            }
+                            
+                            
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="settings" asp-external-subdomain="accounts" asp-external-action="notifications" class="das-user-navigation__sub-menu-link">Notification settings</a></li>
                             <li class="das-user-navigation__sub-menu-list-item" role="menuitem"><a asp-external-controller="" asp-external-action="notifications-manage" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-user-navigation__sub-menu-link">Manage your advert notifications</a></li>
                         </ul>
