@@ -70,7 +70,7 @@ else if (Configuration["AuthType"].Equals("employer",StringComparison.CurrentCul
                             @if (ReservationsWebConfig.Value.UseGovSignIn)
                             {
                                 <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                    <a asp-external-controller="user"  asp-external-subdomain="employerprofiles" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" asp-external-action="change-sign-in-details" >Change your sign-in details</a>
+                                    <a asp-external-controller="user"  asp-external-subdomain="employerprofiles" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" asp-external-action="change-sign-in-details" class="das-user-navigation__sub-menu-link">Change your sign-in details</a>
                                 </li>
                             }
                             else
