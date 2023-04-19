@@ -18,8 +18,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
     {
         public static void AddAndConfigureEmployerAuthentication(
             this IServiceCollection services,
-            IOptions<IdentityServerConfiguration> configuration, 
-            IEmployerAccountService accountsSvc)
+            IdentityServerConfiguration configuration)
         {
             services
                 .AddAuthentication(sharedOptions =>
@@ -31,20 +30,19 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
                 }).AddOpenIdConnect(options =>
                 {
-                    options.ClientId = configuration.Value.ClientId;
-                    options.ClientSecret = configuration.Value.ClientSecret;
-                    options.Authority = configuration.Value.BaseAddress;
-                    options.MetadataAddress = $"{configuration.Value.BaseAddress}/.well-known/openid-configuration";
+                    options.ClientId = configuration.ClientId;
+                    options.ClientSecret = configuration.ClientSecret;
+                    options.Authority = configuration.BaseAddress;
+                    options.MetadataAddress = $"{configuration.BaseAddress}/.well-known/openid-configuration";
                     options.ResponseType = "code";
                     options.UsePkce = false;
                     
-                    var scopes = configuration.Value.Scopes.Split(' ');
+                    var scopes = configuration.Scopes.Split(' ');
                     foreach (var scope in scopes)
                     {
                         options.Scope.Add(scope);
                     }
                     options.ClaimActions.MapUniqueJsonKey("sub", "id");
-                    options.Events.OnTokenValidated = async (ctx) => await PopulateAccountsClaim(ctx, accountsSvc);
                     options.Events.OnRemoteFailure = c =>
                     {
                         if (c.Failure.Message.Contains("Correlation failed"))
@@ -65,6 +63,15 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     options.SlidingExpiration = true;
                     options.Cookie.SameSite = SameSiteMode.None;
                     options.CookieManager = new ChunkingCookieManager() { ChunkSize = 3000 };
+                });
+            services
+                .AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
+                .Configure<IEmployerAccountService>((options, accountsSvc) =>
+                {
+                    options.Events.OnTokenValidated = async (ctx) =>
+                    {
+                        await PopulateAccountsClaim(ctx, accountsSvc);
+                    };
                 });
         }
 

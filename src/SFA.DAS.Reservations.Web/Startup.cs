@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            services.AddServices(serviceParameters, _configuration);
+            
 
             if (_configuration["Environment"] != "DEV" || (
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
@@ -108,14 +108,13 @@ namespace SFA.DAS.Reservations.Web
                     services.AddProviderConfiguration(_configuration, _environment);
                 }
             }
-
-            var serviceProvider = services.BuildServiceProvider();
-
+            services.AddServices(serviceParameters, _configuration);
+            
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
 
             services.AddCommitmentsPermissionsApi(_configuration, _environment);
-
+            
             if (isEmployerAuth)
             {
                 if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
@@ -127,16 +126,19 @@ namespace SFA.DAS.Reservations.Web
                 }
                 else
                 {
-                    services.AddAndConfigureEmployerAuthentication(
-                        serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
-                        serviceProvider.GetService<IEmployerAccountService>());
+                    var identityServerConfiguration = _configuration
+                        .GetSection("Identity")
+                        .Get<IdentityServerConfiguration>();
+                    services.AddAndConfigureEmployerAuthentication(identityServerConfiguration);
                 }
             }
 
             if (isProviderAuth)
             {
-                services.AddAndConfigureProviderAuthentication(
-                    serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>(),
+                var providerIdamsConfiguration = _configuration
+                    .GetSection("ProviderIdams")
+                    .Get<ProviderIdamsConfiguration>();
+                services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
                     _configuration,
                     _environment);
             }
@@ -144,7 +146,9 @@ namespace SFA.DAS.Reservations.Web
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
-            var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
+            var reservationsWebConfig = _configuration
+                .GetSection("ReservationsWeb")
+                .Get<ReservationsWebConfiguration>();
 
             services.AddMvc(options =>
                     {

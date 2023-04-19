@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {
                 services.AddSingleton<IApiClient, ApiClient>();
-                services.AddSingleton<IEncodingService, EncodingService>();
+                services.AddScoped<IEncodingService, EncodingService>();
             }
 
             services.AddSingleton<IProviderService, ProviderService>();
