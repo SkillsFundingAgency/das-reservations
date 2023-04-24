@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
@@ -15,7 +14,6 @@ using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
@@ -122,7 +120,7 @@ namespace SFA.DAS.Reservations.Web
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
                     services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
-                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth", typeof(EmployerAccountPostAuthenticationClaimsHandler));
+                    services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
                 }
                 else
                 {

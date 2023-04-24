@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
@@ -28,7 +30,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public IActionResult SignOut()
         {
             return SignOut(
-                new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+                new AuthenticationProperties
                 {
                     RedirectUri = "",
                     AllowRefresh = true
@@ -40,14 +42,23 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
         public IActionResult SignOutEmployer()
         {
+            var schemes = new List<string>
+            {
+                CookieAuthenticationDefaults.AuthenticationScheme
+            };
+            _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
+            if (!stubAuth)
+            {
+                schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
+            }
+            
             return SignOut(
                 new Microsoft.AspNetCore.Authentication.AuthenticationProperties
                 {
                     RedirectUri = "",
                     AllowRefresh = true
                 },
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                OpenIdConnectDefaults.AuthenticationScheme);
+                schemes.ToArray());
         }
 
 
@@ -84,14 +95,17 @@ namespace SFA.DAS.Reservations.Web.Controllers
         }
         [HttpPost]
         [Route("SignIn-Stub")]
-        public IActionResult SigninStubPost()
+        public async Task<IActionResult> SigninStubPost()
         {
             var model =  new StubAuthUserDetails
             {
                 Email = _config["StubEmail"],
                 Id = _config["StubId"]
             };
-            _stubAuthenticationService.AddStubEmployerAuth(Response.Cookies, model, true);
+            var claims = await _stubAuthenticationService.GetStubSignInClaims(model);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claims,
+                new AuthenticationProperties());
 
             return RedirectToRoute("Signed-in-stub");
         }
