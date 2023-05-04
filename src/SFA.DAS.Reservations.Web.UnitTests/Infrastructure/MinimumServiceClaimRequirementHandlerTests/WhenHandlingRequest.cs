@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -136,19 +137,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.MinimumServiceClaimR
 
             public AuthorizationHandlerContext SetWithEmployer()
             {
-                var dictionary = new RouteValueDictionary();
-                dictionary.Add(RouteValues.EmployerAccountId, "somevalue");
-                var routeData = new RouteData(dictionary);
-
-                ActionContext fakeActionContext =
-                    new ActionContext(Mock.Of<HttpContext>(),
-                    routeData,
-                    new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
-
-                AuthorizationFilterContext fakeAuthFilterContext =
-                    new AuthorizationFilterContext(fakeActionContext,
-                    new List<IFilterMetadata> { });
-
+                DefaultHttpContext fakeAuthFilterContext =
+                    new DefaultHttpContext();
+                fakeAuthFilterContext.Request.RouteValues.Add(RouteValues.EmployerAccountId, "somevalue");
+                
                 var claims = new List<Claim>();
                 
                 var user = new ClaimsPrincipal(
