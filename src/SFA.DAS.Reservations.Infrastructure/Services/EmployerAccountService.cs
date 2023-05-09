@@ -31,13 +31,21 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             _configuration = configuration.Value;
         }
 
-        public async Task<Claim> GetClaim(string userId, string claimType, string email)
+        public async Task<List<Claim>> GetClaim(string userId, string claimType, string email)
         {
             IEnumerable<EmployerIdentifier> accounts;
+            var claims = new List<Claim>();
             if (_configuration.UseGovSignIn)
             {
                 var apiResponse =
                     await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email));
+                if (apiResponse.IsSuspended)
+                {
+                    claims.Add(new Claim(ClaimTypes.AuthorizationDecision, "Suspended"));
+                }
+                
+                claims.Add(new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, apiResponse.UserId));
+                
                 accounts = apiResponse.UserAccounts.Select(c => new EmployerIdentifier
                 {
                     Role = c.Role,
@@ -54,7 +62,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 
             var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
             var associatedAccountsClaim = new Claim(claimType, accountsAsJson, JsonClaimValueTypes.Json);
-            return associatedAccountsClaim;
+            claims.Add(associatedAccountsClaim);
+            return claims;
         }
 
         public async Task<IEnumerable<EmployerIdentifier>> GetEmployerIdentifiersAsync(string userId)

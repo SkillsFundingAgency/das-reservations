@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
@@ -15,7 +14,6 @@ using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
@@ -93,7 +91,7 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            services.AddServices(serviceParameters, _configuration);
+            
 
             if (_configuration["Environment"] != "DEV" || (
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
@@ -108,14 +106,13 @@ namespace SFA.DAS.Reservations.Web
                     services.AddProviderConfiguration(_configuration, _environment);
                 }
             }
-
-            var serviceProvider = services.BuildServiceProvider();
-
+            services.AddServices(serviceParameters, _configuration);
+            
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
 
             services.AddCommitmentsPermissionsApi(_configuration, _environment);
-
+            
             if (isEmployerAuth)
             {
                 if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
@@ -123,20 +120,23 @@ namespace SFA.DAS.Reservations.Web
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
                     services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
-                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth", typeof(EmployerAccountPostAuthenticationClaimsHandler));
+                    services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
                 }
                 else
                 {
-                    services.AddAndConfigureEmployerAuthentication(
-                        serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
-                        serviceProvider.GetService<IEmployerAccountService>());
+                    var identityServerConfiguration = _configuration
+                        .GetSection("Identity")
+                        .Get<IdentityServerConfiguration>();
+                    services.AddAndConfigureEmployerAuthentication(identityServerConfiguration);
                 }
             }
 
             if (isProviderAuth)
             {
-                services.AddAndConfigureProviderAuthentication(
-                    serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>(),
+                var providerIdamsConfiguration = _configuration
+                    .GetSection("ProviderIdams")
+                    .Get<ProviderIdamsConfiguration>();
+                services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
                     _configuration,
                     _environment);
             }
@@ -144,7 +144,9 @@ namespace SFA.DAS.Reservations.Web
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
-            var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
+            var reservationsWebConfig = _configuration
+                .GetSection("ReservationsWeb")
+                .Get<ReservationsWebConfiguration>();
 
             services.AddMvc(options =>
                     {

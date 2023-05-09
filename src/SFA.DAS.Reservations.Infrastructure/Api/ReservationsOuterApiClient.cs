@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
 
         public async Task<TResponse> Get<TResponse>(IGetApiRequest request) 
         {
-            _logger.LogInformation("Calling Outer API base {0}, url {1}", _config.ApiBaseUrl, request.GetUrl);
+            _logger.LogInformation("Calling Outer API base");
 
             var httpMessage = new HttpRequestMessage(HttpMethod.Get, request.GetUrl);
 
@@ -38,18 +38,18 @@ namespace SFA.DAS.Reservations.Infrastructure.Api
 
             if (response.StatusCode.Equals(HttpStatusCode.NotFound))
             {
-                _logger.LogInformation("URL {0} found nothing", request.GetUrl);
+                _logger.LogInformation("Found nothing");
                 return default;
             }
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("URL {0} returned a response", request.GetUrl);
+                _logger.LogInformation("Returned a response");
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return JsonConvert.DeserializeObject<TResponse>(json);    
             }
 
-            _logger.LogInformation("URL {0} returned a response {1}", request.GetUrl, response.StatusCode);
+            _logger.LogInformation("Returned a response {0}",response.StatusCode);
             response.EnsureSuccessStatusCode();
             
             return default;

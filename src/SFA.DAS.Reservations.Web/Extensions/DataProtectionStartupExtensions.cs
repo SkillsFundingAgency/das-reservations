@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.Extensions
                         .Connect($"{redisConnectionString},{dataProtectionKeysDatabase}");
 
                     services.AddDataProtection()
-                        .SetApplicationName("das-reservations-web")
+                        .SetApplicationName("das-employer")
                         .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
                 }
             }

@@ -79,6 +79,9 @@
     "utcValue": {
       "type": "string",
       "defaultValue": "[utcNow()]"
+    },
+    "stubAuth": {
+        "type": "string"
     }
   },
   "variables": {
@@ -241,6 +244,10 @@
                 {
                   "name": "FeatureToggleOn",
                   "value": "[parameters('featureToggleOn')]"
+                },
+                {
+                    "name": "StubAuth",
+                    "value": "[parameters('stubAuth')]"
                 }
               ]
             }

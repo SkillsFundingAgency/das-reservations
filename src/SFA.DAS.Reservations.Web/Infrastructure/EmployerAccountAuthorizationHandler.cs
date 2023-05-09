@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -13,6 +12,7 @@ using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
@@ -86,9 +86,10 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
                 var userId = userClaim.Value;
 
-                var updatedAccountClaim = _accountsService.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier, email).Result;
+                var updatedClaims = _accountsService.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier, email).Result;
+                var updatedAccountClaim = updatedClaims.First(c=>c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
-                var updatedEmployerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(updatedAccountClaim?.Value);
+                var updatedEmployerAccounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(updatedAccountClaim.Value);
 
                 userClaim.Subject.AddClaim(updatedAccountClaim);
 

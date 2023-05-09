@@ -11,5 +11,11 @@ namespace SFA.DAS.Reservations.Web.Stubs
         {
             return Task.FromResult(true);
         }
+
+        public Task<bool> CanAccessApprenticeship(ApprenticeshipAccessRequest request,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            return Task.FromResult(true);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 
@@ -18,8 +19,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumServiceClaimRequirement requirement)
         {
             _logger.LogDebug("In Handler requirement for minimum service claim " + requirement.MinimumServieClaim);
-            if (context.Resource is AuthorizationFilterContext employerContext &&
-            employerContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId))
+            if (context.Resource is DefaultHttpContext  employerContext &&
+            employerContext.HttpContext.Request.RouteValues.ContainsKey(RouteValues.EmployerAccountId))
             {
                 _logger.LogDebug("It is for employer, bypassing the rules for provider service claim");
                 // Marking this as succeeded as there are other handler which checks for whether employer is authorized.

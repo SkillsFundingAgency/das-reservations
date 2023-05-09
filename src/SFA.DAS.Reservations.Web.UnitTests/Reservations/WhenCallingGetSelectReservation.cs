@@ -29,6 +29,7 @@ using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;
 using Microsoft.AspNetCore.Http;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
