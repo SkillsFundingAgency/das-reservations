@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;

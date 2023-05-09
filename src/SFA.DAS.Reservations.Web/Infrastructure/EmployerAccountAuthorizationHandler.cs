@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {

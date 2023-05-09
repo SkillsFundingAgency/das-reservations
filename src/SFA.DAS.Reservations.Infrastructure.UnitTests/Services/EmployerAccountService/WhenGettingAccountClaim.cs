@@ -13,6 +13,7 @@ using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Testing.AutoFixture;
 using EmployerIdentifier = SFA.DAS.Reservations.Domain.Authentication.EmployerIdentifier;
 
@@ -51,6 +52,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             accountsApi.Verify(x=>x.GetUserAccounts(It.IsAny<string>()), Times.Never);
             accountsApi.Verify(x=>x.GetAccountUsers(It.IsAny<string>()), Times.Never);
             actual.FirstOrDefault(c => c.Type.Equals(ClaimTypes.AuthorizationDecision))?.Value.Should().BeNullOrEmpty();
+            actual.FirstOrDefault(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))?.Value.Should().Be(getUserAccountsResponse.UserId);
         }
         
         [Test, MoqAutoData]
@@ -84,6 +86,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             accountsApi.Verify(x=>x.GetUserAccounts(It.IsAny<string>()), Times.Never);
             accountsApi.Verify(x=>x.GetAccountUsers(It.IsAny<string>()), Times.Never);
             actual.FirstOrDefault(c => c.Type.Equals(ClaimTypes.AuthorizationDecision))?.Value.Should().Be("Suspended");
+            actual.FirstOrDefault(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))?.Value.Should().Be(getUserAccountsResponse.UserId);
         }
 
         [Test, RecursiveMoqAutoData]

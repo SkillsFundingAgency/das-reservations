@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
