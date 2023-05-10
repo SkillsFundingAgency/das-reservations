@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Azure.Documents.SystemFunctions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -48,7 +49,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Filters
             [Frozen] ServiceParameters serviceParameters,
             [ArrangeActionContext] ActionExecutingContext context,
             [Frozen] Mock<ActionExecutionDelegate> nextMethod,
-            GoogleAnalyticsFilter filter)
+            [NoAutoProperties] GoogleAnalyticsFilter filter)
         {
             //Arrange
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, userId.ToString());

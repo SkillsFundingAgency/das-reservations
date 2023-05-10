@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 using System.IO;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
@@ -17,7 +14,6 @@ using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
-using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
@@ -26,17 +22,19 @@ using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 
 namespace SFA.DAS.Reservations.Web
 {
     public class Startup
     {
         private const string EncodingConfigKey = "SFA.DAS.Encoding";
-        
-        private readonly IHostingEnvironment _environment;
+
+        private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _environment = environment;
             var config = new ConfigurationBuilder()
@@ -56,17 +54,19 @@ namespace SFA.DAS.Reservations.Web
                         options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                         options.EnvironmentName = configuration["Environment"];
                         options.PreFixConfigurationKeys = false;
-                        options.ConfigurationKeysRawJsonResult = new[] {EncodingConfigKey};
+                        options.ConfigurationKeysRawJsonResult = new[] { EncodingConfigKey };
                     }
                 );
             }
-            
+
             _configuration = config.Build();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = false;
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -91,11 +91,11 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            services.AddServices(serviceParameters,_configuration);
             
+
             if (_configuration["Environment"] != "DEV" || (
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
-                && _configuration["IsIntegrationTest"].Equals("true",StringComparison.CurrentCultureIgnoreCase)))
+                && _configuration["IsIntegrationTest"].Equals("true", StringComparison.CurrentCultureIgnoreCase)))
             {
                 if (isEmployerAuth)
                 {
@@ -106,14 +106,13 @@ namespace SFA.DAS.Reservations.Web
                     services.AddProviderConfiguration(_configuration, _environment);
                 }
             }
-
-            var serviceProvider = services.BuildServiceProvider();
-
+            services.AddServices(serviceParameters, _configuration);
+            
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
 
             services.AddCommitmentsPermissionsApi(_configuration, _environment);
-           
+            
             if (isEmployerAuth)
             {
                 if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
@@ -121,36 +120,40 @@ namespace SFA.DAS.Reservations.Web
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
                     services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
-                    services.AddAndConfigureGovUkAuthentication(_configuration, $"{typeof(Startup).Assembly.GetName().Name}.Auth",typeof(EmployerAccountPostAuthenticationClaimsHandler));
+                    services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
                 }
                 else
                 {
-                    services.AddAndConfigureEmployerAuthentication(
-                        serviceProvider.GetService<IOptions<IdentityServerConfiguration>>(),
-                        serviceProvider.GetService<IEmployerAccountService>());    
+                    var identityServerConfiguration = _configuration
+                        .GetSection("Identity")
+                        .Get<IdentityServerConfiguration>();
+                    services.AddAndConfigureEmployerAuthentication(identityServerConfiguration);
                 }
             }
 
             if (isProviderAuth)
             {
-                services.AddAndConfigureProviderAuthentication(
-                    serviceProvider.GetService<IOptions<ProviderIdamsConfiguration>>(),
-                    _configuration, 
+                var providerIdamsConfiguration = _configuration
+                    .GetSection("ProviderIdams")
+                    .Get<ProviderIdamsConfiguration>();
+                services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
+                    _configuration,
                     _environment);
             }
+            services.AddHttpContextAccessor();
 
             services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
-            var reservationsWebConfig = serviceProvider.GetService<ReservationsWebConfiguration>();
-            
-            services.AddMvc(
-                    options =>
+            var reservationsWebConfig = _configuration
+                .GetSection("ReservationsWeb")
+                .Get<ReservationsWebConfiguration>();
+
+            services.AddMvc(options =>
                     {
                         options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
                         options.AddAuthorization();
                     })
-                .AddControllersAsServices()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .AddControllersAsServices();
 
             services.AddHttpsRedirection(options =>
             {
@@ -159,11 +162,6 @@ namespace SFA.DAS.Reservations.Web
 
             services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
             services.AddMediatRValidation();
-
-            
-
-            services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-
             services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);
 
@@ -178,7 +176,7 @@ namespace SFA.DAS.Reservations.Web
                     options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
                 });
             }
-            
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -195,22 +193,22 @@ namespace SFA.DAS.Reservations.Web
                     .AddCheck<ReservationsApiHealthCheck>(
                         "Reservation Api",
                         failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
+                        tags: new[] { "ready" })
                     .AddCheck<ProviderRelationshipsApiHealthCheck>(
                         "ProviderRelationships Api",
                         failureStatus: HealthStatus.Unhealthy,
-                        tags: new[] {"ready"})
+                        tags: new[] { "ready" })
                     .AddCheck<AccountApiHealthCheck>(
                         "Accounts Api",
                         failureStatus: HealthStatus.Unhealthy,
                         tags: new[] { "ready" });
             }
-            
-            
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -225,7 +223,7 @@ namespace SFA.DAS.Reservations.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.Use(async (context, next) =>
             {
                 if (context.Response.Headers.ContainsKey("X-Frame-Options"))
@@ -254,12 +252,11 @@ namespace SFA.DAS.Reservations.Web
             }
 
             app.UseSession();
-
-            app.UseMvc(routes =>
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
     }

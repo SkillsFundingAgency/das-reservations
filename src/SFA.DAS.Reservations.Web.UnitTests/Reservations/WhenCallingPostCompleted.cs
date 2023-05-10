@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             CompletedViewModel model, 
             ReservationsRouteModel routeModel)
         {
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
             controller.ModelState.AddModelError("AddApprentice", "AddApprentice");
 
             var actual = controller.PostCompleted(routeModel, model);
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel)
         {
             routeModel.UkPrn = null;
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
             controller.ModelState.AddModelError("AddApprentice", "AddApprentice");
 
             var actual = controller.PostCompleted(routeModel, model);
@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateDashboardUrl(null))
                 .Returns(homeUrl);
             
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
             
             var actual = controller.PostCompleted(routeModel, model);
 
@@ -154,7 +154,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
                 .Returns(homeUrl);
             
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
             
             var actual = controller.PostCompleted(routeModel, model);
 
@@ -200,7 +200,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     model.StartDate, model.CohortRef, routeModel.EmployerAccountId, 
                     false, string.Empty, string.Empty, model.JourneyData))
                 .Returns(addApprenticeUrl);
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
 
             //Act
             var actual = controller.PostCompleted(routeModel, model);
@@ -231,7 +231,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     true, string.Empty, string.Empty, model.JourneyData))
                 .Returns(addApprenticeUrl);
 
-            var controller = _fixture.Create<ReservationsController>();
+            var controller = _fixture.Build<ReservationsController>().OmitAutoProperties().Create();
 
             //Act
             var actual = controller.PostCompleted(routeModel, model);

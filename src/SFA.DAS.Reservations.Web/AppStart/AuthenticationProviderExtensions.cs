@@ -14,6 +14,7 @@ using SFA.DAS.Provider.Idams.Stub.Extensions;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Stubs;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -21,9 +22,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
     {
         public static void AddAndConfigureProviderAuthentication(
             this IServiceCollection services, 
-            IOptions<ProviderIdamsConfiguration> idamsConfiguration, 
+            ProviderIdamsConfiguration idamsConfiguration, 
             IConfiguration config, 
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
             {
@@ -55,8 +56,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
                     })
                     .AddWsFederation(options =>
                     {
-                        options.MetadataAddress = idamsConfiguration.Value.MetadataAddress;
-                        options.Wtrealm = idamsConfiguration.Value.Wtrealm;
+                        options.MetadataAddress = idamsConfiguration.MetadataAddress;
+                        options.Wtrealm = idamsConfiguration.Wtrealm;
                         options.CallbackPath = "/{ukprn}/reservations";
                         options.Events.OnSecurityTokenValidated = async (ctx) =>
                         {

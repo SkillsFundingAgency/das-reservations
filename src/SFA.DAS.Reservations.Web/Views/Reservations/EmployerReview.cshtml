@@ -1,11 +1,12 @@
 ﻿@using SFA.DAS.Reservations.Web.Extensions
-@using SFA.DAS.Reservations.Web.Infrastructure
 @model ReviewViewModel
 @{
     ViewData["Title"] = "Check your reservation information";
-    var changeRouteData = (new Dictionary<string, string> {{"fromReview", "true"}});
 
     ViewBag.GaData.Vpv = "/accounts/reservations/review";
+
+    var employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
+    var reservationId = (string)ViewContext.RouteData.Values["id"];
 }
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
@@ -43,9 +44,10 @@
                         @Model.TrainingDate.GetGDSDateString()
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName" asp-all-route-data="@changeRouteData">
+                        <a class="govuk-link" asp-route="@Model.ChangeStartDateRouteName" asp-route-employerAccountId="@employerAccountId" asp-route-id="@reservationId" asp-route-fromReview="true">
                             Change
                         </a>
+
                     </dd>
                 </dl>
 
@@ -57,7 +59,7 @@
                         @Model.CourseDescription
                     </dd>
                     <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName" asp-all-route-data="@changeRouteData">
+                        <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName" asp-route-employerAccountId="@employerAccountId" asp-route-id="@reservationId" asp-route-fromReview="true">
                             Change
                         </a>
                     </dd>

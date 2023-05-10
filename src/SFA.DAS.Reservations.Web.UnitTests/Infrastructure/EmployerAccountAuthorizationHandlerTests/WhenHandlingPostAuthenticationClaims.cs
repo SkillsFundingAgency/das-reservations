@@ -13,6 +13,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Testing.AutoFixture;
 
@@ -33,15 +34,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             var accountData = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, claimValue);
             apimWebConfiguration.Object.Value.UseGovSignIn = true;
             var tokenValidatedContext = ArrangeTokenValidatedContext(nameIdentifier, idamsIdentifier, emailAddress);
-            accountService.Setup(x => x.GetClaim(nameIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress)).ReturnsAsync(accountData);
+            accountService.Setup(x => x.GetClaim(nameIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress)).ReturnsAsync(new List<Claim>{accountData});
             
             var actual = await handler.GetClaims(tokenValidatedContext);
             
             accountService.Verify(x=>x.GetClaim(nameIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress), Times.Once);
             accountService.Verify(x=>x.GetClaim(idamsIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier,emailAddress), Times.Never);
             actual.Should().ContainSingle(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
-            var actualClaimValue = actual.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)).Value;
-            actual.First().Should().Be(accountData);
+            var actualClaimValue = actual.First(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+            actualClaimValue.Should().Be(accountData);
+            
         }
 
         [Test, MoqAutoData]
@@ -55,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
         {
             var accountData = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, claimValue);
             var tokenValidatedContext = ArrangeTokenValidatedContext(nameIdentifier, idamsIdentifier, string.Empty);
-            accountService.Setup(x => x.GetClaim(idamsIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier, "")).ReturnsAsync(accountData);
+            accountService.Setup(x => x.GetClaim(idamsIdentifier,EmployerClaims.AccountsClaimsTypeIdentifier, "")).ReturnsAsync(new List<Claim>{accountData});
             apimDeveloperWebConfiguration.Object.Value.UseGovSignIn = false;
             
             var actual = await handler.GetClaims(tokenValidatedContext);

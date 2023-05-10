@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Application.Commitments.Services;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Stubs;
+using Microsoft.Extensions.Hosting;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -20,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddCommitmentsApi(
             this IServiceCollection services,
             IConfiguration configuration,
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             services.AddTransient<ICommitmentService, CommitmentService>();
         }
@@ -28,7 +29,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddCommitmentsPermissionsApi(
             this IServiceCollection services,
             IConfiguration configuration,
-            IHostingEnvironment env)
+            IWebHostEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {

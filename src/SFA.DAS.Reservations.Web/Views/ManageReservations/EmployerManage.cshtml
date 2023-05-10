@@ -1,11 +1,11 @@
 ﻿@using SFA.DAS.Reservations.Web.Extensions
-@using SFA.DAS.Reservations.Web.Infrastructure
 @model ManageViewModel
 
 @{
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/manage";
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
 @if (!Model.Reservations.Any())
@@ -19,7 +19,7 @@
                 <div class="govuk-grid-column-two-thirds">
                     <h2 class="govuk-heading-m">There are no funding reservations to use</h2>
                     <p class="govuk-body">You need to reserve funding in order to add a new apprentice.</p>
-                    <a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
+                    <a asp-route="@RouteNames.EmployerIndex" asp-route-employerAccountId="@employerAccountId" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
                 </div>
             </div>
 
@@ -36,7 +36,7 @@ else
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">Your funding reservations</h1>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.EmployerIndex" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
+                    <p class="govuk-heading-m"><a asp-route="@RouteNames.EmployerIndex" asp-route-employerAccountId="@employerAccountId" role="button" tabindex="1" draggable="false" class="govuk-link">Reserve more funding</a></p>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@ else
                                     @if (reservation.Status == ReservationStatusViewModel.Pending)
                                     {
                                         <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a><br />
-                                        <a asp-route="@reservation.DeleteRouteName" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
+                                        <a asp-route="@reservation.DeleteRouteName" asp-route-employerAccountId="@employerAccountId" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                     }
                                     else
                                     {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
 using SFA.DAS.Encoding;
+using SFA.DAS.GovUK.Auth.Authentication;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
@@ -20,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
@@ -33,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
@@ -45,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         private static void AddSharedConfiguration(
             IServiceCollection services,
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IWebHostEnvironment environment)
         {
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {
@@ -79,6 +80,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IEmployerAccountAuthorisationHandler, EmployerAccountAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, HasEmployerViewerUserRoleOrIsProvider>();
             services.AddSingleton<IAuthorizationHandler, MinimumServiceClaimRequirementHandler>();
+            services.AddSingleton<IAuthorizationHandler, AccountActiveAuthorizationHandler>();
         }
     }
 }

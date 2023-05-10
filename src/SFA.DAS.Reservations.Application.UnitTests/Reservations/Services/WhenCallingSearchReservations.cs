@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -36,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                 DateTime.Parse("Oct 2017"),
                 DateTime.Parse("Jul 2019")
             };
-            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt.ToString("MMM yyyy",CultureInfo.InvariantCulture)} to {dt.AddMonths(3).ToString("MMM yyyy",CultureInfo.InvariantCulture)}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
                 .ReturnsAsync(reservationsApiResponse);
@@ -69,7 +70,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                 DateTime.Parse("Oct 2017"),
                 DateTime.Parse("Jul 2019")
             };
-            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt.ToString("MMM yyyy", CultureInfo.InvariantCulture)} to {dt.AddMonths(3).ToString("MMM yyyy", CultureInfo.InvariantCulture)}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
                 .ReturnsAsync(reservationsApiResponse);
@@ -99,10 +100,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                 DateTime.Parse("Oct 2017"),
                 DateTime.Parse("Jul 2019")
             };
-            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+            reservationsApiResponse.Filters.StartDateFilters = dates.Select(dt => $"{dt.ToString("MMM yyyy", CultureInfo.InvariantCulture)} to {dt.AddMonths(3).ToString("MMM yyyy", CultureInfo.InvariantCulture)}");
             var expectedStartDates = dates
                 .OrderBy(dt => dt)
-                .Select(dt => $"{dt:MMM yyyy} to {dt.AddMonths(3):MMM yyyy}");
+                .Select(dt => $"{dt.ToString("MMM yyyy", CultureInfo.InvariantCulture)} to {dt.AddMonths(3).ToString("MMM yyyy", CultureInfo.InvariantCulture)}");
             mockApiClient
                 .Setup(client => client.Search<SearchReservationsApiResponse>(It.IsAny<ISearchApiRequest>()))
                 .ReturnsAsync(reservationsApiResponse);

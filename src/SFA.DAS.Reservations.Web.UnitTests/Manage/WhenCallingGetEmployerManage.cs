@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             long decodedAccountId,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockExternalUrlHelper,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationsQuery>(), It.IsAny<CancellationToken>()))
@@ -116,7 +116,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            ManageReservationsController controller)
+            [NoAutoProperties] ManageReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetTrustedEmployersQuery>(), It.IsAny<CancellationToken>()))

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
@@ -30,14 +31,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         public TestServiceProvider(string authType)
         {
             var serviceCollection = new ServiceCollection();
-            var hosting = new HostingEnvironment{EnvironmentName = EnvironmentName.Development, ApplicationName = "SFA.DAS.Reservations.Web"};
             var configuration = GenerateConfiguration(authType);
 
-            var startup = new Startup(configuration, hosting);
+            var startup = new Startup(configuration, new TestHostEnvironment());
 
             startup.ConfigureServices(serviceCollection);
             serviceCollection.ConfigureTestServiceCollection(configuration, null);
-            serviceCollection.AddTransient<IHostingEnvironment, HostingEnvironment>();
+            serviceCollection.AddTransient<IWebHostEnvironment, TestHostEnvironment>();
             RegisterControllers(serviceCollection);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -61,6 +61,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("Environment", "DEV"),
                     new KeyValuePair<string, string>("Version", "1.0"),
                     new KeyValuePair<string, string>("UseStub", "true"),
+                    new KeyValuePair<string, string>("StubAuth", "false"),
                     new KeyValuePair<string, string>("AuthType", authType),
                     new KeyValuePair<string, string>("IsIntegrationTest", isIntegrationTest.ToString()),
                     new KeyValuePair<string, string>("ReservationsApi:url", "https://local.test.com"),
@@ -69,7 +70,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}"),
                     new KeyValuePair<string, string>("ReservationsWeb:FindApprenticeshipTrainingUrl", $"https://test"),
                     new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test"),
-                    new KeyValuePair<string, string>("Identity:Scopes", ""),
+                    new KeyValuePair<string, string>("Identity:Scopes", "one two"),
                     new KeyValuePair<string, string>("Identity:ClientId", "test"),
                     new KeyValuePair<string, string>("Identity:ClientSecret", "test"),
                     new KeyValuePair<string, string>("Identity:ChangePasswordUrl", "test/{0}/"),
@@ -169,6 +170,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
         }
     }
 
+    public class TestHostEnvironment : IWebHostEnvironment
+    {
+        public IFileProvider WebRootFileProvider { get; set; }
+        public string WebRootPath { get; set; }
+        public string ApplicationName { get => "SFA.DAS.Reservations.Web"; set { } }
+        public IFileProvider ContentRootFileProvider { get; set; }
+        public string ContentRootPath { get; set; }
+        public string EnvironmentName { get => "Development"; set { } }
+    }
     public class EmployerTestServiceProvider : TestServiceProvider
     {
         public EmployerTestServiceProvider() : base("employer")

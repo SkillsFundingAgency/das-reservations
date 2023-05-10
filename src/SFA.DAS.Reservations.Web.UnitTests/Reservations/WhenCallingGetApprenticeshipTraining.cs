@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<ITrainingDateService> mockStartDateService,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<ITrainingDateService> mockStartDateService,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             long accountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            ReservationsController controller,
+            [NoAutoProperties] ReservationsController controller,
             string hashedAccountId)
         {
             routeModel.EmployerAccountId = string.Empty;
@@ -130,7 +130,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<ITrainingDateService> mockStartDateService,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -179,7 +179,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<ITrainingDateService> mockStartDateService,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetCachedReservationQuery>(), It.IsAny<CancellationToken>()))
@@ -229,7 +229,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [Frozen] Mock<ITrainingDateService> mockStartDateService,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             cachedReservationResult.CohortRef = string.Empty;
             mockMediator
@@ -272,7 +272,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             cachedReservationResult.CohortRef = string.Empty;
             mockMediator
@@ -300,7 +300,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string cohortDetailsUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             cachedReservationResult.CohortRef = "ABC123";
             mockMediator
@@ -328,7 +328,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Previous_Reservation_Then_Loads_Existing_Reservation_To_ViewModel(
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             await controller.ApprenticeshipTraining(routeModel);
 
@@ -341,7 +341,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Employer_Then_IsProvider_Is_False(
             ReservationsRouteModel routeModel,
-            ReservationsController controller)
+            [NoAutoProperties] ReservationsController controller)
         {
             routeModel.UkPrn = null;
 

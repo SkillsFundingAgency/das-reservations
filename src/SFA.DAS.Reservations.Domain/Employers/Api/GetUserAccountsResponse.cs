@@ -5,17 +5,21 @@ namespace SFA.DAS.Reservations.Domain.Employers.Api
 {
     public class GetUserAccountsResponse
     {
-        [JsonProperty("UserAccounts")]
+        [JsonProperty("userId")]
+        public string UserId { get; set; }
+        [JsonProperty("isSuspended")]
+        public bool IsSuspended { get; set; }
+        [JsonProperty("userAccounts")]
         public List<EmployerIdentifier> UserAccounts { get; set; }
     }
     
     public class EmployerIdentifier
     {
-        [JsonProperty("EncodedAccountId")]
+        [JsonProperty("encodedAccountId")]
         public string AccountId { get; set; }
-        [JsonProperty("DasAccountName")]
+        [JsonProperty("dasAccountName")]
         public string EmployerName { get; set; }
-        [JsonProperty("Role")]
+        [JsonProperty("role")]
         public string Role { get; set; }
     }
 }

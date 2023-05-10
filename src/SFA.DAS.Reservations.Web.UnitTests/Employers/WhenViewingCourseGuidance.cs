@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             [Frozen] Mock<IExternalUrlHelper> externalUrlHelper,
             [Frozen] IOptions<ReservationsWebConfiguration> configuration,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
             externalUrlHelper.Setup(x => x.GenerateDashboardUrl(routeModel.EmployerAccountId)).Returns(dashboardUrl);

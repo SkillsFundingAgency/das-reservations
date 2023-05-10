@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
         {
             controller.ModelState.AddModelError("test", "test");
 
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = true;
@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             long decodedAccountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = true;
@@ -122,7 +122,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ConfirmLegalEntityViewModel viewModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = true;
@@ -145,7 +145,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ConfirmLegalEntityViewModel viewModel,
             GetLegalEntitiesResponse getLegalEntitiesResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
         {
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = true;
@@ -175,7 +175,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
@@ -191,7 +191,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             ReservationsRouteModel routeModel,
             ConfirmLegalEntityViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            EmployerReservationsController controller)
+             [NoAutoProperties] EmployerReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
@@ -210,8 +210,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 GetLegalEntitiesResponse getLegalEntitiesResponse,
                 [Frozen] Mock<IMediator> mockMediator,
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
-                EmployerReservationsController controller)
+                [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = false;
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;
@@ -241,8 +247,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 GetLegalEntitiesResponse getLegalEntitiesResponse,
                 [Frozen] Mock<IMediator> mockMediator,
                 [Frozen] Mock<IUserClaimsService> mockClaimsService,
-                EmployerReservationsController controller)
+                [NoAutoProperties] EmployerReservationsController controller)
         {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             var firstLegalEntity = getLegalEntitiesResponse.AccountLegalEntities.First();
             firstLegalEntity.AgreementSigned = false;
             viewModel.LegalEntity = firstLegalEntity.AccountLegalEntityPublicHashedId;

@@ -28,6 +28,8 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;
+using Microsoft.AspNetCore.Http;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
@@ -41,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Employer employer,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             
             routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
@@ -63,7 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string accountLegalEntityPublicHashedId,
             Exception exception,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
             
@@ -77,7 +79,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller,
+            [NoAutoProperties] SelectReservationsController controller,
             [Frozen]AccountLegalEntity accountLegalEntity,
             GetAvailableReservationsResult reservationsResult)
         {
@@ -102,7 +104,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller,
+            [NoAutoProperties] SelectReservationsController controller,
             [Frozen]AccountLegalEntity accountLegalEntity,
             GetAvailableReservationsResult reservationsResult)
         {
@@ -129,11 +131,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.IsAny<GetLegalEntitiesQuery>(),
@@ -152,7 +159,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             Employer employer,
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
@@ -195,7 +202,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
@@ -256,7 +263,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen]Mock<IEncodingService> encodingService,
             [Frozen]Mock<IMediator> mediator,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -267,7 +274,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.TransferSenderId = string.Empty;
             viewModel.EncodedPledgeApplicationId = "";
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -306,7 +318,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetAvailableReservationsResult reservationsResult,
             CreateReservationLevyEmployerResult createReservationLevyResult,
             [Frozen]Mock<IMediator> mediator,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -339,7 +351,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             CreateReservationLevyEmployerResult createReservationLevyResult,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
             [Frozen]Mock<IMediator> mediator,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -401,7 +413,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen]Mock<IMediator> mockMediator,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
             string addApprenticeUrl,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -479,7 +491,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen]Mock<IMediator> mediator,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
             [Frozen] Mock<IConfiguration> config,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -492,7 +504,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             employer.AccountId = expectedAccountId;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -537,7 +554,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen]Mock<IMediator> mockMediator,
             [Frozen]Mock<IExternalUrlHelper> urlHelper,
             string addApprenticeUrl,
-            SelectReservationsController controller
+            [NoAutoProperties] SelectReservationsController controller
         )
         {
             //Arrange
@@ -613,7 +630,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -672,13 +689,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IMediator> mockMediator,
             long expectedAccountId,
             [Frozen] Mock<IEncodingService> encodingService,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -724,7 +746,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             long expectedAccountId,
             uint providerId,
             [Frozen] Mock<IEncodingService> encodingService,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -732,7 +754,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.CohortReference = string.Empty;
             viewModel.ProviderId = providerId;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -780,7 +807,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 string cohortDetailsUrl,
                 [Frozen] Mock<IEncodingService> encodingService,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -834,13 +861,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 [Frozen] Mock<IMediator> mockMediator,
                 long expectedAccountId,
                 [Frozen] Mock<IEncodingService> encodingService,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -882,7 +914,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 long expectedAccountId,
                 long expectedAccountLegalEntityId,
                 [Frozen] Mock<IEncodingService> encodingService,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -936,7 +968,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 string cohortDetailsUrl,
                 [Frozen] Mock<IEncodingService> encodingService,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -994,13 +1026,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] Mock<IUserClaimsService> userClaimsService,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -1051,13 +1088,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IEncodingService> encodingService,
             [Frozen] Mock<IUserClaimsService> userClaimsService,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { claim }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -1105,7 +1147,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.Id = Guid.Empty;
@@ -1159,7 +1201,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
        [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
        [Frozen] Mock<IMediator> mockMediator,
        [Frozen] Mock<IConfiguration> configuration,
-       SelectReservationsController controller)
+       [NoAutoProperties] SelectReservationsController controller)
         {
             //Arrange
             routeModel.CohortReference = string.Empty;

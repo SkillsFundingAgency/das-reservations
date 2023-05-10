@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             _mockEncodingService.Setup(s => s.Decode(_routeModel.EmployerAccountId, EncodingType.AccountId))
                 .Returns(ExpectedAccountId);
 
-            _controller = fixture.Create<EmployerReservationsController>();
+            _controller = fixture.Build<EmployerReservationsController>().OmitAutoProperties().Create();
 
             _controller.Url = _urlHelper.Object;
 

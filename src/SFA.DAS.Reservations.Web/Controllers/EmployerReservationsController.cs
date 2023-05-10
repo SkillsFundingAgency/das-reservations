@@ -21,6 +21,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -58,7 +59,6 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
         public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
         {
-
             var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage), RouteNames.EmployerSaveRuleNotificationChoiceNoReservation);
 
             if (viewResult == null)

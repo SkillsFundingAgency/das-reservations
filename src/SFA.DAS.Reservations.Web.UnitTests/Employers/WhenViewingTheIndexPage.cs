@@ -15,6 +15,9 @@ using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Testing.AutoFixture;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Employers
 {
@@ -26,13 +29,18 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            IUrlHelper urlHelper,
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId) }));
+            controller.ControllerContext = new ControllerContext
             {
-                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
-            }));
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+            controller.Url = urlHelper;
+          
             mockMediator.Setup(x =>
                     x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult());
@@ -50,13 +58,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //arrange
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId) }));
+            controller.ControllerContext = new ControllerContext
             {
-                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
-            }));
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+            controller.Url = Mock.Of<IUrlHelper>();
             mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetNextUnreadGlobalFundingRuleResult) null);
 
@@ -75,7 +86,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             [Frozen] Mock<IUrlHelper> urlHelper,
             string expectedBackUrl,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //Arrange
             urlHelper.Setup(h => h.RouteUrl(It.Is<UrlRouteContext>(c =>
@@ -86,10 +97,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
                 Id = 2,
                 ActiveFrom = DateTime.Now.AddDays(2)
             };
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId) }));
+            controller.ControllerContext = new ControllerContext
             {
-                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
-            }));
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+            controller.Url = urlHelper.Object;
             var result = new GetNextUnreadGlobalFundingRuleResult { Rule = expectedRule };
             mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(result);
@@ -116,13 +130,16 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
             //arrange
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId) }));
+            controller.ControllerContext = new ControllerContext
             {
-                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
-            }));
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+            controller.Url = Mock.Of<IUrlHelper>();
             mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{ActiveFrom = DateTime.Now}});
 
@@ -139,13 +156,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             string expectedUserId,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsRouteModel routeModel,
-            EmployerReservationsController controller)
+            [NoAutoProperties] EmployerReservationsController controller)
         {
-            //arrange
-            controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId) }));
+            controller.ControllerContext = new ControllerContext
             {
-                new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId)
-            }));
+                HttpContext = new DefaultHttpContext()
+                { User = user }
+            };
+            controller.Url = Mock.Of<IUrlHelper>();
             mockMediator.Setup(x => x.Send(It.IsAny<GetNextUnreadGlobalFundingRuleQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetNextUnreadGlobalFundingRuleResult {Rule = new GlobalRule{Id = 2}});
 

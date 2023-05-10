@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
@@ -42,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
             var result = await _employerAccountService.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier, email);
 
-            return new List<Claim> { result };
+            return result;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
 {
     public interface IEmployerAccountService
     {
-        Task<Claim> GetClaim(string userId, string claimType, string email);
+        Task<List<Claim>> GetClaim(string userId, string claimType, string email);
         Task<IEnumerable<EmployerAccountUser>> GetAccountUsers(long accountId);
     }
 }

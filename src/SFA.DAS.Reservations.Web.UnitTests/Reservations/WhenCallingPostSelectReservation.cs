@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             SelectReservationViewModel viewModel,
             GetTrustedEmployersResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             GetLegalEntitiesResponse employersResponse,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> encodingService,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
 
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -133,7 +133,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -167,7 +167,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -198,7 +198,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> encodingService,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.UkPrn = null;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -229,7 +229,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
-                SelectReservationsController controller)
+                [NoAutoProperties] SelectReservationsController controller)
         {
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -263,7 +263,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             mockMediator.Setup(x => x.Send(It.Is<GetReservationQuery>(c => c.Id.Equals(viewModel.SelectedReservationId)),
                     It.IsAny<CancellationToken>()))
@@ -289,7 +289,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string addApprenticeUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.UkPrn = null;
 
@@ -319,7 +319,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IConfiguration> configuration,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.CohortReference = string.Empty;
@@ -351,7 +351,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IConfiguration> configuration,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.CohortReference = string.Empty;
@@ -379,7 +379,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string cohortDetailsUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             viewModel.SelectedReservationId = Guid.Empty;
             mockMediator
@@ -409,7 +409,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string cohortDetailsUrl,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
-            SelectReservationsController controller)
+            [NoAutoProperties] SelectReservationsController controller)
         {
             viewModel.SelectedReservationId = null;
             mockMediator
@@ -440,7 +440,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                [Frozen] Mock<IMediator> mockMediator,
                [Frozen] Mock<IConfiguration> configuration,
-               SelectReservationsController controller)
+               [NoAutoProperties] SelectReservationsController controller)
         {
             routeModel.CohortReference = string.Empty;
             viewModel.CohortReference = string.Empty;

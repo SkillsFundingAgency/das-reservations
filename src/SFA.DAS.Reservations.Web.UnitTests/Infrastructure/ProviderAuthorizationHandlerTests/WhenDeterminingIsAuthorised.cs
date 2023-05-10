@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.UnitTests.Customisations;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizationHandlerTests
@@ -12,7 +13,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public void ThenReturnsTrueIfProviderIsAuthorised(
             ProviderUkPrnRequirement requirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
@@ -33,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public void ThenReturnsFalseIfProviderUkprnNotInRoute(
             ProviderUkPrnRequirement requirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
@@ -51,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public void ThenReturnsFalseIfUserDoesNotHaveClaim(
             ProviderUkPrnRequirement requirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
@@ -71,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public void ThenReturnsFalseIfUserDoesNotHaveMatchingUkprnInClaim(
             ProviderUkPrnRequirement requirement,
-            AuthorizationFilterContext contextFilter,
+            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign

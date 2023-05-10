@@ -23,6 +23,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
+using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -121,6 +122,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
         public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
         {
+            _logger.LogInformation(($"GET ApprenticeshipTraining for {routeModel.EmployerAccountId} "));
+
             GetCachedReservationResult cachedReservation = null;
 
             if (routeModel.Id.HasValue)
@@ -132,6 +135,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId) 
                 ? routeModel.EmployerAccountId
                 : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
+
+            _logger.LogInformation("Building BuildApprenticeshipTrainingViewModel");
 
             var viewModel = await BuildApprenticeshipTrainingViewModel(
                 routeModel.UkPrn != null,
