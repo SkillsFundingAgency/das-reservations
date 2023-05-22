@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Encoding;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -46,6 +47,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
             services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
+
+            services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();//Todo remove after gov login go live
         }
     }
 }
