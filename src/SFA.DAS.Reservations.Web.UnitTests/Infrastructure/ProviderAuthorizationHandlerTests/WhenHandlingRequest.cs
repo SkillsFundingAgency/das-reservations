@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -14,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public async Task ThenSucceedsIfProviderIsAuthorised(
             ProviderUkPrnRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
@@ -22,8 +23,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {claim})});
 
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.UkPrn, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.UkPrn, 1234);
 
             //Act
             await handler.HandleAsync(context);
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public async Task ThenFailsIfProviderUkprnNotInRoute(
             ProviderUkPrnRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
@@ -53,14 +54,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public async Task ThenFailsIfUserDoesNotHaveClaim(
             ProviderUkPrnRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new Claim[0])});
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.UkPrn, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.UkPrn, 1234);
 
             //Act
             await handler.HandleAsync(context);
@@ -72,15 +73,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.ProviderAuthorizatio
         [Test, MoqAutoData]
         public async Task ThenFailsIfUserDoesNotHaveMatchingUkprnInClaim(
             ProviderUkPrnRequirement requirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             ProviderAuthorizationHandler handler)
         {
             //Assign
             var claim = new Claim(ProviderClaims.ProviderUkprn, "5555");
             var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {claim})});
             var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.UkPrn, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.UkPrn, 1234);
 
             //Act
             await handler.HandleAsync(context);

@@ -151,7 +151,8 @@ namespace SFA.DAS.Reservations.Web.Controllers
                     Reservations = reservations,
                     BackLink = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
                     FilterModel = filterModel,
-                    TotalReservationCount = searchResult.TotalReservationsForProvider
+                    TotalReservationCount = searchResult.TotalReservationsForProvider,
+                    UkPrn = routeModel.UkPrn
                 });
             }
             catch (ProviderNotAuthorisedException e)

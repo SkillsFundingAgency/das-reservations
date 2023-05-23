@@ -3,6 +3,7 @@ using System.Reflection;
 using AutoFixture;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -24,6 +25,24 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Customisations
             }
 
             return new ArrangeActionContextCustomisation();
+        }
+    }
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public class ArrangeDefaultHttpContextFilterContextAttribute : CustomizeAttribute
+    {
+        public override ICustomization GetCustomization(ParameterInfo parameter)
+        {
+            if (parameter == null)
+            {
+                throw new ArgumentNullException(nameof(parameter));
+            }
+
+            if (parameter.ParameterType != typeof(DefaultHttpContext))
+            {
+                throw new ArgumentException(nameof(parameter));
+            }
+
+            return new ArrangeDefaultHttpContextCustomisation();
         }
     }
 
@@ -73,6 +92,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Customisations
             fixture.Behaviors.Add(new TracingBehavior());
         }
     }
+    public class ArrangeDefaultHttpContextCustomisation: ICustomization
+    {
+        public void Customize(IFixture fixture)
+        {
+            //fixture.Customizations.Add(new DefaultHttpContextBuilder());
+            fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+            fixture.Customize<Microsoft.AspNetCore.Mvc.ModelBinding.BindingInfo>(c => c.OmitAutoProperties());
+            
+            // fixture.Customize<DefaultHttpContext>(composer => composer
+            //     .Without(context => context.));
+
+            fixture.Behaviors.Add(new TracingBehavior());
+        }
+    }
 
     public class ActionExecutingContextBuilder : ISpecimenBuilder
     {
@@ -86,6 +119,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Customisations
             }
 
             return new NoSpecimen();
+        }
+    }
+
+    public class DefaultHttpContextBuilder : ISpecimenBuilder
+    {
+        public object Create(object request, ISpecimenContext context)
+        {
+            return context.Create<DefaultHttpContext>();
         }
     }
 }

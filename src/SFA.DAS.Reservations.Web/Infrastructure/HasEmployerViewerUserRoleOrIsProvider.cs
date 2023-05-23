@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
@@ -19,8 +20,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement)
         {
-            if (context.Resource is AuthorizationFilterContext providerContext &&
-                providerContext.RouteData.Values.ContainsKey(RouteValues.UkPrn))
+            if (context.Resource is HttpContext providerContext &&
+                providerContext.Request.RouteValues.ContainsKey(RouteValues.UkPrn))
             {
                 if (!_providerAuthorizationHandler.IsProviderAuthorised(context))
                 {
@@ -28,8 +29,8 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
                 }
             }
 
-            if (context.Resource is AuthorizationFilterContext employerContext &&
-                employerContext.RouteData.Values.ContainsKey(RouteValues.EmployerAccountId))
+            if (context.Resource is HttpContext employerContext &&
+                employerContext.Request.RouteValues.ContainsKey(RouteValues.EmployerAccountId))
             {
                 if (!_employerAccountAuthorizationHandler.IsEmployerAuthorised(context, true))
                 {

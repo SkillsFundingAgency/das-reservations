@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Moq;
 using NUnit.Framework;
@@ -17,13 +18,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenChecksIfProviderIsAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add("ukprn", 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add("ukprn", 1234);
 
             //Act
             await provider.HandleAsync(context);
@@ -36,13 +37,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenChecksIfEmployerIsAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
 
             //Act
             await provider.HandleAsync(context);
@@ -55,13 +56,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenFailsCheckIfProviderIsNotAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
+            
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add("ukprn", 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add("ukprn", 1234);
 
             providerAuthorizationHandler
                 .Setup(h => h.IsProviderAuthorised(It.IsAny<AuthorizationHandlerContext>()))
@@ -78,13 +80,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenFailsCheckIfEmployerIsNotAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
 
             employerAccountAuthorizationHandler
                 .Setup(h => h.IsEmployerAuthorised(It.IsAny<AuthorizationHandlerContext>(), It.IsAny<bool>()))
@@ -101,13 +103,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenPassesCheckIfProviderIsNotAuthorised(
             [Frozen] Mock<IProviderAuthorisationHandler> providerAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add("ukprn", 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add("ukprn", 1234);
 
             providerAuthorizationHandler
                 .Setup(h => h.IsProviderAuthorised(It.IsAny<AuthorizationHandlerContext>()))
@@ -124,13 +126,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.HasEmployerViewerUse
         public async Task ThenPassesCheckIfEmployerIsNotAuthorised(
             [Frozen] Mock<IEmployerAccountAuthorisationHandler> employerAccountAuthorizationHandler,
             HasEmployerViewerUserRoleOrIsProviderRequirement orIsProviderRequirement,
-            [ArrangeAuthorizationFilterContext] AuthorizationFilterContext contextFilter ,
+            [ArrangeDefaultHttpContextFilterContext] DefaultHttpContext contextFilter ,
             HasEmployerViewerUserRoleOrIsProvider provider)
         {
             //Assign
             var context = new AuthorizationHandlerContext(new []{orIsProviderRequirement},ClaimsPrincipal.Current, contextFilter);
-            var filter = context.Resource as AuthorizationFilterContext;
-            filter.RouteData.Values.Add(RouteValues.EmployerAccountId, 1234);
+            var filter = context.Resource as DefaultHttpContext;
+            filter.HttpContext.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
 
             employerAccountAuthorizationHandler
                 .Setup(h => h.IsEmployerAuthorised(It.IsAny<AuthorizationHandlerContext>(), It.IsAny<bool>()))
