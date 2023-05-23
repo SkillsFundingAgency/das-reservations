@@ -17,7 +17,7 @@
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
                     <h2 class="govuk-heading-m">None of your employers have any funding to use.</h2>
                     <p class="govuk-body">You need to reserve funding in order to add a new apprentice.</p>
-                    <a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
+                    <a asp-route="@RouteNames.ProviderIndex" asp-route-ukPrn="@Model.UkPrn" asp-route-isFromManage="true" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
                 </div>
             </div>
         </main>
@@ -31,7 +31,7 @@ else
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
-                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
+                    <p class="govuk-heading-m"><a asp-route="@RouteNames.ProviderIndex" asp-route-ukPrn="@Model.UkPrn" asp-route-isFromManage="true" tabindex="1" class="govuk-link">Reserve more funding</a></p>
                 </div>
             </div>
             @if (Model.ShowSearch)
