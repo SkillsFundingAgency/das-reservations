@@ -119,7 +119,6 @@ namespace SFA.DAS.Reservations.Web
                         .Equals("true", StringComparison.CurrentCultureIgnoreCase))
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
-                    services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
                     services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
                 }
                 else
