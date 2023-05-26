@@ -184,7 +184,7 @@ namespace SFA.DAS.Reservations.Web
                 options.Cookie.IsEssential = true;
             });
 
-            services.AddDataProtection(_configuration, _environment);
+            services.AddDataProtection(reservationsWebConfig, _environment, isEmployerAuth);
 
             if (!_environment.IsDevelopment())
             {
