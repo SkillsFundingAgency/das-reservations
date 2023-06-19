@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
@@ -20,13 +21,13 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
         public bool IsProviderAuthorised(AuthorizationHandlerContext context)
         {
-            if (!(context.Resource is AuthorizationFilterContext mvcContext) || !mvcContext.RouteData.Values.ContainsKey(RouteValues.UkPrn))
+            if (!(context.Resource is HttpContext providerContext && providerContext.Request.RouteValues.ContainsKey(RouteValues.UkPrn)))
                 return false;
 
             if (!context.User.HasClaim(c => c.Type.Equals(ProviderClaims.ProviderUkprn)))
                 return false;
 
-            var ukPrnFromUrl = mvcContext.RouteData.Values[RouteValues.UkPrn].ToString().ToUpper();
+            var ukPrnFromUrl = providerContext.Request.RouteValues[RouteValues.UkPrn].ToString().ToUpper();
             var ukPrn = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
 
             if (ukPrn == ukPrnFromUrl)

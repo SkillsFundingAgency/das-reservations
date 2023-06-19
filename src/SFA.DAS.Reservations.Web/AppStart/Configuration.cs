@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
 using SFA.DAS.Encoding;
 using SFA.DAS.GovUK.Auth.Authentication;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
@@ -81,6 +82,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IAuthorizationHandler, HasEmployerViewerUserRoleOrIsProvider>();
             services.AddSingleton<IAuthorizationHandler, MinimumServiceClaimRequirementHandler>();
             services.AddSingleton<IAuthorizationHandler, AccountActiveAuthorizationHandler>();
+            
+            services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
+            services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
         }
     }
 }

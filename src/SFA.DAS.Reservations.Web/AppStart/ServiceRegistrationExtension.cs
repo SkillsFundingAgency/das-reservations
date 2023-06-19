@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Encoding;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -11,6 +12,7 @@ using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart
@@ -46,6 +48,8 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
             services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
             services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
+            
+            
         }
     }
 }

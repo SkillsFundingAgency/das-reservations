@@ -10,22 +10,22 @@ namespace SFA.DAS.Reservations.Web.Extensions
 {
     public static class DataProtectionStartupExtensions
     {
-        public static IServiceCollection AddDataProtection(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        public static IServiceCollection AddDataProtection(this IServiceCollection services, ReservationsWebConfiguration configuration, IWebHostEnvironment environment, bool isEmployerAuth)
         {
             if (!environment.IsDevelopment())
             {
-                var config = services.BuildServiceProvider().GetService<ReservationsWebConfiguration>();
-
-                if (config != null)
+                if (configuration != null)
                 {
-                    var redisConnectionString = config.RedisCacheConnectionString;
-                    var dataProtectionKeysDatabase = config.DataProtectionKeysDatabase;
+                    var redisConnectionString = configuration.RedisCacheConnectionString;
+                    var dataProtectionKeysDatabase = configuration.DataProtectionKeysDatabase;
 
                     var redis = ConnectionMultiplexer
                         .Connect($"{redisConnectionString},{dataProtectionKeysDatabase}");
 
+                    var applicationName = isEmployerAuth ? "das-employer" : "das-provider";
+                    
                     services.AddDataProtection()
-                        .SetApplicationName("das-employer")
+                        .SetApplicationName(applicationName)
                         .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
                 }
             }

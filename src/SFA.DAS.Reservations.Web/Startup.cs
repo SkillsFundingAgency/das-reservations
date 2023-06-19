@@ -119,7 +119,6 @@ namespace SFA.DAS.Reservations.Web
                         .Equals("true", StringComparison.CurrentCultureIgnoreCase))
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
-                    services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
                     services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
                 }
                 else
@@ -185,7 +184,7 @@ namespace SFA.DAS.Reservations.Web
                 options.Cookie.IsEssential = true;
             });
 
-            services.AddDataProtection(_configuration, _environment);
+            services.AddDataProtection(reservationsWebConfig, _environment, isEmployerAuth);
 
             if (!_environment.IsDevelopment())
             {
