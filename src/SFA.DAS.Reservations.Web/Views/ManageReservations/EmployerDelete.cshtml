@@ -42,7 +42,7 @@
                 </dl>
             </div>
 
-            <form method="post" asp-route="@RouteNames.EmployerDelete">
+            <form method="post" asp-route="@RouteNames.EmployerDelete" asp-route-id="@Model.Id" asp-route-employerAccountId="@((string)ViewContext.RouteData.Values["employerAccountId"])">
                 <input type="hidden" id="AccountLegalEntityName" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName"/>
                 <input type="hidden" id="StartDateDescription" name="StartDateDescription" value="@Model.StartDateDescription"/>
                 <input type="hidden" id="CourseDescription" name="CourseDescription" value="@Model.CourseDescription"/>

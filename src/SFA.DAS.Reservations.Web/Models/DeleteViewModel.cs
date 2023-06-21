@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public DeleteViewModel(GetReservationResult queryResult)
         {
             Id = queryResult.ReservationId;
+            UkPrn = queryResult.UkPrn;
             StartDateDescription = new TrainingDateModel
             {
                 StartDate = queryResult.StartDate,
@@ -26,6 +27,8 @@ namespace SFA.DAS.Reservations.Web.Models
             CourseDescription = queryResult.Course?.CourseDescription ?? 
                                 new Course(null, null, 0).CourseDescription;
         }
+
+        public uint? UkPrn { get; set; }
 
         [Required(ErrorMessage = "Select whether you want to delete this reservation")]
         public bool? Delete { get; set; }
