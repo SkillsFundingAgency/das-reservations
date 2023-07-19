@@ -24,6 +24,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using SFA.DAS.DfESignIn.Auth.AppStart;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -80,7 +81,6 @@ namespace SFA.DAS.Reservations.Web
                 _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
             var isProviderAuth =
                 _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
-
             var serviceParameters = new ServiceParameters();
             if (isEmployerAuth)
             {
@@ -132,12 +132,26 @@ namespace SFA.DAS.Reservations.Web
 
             if (isProviderAuth)
             {
-                var providerIdamsConfiguration = _configuration
-                    .GetSection("ProviderIdams")
-                    .Get<ProviderIdamsConfiguration>();
-                services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
-                    _configuration,
-                    _environment);
+                if (_configuration["ReservationsWeb:UseDfESignIn"] != null && _configuration["ReservationsWeb:UseDfESignIn"].Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    services.AddAndConfigureDfESignInAuthentication(
+                        _configuration,
+                        "SFA.DAS.ProviderApprenticeshipService",
+                        typeof(CustomServiceRole),
+                        "ProviderRoATP",
+                        "/signout");    
+                }
+                else
+                {
+                    var providerIdamsConfiguration = _configuration
+                        .GetSection("ProviderIdams")
+                        .Get<ProviderIdamsConfiguration>();
+                
+                    services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
+                        _configuration,
+                        _environment);
+                }
+                
             }
             services.AddHttpContextAccessor();
 
