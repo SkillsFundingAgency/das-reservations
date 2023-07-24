@@ -15,6 +15,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Stubs;
 using Microsoft.Extensions.Hosting;
+using SFA.DAS.DfESignIn.Auth.AppStart;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
