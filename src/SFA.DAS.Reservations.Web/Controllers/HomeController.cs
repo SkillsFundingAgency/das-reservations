@@ -29,14 +29,20 @@ namespace SFA.DAS.Reservations.Web.Controllers
         [Route("signout",Name = RouteNames.ProviderSignOut)]
         public IActionResult SignOut()
         {
-            return SignOut(
+            var useAuthScheme = _config["ReservationsWeb:UseDfESignIn"] != null &&
+                                _config["ReservationsWeb:UseDfESignIn"]
+                                    .Equals("true", StringComparison.CurrentCultureIgnoreCase)
+                ? OpenIdConnectDefaults.AuthenticationScheme
+                : WsFederationDefaults.AuthenticationScheme;
+
+                return SignOut(
                 new AuthenticationProperties
                 {
                     RedirectUri = "",
                     AllowRefresh = true
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                WsFederationDefaults.AuthenticationScheme);
+                useAuthScheme);
         }
 
         [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
