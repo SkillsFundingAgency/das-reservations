@@ -14,7 +14,7 @@
                         <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Apprentice requests</a>
                     </li>
                     <li class="das-navigation__list-item">
-                        <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
+                        <a asp-route="@RouteNames.ProviderManage" asp-route-ukPrn="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
                     </li>
                     <li class="das-navigation__list-item">
                         <a asp-external-controller="apprentices" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage your apprentices</a>
