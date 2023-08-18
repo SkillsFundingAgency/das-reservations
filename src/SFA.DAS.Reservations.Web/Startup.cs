@@ -139,7 +139,8 @@ namespace SFA.DAS.Reservations.Web
                         "SFA.DAS.ProviderApprenticeshipService",
                         typeof(CustomServiceRole),
                         "ProviderRoATP",
-                        "/signout");    
+                        "/signout",
+                        "/dashboard");    
                 }
                 else
                 {
