@@ -123,9 +123,9 @@
 
                         <div class="govuk-radios govuk-!-margin-bottom-6">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="" checked="">
+                                <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
                                 <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
-                                    July
+                                    @Model.PastStartDate.StartDate.GetGDSLongDateString()
                                 </label>
                             </div>
                         </div>
