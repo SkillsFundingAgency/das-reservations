@@ -55,9 +55,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Tests
             
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            Assert.IsTrue(result.RequestMessage.RequestUri.ToString().Contains($"/accounts/{TestDataValues.NonLevyHashedAccountId}/reservations/start"));
+            Assert.IsTrue(result.RequestMessage.RequestUri.ToString().Contains($"/error/403"));
         }
-
-
     }
 }

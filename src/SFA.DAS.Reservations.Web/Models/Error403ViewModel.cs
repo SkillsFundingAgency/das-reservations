@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Web.Models
 
         public Error403ViewModel(string environment)
         {
-            if (!environment.Equals("prd", StringComparison.CurrentCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(environment) && !environment.Equals("prd", StringComparison.CurrentCultureIgnoreCase))
             {
                 _integrationUrlPart = "test-";
             }
