@@ -25,6 +25,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View(new Error403ViewModel(_configuration["ResourceEnvironmentName"])
             {
                 UseDfESignIn = _reservationsWebConfiguration.UseDfESignIn,
+                DashboardUrl = _reservationsWebConfiguration.DashboardUrl,
             });
         }
 

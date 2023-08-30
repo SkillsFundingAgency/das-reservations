@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -55,7 +56,11 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Tests
             
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            Assert.IsTrue(result.RequestMessage.RequestUri.ToString().Contains($"/error/403"));
+
+            var expectedUrl = HttpUtility.UrlDecode($"/accounts/{TestDataValues.NonLevyHashedAccountId}/reservations");
+            var actualUrl = HttpUtility.UrlDecode(result.RequestMessage?.RequestUri?.ToString());
+
+            Assert.IsTrue(actualUrl?.Contains(expectedUrl));
         }
     }
 }

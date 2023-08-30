@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Error403ViewModel
+@{
     @if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
     {
         ViewData["Title"] = "You do not have permission to access this page";
@@ -31,7 +32,7 @@
                             The DfE Sign-in approver inside your organisation can do this for you. You can find out who your approver is under <a href="@Model.HelpPageLink" target="_blank" rel="noopener noreferrer">the organisation section of your DfE Sign-in account.</a>
                         </p>
                         <p>
-                            If you came here by mistake, go back to the <a id="back-link" class="govuk-link govuk-link--no-visited-state" asp-external-controller="">homepage of Manage apprenticeships for training providers.</a>
+                            If you came here by mistake, go back to the <a id="back-link" class="govuk-link govuk-link--no-visited-state" href="@Model.DashboardUrl" target="_parent">homepage of Manage apprenticeships for training providers.</a>
                         </p>
                     </div>
                 }
@@ -55,7 +56,6 @@
                 <p class="govuk-body">If you are experiencing difficulty accessing the area of the site you need, first contact an/the account owner to ensure you have the correct role assigned to your account.</p>
                 <p class="govuk-body"><a asp-external-controller="service" asp-external-action="accounts">Go back to the service home page</a></p>
             }
-
         </div>
     </div>
 </main>

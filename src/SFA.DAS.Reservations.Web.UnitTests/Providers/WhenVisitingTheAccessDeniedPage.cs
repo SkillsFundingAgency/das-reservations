@@ -15,6 +15,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         private Mock<IConfiguration> _configuration;
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
         private bool _useDfESignIn;
+        private string _dashboardUrl;
         public ErrorController Sut { get; set; }
 
         [Test]
@@ -26,8 +27,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         {
             var fixture = new Fixture();
             _useDfESignIn = fixture.Create<bool>();
+            _dashboardUrl = fixture.Create<string>();
 
             fixture.Customize<ReservationsWebConfiguration>(c => c.With(x =>x.UseDfESignIn, _useDfESignIn));
+            fixture.Customize<ReservationsWebConfiguration>(c => c.With(x => x.DashboardUrl, _dashboardUrl));
+
             var mockReservationsConfig = fixture.Create<ReservationsWebConfiguration>();
 
             _configuration = new Mock<IConfiguration>();
@@ -44,6 +48,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             var actualModel = result?.Model as Error403ViewModel;
             Assert.That(actualModel?.HelpPageLink, Is.EqualTo(helpLink));
             Assert.AreEqual(actualModel?.UseDfESignIn, _useDfESignIn);
+            Assert.AreEqual(actualModel?.DashboardUrl, _dashboardUrl);
         }
     }
 }
