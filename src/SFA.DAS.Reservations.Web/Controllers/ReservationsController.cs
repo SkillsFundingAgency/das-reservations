@@ -476,11 +476,16 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
                 : dates.Where(d => d.StartDate >= activeGlobalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
 
+            var previousMonth = DateTime.UtcNow.AddMonths(-1);
+            var pastTrainingStartDate = new TrainingDateModel { StartDate = previousMonth, EndDate = previousMonth.AddMonths(2) };
+            var pastTrainingStartDateVm = new TrainingDateViewModel(pastTrainingStartDate, pastTrainingStartDate.Equals(selectedTrainingDate));
+
             return new ApprenticeshipTrainingViewModel
             {
                 ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule),
                 RouteName = isProvider ? RouteNames.ProviderCreateApprenticeshipTraining : RouteNames.EmployerCreateApprenticeshipTraining,
                 PossibleStartDates = possibleDates,
+                PastStartDate = pastTrainingStartDateVm,
                 Courses = coursesResult.Courses?.Select(course => new CourseViewModel(course, courseId)),
                 CourseId = courseId,
                 AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId,

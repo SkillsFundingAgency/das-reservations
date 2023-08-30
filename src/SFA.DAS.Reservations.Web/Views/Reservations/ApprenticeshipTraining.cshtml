@@ -98,20 +98,16 @@
                 }
                 <div class="govuk-form-group @(startDateInvalid ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset">
-                        @if (Model.IsProvider)
-                        {
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                <h2 class="govuk-fieldset__heading">
-                                    When will the apprenticeship training start?
-                                </h2>
-                            </legend>
-                        }
+            
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m  @(Model.IsProvider ? "" : "govuk-visually-hidden")">
+                            <h2 class="govuk-fieldset__heading">
+                                When will the apprenticeship training start?
+                            </h2>
+                        </legend>
 
-                        <span id="choose-start-date-hint" class="govuk-hint">
-                            Select the month for the planned start date of the apprenticeship.
-                        </span>
-
-                        @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule)
+                        <div class="govuk-hint">
+                            Apprenticeship already started.
+                        </div>
 
                         @if (startDateInvalid)
                         {
@@ -125,11 +121,26 @@
                             }
                         }
 
+                        <div class="govuk-radios govuk-!-margin-bottom-6">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
+                                <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
+                                    @Model.PastStartDate.StartDate.GetGDSLongDateString()
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="govuk-hint">
+                            Planned start date of the apprenticeship.
+                        </div>
+
+                        @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule)
+
                         <div class="govuk-radios" data-validation-message="You must select a start date" data-validation-summary-message="Select a start date">
                             @foreach (var possibleStartDate in Model.PossibleStartDates)
                             {
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.SerializedModel" checked="@possibleStartDate.Checked" required>
+                                    <input class="govuk-radios__input" id="StartDate-@possibleStartDate.Id" name="StartDate" type="radio" value="@possibleStartDate.SerializedModel" checked="@possibleStartDate.Checked">
                                     <label class="govuk-label govuk-radios__label" for="StartDate-@possibleStartDate.Id">
                                         @possibleStartDate.StartDate.GetGDSLongDateString()
                                     </label>
