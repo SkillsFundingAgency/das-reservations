@@ -140,7 +140,7 @@ namespace SFA.DAS.Reservations.Web
                         typeof(CustomServiceRole),
                         "ProviderRoATP",
                         "/signout",
-                        "/dashboard");    
+                        "");    
                 }
                 else
                 {
