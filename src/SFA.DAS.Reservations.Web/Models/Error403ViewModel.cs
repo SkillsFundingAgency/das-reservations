@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Web.Models
         }
 
         public bool UseDfESignIn { get; set; }
-        public string HelpPageLink => $"https://{_integrationUrlPart}services.signin.education.gov.uk/organisations";
+        public string HelpPageLink => $"https://{_integrationUrlPart}services.signin.education.gov.uk/approvals/select-organisation?action=request-service";
         public string DashboardUrl { get; set; }
     }
 }
