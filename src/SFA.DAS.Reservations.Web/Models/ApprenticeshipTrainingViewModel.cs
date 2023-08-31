@@ -12,5 +12,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string CohortRef { get; set; }
         public bool? FromReview { get; set; }
         public GlobalRuleViewModel ActiveGlobalRule { get; set; }
+        public TrainingDateViewModel PastStartDate { get; set; }
     }
 }

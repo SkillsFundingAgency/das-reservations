@@ -11,7 +11,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -59,7 +58,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             long accountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
-            [Frozen] Mock<ITrainingDateService> mockStartDateService,
             [NoAutoProperties] ReservationsController controller)
         {
             mockMediator
@@ -87,7 +85,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ReservationsRouteModel routeModel,
             GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,
-            long accountId,
             [Frozen] Mock<IMediator> mockMediator,
             [Frozen] Mock<IEncodingService> mockEncodingService,
             [NoAutoProperties] ReservationsController controller,
@@ -249,6 +246,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
             routeModel.FromReview = false;
+            var expectedPastStartDate = new TrainingDateViewModel(new TrainingDateModel { StartDate = DateTime.UtcNow.AddMonths(-1) });
 
             var result = await controller.ApprenticeshipTraining(routeModel);
 
@@ -264,6 +262,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
             viewModel.AccountLegalEntityPublicHashedId.Should()
                 .Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
+            viewModel.PastStartDate.Id.Should().Be(expectedPastStartDate.Id);
         }
 
         [Test, MoqAutoData]
