@@ -20,7 +20,7 @@
                 </h1>
             </div>
 
-            <form method="post" asp-route="@RouteNames.EmployerDeleteCompleted">
+            <form method="post" asp-route="@RouteNames.EmployerDeleteCompleted" asp-route-id="@((string)ViewContext.RouteData.Values["id"])" asp-route-employerAccountId="@((string)ViewContext.RouteData.Values["employerAccountId"])">
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

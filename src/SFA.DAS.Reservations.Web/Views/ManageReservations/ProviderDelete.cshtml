@@ -1,4 +1,6 @@
 ﻿@using SFA.DAS.Reservations.Web.Infrastructure
+@using System.Net.Http
+@using Microsoft.AspNetCore.Http
 @model DeleteViewModel
 @{
     ViewData["Title"] = "Reservations";
@@ -43,7 +45,7 @@
                 </dl>
             </div>
 
-            <form method="post" asp-route="@RouteNames.ProviderDelete">
+            <form method="post" asp-route="@RouteNames.ProviderDelete" asp-route-id="@Model.Id" asp-route-ukprn="@Model.UkPrn">
                 <input type="hidden" id="AccountLegalEntityName" name="AccountLegalEntityName" value="@Model.AccountLegalEntityName"/>
                 <input type="hidden" id="StartDateDescription" name="StartDateDescription" value="@Model.StartDateDescription"/>
                 <input type="hidden" id="CourseDescription" name="CourseDescription" value="@Model.CourseDescription"/>

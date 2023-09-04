@@ -269,7 +269,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (viewModel.Manage.HasValue && viewModel.Manage.Value)
             {
-                return RedirectToRoute(manageRouteName);
+                return RedirectToRoute(manageRouteName, routeModel);
             }
 
             return Redirect(dashboardUrl);
