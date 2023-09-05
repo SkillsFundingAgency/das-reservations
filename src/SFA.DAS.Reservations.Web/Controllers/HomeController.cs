@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using SFA.DAS.GovUK.Auth.Models;
 using SFA.DAS.GovUK.Auth.Services;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
@@ -19,24 +21,30 @@ namespace SFA.DAS.Reservations.Web.Controllers
     {    
         private readonly IConfiguration _config;
         private readonly IStubAuthenticationService _stubAuthenticationService;
+        private readonly ReservationsWebConfiguration _configuration;
 
-        public HomeController(IConfiguration config, IStubAuthenticationService stubAuthenticationService)
+        public HomeController(IConfiguration config, IStubAuthenticationService stubAuthenticationService, IOptions<ReservationsWebConfiguration> configuration)
         {
             _config = config;
             _stubAuthenticationService = stubAuthenticationService;
+            _configuration = configuration.Value;
         }
 
         [Route("signout",Name = RouteNames.ProviderSignOut)]
         public IActionResult SignOut()
         {
-            return SignOut(
+            var useAuthScheme = _configuration.UseDfESignIn
+                ? OpenIdConnectDefaults.AuthenticationScheme
+                : WsFederationDefaults.AuthenticationScheme;
+
+                return SignOut(
                 new AuthenticationProperties
                 {
                     RedirectUri = "",
                     AllowRefresh = true
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                WsFederationDefaults.AuthenticationScheme);
+                useAuthScheme);
         }
 
         [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
@@ -84,6 +92,13 @@ namespace SFA.DAS.Reservations.Web.Controllers
         public IActionResult FeatureNotAvailable()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Route("dashboard")]
+        public IActionResult Dashboard()
+        {
+            return RedirectPermanent(_configuration.DashboardUrl);
         }
         
 #if DEBUG
