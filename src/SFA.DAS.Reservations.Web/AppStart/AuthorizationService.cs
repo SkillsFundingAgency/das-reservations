@@ -34,6 +34,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         policy.RequireClaim(ProviderClaims.ProviderUkprn);
                         policy.RequireAssertion(HasValidServiceClaim);
                         policy.Requirements.Add(new ProviderUkPrnRequirement());
+                        policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames.HasProviderOrEmployerAccount, policy =>
@@ -42,6 +43,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasProviderOrEmployerAccountRequirement());
                         policy.Requirements.Add(new AccountActiveRequirement());
+                        policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames.HasEmployerViewerUserRoleOrIsProvider
@@ -51,6 +53,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new HasEmployerViewerUserRoleOrIsProviderRequirement());
                         policy.Requirements.Add(new AccountActiveRequirement());
+                        policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
                     });
                 options.AddPolicy(
                     PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer
@@ -60,6 +63,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                         ProviderOrEmployerAssertion(policy);
                         policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAV));
                         policy.Requirements.Add(new AccountActiveRequirement());
+                        policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
                     });
                 options.AddPolicy(
                    PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer
@@ -69,6 +73,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
                        ProviderOrEmployerAssertion(policy);
                        policy.Requirements.Add(new MinimumServiceClaimRequirement(ServiceClaim.DAC));
                        policy.Requirements.Add(new AccountActiveRequirement());
+                       policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
                    });
             });
         }
