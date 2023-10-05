@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         {
             var actual = new GetProviderStatusDetails(baseUrl, ukprn);
 
-            actual.GetUrl.Should().Be($"provideraccounts/{ukprn}");
+            actual.GetUrl.Should().Be($"{baseUrl}/provideraccounts/{ukprn}");
         }
     }
 }

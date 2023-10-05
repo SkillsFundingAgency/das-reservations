@@ -6,12 +6,12 @@ namespace SFA.DAS.Reservations.Domain.Providers.Api
     {
         private readonly long _ukprn;
         public string BaseUrl { get; }
-        public string GetUrl => $"{BaseUrl}api/provideraccounts/{_ukprn}";
+        public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}";
 
         public GetProviderStatusDetails(string baseUrl, long ukprn)
         {
             _ukprn = ukprn;
-            BaseUrl = baseUrl;
+            BaseUrl = baseUrl.EndsWith('/') ? baseUrl : baseUrl + "/";
         }
     }
 }
