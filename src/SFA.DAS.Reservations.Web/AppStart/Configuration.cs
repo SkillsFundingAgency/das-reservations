@@ -85,6 +85,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
             
             services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
             services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
+
+            services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, TrainingProviderAllRolesAuthorizationHandler>();
         }
     }
 }
