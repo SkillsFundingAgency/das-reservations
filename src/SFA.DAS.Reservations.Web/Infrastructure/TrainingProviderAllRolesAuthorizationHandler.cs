@@ -5,20 +5,24 @@ using Microsoft.Extensions.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Web.AppStart;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {
     public class TrainingProviderAllRolesAuthorizationHandler : AuthorizationHandler<TrainingProviderAllRolesRequirement>
     {
+        private readonly ServiceParameters _serviceParameters;
         private readonly ITrainingProviderAuthorizationHandler _handler;
         private readonly IConfiguration _configuration;
         private readonly ReservationsWebConfiguration _reservationsWebConfiguration;
 
         public TrainingProviderAllRolesAuthorizationHandler(
+            ServiceParameters serviceParameters,
             ITrainingProviderAuthorizationHandler handler,
             IConfiguration configuration,
             IOptions<ReservationsWebConfiguration> reservationsWebConfiguration)
         {
+            _serviceParameters = serviceParameters;
             _handler = handler;
             _reservationsWebConfiguration = reservationsWebConfiguration.Value;
             _configuration = configuration;
@@ -26,6 +30,12 @@ namespace SFA.DAS.Reservations.Web.Infrastructure
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, TrainingProviderAllRolesRequirement requirement)
         {
+            if (_serviceParameters.AuthenticationType == AuthenticationType.Employer)
+            {
+                context.Succeed(requirement);
+                return;
+            }
+            
             HttpContext currentContext;
             switch (context.Resource)
             {
