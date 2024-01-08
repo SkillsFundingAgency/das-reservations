@@ -25,6 +25,7 @@ using SFA.DAS.Reservations.Web.StartupConfig;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using SFA.DAS.DfESignIn.Auth.AppStart;
+using SFA.DAS.DfESignIn.Auth.Enums;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -138,7 +139,7 @@ namespace SFA.DAS.Reservations.Web
                         _configuration,
                         "SFA.DAS.ProviderApprenticeshipService",
                         typeof(CustomServiceRole),
-                        "ProviderRoATP",
+                        ClientName.ProviderRoatp,
                         "/signout",
                         "");    
                 }

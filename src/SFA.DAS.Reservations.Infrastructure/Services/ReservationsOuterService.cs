@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
@@ -25,6 +26,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
             var response = await _apiClient.Get<GetTransferValidityResponse>(request);
 
             return response;
+        }
+
+        public async Task<ProviderAccountResponse> GetProviderStatus(long ukprn)
+        {
+            return await _apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
         }
     }
 }
