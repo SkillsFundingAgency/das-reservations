@@ -7,12 +7,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.DfESignIn.Auth.AppStart;
+using SFA.DAS.DfESignIn.Auth.Enums;
+using SFA.DAS.EmployerUrlHelper.DependencyResolution;
 using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
-using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
@@ -22,10 +26,6 @@ using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
-using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Logging;
-using SFA.DAS.DfESignIn.Auth.AppStart;
-using SFA.DAS.DfESignIn.Auth.Enums;
 
 namespace SFA.DAS.Reservations.Web
 {
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Web
                 serviceParameters.AuthenticationType = AuthenticationType.Provider;
             }
 
-            
+
 
             if (_configuration["Environment"] != "DEV" || (
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
@@ -108,19 +108,21 @@ namespace SFA.DAS.Reservations.Web
                 }
             }
             services.AddServices(serviceParameters, _configuration);
-            
+
+            services.AddEmployerUrlHelper();
+
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
 
             services.AddCommitmentsPermissionsApi(_configuration, _environment);
-            
+
             if (isEmployerAuth)
             {
                 if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
                         .Equals("true", StringComparison.CurrentCultureIgnoreCase))
                 {
                     services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
-                    services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler),"","/SignIn-Stub");
+                    services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler), "", "/SignIn-Stub");
                 }
                 else
                 {
@@ -141,19 +143,19 @@ namespace SFA.DAS.Reservations.Web
                         typeof(CustomServiceRole),
                         ClientName.ProviderRoatp,
                         "/signout",
-                        "");    
+                        "");
                 }
                 else
                 {
                     var providerIdamsConfiguration = _configuration
                         .GetSection("ProviderIdams")
                         .Get<ProviderIdamsConfiguration>();
-                
+
                     services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
                         _configuration,
                         _environment);
                 }
-                
+
             }
             services.AddHttpContextAccessor();
 

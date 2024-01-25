@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Infrastructure.Services;
-using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
@@ -35,6 +34,26 @@ namespace SFA.DAS.Reservations.Web.Services
                 _logger.LogError(e, "Error while trying to assert employer user role.");
                 return false;
             }
+        }
+
+        public List<EmployerIdentifier> GetAllAssociatedAccounts(IEnumerable<Claim> claims)
+        {
+            var accountsClaims = claims
+               .Where(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier))
+               .Select(c => c.Value)
+               .ToList();
+
+            if (accountsClaims.Any())
+            {
+                var accounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(
+                    accountsClaims.FirstOrDefault())
+                    .Select(c => c.Value)
+                    .ToList();
+
+                return accounts;
+            }
+
+            return new List<EmployerIdentifier>();
         }
     }
 }
