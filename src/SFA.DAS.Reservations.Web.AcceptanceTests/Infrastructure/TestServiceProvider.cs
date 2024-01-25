@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 InitialData = new[]
                 {
                     new KeyValuePair<string, string>("ConfigurationStorageConnectionString", "UseDevelopmentStorage=true;"),
-                    new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding"),
+                    new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding,SFA.DAS.EmployerUrlHelper:EmployerUrlHelper"),
                     new KeyValuePair<string, string>("Environment", "DEV"),
                     new KeyValuePair<string, string>("Version", "1.0"),
                     new KeyValuePair<string, string>("UseStubs", "true"),
