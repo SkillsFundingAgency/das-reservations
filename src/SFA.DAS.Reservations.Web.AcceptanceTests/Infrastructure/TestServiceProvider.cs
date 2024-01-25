@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
     public class TestServiceProvider : IServiceProvider
     {
         private readonly IServiceProvider _serviceProvider;
-        
+
         public TestServiceProvider(string authType)
         {
             var serviceCollection = new ServiceCollection();
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
 
-        
+
 
         public object GetService(Type serviceType)
         {
@@ -126,7 +126,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 {
                     ControllerContext = GetControllerContext<ProviderReservationsController>()
                 });
-            serviceCollection.AddTransient(sp => 
+            serviceCollection.AddTransient(sp =>
                 new ManageReservationsController(
                     sp.GetService<IMediator>(),
                     sp.GetService<IEncodingService>(),
@@ -138,12 +138,12 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                     ControllerContext = GetControllerContext<ManageReservationsController>()
                 });
 
-            serviceCollection.AddTransient(sp => 
+            serviceCollection.AddTransient(sp =>
                 new SelectReservationsController(
                     sp.GetService<IMediator>(),
                     sp.GetService<ILogger<ReservationsController>>(),
                     sp.GetService<IEncodingService>(),
-                    
+
                     sp.GetService<IConfiguration>(),
                     sp.GetService<IExternalUrlHelper>(),
                     sp.GetService<IUserClaimsService>()
@@ -151,7 +151,16 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 {
                     ControllerContext = GetControllerContext<SelectReservationsController>()
                 });
-            
+
+            serviceCollection.AddTransient(sp =>
+                new ErrorController(
+                    sp.GetService<IConfiguration>(),
+                    sp.GetService<IOptions<ReservationsWebConfiguration>>(),
+                    sp.GetService<IUserClaimsService>()
+                )
+                {
+                    ControllerContext = GetControllerContext<ErrorController>()
+                });
         }
 
         private static ControllerContext GetControllerContext<T>() where T : ControllerBase
