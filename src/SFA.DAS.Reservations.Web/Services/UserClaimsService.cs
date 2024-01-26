@@ -34,26 +34,6 @@ namespace SFA.DAS.Reservations.Web.Services
                 _logger.LogError(e, "Error while trying to assert employer user role.");
                 return false;
             }
-        }
-
-        public List<EmployerIdentifier> GetAllAssociatedAccounts(IEnumerable<Claim> claims)
-        {
-            var accountsClaims = claims
-               .Where(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier))
-               .Select(c => c.Value)
-               .ToList();
-
-            if (accountsClaims.Any())
-            {
-                var accounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(
-                    accountsClaims.FirstOrDefault())
-                    .Select(c => c.Value)
-                    .ToList();
-
-                return accounts;
-            }
-
-            return new List<EmployerIdentifier>();
-        }
+        }      
     }
 }

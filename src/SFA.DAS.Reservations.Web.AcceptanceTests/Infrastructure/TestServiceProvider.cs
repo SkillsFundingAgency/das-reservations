@@ -151,16 +151,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
                 {
                     ControllerContext = GetControllerContext<SelectReservationsController>()
                 });
-
-            serviceCollection.AddTransient(sp =>
-                new ErrorController(
-                    sp.GetService<IConfiguration>(),
-                    sp.GetService<IOptions<ReservationsWebConfiguration>>(),
-                    sp.GetService<IUserClaimsService>()
-                )
-                {
-                    ControllerContext = GetControllerContext<ErrorController>()
-                });
         }
 
         private static ControllerContext GetControllerContext<T>() where T : ControllerBase

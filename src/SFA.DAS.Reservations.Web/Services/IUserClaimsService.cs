@@ -8,6 +8,5 @@ namespace SFA.DAS.Reservations.Web.Services
     public interface IUserClaimsService
     {
         bool UserIsInRole(string employerAccountId, EmployerUserRole userRole, IEnumerable<Claim> claims);
-        List<EmployerIdentifier> GetAllAssociatedAccounts(IEnumerable<Claim> claims);
     }
 }

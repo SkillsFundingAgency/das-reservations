@@ -1,4 +1,7 @@
-﻿@inject SFA.DAS.EmployerUrlHelper.ILinkGenerator LinkGenerator
+﻿@using Newtonsoft.Json
+@using SFA.DAS.Reservations.Domain.Authentication
+@using SFA.DAS.Reservations.Infrastructure.Services
+@inject SFA.DAS.EmployerUrlHelper.ILinkGenerator LinkGenerator
 
 @model Error403ViewModel
 @{
@@ -11,6 +14,22 @@
         ViewData["Title"] = "Access denied";
     }
     ViewBag.GaData.Vpv = "/error/403";
+
+    var hasSingleAccount = false;
+    var accountsClaims = User.Claims
+      .Where(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier))
+      .Select(c => c.Value)
+      .ToList();
+
+    if (accountsClaims.Any())
+    {
+        var accounts = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(
+            accountsClaims.FirstOrDefault())
+            .Select(c => c.Value)
+            .ToList();
+
+        hasSingleAccount = accounts.Count == 1;
+    }
 }
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
@@ -59,7 +78,7 @@
             {
                 <h1 class="govuk-heading-xl">Access denied</h1>
                 <p class="govuk-body">If you are experiencing difficulty accessing the area of the site you need, first contact an/the account owner to ensure you have the correct role assigned to your account.</p>
-                @if (Model.HasSingleAccount)
+                @if (hasSingleAccount)
                 {
                     <p class="govuk-body"><a href="@LinkGenerator.AccountsLink("")">Go back to the service home page</a></p>
                 }

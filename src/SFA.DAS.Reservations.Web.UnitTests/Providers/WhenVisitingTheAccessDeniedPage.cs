@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using AutoFixture;
-using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+﻿using AutoFixture;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -11,14 +7,12 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
-using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
     public class WhenVisitingTheAccessDeniedPage
     {
         private Mock<IConfiguration> _configuration;
-        private Mock<IUserClaimsService> _userClaimService;
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
         private bool _useDfESignIn;
         private string _dashboardUrl;
@@ -41,35 +35,20 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             var mockReservationsConfig = fixture.Create<ReservationsWebConfiguration>();
 
             _configuration = new Mock<IConfiguration>();
-            _userClaimService = new Mock<IUserClaimsService>();
-
-            _userClaimService
-               .Setup(service => service.GetAllAssociatedAccounts(
-                   It.IsAny<IEnumerable<Claim>>()))
-               .Returns(new List<Domain.Authentication.EmployerIdentifier>());
-
             _reservationsConfiguration = new Mock<IOptions<ReservationsWebConfiguration>>();
 
             _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
             _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);
 
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
-
-            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object, _userClaimService.Object);
-            Sut.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext()
-                { User = user }
-            };
+            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object);
 
             var result = (ViewResult)Sut.AccessDenied();
-            result.Should().NotBeNull();
 
-            var actualModel = result?.Model.Should().BeOfType<Error403ViewModel>().Subject;
-            actualModel.HelpPageLink.Should().Be(helpLink);
-            actualModel.UseDfESignIn.Should().Be(_useDfESignIn);
-            actualModel.DashboardUrl.Should().Be(_dashboardUrl);
-            actualModel.HasSingleAccount.Should().BeFalse();
+            Assert.That(result, Is.Not.Null);
+            var actualModel = result?.Model as Error403ViewModel;
+            Assert.That(actualModel?.HelpPageLink, Is.EqualTo(helpLink));
+            Assert.AreEqual(actualModel?.UseDfESignIn, _useDfESignIn);
+            Assert.AreEqual(actualModel?.DashboardUrl, _dashboardUrl);
         }
     }
 }
