@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
                 .Should().HaveCount(0);
         }
 
-        private IEnumerable<Claim> BuildClaims(string employerAccountId, EmployerUserRole userRole)
+        private static IEnumerable<Claim> BuildClaims(string employerAccountId, EmployerUserRole userRole)
         {
             var claims = new List<Claim>
             {
