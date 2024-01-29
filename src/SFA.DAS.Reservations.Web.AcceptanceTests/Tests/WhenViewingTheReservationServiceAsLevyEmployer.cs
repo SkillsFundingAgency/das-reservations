@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -54,7 +55,12 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Tests
         {
             //Act
             var result = await _client.GetAsync($"/accounts/{TestDataValues.LevyHashedAccountId}/reservations");
-            
+
+            // Log response details
+            Console.WriteLine($"Response Status Code: {result.StatusCode}");
+            Console.WriteLine($"Response Content: {await result.Content.ReadAsStringAsync()}");
+
+
             //Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
             Assert.IsTrue(result.RequestMessage.RequestUri.ToString().Contains($"/error/403"));
