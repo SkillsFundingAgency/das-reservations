@@ -15,7 +15,7 @@
     }
     ViewBag.GaData.Vpv = "/error/403";
 
-    var hasSingleAccount = false;
+    //var hasSingleAccount = false;
     // var accountsClaims = User.Claims
     //   .Where(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier))
     //   .Select(c => c.Value)
@@ -78,14 +78,13 @@
             {
                 <h1 class="govuk-heading-xl">Access denied</h1>
                 <p class="govuk-body">If you are experiencing difficulty accessing the area of the site you need, first contact an/the account owner to ensure you have the correct role assigned to your account.</p>
-                @if (hasSingleAccount)
+                @if (string.IsNullOrEmpty(Model.ServiceHomePageUrl))
                 {
-                    @* <p class="govuk-body"><a href="@LinkGenerator.AccountsLink("")">Go back to the service home page</a></p> *@
                     <p class="govuk-body"><a asp-external-subdomain="accounts" asp-external-controller="service" asp-external-action="accounts">Go back to the service home page</a></p>
-
                 }
                 else
                 {
+                    @* <p class="govuk-body"><a href="@LinkGenerator.AccountsLink("")">Go back to the service home page</a></p> *@
                     <p class="govuk-body"><a asp-external-subdomain="accounts" asp-external-controller="service" asp-external-action="accounts">Go back to the service home page</a></p>
                 }
             }

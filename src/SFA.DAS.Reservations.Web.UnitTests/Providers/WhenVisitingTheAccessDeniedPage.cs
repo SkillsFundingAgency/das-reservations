@@ -1,9 +1,11 @@
 ﻿using AutoFixture;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerUrlHelper;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
@@ -14,6 +16,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         private Mock<IConfiguration> _configuration;
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
+        private Mock<ILinkGenerator> _linkGenerator;
         private bool _useDfESignIn;
         private string _dashboardUrl;
         public ErrorController Sut { get; set; }
@@ -35,12 +38,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             var mockReservationsConfig = fixture.Create<ReservationsWebConfiguration>();
 
             _configuration = new Mock<IConfiguration>();
+            _linkGenerator = new Mock<ILinkGenerator>();
             _reservationsConfiguration = new Mock<IOptions<ReservationsWebConfiguration>>();
 
             _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
             _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);
 
-            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object);
+            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object, _linkGenerator.Object);
 
             var result = (ViewResult)Sut.AccessDenied();
 
