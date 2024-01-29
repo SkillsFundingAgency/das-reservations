@@ -7,7 +7,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Moq;
 using SFA.DAS.EAS.Account.Api.Client;
-using SFA.DAS.EmployerUrlHelper.DependencyResolution;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
@@ -77,8 +76,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
 
             var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             serviceCollection.AddSingleton<IFileProvider>(physicalProvider);
-
-            serviceCollection.AddEmployerUrlHelper(configuration);
         }
     }
 }

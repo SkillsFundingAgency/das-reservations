@@ -14,7 +14,6 @@ using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.DfESignIn.Auth.AppStart;
 using SFA.DAS.DfESignIn.Auth.Enums;
-using SFA.DAS.EmployerUrlHelper.DependencyResolution;
 using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -108,8 +107,6 @@ namespace SFA.DAS.Reservations.Web
                 }
             }
             services.AddServices(serviceParameters, _configuration);
-
-            services.AddEmployerUrlHelper();
 
             services.AddAuthorizationService();
             services.AddAuthorization<AuthorizationContextProvider>();
