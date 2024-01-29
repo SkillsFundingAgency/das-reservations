@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             serviceCollection.AddSingleton<IFileProvider>(physicalProvider);
 
-            serviceCollection.AddEmployerUrlHelper();
+            serviceCollection.AddEmployerUrlHelper(configuration);
         }
     }
 }
