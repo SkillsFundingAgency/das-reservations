@@ -4,16 +4,13 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
-using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 {
@@ -21,7 +18,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
     {
         private Mock<IConfiguration> _configuration;
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
-        private Mock<IUserClaimsService> _userClaimsService;
         private bool _useDfESignIn;
         private string _dashboardUrl;
         public ErrorController Sut { get; set; }
@@ -44,16 +40,12 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             _configuration = new Mock<IConfiguration>();
 
-            _userClaimsService = new Mock<IUserClaimsService>();
-            _userClaimsService.Setup(x => x.GetAllAssociatedAccounts(
-                 It.IsAny<IEnumerable<Claim>>())).Returns(new List<EmployerIdentifier>());
-
             _reservationsConfiguration = new Mock<IOptions<ReservationsWebConfiguration>>();
 
             _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
             _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);
 
-            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object, _userClaimsService.Object);
+            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object);
 
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim("X1", "2") }));
             Sut.ControllerContext = new ControllerContext
@@ -69,7 +61,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             actualModel.HelpPageLink.Should().Be(helpLink);
             actualModel.UseDfESignIn.Should().Be(_useDfESignIn);
             actualModel.DashboardUrl.Should().Be(_dashboardUrl);
-            actualModel.HasSingleAccount.Should().BeFalse();
         }
     }
 }
