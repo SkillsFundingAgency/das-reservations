@@ -31,7 +31,8 @@ public static class AuthenticationStartupExtensions
             var providerIdamsConfiguration = configuration
                 .GetSection("ProviderIdams")
                 .Get<ProviderIdamsConfiguration>();
-
+            
+            
             services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
                 configuration,
                 environment);

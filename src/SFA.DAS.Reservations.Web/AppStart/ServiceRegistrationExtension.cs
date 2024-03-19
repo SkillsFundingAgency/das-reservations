@@ -47,7 +47,5 @@ public static class ServiceRegistrationExtension
 
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
-        
-        services.AddTransient<ICachedOuterApiService, CachedOuterApiService>();
     }
 }
