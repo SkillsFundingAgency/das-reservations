@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using SFA.DAS.CommitmentsV2.Types;
+using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -10,35 +10,30 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services;
 
-public class ReservationsOuterService : IReservationsOuterService
+public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOptions<ReservationsOuterApiConfiguration> options)
+    : IReservationsOuterService
 {
-    private readonly IReservationsOuterApiClient _apiClient;
-    private readonly ReservationsOuterApiConfiguration _config;
-
-    public ReservationsOuterService(IReservationsOuterApiClient apiClient, IOptions<ReservationsOuterApiConfiguration> options)
-    {
-        _apiClient = apiClient;
-        _config = options.Value;
-    }
+    private readonly ReservationsOuterApiConfiguration _config = options.Value;
 
     public async Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null)
     {
         var request = new GetTransferValidityRequest(_config.ApiBaseUrl, senderId, receiverId, pledgeApplicationId);
 
-        return await _apiClient.Get<GetTransferValidityResponse>(request);
+        return await apiClient.Get<GetTransferValidityResponse>(request);
     }
 
     public async Task<ProviderAccountResponse> GetProviderStatus(long ukprn)
     {
-        return await _apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
+        return await apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
     }
-
-    public async Task<bool> CanAccessCohort(Party party, long partyId, long cohortId)
+    
+    public async Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetAccountProviderLegalEntitiesWithPermission(long ukprn, Operation operation)
     {
-        var content = new GetCohortAccessRequest(_config.ApiBaseUrl, party, partyId, cohortId);
+        var request = new GetAccountProviderLegalEntitiesWithPermissionRequest(
+            _config.ApiBaseUrl,
+            ukprn,
+            operation);
 
-        var response = await _apiClient.Get<GetCohortAccessResponse>(content);
-
-        return response.HasCohortAccess;
+        return await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
     }
 }

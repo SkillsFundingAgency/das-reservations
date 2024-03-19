@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.Authorization.CommitmentPermissions.Options;
-using SFA.DAS.Authorization.Mvc.Attributes;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;

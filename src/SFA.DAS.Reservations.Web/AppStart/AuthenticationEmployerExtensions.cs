@@ -83,6 +83,5 @@ namespace SFA.DAS.Reservations.Web.AppStart
             var associatedAccountsClaim = await accountsSvc.GetClaim(userId, EmployerClaims.AccountsClaimsTypeIdentifier, "");
             ctx.Principal.Identities.First().AddClaim(associatedAccountsClaim.First(c=>c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier)));
         }
-
     }
 }
