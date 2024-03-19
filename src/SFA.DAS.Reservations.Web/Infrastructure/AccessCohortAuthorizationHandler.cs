@@ -15,16 +15,3 @@ public class AccessCohortAuthorizationHandler(ICommitmentsAuthorisationHandler h
         context.Succeed(requirement);
     }
 }
-
-public class AllowEmptyCohortAuthorizationHandler(ICommitmentsAuthorisationHandler handler) : AuthorizationHandler<AllowEmptyCohortRequirement>
-{
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AllowEmptyCohortRequirement requirement)
-    {
-        if (!await handler.AllowEmptyCohort())
-        {
-            return;
-        }
-
-        context.Succeed(requirement);
-    }
-}

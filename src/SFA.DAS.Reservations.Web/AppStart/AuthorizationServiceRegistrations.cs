@@ -70,12 +70,11 @@ public static class AuthorizationServiceRegistrations
                 policy.Requirements.Add(new TrainingProviderAllRolesRequirement());
             });
             
-            options.AddPolicy(PolicyNames.AccessCohortOrAllowEmptyCohort, policy =>
+            options.AddPolicy(PolicyNames.AccessCohort, policy =>
             {
                 policy.RequireAuthenticatedUser();
                 ProviderOrEmployerAssertion(policy);
                 policy.Requirements.Add(new AccessCohortRequirement());
-                policy.Requirements.Add(new AllowEmptyCohortRequirement());
             });
         });
     }

@@ -8,5 +8,5 @@ public static class PolicyNames
     public static string HasEmployerViewerUserRoleOrIsProvider => nameof(HasEmployerViewerUserRoleOrIsProvider);
     public static string HasProviderGotViewerOrHigherRoleOrIsEmployer => nameof(HasProviderGotViewerOrHigherRoleOrIsEmployer);
     public static string HasProviderGotContributorOrHigherRoleOrIsEmployer => nameof(HasProviderGotContributorOrHigherRoleOrIsEmployer);
-    public static string AccessCohortOrAllowEmptyCohort => nameof(AccessCohortOrAllowEmptyCohort);
+    public static string AccessCohort => nameof(AccessCohort);
 }

@@ -51,7 +51,7 @@ public class SelectReservationsController : Controller
         _configuration = configuration;
     }
 
-    [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
+    [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
     [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
     [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
     public async Task<IActionResult> SelectReservation(
@@ -195,7 +195,7 @@ public class SelectReservationsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [DasAuthorize(CommitmentOperation.AccessCohort, CommitmentOperation.AllowEmptyCohort)]
+    [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
     [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
     [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
     public async Task<IActionResult> PostSelectReservation(
