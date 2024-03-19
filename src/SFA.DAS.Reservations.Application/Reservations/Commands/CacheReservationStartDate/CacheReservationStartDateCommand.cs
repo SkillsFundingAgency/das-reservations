@@ -4,7 +4,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate
 {
-    public class CacheReservationStartDateCommand : IRequest<Unit>
+    public class CacheReservationStartDateCommand : IRequest
     {
         public Guid Id { get; set; }
         public TrainingDateModel TrainingDate { get; set; }

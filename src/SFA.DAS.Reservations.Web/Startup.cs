@@ -175,7 +175,7 @@ namespace SFA.DAS.Reservations.Web
                 options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
             });
 
-            services.AddMediatR(typeof(CreateReservationCommandHandler).Assembly);
+            services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
             services.AddMediatRValidation();
             services.AddCommitmentsApi(_configuration, _environment);
             services.AddProviderRelationsApi(_configuration, _environment);

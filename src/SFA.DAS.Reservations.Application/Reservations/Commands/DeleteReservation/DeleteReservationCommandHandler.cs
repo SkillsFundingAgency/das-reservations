@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
             _apiClient = apiClient;
         }
 
-        public async Task<Unit> Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
+        public async Task Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
 
@@ -42,8 +42,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
 
             var apiRequest = new ReservationApiRequest(_apiOptions.Value.Url, command.ReservationId, command.DeletedByEmployer);
             await _apiClient.Delete(apiRequest);
-
-            return Unit.Value;
         }
     }
 }
