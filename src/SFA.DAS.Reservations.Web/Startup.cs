@@ -72,7 +72,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
 
         services.AddServices(serviceParameters, _configuration);
 
-        services.AddAuthorizationService();
+        services.AddAuthorizationServices();
         services.AddAuthorization<AuthorizationContextProvider>();
 
         services.AddCommitmentsPermissionsApi(_configuration, environment);

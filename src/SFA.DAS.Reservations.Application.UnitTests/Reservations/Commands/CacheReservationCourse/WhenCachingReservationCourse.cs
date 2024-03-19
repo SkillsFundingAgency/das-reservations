@@ -184,7 +184,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             _mockCacheStorageService.Verify(service => service.SaveToCache(
                 It.IsAny<string>(),
                 It.Is<CachedReservation>(c => c.CourseId.Equals(_expectedCourse.Id) &&
-                    c.CourseDescription.Equals(_expectedCourse.CourseDescription)),
+                                              c.CourseDescription.Equals(_expectedCourse.CourseDescription)),
                 1));
         }
 
