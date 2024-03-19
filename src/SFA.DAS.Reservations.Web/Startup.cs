@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,11 +11,6 @@ using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Logging;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 using SFA.DAS.Authorization.Mvc.Extensions;
-using SFA.DAS.Configuration.AzureTableStorage;
-using SFA.DAS.DfESignIn.Auth.AppStart;
-using SFA.DAS.DfESignIn.Auth.Enums;
-using SFA.DAS.GovUK.Auth.AppStart;
-using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
@@ -24,12 +18,11 @@ using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
-using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
 
 namespace SFA.DAS.Reservations.Web;
 
-public class Startup(IConfiguration configuration, IWebHostEnvironment environment)
+public class Startup(IConfiguration configuration, IHostEnvironment environment)
 {
     private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
 
@@ -37,6 +30,8 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
     {
         IdentityModelEventSource.ShowPII = false;
 
+        services.AddOptions();
+        services.AddHttpContextAccessor();
         services.AddLogging(builder =>
         {
             builder.AddFilter<ApplicationInsightsLoggerProvider>(string.Empty, LogLevel.Information);
@@ -50,18 +45,13 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
             options.MinimumSameSitePolicy = SameSiteMode.None;
         });
 
-        services.AddOptions();
-
-        var isEmployerAuth = _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
-        var isProviderAuth = _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase);
-
         var serviceParameters = new ServiceParameters();
 
-        if (isEmployerAuth)
+        if (_configuration.IsEmployerAuth())
         {
             serviceParameters.AuthenticationType = AuthenticationType.Employer;
         }
-        else if (isProviderAuth)
+        else if (_configuration.IsProviderAuth())
         {
             serviceParameters.AuthenticationType = AuthenticationType.Provider;
         }
@@ -70,11 +60,11 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
                 !string.IsNullOrEmpty(_configuration["IsIntegrationTest"])
                 && _configuration["IsIntegrationTest"].Equals("true", StringComparison.CurrentCultureIgnoreCase)))
         {
-            if (isEmployerAuth)
+            if (_configuration.IsEmployerAuth())
             {
                 services.AddEmployerConfiguration(_configuration, environment);
             }
-            else if (isProviderAuth)
+            else if (_configuration.IsProviderAuth())
             {
                 services.AddProviderConfiguration(_configuration, environment);
             }
@@ -87,48 +77,15 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
         services.AddCommitmentsPermissionsApi(_configuration, environment);
 
-        if (isEmployerAuth)
+        if (_configuration.IsEmployerAuth())
         {
-            if (_configuration["ReservationsWeb:UseGovSignIn"] != null && _configuration["ReservationsWeb:UseGovSignIn"]
-                    .Equals("true", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services.Configure<GovUkOidcConfiguration>(_configuration.GetSection("GovUkOidcConfiguration"));
-                services.AddAndConfigureGovUkAuthentication(_configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler), "", "/SignIn-Stub");
-            }
-            else
-            {
-                var identityServerConfiguration = _configuration
-                    .GetSection("Identity")
-                    .Get<IdentityServerConfiguration>();
-                services.AddAndConfigureEmployerAuthentication(identityServerConfiguration);
-            }
+            services.SetupEmployerAuth(configuration);
         }
 
-        if (isProviderAuth)
+        if (_configuration.IsProviderAuth())
         {
-            if (_configuration["ReservationsWeb:UseDfESignIn"] != null && _configuration["ReservationsWeb:UseDfESignIn"].Equals("true", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services.AddAndConfigureDfESignInAuthentication(
-                    _configuration,
-                    "SFA.DAS.ProviderApprenticeshipService",
-                    typeof(CustomServiceRole),
-                    ClientName.ProviderRoatp,
-                    "/signout",
-                    "");
-            }
-            else
-            {
-                var providerIdamsConfiguration = _configuration
-                    .GetSection("ProviderIdams")
-                    .Get<ProviderIdamsConfiguration>();
-
-                services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
-                    _configuration,
-                    environment);
-            }
+            services.SetupProviderAuth(configuration, environment);
         }
-
-        services.AddHttpContextAccessor();
 
         services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
 
@@ -147,7 +104,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
         services.AddMediatRValidation();
-        services.AddCommitmentsApi(_configuration, environment);
+        services.AddCommitmentsApi();
         services.AddProviderRelationsApi(_configuration, environment);
 
         if (_configuration["Environment"] == "LOCAL" || _configuration["Environment"] == "DEV")
@@ -167,7 +124,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
             options.Cookie.IsEssential = true;
         });
 
-        services.AddDataProtection(reservationsWebConfig, environment, isEmployerAuth);
+        services.AddDataProtection(reservationsWebConfig, environment, _configuration.IsEmployerAuth());
 
         if (!environment.IsDevelopment())
         {
@@ -188,8 +145,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
         services.AddApplicationInsightsTelemetry();
     }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+   
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())

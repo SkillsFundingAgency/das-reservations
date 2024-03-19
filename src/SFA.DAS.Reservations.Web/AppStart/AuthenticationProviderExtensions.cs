@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             this IServiceCollection services, 
             ProviderIdamsConfiguration idamsConfiguration, 
             IConfiguration config, 
-            IWebHostEnvironment env)
+            IHostEnvironment env)
         {
             var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
             {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
@@ -22,7 +23,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
@@ -47,7 +48,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         private static void AddSharedConfiguration(
             IServiceCollection services,
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {

@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerAccountApi(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IWebHostEnvironment env)
+            IHostEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {

@@ -15,41 +15,37 @@ using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 
-namespace SFA.DAS.Reservations.Web.AppStart
+namespace SFA.DAS.Reservations.Web.AppStart;
+
+public static class ServiceRegistrationExtension
 {
-    public static class ServiceRegistrationExtension
+    public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IConfiguration configuration)
     {
-        public static void AddServices(this IServiceCollection services, ServiceParameters serviceParameters, IConfiguration configuration)
+        services.AddSingleton(serviceParameters);
+        services.AddScoped<LevyNotPermittedFilter>();
+        services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
+        services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
+
+        if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
         {
-            services.AddSingleton(serviceParameters);
-            services.AddScoped<LevyNotPermittedFilter>();
-            services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
-            services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
-
-
-            if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
-            {
-                services.AddSingleton<IApiClient, ApiClient>();
-                services.AddScoped<IEncodingService, EncodingService>();
-            }
-
-            services.AddSingleton<IProviderService, ProviderService>();
-            services.AddTransient<ITrainingDateService, TrainingDateService>();
-            services.AddSingleton<IUserClaimsService, UserClaimsService>();
-            services.AddTransient<ICourseService, CourseService>();
-            services.AddTransient<IReservationService, ReservationService>();
-            services.AddTransient<ICacheStorageService, CacheStorageService>();
-            services.AddTransient<IFundingRulesService, FundingRulesService>();
-            services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
-
-            services.AddTransient<HttpClient>();
-            services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
-            services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
-
-            services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
-            services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
-            
-            
+            services.AddSingleton<IApiClient, ApiClient>();
+            services.AddScoped<IEncodingService, EncodingService>();
         }
+
+        services.AddSingleton<IProviderService, ProviderService>();
+        services.AddTransient<ITrainingDateService, TrainingDateService>();
+        services.AddSingleton<IUserClaimsService, UserClaimsService>();
+        services.AddTransient<ICourseService, CourseService>();
+        services.AddTransient<IReservationService, ReservationService>();
+        services.AddTransient<ICacheStorageService, CacheStorageService>();
+        services.AddTransient<IFundingRulesService, FundingRulesService>();
+        services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
+
+        services.AddTransient<HttpClient>();
+        services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
+        services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
+
+        services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
+        services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
     }
 }
