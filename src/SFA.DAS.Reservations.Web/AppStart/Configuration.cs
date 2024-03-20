@@ -42,6 +42,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
             services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
             AddSharedConfiguration(services, configuration, environment);
         }
 

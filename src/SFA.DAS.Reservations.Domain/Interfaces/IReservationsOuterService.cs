@@ -8,5 +8,5 @@ public interface IReservationsOuterService
 {
     Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null);
     Task<ProviderAccountResponse> GetProviderStatus(long ukprn);
-    Task<GetAccountProviderLegalEntitiesResponse> GetAccountProviderLegalEntities(long ukprn);
+    Task<GetAccountProviderLegalEntitiesWithCreateCohortResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn);
 }

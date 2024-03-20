@@ -2,14 +2,14 @@
 
 namespace SFA.DAS.Reservations.Domain.Providers.Api;
 
-public class GetAccountProviderLegalEntitiesRequest : IGetApiRequest
+public class GetAccountProviderLegalEntitiesWithCreateCohortRequest : IGetApiRequest
 {
     private readonly long _ukprn;
     
-    public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}/legalentities";
+    public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}/legalentities-with-create-cohort";
     public string BaseUrl { get; }
 
-    public GetAccountProviderLegalEntitiesRequest(string apiBaseUrl, long ukprn)
+    public GetAccountProviderLegalEntitiesWithCreateCohortRequest(string apiBaseUrl, long ukprn)
     {
         _ukprn = ukprn;
         

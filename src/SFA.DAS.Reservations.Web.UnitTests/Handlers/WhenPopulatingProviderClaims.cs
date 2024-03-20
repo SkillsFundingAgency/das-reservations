@@ -24,7 +24,7 @@ public class WhenPopulatingProviderClaims
         string displayName,
         [Frozen] Mock<HttpContext> httpContext,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        List<GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto> accountLegalEntities,
+        List<GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> accountLegalEntities,
         ProviderAccountPostAuthenticationClaimsHandler handler)
     {
         var identity = new Mock<ClaimsIdentity>();
@@ -35,14 +35,14 @@ public class WhenPopulatingProviderClaims
         });
 
         outerService
-            .Setup(x => x.GetAccountProviderLegalEntities(ukprn))
-            .ReturnsAsync(new GetAccountProviderLegalEntitiesResponse { AccountProviderLegalEntities = accountLegalEntities });
+            .Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn))
+            .ReturnsAsync(new GetAccountProviderLegalEntitiesWithCreateCohortResponse { AccountProviderLegalEntities = accountLegalEntities });
 
         var principal = new ClaimsPrincipal();
         principal.AddIdentity(identity.Object);
 
         var actual = await handler.GetClaims(httpContext.Object, principal);
-        outerService.Verify(x => x.GetAccountProviderLegalEntities(ukprn), Times.Once);
+        outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
 
         actual.Count().Should().Be(3);
 

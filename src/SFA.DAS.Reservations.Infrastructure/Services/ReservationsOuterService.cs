@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -27,10 +26,10 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         return await apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
     }
     
-    public async Task<GetAccountProviderLegalEntitiesResponse> GetAccountProviderLegalEntities(long ukprn)
+    public async Task<GetAccountProviderLegalEntitiesWithCreateCohortResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn)
     {
-        var request = new GetAccountProviderLegalEntitiesRequest(_config.ApiBaseUrl, ukprn);
+        var request = new GetAccountProviderLegalEntitiesWithCreateCohortRequest(_config.ApiBaseUrl, ukprn);
 
-        return await apiClient.Get<GetAccountProviderLegalEntitiesResponse>(request);
+        return await apiClient.Get<GetAccountProviderLegalEntitiesWithCreateCohortResponse>(request);
     }
 }

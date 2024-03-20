@@ -9,10 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
-using SFA.DAS.Reservations.Domain.Reservations.Api;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure;
 
@@ -25,55 +23,59 @@ public class AccessCohortAuthorizationHandler(
 {
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.ContainsKey(RouteValueKeys.AccountLegalEntityPublicHashedId))
+        if (!await IsProviderAuthorised(context))
         {
             return;
         }
 
-        var providerIdClaim = context.User.GetClaimValue(ClaimsIdentity.DefaultNameClaimType);
-        var accountLegalEntityPublicHashedIdFromUrl = httpContextAccessor.HttpContext.Request.RouteValues[RouteValueKeys.AccountLegalEntityPublicHashedId].ToString().ToUpper();
+        context.Succeed(requirement);
+    }
 
-        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedIdFromUrl))
+    public async Task<bool> IsProviderAuthorised(AuthorizationHandlerContext context)
+    {
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
-            return;
+            return false;
+        }
+
+        var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
+        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
+        {
+            return false;
         }
 
         var trustedAccountClaim = context.User.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
 
-        Dictionary<long, GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto> trustedEmployers;
-        
-        if (trustedAccountClaim == null)
+        Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
+
+        if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
+            var providerIdClaim = context.User.GetClaimValue(ClaimsIdentity.DefaultNameClaimType);
             var providerId = int.Parse(providerIdClaim);
-            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntities(providerId);
-            
+            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+
             trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-            
+
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
             var claimsIdentity = (ClaimsIdentity)context.User.Identity;
-            
+
             claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
         else
         {
             try
             {
-                trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
+                trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {
                 logger.LogError(exception, "Could not deserialize trusted accounts claim for provider.");
-                return;
+                return false;
             }
         }
 
-        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedIdFromUrl, EncodingType.AccountLegalEntityId);
+        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
 
-        if (!trustedEmployers.ContainsKey(accountLegalEntityId))
-        {
-            return;
-        }
-
-        context.Succeed(requirement);
+        return trustedEmployers.ContainsKey(accountLegalEntityId);
     }
 }

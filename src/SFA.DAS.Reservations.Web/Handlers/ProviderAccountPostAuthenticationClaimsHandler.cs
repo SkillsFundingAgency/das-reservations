@@ -28,7 +28,7 @@ public class ProviderAccountPostAuthenticationClaimsHandler(IReservationsOuterSe
 
         var providerId = int.Parse(providerIdValue);
 
-        var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntities(providerId);
+        var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
         var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
         var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
