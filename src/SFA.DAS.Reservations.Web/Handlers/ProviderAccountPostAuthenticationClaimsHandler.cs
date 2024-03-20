@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
@@ -29,8 +28,8 @@ public class ProviderAccountPostAuthenticationClaimsHandler(IReservationsOuterSe
 
         var providerId = int.Parse(providerIdValue);
 
-        var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithPermission(providerId, Operation.CreateCohort);
-        var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.Id);
+        var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntities(providerId);
+        var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
         var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
         claims.Add(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));

@@ -11,6 +11,7 @@ using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure;
@@ -39,14 +40,14 @@ public class AccessCohortAuthorizationHandler(
 
         var trustedAccountClaim = context.User.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
 
-        Dictionary<long, GetAccountProviderLegalEntitiesWithPermissionResponse.AccountProviderLegalEntityDto> trustedEmployers;
+        Dictionary<long, GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto> trustedEmployers;
         
         if (trustedAccountClaim == null)
         {
             var providerId = int.Parse(providerIdClaim);
-            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithPermission(providerId, Operation.CreateCohort);
+            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntities(providerId);
             
-            trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.Id);
+            trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
             
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
             var claimsIdentity = (ClaimsIdentity)context.User.Identity;
@@ -57,7 +58,7 @@ public class AccessCohortAuthorizationHandler(
         {
             try
             {
-                trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithPermissionResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
+                trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {

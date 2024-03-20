@@ -27,13 +27,10 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         return await apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
     }
     
-    public async Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetAccountProviderLegalEntitiesWithPermission(long ukprn, Operation operation)
+    public async Task<GetAccountProviderLegalEntitiesResponse> GetAccountProviderLegalEntities(long ukprn)
     {
-        var request = new GetAccountProviderLegalEntitiesWithPermissionRequest(
-            _config.ApiBaseUrl,
-            ukprn,
-            operation);
+        var request = new GetAccountProviderLegalEntitiesRequest(_config.ApiBaseUrl, ukprn);
 
-        return await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
+        return await apiClient.Get<GetAccountProviderLegalEntitiesResponse>(request);
     }
 }

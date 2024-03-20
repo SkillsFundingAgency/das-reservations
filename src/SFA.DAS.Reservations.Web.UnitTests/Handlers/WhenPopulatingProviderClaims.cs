@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Testing.AutoFixture;
@@ -25,7 +24,7 @@ public class WhenPopulatingProviderClaims
         string displayName,
         [Frozen] Mock<HttpContext> httpContext,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        List<GetAccountProviderLegalEntitiesWithPermissionResponse.AccountProviderLegalEntityDto> accountLegalEntities,
+        List<GetAccountProviderLegalEntitiesResponse.AccountProviderLegalEntityDto> accountLegalEntities,
         ProviderAccountPostAuthenticationClaimsHandler handler)
     {
         var identity = new Mock<ClaimsIdentity>();
@@ -36,19 +35,19 @@ public class WhenPopulatingProviderClaims
         });
 
         outerService
-            .Setup(x => x.GetAccountProviderLegalEntitiesWithPermission(ukprn, Operation.CreateCohort))
-            .ReturnsAsync(new GetAccountProviderLegalEntitiesWithPermissionResponse { AccountProviderLegalEntities = accountLegalEntities });
+            .Setup(x => x.GetAccountProviderLegalEntities(ukprn))
+            .ReturnsAsync(new GetAccountProviderLegalEntitiesResponse { AccountProviderLegalEntities = accountLegalEntities });
 
         var principal = new ClaimsPrincipal();
         principal.AddIdentity(identity.Object);
 
         var actual = await handler.GetClaims(httpContext.Object, principal);
-        outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithPermission(ukprn, Operation.CreateCohort), Times.Once);
+        outerService.Verify(x => x.GetAccountProviderLegalEntities(ukprn), Times.Once);
 
         actual.Count().Should().Be(3);
 
         var actualClaimValue = actual.First(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value;
-        JsonConvert.SerializeObject(accountLegalEntities.ToDictionary(x => x.Id)).Should().Be(actualClaimValue);
+        JsonConvert.SerializeObject(accountLegalEntities.ToDictionary(x => x.AccountId)).Should().Be(actualClaimValue);
 
         actual.First(c => c.Type.Equals(ClaimsIdentity.DefaultNameClaimType)).Value.Should().Be(ukprn.ToString());
         actual.First(c => c.Type.Equals(ProviderClaims.DisplayName)).Value.Should().Be(displayName);
