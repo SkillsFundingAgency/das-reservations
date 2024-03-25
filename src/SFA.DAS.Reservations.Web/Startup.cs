@@ -142,11 +142,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
                     failureStatus: HealthStatus.Unhealthy,
                     tags: new[] { "ready" });
         }
-
-        if (!environment.IsDevelopment())
-        {
-            services.AddApplicationInsightsTelemetry();
-        }
     }
 
     public void Configure(IApplicationBuilder app, IHostEnvironment env)
