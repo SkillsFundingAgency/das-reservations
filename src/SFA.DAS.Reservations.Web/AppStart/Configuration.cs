@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
 using SFA.DAS.Encoding;
 using SFA.DAS.GovUK.Auth.Authentication;
 using SFA.DAS.GovUK.Auth.Services;
@@ -68,9 +67,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
             services.AddSingleton(config => config.GetService<IOptions<AccountApiConfiguration>>().Value);
             
-            services.Configure<CommitmentPermissionsApiClientConfiguration>(configuration.GetSection("CommitmentsApiClient"));
-            services.AddSingleton(config => config.GetService<IOptions<CommitmentPermissionsApiClientConfiguration>>().Value);
-
             services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 

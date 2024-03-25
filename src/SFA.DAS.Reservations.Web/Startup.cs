@@ -8,13 +8,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Logging;
-using SFA.DAS.Authorization.DependencyResolution.Microsoft;
-using SFA.DAS.Authorization.Mvc.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
-using SFA.DAS.Reservations.Web.Authorization;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
 using SFA.DAS.Reservations.Web.StartupConfig;
@@ -24,7 +21,7 @@ namespace SFA.DAS.Reservations.Web;
 public class Startup(IConfiguration configuration, IHostEnvironment environment)
 {
     private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
-    
+
     public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = false;
@@ -72,9 +69,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
         services.AddServices(serviceParameters, _configuration);
 
         services.AddAuthorizationServices();
-        services.AddAuthorization<AuthorizationContextProvider>();
-
-        services.AddCommitmentsPermissionsApi(_configuration, environment);
 
         if (_configuration.IsEmployerAuth())
         {
@@ -92,11 +86,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
             .GetSection("ReservationsWeb")
             .Get<ReservationsWebConfiguration>();
 
-        services.AddMvc(options =>
-            {
-                options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
-                options.AddAuthorization();
-            })
+        services.AddMvc(options => { options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters)); })
             .AddControllersAsServices();
 
         services.AddHttpsRedirection(options => { options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443; });
