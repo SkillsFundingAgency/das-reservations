@@ -18,9 +18,16 @@ using SFA.DAS.Reservations.Web.StartupConfig;
 
 namespace SFA.DAS.Reservations.Web;
 
-public class Startup(IConfiguration configuration, IHostEnvironment environment)
+public class Startup
 {
-    private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
+    private readonly IConfiguration _configuration;
+    private readonly IHostEnvironment _environment;
+
+    public Startup(IConfiguration configuration, IHostEnvironment environment)
+    {
+        _configuration = configuration.BuildDasConfiguration();
+        _environment = environment;
+    }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -58,11 +65,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             if (_configuration.IsEmployerAuth())
             {
-                services.AddEmployerConfiguration(_configuration, environment);
+                services.AddEmployerConfiguration(_configuration, _environment);
             }
             else if (_configuration.IsProviderAuth())
             {
-                services.AddProviderConfiguration(_configuration, environment);
+                services.AddProviderConfiguration(_configuration, _environment);
             }
         }
 
@@ -72,12 +79,12 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
 
         if (_configuration.IsEmployerAuth())
         {
-            services.SetupEmployerAuth(configuration);
+            services.SetupEmployerAuth(_configuration);
         }
 
         if (_configuration.IsProviderAuth())
         {
-            services.SetupProviderAuth(configuration, environment);
+            services.SetupProviderAuth(_configuration, _environment);
         }
 
         services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
@@ -94,7 +101,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
         services.AddMediatRValidation();
         services.AddCommitmentsApi();
-        services.AddProviderRelationsApi(_configuration, environment);
+        services.AddProviderRelationsApi(_configuration, _environment);
 
         if (_configuration["Environment"] == "LOCAL" || _configuration["Environment"] == "DEV")
         {
@@ -113,9 +120,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
             options.Cookie.IsEssential = true;
         });
 
-        services.AddDataProtection(reservationsWebConfig, environment, _configuration.IsEmployerAuth());
+        services.AddDataProtection(reservationsWebConfig, _environment, _configuration.IsEmployerAuth());
 
-        if (!environment.IsDevelopment())
+        if (!_environment.IsDevelopment())
         {
             services.AddHealthChecks()
                 .AddCheck<ReservationsApiHealthCheck>(
@@ -171,7 +178,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
         });
         app.UseAuthentication();
 
-        if (!environment.IsDevelopment())
+        if (!_environment.IsDevelopment())
         {
             app.UseHealthChecks();
         }
