@@ -29,7 +29,6 @@
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.17"/>
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.28"/>
         <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.24"/>
         <PackageReference Include="SFA.DAS.Authorization.Mvc" Version="6.0.97"/>
         <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89"/>
         <PackageReference Include="System.Drawing.Common" Version="8.0.3"/>
