@@ -19,7 +19,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     <PackageReference Include="SFA.DAS.Testing.AutoFixture" Version="3.0.169" />
-    <PackageReference Include="SpecFlow.NUnit.Runners" Version="3.9.69" />
   </ItemGroup>
 
   <ItemGroup>
