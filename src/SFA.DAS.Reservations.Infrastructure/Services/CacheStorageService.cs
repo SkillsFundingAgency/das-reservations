@@ -9,20 +9,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services;
 public class CacheStorageService : ICacheStorageService
 {
     private readonly IDistributedCache _distributedCache;
-
-    /// <summary>
-    /// Returns NULL instead of throwing exception if cached item not found.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public async Task<T> SafeRetrieveFromCache<T>(string key)
-    {
-        var json = await _distributedCache.GetStringAsync(key);
-
-        return json == null ? default : JsonConvert.DeserializeObject<T>(json);
-    }
-
+    
     public CacheStorageService(IDistributedCache distributedCache)
     {
         _distributedCache = distributedCache;
@@ -42,7 +29,6 @@ public class CacheStorageService : ICacheStorageService
     {
         await SaveToCache(key, item, TimeSpan.FromHours(expirationInHours));
     }
-
 
     public async Task<T> RetrieveFromCache<T>(string key)
     {
