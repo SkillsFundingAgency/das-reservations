@@ -12,7 +12,7 @@ public static class HstsStartup
 {
     public static IApplicationBuilder UseDasHsts(this IApplicationBuilder app)
     {
-        var hostingEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
+        var hostingEnvironment = app.ApplicationServices.GetService<IHostEnvironment>();
 
         if (!hostingEnvironment.IsDevelopment())
         {

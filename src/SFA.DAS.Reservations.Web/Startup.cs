@@ -26,7 +26,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
 {
     private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
 
-    public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services, bool isAcceptanceTests = false)
     {
         IdentityModelEventSource.ShowPII = false;
 
@@ -143,10 +143,13 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
                     tags: new[] { "ready" });
         }
 
-        services.AddApplicationInsightsTelemetry();
+        if (!isAcceptanceTests)
+        {
+            services.AddApplicationInsightsTelemetry();
+        }
     }
-   
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+
+    public void Configure(IApplicationBuilder app, IHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
