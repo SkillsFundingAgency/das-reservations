@@ -25,8 +25,8 @@ namespace SFA.DAS.Reservations.Web;
 public class Startup(IConfiguration configuration, IHostEnvironment environment)
 {
     private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
-
-    public void ConfigureServices(IServiceCollection services, bool isAcceptanceTests = false)
+    
+    public void ConfigureServices(IServiceCollection services)
     {
         IdentityModelEventSource.ShowPII = false;
 
@@ -143,7 +143,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment environment)
                     tags: new[] { "ready" });
         }
 
-        if (!isAcceptanceTests)
+        if (!environment.IsDevelopment())
         {
             services.AddApplicationInsightsTelemetry();
         }

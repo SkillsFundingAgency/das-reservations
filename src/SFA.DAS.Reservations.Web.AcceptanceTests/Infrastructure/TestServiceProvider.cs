@@ -35,7 +35,7 @@ public class TestServiceProvider : IServiceProvider
 
         var startup = new Startup(configuration, new TestHostEnvironment());
 
-        startup.ConfigureServices(serviceCollection, isAcceptanceTests: true);
+        startup.ConfigureServices(serviceCollection);
         serviceCollection.ConfigureTestServiceCollection(configuration, null);
         serviceCollection.AddTransient<IHostEnvironment, TestHostEnvironment>();
         RegisterControllers(serviceCollection);
