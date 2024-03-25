@@ -1,6 +1,4 @@
-﻿using SFA.DAS.Common.Domain.Types;
-
-namespace SFA.DAS.Reservations.Domain.Employers
+﻿namespace SFA.DAS.Reservations.Domain.Employers
 {
     public class AccountLegalEntity
     {

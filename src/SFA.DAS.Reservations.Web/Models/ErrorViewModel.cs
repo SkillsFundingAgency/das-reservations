@@ -1,5 +1,3 @@
-using System;
-
 namespace SFA.DAS.Reservations.Web.Models
 {
     public class ErrorViewModel

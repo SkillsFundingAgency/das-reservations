@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Employers;
@@ -13,7 +12,6 @@ using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
-using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 {

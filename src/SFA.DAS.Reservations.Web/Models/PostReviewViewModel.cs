@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Models

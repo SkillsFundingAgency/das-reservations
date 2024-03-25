@@ -3,7 +3,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using Castle.Core.Logging;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Authorization;
