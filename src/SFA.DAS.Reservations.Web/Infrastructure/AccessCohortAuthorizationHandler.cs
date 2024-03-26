@@ -25,10 +25,10 @@ public class AccessCohortAuthorizationHandler(
     {
         logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
         
-        // if (!await IsProviderAuthorised(context))
-        // {
-        //     return;
-        // }
+        if (!await IsProviderAuthorised(context))
+        {
+            return;
+        }
 
         context.Succeed(requirement);
     }
