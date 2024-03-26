@@ -31,11 +31,15 @@ public class ProviderAccountPostAuthenticationClaimsHandler(IReservationsOuterSe
         var providerId = int.Parse(providerIdValue);
 
         var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-        
-        var logger = httpContext.RequestServices.GetRequiredService<ILogger<ProviderAccountPostAuthenticationClaimsHandler>>();
 
-        logger.LogWarning("ProviderAccountPostAuthenticationClaimsHandler.GetClaims() legalEntitiesWithPermissionResponse: {Response}", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+        var loggingService = httpContext.RequestServices.GetRequiredService(typeof(ILogger<ProviderAccountPostAuthenticationClaimsHandler>));
+
+        if (loggingService is ILogger<ProviderAccountPostAuthenticationClaimsHandler> logger)
+        {
+            logger.LogWarning("ProviderAccountPostAuthenticationClaimsHandler.GetClaims() legalEntitiesWithPermissionResponse: {Response}", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));    
+        }
         
+      
         var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
         var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
