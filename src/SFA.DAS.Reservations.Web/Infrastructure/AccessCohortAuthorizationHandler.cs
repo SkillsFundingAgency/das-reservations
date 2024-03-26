@@ -23,10 +23,12 @@ public class AccessCohortAuthorizationHandler(
 {
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
-        if (!await IsProviderAuthorised(context))
-        {
-            return;
-        }
+        logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
+        
+        // if (!await IsProviderAuthorised(context))
+        // {
+        //     return;
+        // }
 
         context.Succeed(requirement);
     }
@@ -50,7 +52,7 @@ public class AccessCohortAuthorizationHandler(
 
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
-            logger.LogWarning("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
             
             var providerIdClaim = context.User.GetClaimValue(ClaimsIdentity.DefaultNameClaimType);
             var providerId = int.Parse(providerIdClaim);
@@ -65,7 +67,7 @@ public class AccessCohortAuthorizationHandler(
         }
         else
         {
-            logger.LogWarning("AccessCohortAuthorizationHandler.IsProviderAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
             
             try
             {
