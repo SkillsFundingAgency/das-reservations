@@ -3,6 +3,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -29,6 +31,11 @@ public class ProviderAccountPostAuthenticationClaimsHandler(IReservationsOuterSe
         var providerId = int.Parse(providerIdValue);
 
         var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+        
+        var logger = httpContext.RequestServices.GetRequiredService<ILogger<ProviderAccountPostAuthenticationClaimsHandler>>();
+
+        logger.LogWarning("ProviderAccountPostAuthenticationClaimsHandler.GetClaims() legalEntitiesWithPermissionResponse: {Response}", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+        
         var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
         var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
