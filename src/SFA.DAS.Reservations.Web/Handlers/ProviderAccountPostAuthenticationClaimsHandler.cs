@@ -36,10 +36,9 @@ public class ProviderAccountPostAuthenticationClaimsHandler(IReservationsOuterSe
 
         if (loggingService is ILogger<ProviderAccountPostAuthenticationClaimsHandler> logger)
         {
-            logger.LogWarning("ProviderAccountPostAuthenticationClaimsHandler.GetClaims() legalEntitiesWithPermissionResponse: {Response}", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));    
+            logger.LogWarning("ProviderAccountPostAuthenticationClaimsHandler.GetClaims() legalEntitiesWithPermissionResponse: {Response}", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
         }
-        
-      
+
         var trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
         var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 

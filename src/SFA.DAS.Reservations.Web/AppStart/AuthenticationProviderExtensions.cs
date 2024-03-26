@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Provider.Idams.Stub.Extensions;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -51,16 +52,20 @@ public static class AuthenticationProviderExtensions
                     options.MetadataAddress = idamsConfiguration.MetadataAddress;
                     options.Wtrealm = idamsConfiguration.Wtrealm;
                     options.CallbackPath = "/{ukprn}/reservations";
-                    options.Events.OnSecurityTokenValidated = async (ctx) => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); };
+                    options.Events.OnSecurityTokenValidated = async ctx => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); };
                 }).AddCookie(cookieOptions);
         }
     }
 
     private static async Task PopulateProviderClaims(HttpContext httpContext, ClaimsPrincipal principal)
     {
+        var logger = httpContext.RequestServices.GetService<ILogger<Startup>>();
+        logger.LogWarning("AuthenticationProviderExtensions.PopulateProviderClaims() executing.");
+
         var outerService = httpContext.RequestServices.GetService<IReservationsOuterService>();
+
         var claimsHandler = new ProviderAccountPostAuthenticationClaimsHandler(outerService);
-        
+
         await claimsHandler.GetClaims(httpContext, principal);
     }
 }

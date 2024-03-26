@@ -50,6 +50,8 @@ public class AccessCohortAuthorizationHandler(
 
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
+            logger.LogWarning("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
+            
             var providerIdClaim = context.User.GetClaimValue(ClaimsIdentity.DefaultNameClaimType);
             var providerId = int.Parse(providerIdClaim);
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
@@ -63,6 +65,8 @@ public class AccessCohortAuthorizationHandler(
         }
         else
         {
+            logger.LogWarning("AccessCohortAuthorizationHandler.IsProviderAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
+            
             try
             {
                 trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
