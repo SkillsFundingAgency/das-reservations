@@ -35,7 +35,7 @@ public class AccessCohortAuthorizationHandler(
 
     public async Task<bool> IsProviderAuthorised(AuthorizationHandlerContext context)
     {
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(nameof(RouteValueKeys.AccountLegalEntityPublicHashedId), out var accountLegalEntityPublicHashedIdFromUrl))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
