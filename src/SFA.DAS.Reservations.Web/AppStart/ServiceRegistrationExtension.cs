@@ -40,8 +40,6 @@ public static class ServiceRegistrationExtension
         services.AddTransient<IFundingRulesService, FundingRulesService>();
         services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
         
-        services.AddTransient<ProviderAccountPostAuthenticationClaimsHandler>();
-        
         services.AddTransient<HttpClient>();
         services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
         services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
