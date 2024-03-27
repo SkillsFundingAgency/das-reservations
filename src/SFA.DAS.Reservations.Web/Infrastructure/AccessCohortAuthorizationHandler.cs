@@ -37,6 +37,7 @@ public class AccessCohortAuthorizationHandler(
     {
         if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
         }
 
@@ -54,7 +55,8 @@ public class AccessCohortAuthorizationHandler(
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
             
-            var providerIdClaim = context.User.GetClaimValue(ClaimsIdentity.DefaultNameClaimType);
+            var providerIdClaim = context.User.GetClaimValue(ProviderClaims.ProviderUkprn);
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
             var providerId = int.Parse(providerIdClaim);
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 

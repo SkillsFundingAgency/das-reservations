@@ -89,7 +89,7 @@ public class WhenDeterminingIsAuthorized
         {
             new ClaimsIdentity(new[]
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString())
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
             })
         });
 
