@@ -50,6 +50,10 @@ public class AccessCohortAuthorizationHandler(
 
         var trustedAccountClaim = context.User.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
 
+        logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {claims}", 
+            JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+            );
+
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
