@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
@@ -48,11 +47,13 @@ public class AccessCohortAuthorizationHandler(
             return false;
         }
 
-        var trustedAccountClaim = context.User.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
+        var claimsIdentity = (ClaimsIdentity)context.User.Identity;
 
-        logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {claims}", 
-            JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
-            );
+        var trustedAccountClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
+
+        logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {claims}",
+            JsonConvert.SerializeObject(claimsIdentity.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+        );
 
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
@@ -60,7 +61,7 @@ public class AccessCohortAuthorizationHandler(
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
-            var providerIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == ProviderClaims.ProviderUkprn)?.Value;
+            var providerIdClaim = claimsIdentity.Claims.FirstOrDefault(claim => claim.Type == ProviderClaims.ProviderUkprn)?.Value;
 
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
@@ -76,7 +77,6 @@ public class AccessCohortAuthorizationHandler(
             trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
 
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
-            var claimsIdentity = (ClaimsIdentity)context.User.Identity;
 
             claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
