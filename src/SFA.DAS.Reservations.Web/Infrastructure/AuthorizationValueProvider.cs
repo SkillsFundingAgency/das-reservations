@@ -7,9 +7,9 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 
 public static class RouteValueKeys
 {
-    public const string ProviderId = "providerId";
-    public const string AccountLegalEntityPublicHashedId = "employerAccountLegalEntityPublicHashedId";
-    public const string CohortReference = "cohortReference";
+    public const string ProviderId = nameof(ProviderId);
+    public const string AccountLegalEntityPublicHashedId = nameof(AccountLegalEntityPublicHashedId);
+    public const string CohortReference = nameof(CohortReference);
     public const string ApprenticeshipId = "apprenticeshipHashedId";
 }
 
