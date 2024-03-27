@@ -59,6 +59,7 @@ public static class AuthenticationProviderExtensions
 
     private static async Task PopulateProviderClaims(HttpContext httpContext, ClaimsPrincipal principal)
     {
+        throw new ApplicationException("Testing PopulateProviderClaims is firing!");
         var logger = httpContext.RequestServices.GetService<ILogger<Startup>>();
         logger.LogWarning("AuthenticationProviderExtensions.PopulateProviderClaims() executing.");
 
