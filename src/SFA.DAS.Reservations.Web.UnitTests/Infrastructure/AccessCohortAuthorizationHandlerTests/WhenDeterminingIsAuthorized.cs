@@ -75,45 +75,45 @@ public class WhenDeterminingIsAuthorized
         actual.Should().BeFalse();
     }
 
-    // [Test, MoqAutoData]
-    // public async Task ThenCallsToOuterApiWhenTrustedEmployersClaimIsEmptyAndSavesResultToClaims(
-    //     int ukprn,
-    //     string accountLegalEntityHashedId,
-    //     AccessCohortRequirement requirement,
-    //     [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
-    //     [Frozen] Mock<IReservationsOuterService> outerService,
-    //     AccessCohortAuthorizationHandler handler,
-    //     GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
-    // {
-    //     var claimsPrinciple = new ClaimsPrincipal(new[]
-    //     {
-    //         new ClaimsIdentity(new[]
-    //         {
-    //             new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
-    //         })
-    //     });
-    //
-    //     var context = new AuthorizationHandlerContext(new[] { requirement }, claimsPrinciple, null);
-    //     var httpContext = new DefaultHttpContext(new FeatureCollection());
-    //
-    //     httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
-    //     httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
-    //     outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
-    //
-    //     var actual = await handler.IsProviderAuthorised(context);
-    //
-    //     actual.Should().BeFalse();
-    //
-    //     outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
-    //
-    //     var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
-    //
-    //     using (new AssertionScope())
-    //     {
-    //         claimResult.Should().NotBeEmpty();
-    //         claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
-    //     }
-    // }
+    [Test, MoqAutoData]
+    public async Task ThenCallsToOuterApiWhenTrustedEmployersClaimIsEmptyAndSavesResultToClaims(
+        int ukprn,
+        string accountLegalEntityHashedId,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        AccessCohortAuthorizationHandler handler,
+        GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
+    {
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
+            })
+        });
+    
+        var context = new AuthorizationHandlerContext(new[] { requirement }, claimsPrinciple, null);
+        var httpContext = new DefaultHttpContext(new FeatureCollection());
+    
+        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+        outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
+    
+        var actual = await handler.IsProviderAuthorised(context);
+    
+        actual.Should().BeFalse();
+    
+        outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
+    
+        var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
+    
+        using (new AssertionScope())
+        {
+            claimResult.Should().NotBeEmpty();
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
+        }
+    }
 
     [Test, MoqAutoData]
     public async Task ThenDoesNotCallToOuterApiWhenTrustedEmployersClaimIsPopulated(

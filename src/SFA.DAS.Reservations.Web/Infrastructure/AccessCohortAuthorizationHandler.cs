@@ -55,26 +55,19 @@ public class AccessCohortAuthorizationHandler(
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
-            
-            var claimsDictionary = context.User.Claims.ToDictionary(userClaim => userClaim.Type, userClaim => userClaim.Value);
 
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {Claims}", JsonConvert.SerializeObject(claimsDictionary));
+            var providerIdClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
 
-            if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.UkPrn, out var ukprnFromUrl))
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
+
+            if (!int.TryParse(providerIdClaim, out var providerId))
             {
-                throw new ApplicationException("UkPrn value was not found on the route");
+                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
             }
 
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ukprnFromUrl value: {Id}.", ukprnFromUrl);
-            
-            var ukPrn = ukprnFromUrl?.ToString();
-            var providerId = int.Parse(ukPrn);
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 
-             //var providerIdClaim = context.User.GetClaimValue(ProviderClaims.ProviderUkprn);
-            // logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
-            // var providerId = int.Parse(providerIdClaim);
-            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
             trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
 
