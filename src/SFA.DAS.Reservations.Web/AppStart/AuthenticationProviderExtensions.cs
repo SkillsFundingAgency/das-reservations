@@ -52,9 +52,24 @@ public static class AuthenticationProviderExtensions
                     options.MetadataAddress = idamsConfiguration.MetadataAddress;
                     options.Wtrealm = idamsConfiguration.Wtrealm;
                     options.CallbackPath = "/{ukprn}/reservations";
-                    options.Events.OnSecurityTokenValidated = async ctx => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); };
+                    //options.Events.OnSecurityTokenValidated = async ctx => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); };
                 }).AddCookie(cookieOptions);
+
+            services
+                .AddOptions<WsFederationOptions>(WsFederationDefaults.AuthenticationScheme)
+                .Configure<ProviderAccountPostAuthenticationClaimsHandler>((options, claimsHandler) =>
+                {
+                    options.Events.OnSecurityTokenValidated = async ctx =>
+                    {
+                        await PopulateProviderClaims(ctx, claimsHandler);
+                    };
+                });
         }
+    }
+
+    private static async Task PopulateProviderClaims(SecurityTokenValidatedContext context, ProviderAccountPostAuthenticationClaimsHandler handler)
+    {
+        await handler.GetClaims(context.HttpContext, context.Principal);
     }
 
     private static async Task PopulateProviderClaims(HttpContext httpContext, ClaimsPrincipal principal)
