@@ -56,7 +56,7 @@ public class AccessCohortAuthorizationHandler(
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
-            var providerIdClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
+            var providerIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == ProviderClaims.ProviderUkprn)?.Value;
 
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
