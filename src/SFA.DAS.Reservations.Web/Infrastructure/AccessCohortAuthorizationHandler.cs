@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -24,7 +25,7 @@ public class AccessCohortAuthorizationHandler(
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
         logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
-        
+
         if (!await IsProviderAuthorised(context))
         {
             return;
@@ -54,11 +55,26 @@ public class AccessCohortAuthorizationHandler(
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
-            
-            var providerIdClaim = context.User.GetClaimValue(ProviderClaims.ProviderUkprn);
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
-            var providerId = int.Parse(providerIdClaim);
+
+            if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.UkPrn, out var ukprnFromUrl))
+            {
+                throw new ApplicationException("UkPrn value was not found on the route");
+            }
+
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ukprnFromUrl value: {Id}.", ukprnFromUrl);
+
+            var ukPrn = ukprnFromUrl?.ToString();
+            var providerId = int.Parse(ukPrn);
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+
+            var claimsDictionary = context.User.Claims.ToDictionary(userClaim => userClaim.Type, userClaim => userClaim.Value);
+
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {Claims}", JsonConvert.SerializeObject(claimsDictionary));
+
+             //var providerIdClaim = context.User.GetClaimValue(ProviderClaims.ProviderUkprn);
+            // logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
+            // var providerId = int.Parse(providerIdClaim);
+            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 
             trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
 
@@ -70,7 +86,7 @@ public class AccessCohortAuthorizationHandler(
         else
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
-            
+
             try
             {
                 trustedEmployers = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
