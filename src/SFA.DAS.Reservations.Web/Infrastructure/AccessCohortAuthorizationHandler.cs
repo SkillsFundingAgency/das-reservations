@@ -62,14 +62,14 @@ public class AccessCohortAuthorizationHandler(
             }
 
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ukprnFromUrl value: {Id}.", ukprnFromUrl);
+            
+            var claimsDictionary = context.User.Claims.ToDictionary(userClaim => userClaim.Type, userClaim => userClaim.Value);
+
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {Claims}", JsonConvert.SerializeObject(claimsDictionary));
 
             var ukPrn = ukprnFromUrl?.ToString();
             var providerId = int.Parse(ukPrn);
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-
-            var claimsDictionary = context.User.Claims.ToDictionary(userClaim => userClaim.Type, userClaim => userClaim.Value);
-
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {Claims}", JsonConvert.SerializeObject(claimsDictionary));
 
              //var providerIdClaim = context.User.GetClaimValue(ProviderClaims.ProviderUkprn);
             // logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
