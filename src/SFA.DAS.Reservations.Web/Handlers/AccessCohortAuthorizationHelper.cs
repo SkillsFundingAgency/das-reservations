@@ -33,10 +33,10 @@ public class AccessCohortAuthorizationHelper(
             JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
-        var employerAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+        var employerAccountClaim = httpContextAccessor.HttpContext.User.FindFirstValue(EmployerClaims.AccountsClaimsTypeIdentifier);
 
         // TODO Test this
-        if (employerAccountClaim?.Value != null)
+        if (employerAccountClaim != null)
         {
             // Allow all employers through
             return true;
