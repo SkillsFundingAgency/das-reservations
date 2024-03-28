@@ -8,7 +8,7 @@ public class AccessCohortAuthorizationHandler(IAccessCohortAuthorizationHelper h
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
-        if (!helper.IsAuthorised(context))
+        if (!helper.IsAuthorised())
         {
             return Task.CompletedTask;
         }
