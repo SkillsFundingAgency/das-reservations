@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 //     IReservationsOuterService outerService)
 //     : AuthorizationHandler<AccessCohortRequirement>
 
-public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
+public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger, IActionContextAccessor actionContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
@@ -40,7 +40,14 @@ public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationH
 
     public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        
+        // if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        // {
+        //     logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
+        //     return false;
+        // }
+        
+        if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
