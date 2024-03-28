@@ -1,7 +1,4 @@
-﻿using System;
-using SFA.DAS.Reservations.Domain.Courses;
-
-namespace SFA.DAS.Reservations.Web.Models
+﻿namespace SFA.DAS.Reservations.Web.Models
 {
     public abstract class AddApprenticeViewModel
     {

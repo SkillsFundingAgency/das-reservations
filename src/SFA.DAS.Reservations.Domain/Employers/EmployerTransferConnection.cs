@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SFA.DAS.Reservations.Domain.Employers
+﻿namespace SFA.DAS.Reservations.Domain.Employers
 {
     public class EmployerTransferConnection
     {

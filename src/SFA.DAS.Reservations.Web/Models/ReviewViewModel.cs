@@ -1,5 +1,4 @@
-﻿using System;
-using SFA.DAS.Reservations.Domain.Rules;
+﻿using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Models

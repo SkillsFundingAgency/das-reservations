@@ -5,60 +5,54 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
-namespace SFA.DAS.Reservations.Infrastructure.Api
+namespace SFA.DAS.Reservations.Infrastructure.Api;
+
+public class ApiClient(IOptions<ReservationsApiConfiguration> apiConfigurationOptions) : ApiClientBase, IApiClient
 {
-    public class ApiClient : ApiClientBase, IApiClient
+    private readonly ReservationsApiConfiguration _reservationsApiClientConfiguration = apiConfigurationOptions.Value;
+
+    public override async Task<string> Ping()
     {
-        private readonly ReservationsApiConfiguration _reservationsApiClientConfiguration;
+        var pingUrl = _reservationsApiClientConfiguration.Url;
 
-        public ApiClient(IOptions<ReservationsApiConfiguration> apiConfigurationOptions)
-        {
-            _reservationsApiClientConfiguration = apiConfigurationOptions.Value;
-        }
+        pingUrl += pingUrl.EndsWith("/") ? "ping" : "/ping";
 
-        public override async Task<string> Ping()
-        {
-            var pingUrl = _reservationsApiClientConfiguration.Url;
+        //not unit testable using directly
+        using var client = new HttpClient();
+        
+        var response = await client.GetAsync(pingUrl).ConfigureAwait(false);
 
-            pingUrl += pingUrl.EndsWith("/") ? "ping" : "/ping";
+        response.EnsureSuccessStatusCode();
+        
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    }
 
-            using (var client = new HttpClient())//not unit testable using directly
-            {
-                var response = await client.GetAsync(pingUrl).ConfigureAwait(false);
+    protected override async Task<string> GetAccessTokenAsync()
+    {
+        var accessToken = IsClientCredentialConfiguration(_reservationsApiClientConfiguration.Id, _reservationsApiClientConfiguration.Secret, _reservationsApiClientConfiguration.Tenant)
+            ? await GetClientCredentialAuthenticationResult(_reservationsApiClientConfiguration.Id, _reservationsApiClientConfiguration.Secret, _reservationsApiClientConfiguration.Identifier, _reservationsApiClientConfiguration.Tenant)
+            : await GetManagedIdentityAuthenticationResult(_reservationsApiClientConfiguration.Identifier);
 
-                response.EnsureSuccessStatusCode();
-                var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return result;
-            }
-        }
+        return accessToken;
+    }
 
-        protected override async Task<string> GetAccessTokenAsync()
-        {
-            var accessToken = IsClientCredentialConfiguration(_reservationsApiClientConfiguration.Id, _reservationsApiClientConfiguration.Secret, _reservationsApiClientConfiguration.Tenant)
-               ? await GetClientCredentialAuthenticationResult(_reservationsApiClientConfiguration.Id, _reservationsApiClientConfiguration.Secret, _reservationsApiClientConfiguration.Identifier, _reservationsApiClientConfiguration.Tenant)
-               : await GetManagedIdentityAuthenticationResult(_reservationsApiClientConfiguration.Identifier);
+    private static async Task<string> GetClientCredentialAuthenticationResult(string clientId, string clientSecret, string resource, string tenant)
+    {
+        var authority = $"https://login.microsoftonline.com/{tenant}";
+        var clientCredential = new ClientCredential(clientId, clientSecret);
+        var context = new AuthenticationContext(authority, true);
+        var result = await context.AcquireTokenAsync(resource, clientCredential);
+        return result.AccessToken;
+    }
 
-            return accessToken;
-        }
+    private static async Task<string> GetManagedIdentityAuthenticationResult(string resource)
+    {
+        var azureServiceTokenProvider = new AzureServiceTokenProvider();
+        return await azureServiceTokenProvider.GetAccessTokenAsync(resource);
+    }
 
-        private async Task<string> GetClientCredentialAuthenticationResult(string clientId, string clientSecret, string resource, string tenant)
-        {
-            var authority = $"https://login.microsoftonline.com/{tenant}";
-            var clientCredential = new ClientCredential(clientId, clientSecret);
-            var context = new AuthenticationContext(authority, true);
-            var result = await context.AcquireTokenAsync(resource, clientCredential);
-            return result.AccessToken;
-        }
-
-        private async Task<string> GetManagedIdentityAuthenticationResult(string resource)
-        {
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-            return await azureServiceTokenProvider.GetAccessTokenAsync(resource);
-        }
-
-        private bool IsClientCredentialConfiguration(string clientId, string clientSecret, string tenant)
-        {
-            return !string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(tenant);
-        }
+    private static bool IsClientCredentialConfiguration(string clientId, string clientSecret, string tenant)
+    {
+        return !string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(tenant);
     }
 }

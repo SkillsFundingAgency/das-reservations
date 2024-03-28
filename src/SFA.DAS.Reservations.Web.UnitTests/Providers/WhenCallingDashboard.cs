@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NUnit.Framework;
-using System.Threading.Tasks;
 using FluentAssertions;
-using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using AutoFixture.NUnit3;

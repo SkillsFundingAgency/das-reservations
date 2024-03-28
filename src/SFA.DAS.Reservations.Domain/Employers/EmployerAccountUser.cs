@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using SFA.DAS.EAS.Account.Api.Types;
+﻿using SFA.DAS.EAS.Account.Api.Types;
 
 namespace SFA.DAS.Reservations.Domain.Employers
 {

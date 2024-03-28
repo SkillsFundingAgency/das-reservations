@@ -6,7 +6,6 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Application.Validation;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 
 namespace SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount

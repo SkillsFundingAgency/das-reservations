@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules

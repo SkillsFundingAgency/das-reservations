@@ -64,17 +64,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     It.IsAny<GetCachedReservationQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => _cachedReservationResult);
-
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<CacheReservationCourseCommand>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
-
-            _mediator.Setup(mediator => mediator.Send(
-                    It.IsAny<CacheReservationStartDateCommand>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
-
+            
             _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetCoursesResult
                 {

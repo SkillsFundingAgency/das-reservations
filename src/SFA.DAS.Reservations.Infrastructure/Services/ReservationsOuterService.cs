@@ -7,30 +7,29 @@ using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
-namespace SFA.DAS.Reservations.Infrastructure.Services
+namespace SFA.DAS.Reservations.Infrastructure.Services;
+
+public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOptions<ReservationsOuterApiConfiguration> options)
+    : IReservationsOuterService
 {
-    public class ReservationsOuterService : IReservationsOuterService
+    private readonly ReservationsOuterApiConfiguration _config = options.Value;
+
+    public async Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null)
     {
-        private readonly IReservationsOuterApiClient _apiClient;
-        private readonly ReservationsOuterApiConfiguration _config;
+        var request = new GetTransferValidityRequest(_config.ApiBaseUrl, senderId, receiverId, pledgeApplicationId);
 
-        public ReservationsOuterService(IReservationsOuterApiClient apiClient, IOptions<ReservationsOuterApiConfiguration> options)
-        {
-            _apiClient = apiClient;
-            _config = options.Value;
-        }
+        return await apiClient.Get<GetTransferValidityResponse>(request);
+    }
 
-        public async Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null)
-        {
-            var request = new GetTransferValidityRequest(_config.ApiBaseUrl, senderId, receiverId, pledgeApplicationId);
-            var response = await _apiClient.Get<GetTransferValidityResponse>(request);
+    public async Task<ProviderAccountResponse> GetProviderStatus(long ukprn)
+    {
+        return await apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
+    }
 
-            return response;
-        }
+    public async Task<GetAccountProviderLegalEntitiesWithCreateCohortResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn)
+    {
+        var request = new GetAccountProviderLegalEntitiesWithCreateCohortRequest(_config.ApiBaseUrl, ukprn);
 
-        public async Task<ProviderAccountResponse> GetProviderStatus(long ukprn)
-        {
-            return await _apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
-        }
+        return await apiClient.Get<GetAccountProviderLegalEntitiesWithCreateCohortResponse>(request);
     }
 }

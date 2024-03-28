@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;

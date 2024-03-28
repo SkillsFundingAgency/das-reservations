@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Testing.AutoFixture;

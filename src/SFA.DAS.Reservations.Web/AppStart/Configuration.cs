@@ -1,17 +1,17 @@
-﻿using System;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SFA.DAS.Authorization.CommitmentPermissions.Configuration;
 using SFA.DAS.Encoding;
 using SFA.DAS.GovUK.Auth.Authentication;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
+using ProviderAuthorizationHandler = SFA.DAS.Reservations.Web.Infrastructure.ProviderAuthorizationHandler;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
@@ -35,19 +35,20 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddProviderConfiguration(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
             services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
+            
             AddSharedConfiguration(services, configuration, environment);
         }
 
         private static void AddSharedConfiguration(
             IServiceCollection services,
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IHostEnvironment environment)
         {
             if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
             {
@@ -68,9 +69,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
             services.AddSingleton(config => config.GetService<IOptions<AccountApiConfiguration>>().Value);
             
-            services.Configure<CommitmentPermissionsApiClientConfiguration>(configuration.GetSection("CommitmentsApiClient"));
-            services.AddSingleton(config => config.GetService<IOptions<CommitmentPermissionsApiClientConfiguration>>().Value);
-
             services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 
@@ -88,6 +86,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
             services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, TrainingProviderAllRolesAuthorizationHandler>();
+            
+            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
+            services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
         }
     }
 }

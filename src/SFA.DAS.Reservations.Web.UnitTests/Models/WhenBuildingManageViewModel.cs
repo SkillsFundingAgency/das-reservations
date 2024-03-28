@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Models;
 

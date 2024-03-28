@@ -1,17 +1,16 @@
 ﻿using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Domain.Providers.Api
-{
-    public class GetProviderStatusDetails : IGetApiRequest
-    {
-        private readonly long _ukprn;
-        public string BaseUrl { get; }
-        public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}";
+namespace SFA.DAS.Reservations.Domain.Providers.Api;
 
-        public GetProviderStatusDetails(string baseUrl, long ukprn)
-        {
-            _ukprn = ukprn;
-            BaseUrl = baseUrl.EndsWith('/') ? baseUrl : baseUrl + "/";
-        }
+public class GetProviderStatusDetails : IGetApiRequest
+{
+    private readonly long _ukprn;
+    public string BaseUrl { get; }
+    public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}";
+
+    public GetProviderStatusDetails(string baseUrl, long ukprn)
+    {
+        _ukprn = ukprn;
+        BaseUrl = baseUrl.EndsWith('/') ? baseUrl : baseUrl + "/";
     }
 }

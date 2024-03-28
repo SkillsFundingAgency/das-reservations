@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SFA.DAS.Reservations.Infrastructure.Configuration
+﻿namespace SFA.DAS.Reservations.Infrastructure.Configuration
 {
     public class ReservationsWebConfiguration
     {

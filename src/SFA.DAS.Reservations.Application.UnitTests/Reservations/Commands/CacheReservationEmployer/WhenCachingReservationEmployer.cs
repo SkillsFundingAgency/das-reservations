@@ -170,16 +170,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             _mockCacheStorageService.Verify(service => service.SaveToCache(
                 It.IsAny<string>(), 
                 It.Is<CachedReservation>(c => c.Id.Equals(command.Id) &&
-                    c.AccountId.Equals(command.AccountId) &&
-                    c.AccountLegalEntityId.Equals(command.AccountLegalEntityId) &&
-                    c.AccountLegalEntityName.Equals(command.AccountLegalEntityName) &&
-                    c.AccountLegalEntityPublicHashedId.Equals(command.AccountLegalEntityPublicHashedId) &&
-                    c.AccountName.Equals(command.AccountName) &&
-                    c.CohortRef.Equals(command.CohortRef) &&
-                    c.UkPrn.Equals(command.UkPrn) &&
-                    c.JourneyData.Equals(command.JourneyData) &&
-                    c.IsEmptyCohortFromSelect.Equals(command.IsEmptyCohortFromSelect) &&
-                    c.EmployerHasSingleLegalEntity.Equals(command.EmployerHasSingleLegalEntity)), 
+                                              c.AccountId.Equals(command.AccountId) &&
+                                              c.AccountLegalEntityId.Equals(command.AccountLegalEntityId) &&
+                                              c.AccountLegalEntityName.Equals(command.AccountLegalEntityName) &&
+                                              c.AccountLegalEntityPublicHashedId.Equals(command.AccountLegalEntityPublicHashedId) &&
+                                              c.AccountName.Equals(command.AccountName) &&
+                                              c.CohortRef.Equals(command.CohortRef) &&
+                                              c.UkPrn.Equals(command.UkPrn) &&
+                                              c.JourneyData.Equals(command.JourneyData) &&
+                                              c.IsEmptyCohortFromSelect.Equals(command.IsEmptyCohortFromSelect) &&
+                                              c.EmployerHasSingleLegalEntity.Equals(command.EmployerHasSingleLegalEntity)), 
                 1));
         }
     }
