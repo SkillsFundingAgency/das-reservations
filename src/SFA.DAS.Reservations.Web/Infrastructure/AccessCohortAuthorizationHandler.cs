@@ -47,7 +47,7 @@ public class AccessCohortAuthorizationHandler(
             return false;
         }
 
-        var claimsIdentity = (ClaimsIdentity)context.User.Identity;
+        var claimsIdentity = (ClaimsIdentity)httpContextAccessor.HttpContext.User.Identity;
 
         var trustedAccountClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
 
