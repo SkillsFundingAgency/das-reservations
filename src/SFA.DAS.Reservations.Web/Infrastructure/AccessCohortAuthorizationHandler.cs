@@ -41,23 +41,16 @@ public class AccessCohortAuthorizationHandler(
             return false;
         }
         
-        if (!context.User.HasClaim(c => c.Type.Equals(ProviderClaims.ProviderUkprn)))
-        {
-            throw new UnauthorizedAccessException("ProviderClaims.ProviderUkprn not found on User object.");
-        }
-
         var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
         if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
         {
             return false;
         }
 
-        var claimsIdentity = context.User.Identities.First();
-        
-        var trustedAccountClaim = claimsIdentity.FindFirst(ProviderClaims.TrustedEmployerAccounts)?.Value;
+        var trustedAccountClaim =  context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value; 
 
         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
-            JsonConvert.SerializeObject(claimsIdentity.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+            JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
@@ -66,7 +59,7 @@ public class AccessCohortAuthorizationHandler(
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() no trusted account claims found. Retrieving from outerApi.");
 
-            var providerIdClaim = claimsIdentity.FindFirst(ProviderClaims.ProviderUkprn)?.Value;
+            var providerIdClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
 
             logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() ProviderIdClaim value: {Id}.", providerIdClaim);
 
@@ -83,6 +76,8 @@ public class AccessCohortAuthorizationHandler(
 
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
+            var claimsIdentity = context.User.Identities.First();
+            
             claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
         else
