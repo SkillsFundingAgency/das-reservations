@@ -72,7 +72,7 @@ public static class AuthorizationServiceRegistrations
             options.AddPolicy(PolicyNames.AccessCohort, policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireClaim(ProviderClaims.ProviderUkprn);
+                ProviderOrEmployerAssertion(policy);
                 policy.Requirements.Add(new AccessCohortRequirement());
             });
         });
