@@ -1,71 +1,40 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Providers.Api;
-using SFA.DAS.Reservations.Web.Handlers;
+using SFA.DAS.Reservations.Web.Infrastructure;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure;
+namespace SFA.DAS.Reservations.Web.Handlers;
 
-// public class AccessCohortAuthorizationHandler(
-//     IActionContextAccessor actionContextAccessor,
-//     ILogger<AccessCohortAuthorizationHandler> logger,
-//     IEncodingService encodingService,
-//     IReservationsOuterService outerService)
-//     : AuthorizationHandler<AccessCohortRequirement>
-
-public class AccessCohortAuthorizationHandler(IProviderAuthorizationHandler providerAuthorizationHandler) : AuthorizationHandler<AccessCohortRequirement>
+public interface IProviderAuthorizationHandler
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
+    bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context);
+}
+
+public class ProviderAuthorizationHandlers(ILogger<ProviderAuthorizationHandlers> logger, IHttpContextAccessor httpContextAccessor) : IProviderAuthorizationHandler
+{
+    public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
-        if (!providerAuthorizationHandler.IsAuthorisedToAccessCohort(context))
+        logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
+            JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+        );
+        
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
-            return Task.CompletedTask;
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
+            return false;
         }
+        
+        var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
+        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
+        {
+            return false;
+        }
+        
+        var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
 
-        context.Succeed(requirement);
-
-        return Task.CompletedTask;
-    }
-
-
-// public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
-    // {
-    //     
-    //     // if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
-    //     // {
-    //     //     logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
-    //     //     return false;
-    //     // }
-    //     
-    //     if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
-    //     {
-    //         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
-    //         return false;
-    //     }
-    //     
-    //     var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
-    //     if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
-    //     {
-    //         return false;
-    //     }
-    //     
-    //     logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
-    //         JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
-    //     );
-    //     
-    //     var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
-    //
-    //     return false;
+        return false;
 
         // Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
         //
@@ -113,3 +82,4 @@ public class AccessCohortAuthorizationHandler(IProviderAuthorizationHandler prov
         //
         // return trustedEmployers.ContainsKey(accountLegalEntityId);
     }
+}
