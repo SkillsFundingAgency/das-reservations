@@ -25,7 +25,7 @@ public class AccessCohortAuthorizationHandler(
     {
         logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
 
-        if (!await IsProviderAuthorised(context))
+        if (!await IsProviderAuthorised())
         {
             return;
         }
@@ -33,7 +33,7 @@ public class AccessCohortAuthorizationHandler(
         context.Succeed(requirement);
     }
 
-    public async Task<bool> IsProviderAuthorised(AuthorizationHandlerContext context)
+    public async Task<bool> IsProviderAuthorised()
     {
         if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
