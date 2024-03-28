@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Encoding;
@@ -23,6 +24,7 @@ public static class ServiceRegistrationExtension
         services.AddScoped<LevyNotPermittedFilter>();
         services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
         services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
+        services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
 
         if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
         {

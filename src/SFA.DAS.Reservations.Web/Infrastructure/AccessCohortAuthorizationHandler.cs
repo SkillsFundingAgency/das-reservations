@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
@@ -15,7 +15,7 @@ using SFA.DAS.Reservations.Domain.Providers.Api;
 namespace SFA.DAS.Reservations.Web.Infrastructure;
 
 public class AccessCohortAuthorizationHandler(
-    IHttpContextAccessor httpContextAccessor,
+    IActionContextAccessor actionContextAccessor,
     ILogger<AccessCohortAuthorizationHandler> logger,
     IEncodingService encodingService,
     IReservationsOuterService outerService)
@@ -35,19 +35,19 @@ public class AccessCohortAuthorizationHandler(
 
     public async Task<bool> IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
         }
-        
+
         var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
         if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
         {
             return false;
         }
 
-        var trustedAccountClaim =  context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value; 
+        var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value;
 
         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
             JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
@@ -77,7 +77,7 @@ public class AccessCohortAuthorizationHandler(
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
             var claimsIdentity = context.User.Identities.First();
-            
+
             claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
         else
