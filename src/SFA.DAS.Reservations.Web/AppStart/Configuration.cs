@@ -41,8 +41,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
             services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
-            services.AddSingleton<IProviderAuthorizationHandler, ProviderAuthorizationHandlers>();
+            
             AddSharedConfiguration(services, configuration, environment);
         }
 
@@ -87,6 +86,9 @@ namespace SFA.DAS.Reservations.Web.AppStart
 
             services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, TrainingProviderAllRolesAuthorizationHandler>();
+            
+            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
+            services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
         }
     }
 }

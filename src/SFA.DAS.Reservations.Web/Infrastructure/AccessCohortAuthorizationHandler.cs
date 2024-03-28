@@ -23,11 +23,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 //     IReservationsOuterService outerService)
 //     : AuthorizationHandler<AccessCohortRequirement>
 
-public class AccessCohortAuthorizationHandler(IProviderAuthorizationHandler providerAuthorizationHandler) : AuthorizationHandler<AccessCohortRequirement>
+public class AccessCohortAuthorizationHandler(IAccessCohortAuthorizationHelper helper) : AuthorizationHandler<AccessCohortRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
-        if (!providerAuthorizationHandler.IsAuthorisedToAccessCohort(context))
+        if (!helper.IsAuthorised(context))
         {
             return Task.CompletedTask;
         }

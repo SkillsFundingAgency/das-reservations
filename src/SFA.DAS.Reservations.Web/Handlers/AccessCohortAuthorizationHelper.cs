@@ -7,14 +7,14 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Handlers;
 
-public interface IProviderAuthorizationHandler
+public interface IAccessCohortAuthorizationHelper
 {
-    bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context);
+    bool IsAuthorised(AuthorizationHandlerContext context);
 }
 
-public class ProviderAuthorizationHandlers(ILogger<ProviderAuthorizationHandlers> logger, IHttpContextAccessor httpContextAccessor) : IProviderAuthorizationHandler
+public class AccessCohortAuthorizationHelper(ILogger<AccessCohortAuthorizationHelper> logger, IHttpContextAccessor httpContextAccessor) : IAccessCohortAuthorizationHelper
 {
-    public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
+    public bool IsAuthorised(AuthorizationHandlerContext context)
     {
         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
             JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
