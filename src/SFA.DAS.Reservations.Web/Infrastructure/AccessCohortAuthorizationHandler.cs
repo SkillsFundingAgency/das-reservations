@@ -25,7 +25,7 @@ public class AccessCohortAuthorizationHandler(
     {
         logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
 
-        if (!await IsProviderAuthorised())
+        if (!await IsProviderAuthorised(context))
         {
             return;
         }
@@ -33,7 +33,7 @@ public class AccessCohortAuthorizationHandler(
         context.Succeed(requirement);
     }
 
-    public async Task<bool> IsProviderAuthorised()
+    public async Task<bool> IsProviderAuthorised(AuthorizationHandlerContext context)
     {
         if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
@@ -47,12 +47,10 @@ public class AccessCohortAuthorizationHandler(
             return false;
         }
 
-        var claimsIdentity = (ClaimsIdentity)httpContextAccessor.HttpContext.User.Identity;
-
-        var trustedAccountClaim = claimsIdentity.Claims.FirstOrDefault(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
+        var trustedAccountClaim = context.User.FindFirstValue(ProviderClaims.TrustedEmployerAccounts);
 
         logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {claims}",
-            JsonConvert.SerializeObject(claimsIdentity.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+            JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
@@ -61,7 +59,7 @@ public class AccessCohortAuthorizationHandler(
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
-            var providerIdClaim = claimsIdentity.Claims.FirstOrDefault(claim => claim.Type == ProviderClaims.ProviderUkprn)?.Value;
+            var providerIdClaim = context.User.FindFirstValue(ProviderClaims.ProviderUkprn);
 
             logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
@@ -78,6 +76,7 @@ public class AccessCohortAuthorizationHandler(
 
             var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
 
+            var claimsIdentity = (ClaimsIdentity)context.User.Identity;
             claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
         else
