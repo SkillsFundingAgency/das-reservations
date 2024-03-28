@@ -52,7 +52,7 @@ public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationH
             return false;
         }
         
-        var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value;
+        var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
 
         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
             JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
