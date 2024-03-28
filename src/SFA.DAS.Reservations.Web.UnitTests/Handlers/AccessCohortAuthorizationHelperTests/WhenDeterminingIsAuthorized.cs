@@ -16,10 +16,11 @@
 // using SFA.DAS.Encoding;
 // using SFA.DAS.Reservations.Domain.Interfaces;
 // using SFA.DAS.Reservations.Domain.Providers.Api;
+// using SFA.DAS.Reservations.Web.Handlers;
 // using SFA.DAS.Reservations.Web.Infrastructure;
 // using SFA.DAS.Testing.AutoFixture;
 //
-// namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.AccessCohortAuthorizationHandlerTests;
+// namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.AccessCohortAuthorizationHelperTests;
 //
 // public class WhenDeterminingIsAuthorized
 // {
@@ -29,7 +30,7 @@
 //         AccessCohortRequirement requirement,
 //         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
 //         [Frozen] Mock<IReservationsOuterService> outerService,
-//         AccessCohortAuthorizationHandler handler)
+//         AccessCohortAuthorizationHelper sut)
 //     {
 //         var claimsPrinciple = new ClaimsPrincipal(new[]
 //         {
@@ -43,7 +44,7 @@
 //         var httpContext = new DefaultHttpContext(new FeatureCollection());
 //         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 //
-//         var actual = await handler.IsProviderAuthorised();
+//         var actual = await sut.IsAuthorised();
 //
 //         actual.Should().BeFalse();
 //     }
@@ -54,7 +55,7 @@
 //         AccessCohortRequirement requirement,
 //         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
 //         [Frozen] Mock<IReservationsOuterService> outerService,
-//         AccessCohortAuthorizationHandler handler)
+//         AccessCohortAuthorizationHelper sut)
 //     {
 //         var claimsPrinciple = new ClaimsPrincipal(new[]
 //         {
@@ -70,7 +71,7 @@
 //         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, string.Empty);
 //         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 //
-//         var actual = await handler.IsProviderAuthorised();
+//         var actual = await sut.IsProviderAuthorised();
 //
 //         actual.Should().BeFalse();
 //     }
@@ -82,7 +83,7 @@
 //         AccessCohortRequirement requirement,
 //         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
 //         [Frozen] Mock<IReservationsOuterService> outerService,
-//         AccessCohortAuthorizationHandler handler,
+//         AccessCohortAuthorizationHelper sut,
 //         GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
 //     {
 //         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -92,22 +93,22 @@
 //                 new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
 //             })
 //         });
-//     
+//
 //         var context = new AuthorizationHandlerContext(new[] { requirement }, claimsPrinciple, null);
 //         var httpContext = new DefaultHttpContext(new FeatureCollection());
-//     
+//
 //         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
 //         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 //         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
-//     
-//         var actual = await handler.IsProviderAuthorised();
-//     
+//
+//         var actual = await sut.IsProviderAuthorised();
+//
 //         actual.Should().BeFalse();
-//     
+//
 //         outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
-//     
+//
 //         var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.TrustedEmployerAccounts);
-//     
+//
 //         using (new AssertionScope())
 //         {
 //             claimResult.Should().NotBeEmpty();
@@ -122,7 +123,7 @@
 //         AccessCohortRequirement requirement,
 //         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
 //         [Frozen] Mock<IReservationsOuterService> outerService,
-//         AccessCohortAuthorizationHandler handler,
+//         AccessCohortAuthorizationHelper sut,
 //         GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
 //     {
 //         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -141,7 +142,7 @@
 //         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 //         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
 //
-//         var actual = await handler.IsProviderAuthorised();
+//         var actual = await sut.IsProviderAuthorised();
 //
 //         using (new AssertionScope())
 //         {
@@ -163,7 +164,7 @@
 //         AccessCohortRequirement requirement,
 //         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
 //         [Frozen] Mock<IReservationsOuterService> outerService,
-//         AccessCohortAuthorizationHandler handler,
+//         AccessCohortAuthorizationHelper sut,
 //         GetAccountProviderLegalEntitiesWithCreateCohortResponse response,
 //         [Frozen] Mock<IEncodingService> encodingService)
 //     {
@@ -184,7 +185,7 @@
 //         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
 //         encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.AccountLegalEntityId)).Returns(accountLegalEntityId);
 //
-//         var actual = await handler.IsProviderAuthorised();
+//         var actual = await sut.IsProviderAuthorised();
 //
 //         actual.Should().BeFalse();
 //     }
@@ -224,9 +225,9 @@
 //         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
 //         encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.AccountLegalEntityId)).Returns(accountLegalEntityId);
 //
-//         var handler = new AccessCohortAuthorizationHandler(httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHandler>>(), encodingService.Object, outerService.Object);
+//         var sut = new AccessCohortAuthorizationHelper(httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHandler>>(), encodingService.Object, outerService.Object);
 //
-//         var actual = await handler.IsProviderAuthorised();
+//         var actual = await sut.IsProviderAuthorised();
 //
 //         using (new AssertionScope())
 //         {
