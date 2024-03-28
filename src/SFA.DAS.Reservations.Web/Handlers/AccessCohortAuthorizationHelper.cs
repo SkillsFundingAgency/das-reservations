@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.Handlers;
 
 public interface IAccessCohortAuthorizationHelper
 {
-    bool IsAuthorised();
+    Task<bool> IsAuthorised();
 }
 
 public class AccessCohortAuthorizationHelper(
@@ -27,16 +27,16 @@ public class AccessCohortAuthorizationHelper(
     IEncodingService encodingService,
     IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
 {
-    public bool IsAuthorised()
+    public async Task<bool> IsAuthorised()
     {
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
-        var employerAccountClaim = httpContextAccessor.HttpContext.User.FindFirstValue(EmployerClaims.AccountsClaimsTypeIdentifier);
+        var hasEmployerAccountClaim = httpContextAccessor.HttpContext.User.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
         // TODO Test this
-        if (employerAccountClaim != null)
+        if (hasEmployerAccountClaim)
         {
             // Allow all employers through
             return true;

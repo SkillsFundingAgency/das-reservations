@@ -6,15 +6,13 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 
 public class AccessCohortAuthorizationHandler(IAccessCohortAuthorizationHelper helper) : AuthorizationHandler<AccessCohortRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
-        if (!helper.IsAuthorised())
+        if (!await helper.IsAuthorised())
         {
-            return Task.CompletedTask;
+            return;
         }
 
         context.Succeed(requirement);
-
-        return Task.CompletedTask;
     }
 }
