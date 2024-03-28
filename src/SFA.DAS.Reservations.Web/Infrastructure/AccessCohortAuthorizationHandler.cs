@@ -14,12 +14,14 @@ using SFA.DAS.Reservations.Domain.Providers.Api;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure;
 
-public class AccessCohortAuthorizationHandler(
-    IActionContextAccessor actionContextAccessor,
-    ILogger<AccessCohortAuthorizationHandler> logger,
-    IEncodingService encodingService,
-    IReservationsOuterService outerService)
-    : AuthorizationHandler<AccessCohortRequirement>
+// public class AccessCohortAuthorizationHandler(
+//     IActionContextAccessor actionContextAccessor,
+//     ILogger<AccessCohortAuthorizationHandler> logger,
+//     IEncodingService encodingService,
+//     IReservationsOuterService outerService)
+//     : AuthorizationHandler<AccessCohortRequirement>
+
+public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger) : AuthorizationHandler<AccessCohortRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
@@ -31,7 +33,7 @@ public class AccessCohortAuthorizationHandler(
         }
 
         context.Succeed(requirement);
-        
+
         return Task.CompletedTask;
     }
 
