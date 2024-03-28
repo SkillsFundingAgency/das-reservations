@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 //     IReservationsOuterService outerService)
 //     : AuthorizationHandler<AccessCohortRequirement>
 
-public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger, IActionContextAccessor actionContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
+public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
@@ -39,7 +40,7 @@ public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationH
 
     public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
-        if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
             logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;

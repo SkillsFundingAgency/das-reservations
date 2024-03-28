@@ -24,7 +24,6 @@ public static class ServiceRegistrationExtension
         services.AddScoped<LevyNotPermittedFilter>();
         services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
         services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
-        services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
 
         if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
         {
