@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Web.Infrastructure;
 //     IReservationsOuterService outerService)
 //     : AuthorizationHandler<AccessCohortRequirement>
 
-public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger) : AuthorizationHandler<AccessCohortRequirement>
+public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationHandler> logger, IActionContextAccessor actionContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessCohortRequirement requirement)
     {
@@ -39,19 +39,19 @@ public class AccessCohortAuthorizationHandler(ILogger<AccessCohortAuthorizationH
 
     public bool IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
-        // if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
-        // {
-        //     logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
-        //     return false;
-        // }
-        //
-        // var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
-        // if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
-        // {
-        //     return false;
-        // }
-        //
-        // var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value;
+        if (!actionContextAccessor.ActionContext.RouteData.Values.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        {
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
+            return false;
+        }
+        
+        var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
+        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
+        {
+            return false;
+        }
+        
+        var trustedAccountClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts)).Value;
 
         logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
             JsonConvert.SerializeObject(context.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
