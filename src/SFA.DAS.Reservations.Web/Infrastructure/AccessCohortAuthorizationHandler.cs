@@ -25,7 +25,7 @@ public class AccessCohortAuthorizationHandler(
     {
         logger.LogWarning("AccessCohortAuthorizationHandler.HandleRequirementAsync() starting.");
 
-        if (!await IsProviderAuthorised(context))
+        if (!await IsAuthorisedToAccessCohort(context))
         {
             return;
         }
@@ -33,12 +33,17 @@ public class AccessCohortAuthorizationHandler(
         context.Succeed(requirement);
     }
 
-    public async Task<bool> IsProviderAuthorised(AuthorizationHandlerContext context)
+    public async Task<bool> IsAuthorisedToAccessCohort(AuthorizationHandlerContext context)
     {
         if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
+        }
+        
+        if (!context.User.HasClaim(c => c.Type.Equals(ProviderClaims.ProviderUkprn)))
+        {
+            throw new UnauthorizedAccessException("ProviderClaims.ProviderUkprn not found on User object.");
         }
 
         var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
@@ -51,7 +56,7 @@ public class AccessCohortAuthorizationHandler(
         
         var trustedAccountClaim = claimsIdentity.FindFirst(ProviderClaims.TrustedEmployerAccounts)?.Value;
 
-        logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() claims: {claims}",
+        logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() claims: {claims}",
             JsonConvert.SerializeObject(claimsIdentity.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
@@ -59,11 +64,11 @@ public class AccessCohortAuthorizationHandler(
 
         if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() no trusted account claims found. Retrieving from outerApi.");
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() no trusted account claims found. Retrieving from outerApi.");
 
             var providerIdClaim = claimsIdentity.FindFirst(ProviderClaims.ProviderUkprn)?.Value;
 
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() ProviderIdClaim value: {Id}.", providerIdClaim);
 
             if (!int.TryParse(providerIdClaim, out var providerId))
             {
@@ -72,7 +77,7 @@ public class AccessCohortAuthorizationHandler(
 
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
             trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
 
@@ -82,7 +87,7 @@ public class AccessCohortAuthorizationHandler(
         }
         else
         {
-            logger.LogInformation("AccessCohortAuthorizationHandler.IsProviderAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
+            logger.LogInformation("AccessCohortAuthorizationHandler.IsAuthorisedToAccessCohort() trusted account claims found: {Claims}.", trustedAccountClaim);
 
             try
             {
