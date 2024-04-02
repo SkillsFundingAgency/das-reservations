@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.Handlers;
 
 public interface IAccessCohortAuthorizationHelper
 {
-    bool IsAuthorised();
+    Task<bool> IsAuthorised();
 }
 
 public class AccessCohortAuthorizationHelper(
@@ -29,10 +29,10 @@ public class AccessCohortAuthorizationHelper(
     IEncodingService encodingService,
     IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
 {
-    public bool IsAuthorised()
+    public async Task<bool> IsAuthorised()
     {
         var user = httpContextAccessor.HttpContext?.User;
-        
+
         if (user == null)
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User is null.");
@@ -44,7 +44,7 @@ public class AccessCohortAuthorizationHelper(
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User not authenticated.");
             return false;
         }
-        
+
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(user.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
@@ -75,30 +75,21 @@ public class AccessCohortAuthorizationHelper(
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
             var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
-            
+
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
-            
+
             if (!int.TryParse(providerIdClaim, out var providerId))
             {
                 throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
             }
-            
-            var legalEntitiesWithPermissionResponse = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
-            {
-                AccountProviderLegalEntities = new[]
-                {
-                    new AccountProviderLegalEntityDto { AccountId = 88888888 },
-                    new AccountProviderLegalEntityDto { AccountId = 88888889 },
-                }
-            };
-            
-            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            
+
+            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-            
+
             trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-            
-            httpContextAccessor.HttpContext.User.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
+
+            user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         // else
         // {
