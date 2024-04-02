@@ -31,11 +31,25 @@ public class AccessCohortAuthorizationHelper(
 {
     public bool IsAuthorised()
     {
+        var user = httpContextAccessor.HttpContext?.User;
+        
+        if (user == null)
+        {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User is null.");
+            return false;
+        }
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User not authenticated.");
+            return false;
+        }
+        
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
-            JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
+            JsonConvert.SerializeObject(user.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
-        var hasEmployerAccountClaim = httpContextAccessor.HttpContext.User.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+        var hasEmployerAccountClaim = user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
         // TODO Test this
         if (hasEmployerAccountClaim)
@@ -52,7 +66,7 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId: {AccountLegalEntityPublicHashedId}.", accountLegalEntityPublicHashedId);
 
-        var trustedAccountClaim = httpContextAccessor.HttpContext.User.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+        var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
         Dictionary<long, AccountProviderLegalEntityDto> trustedAccounts;
 
@@ -60,31 +74,31 @@ public class AccessCohortAuthorizationHelper(
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
-            var providerIdClaim = httpContextAccessor.HttpContext.User.GetClaimValue(ProviderClaims.ProviderUkprn);
+            var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
             
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
             
-            // // if (!int.TryParse(providerIdClaim, out var providerId))
-            // // {
-            // //     throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            // // }
-            //
-            // var legalEntitiesWithPermissionResponse = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
-            // {
-            //     AccountProviderLegalEntities = new[]
-            //     {
-            //         new AccountProviderLegalEntityDto { AccountId = 88888888 },
-            //         new AccountProviderLegalEntityDto { AccountId = 88888889 },
-            //     }
-            // };
-            //
-            // // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            //
-            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-            //
-            // trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-            //
-            // httpContextAccessor.HttpContext.User.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
+            if (!int.TryParse(providerIdClaim, out var providerId))
+            {
+                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+            }
+            
+            var legalEntitiesWithPermissionResponse = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
+            {
+                AccountProviderLegalEntities = new[]
+                {
+                    new AccountProviderLegalEntityDto { AccountId = 88888888 },
+                    new AccountProviderLegalEntityDto { AccountId = 88888889 },
+                }
+            };
+            
+            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+            
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+            
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+            
+            httpContextAccessor.HttpContext.User.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         // else
         // {
