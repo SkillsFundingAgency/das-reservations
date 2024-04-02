@@ -9,12 +9,10 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
-using AccountProviderLegalEntityDto = SFA.DAS.Reservations.Domain.Providers.Api.AccountProviderLegalEntityDto;
 
 namespace SFA.DAS.Reservations.Web.Handlers;
 
@@ -68,7 +66,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, AccountProviderLegalEntityDto> trustedAccounts;
+        Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -87,29 +85,27 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+            trustedAccounts = legalEntitiesWithPermissionResponse.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId);
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
-        // else
-        // {
-        //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
-        //
-        //     try
-        //     {
-        //         trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
-        //     }
-        //     catch (JsonSerializationException exception)
-        //     {
-        //         logger.LogError(exception, "Could not deserialize trusted accounts claim for provider.");
-        //         return false;
-        //     }
-        // }
-        //
-        // var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
-        //
-        // return trustedAccounts.ContainsKey(accountLegalEntityId);
-
-        return false;
+        else
+        {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
+        
+            try
+            {
+                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem>>(trustedAccountClaim);
+            }
+            catch (JsonSerializationException exception)
+            {
+                logger.LogError(exception, "Could not deserialize trusted accounts claim for provider.");
+                return false;
+            }
+        }
+        
+        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.AccountLegalEntityId);
+        
+        return trustedAccounts.ContainsKey(accountLegalEntityId);
     }
 }

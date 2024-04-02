@@ -4,11 +4,11 @@ namespace SFA.DAS.Reservations.Domain.Providers.Api;
 
 public record GetAccountProviderLegalEntitiesWithCreateCohortResponse
 {
-    public IEnumerable<AccountProviderLegalEntityDto> AccountProviderLegalEntities { get; set; }
+    public IEnumerable<GetProviderAccountLegalEntityWithCreatCohortItem> ProviderAccountLegalEntities { get; set; }
 
 }
 
-public record AccountProviderLegalEntityDto
+public record GetProviderAccountLegalEntityWithCreatCohortItem
 {
     public long AccountId { get; set; }
 }
