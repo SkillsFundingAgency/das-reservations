@@ -35,12 +35,10 @@ public class AccessCohortAuthorizationHelper(
             JsonConvert.SerializeObject(user.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
-        var hasEmployerAccountClaim = user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+        var isEmployerUser = user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
-        // TODO Test this
-        if (hasEmployerAccountClaim)
+        if (isEmployerUser)
         {
-            // Allow all employers through
             return true;
         }
 
