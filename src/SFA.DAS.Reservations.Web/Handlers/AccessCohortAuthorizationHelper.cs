@@ -41,15 +41,16 @@ public class AccessCohortAuthorizationHelper(
             return true;
         }
 
-        return false;
-
         // Something below here is causing issues ...
 
-        // if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
-        // {
-        //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
-        //     return false;
-        // }
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
+            return false;
+        }
+
+        return false;
+
         //
         // var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
         // if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
