@@ -28,6 +28,8 @@ public class AccessCohortAuthorizationHelper(
 {
     public async Task<bool> IsAuthorised()
     {
+        var accountLegalEntityPublicHashedIdFromUrl = "ABBBAA";
+        
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
@@ -40,12 +42,14 @@ public class AccessCohortAuthorizationHelper(
             // Allow all employers through
             return true;
         }
+        
+        // Something below here is causing issues ...
 
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
-            return false;
-        }
+        // if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        // {
+        //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
+        //     return false;
+        // }
 
         var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
         if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
