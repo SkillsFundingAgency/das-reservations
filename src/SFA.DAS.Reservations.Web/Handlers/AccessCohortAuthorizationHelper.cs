@@ -48,8 +48,6 @@ public class AccessCohortAuthorizationHelper(
             return false;
         }
 
-        logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId: {AccountLegalEntityPublicHashedId}.", accountLegalEntityPublicHashedId);
-
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
         Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts;
@@ -71,7 +69,7 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId);
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }

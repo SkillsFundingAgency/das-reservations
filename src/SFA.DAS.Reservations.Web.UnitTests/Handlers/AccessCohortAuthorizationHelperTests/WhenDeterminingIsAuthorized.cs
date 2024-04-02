@@ -132,7 +132,7 @@ public class WhenDeterminingIsAuthorized
         using (new AssertionScope())
         {
             claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
         }
     }
 
@@ -151,7 +151,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -171,7 +171,7 @@ public class WhenDeterminingIsAuthorized
 
             var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
         }
     }
 
@@ -192,7 +192,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -223,7 +223,7 @@ public class WhenDeterminingIsAuthorized
 
         var response = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
         {
-            ProviderAccountLegalEntities = trustedAccounts,
+            AccountProviderLegalEntities = trustedAccounts,
         };
 
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -231,7 +231,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderAccountLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 

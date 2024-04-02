@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Domain.Providers.Api;
 
 public record GetAccountProviderLegalEntitiesWithCreateCohortResponse
 {
-    public IEnumerable<GetProviderAccountLegalEntityWithCreatCohortItem> ProviderAccountLegalEntities { get; set; }
+    public List<GetProviderAccountLegalEntityWithCreatCohortItem> AccountProviderLegalEntities { get; set; }
 
 }
 
