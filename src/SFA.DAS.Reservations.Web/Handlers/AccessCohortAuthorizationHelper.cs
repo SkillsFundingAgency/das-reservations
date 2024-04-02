@@ -41,27 +41,27 @@ public class AccessCohortAuthorizationHelper(
             return true;
         }
 
-        // Something below here is causing issues ...
-
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+       if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
             return false;
         }
 
+        
+        // Something below here is causing issues ...
+        
+        var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
+        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
+        {
+            return false;
+        }
+        
+        var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
+        
+        Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
+
         return false;
 
-        //
-        // var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
-        // if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
-        // {
-        //     return false;
-        // }
-        //
-        // var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
-        //
-        // Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
-        //
         // if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         // {
         //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
