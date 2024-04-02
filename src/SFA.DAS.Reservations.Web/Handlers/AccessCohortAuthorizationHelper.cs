@@ -59,7 +59,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = httpContextAccessor.HttpContext.User.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedAccounts;
+        Dictionary<long, AccountProviderLegalEntityDto> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -69,18 +69,17 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
+            if (!int.TryParse(providerIdClaim, out var providerId))
+            {
+                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+            }
+            
+            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+            
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+            
             return false;
             
-            // if (!int.TryParse(providerIdClaim, out var providerId))
-            // {
-            //     throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            // }
-            //
-            //
-            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            //
-            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-            //
             // trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
             //
             // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedAccounts);
