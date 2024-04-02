@@ -9,16 +9,18 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
+using SFA.DAS.ProviderRelationships.Types.Dtos;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using AccountProviderLegalEntityDto = SFA.DAS.Reservations.Domain.Providers.Api.AccountProviderLegalEntityDto;
 
 namespace SFA.DAS.Reservations.Web.Handlers;
 
 public interface IAccessCohortAuthorizationHelper
 {
-    Task<bool> IsAuthorised();
+    bool IsAuthorised();
 }
 
 public class AccessCohortAuthorizationHelper(
@@ -27,7 +29,7 @@ public class AccessCohortAuthorizationHelper(
     IEncodingService encodingService,
     IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
 {
-    public async Task<bool> IsAuthorised()
+    public bool IsAuthorised()
     {
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
@@ -42,16 +44,9 @@ public class AccessCohortAuthorizationHelper(
             return true;
         }
 
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedIdFromUrl))
+        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedId))
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() AccountLegalEntityPublicHashedId value was not found on the route.");
-            return false;
-        }
-
-        var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
-        if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId value null or empty.");
             return false;
         }
 
@@ -69,22 +64,27 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
-            if (!int.TryParse(providerIdClaim, out var providerId))
+            // if (!int.TryParse(providerIdClaim, out var providerId))
+            // {
+            //     throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+            // }
+
+            var legalEntitiesWithPermissionResponse = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
             {
-                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            }
+                AccountProviderLegalEntities = new[]
+                {
+                    new AccountProviderLegalEntityDto { AccountId = 88888888 },
+                    new AccountProviderLegalEntityDto { AccountId = 88888889 },
+                }
+            };
 
             // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            //
-            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+            
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
-            // trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-            //
-            // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedAccounts);
-            //
-            // var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
-            //
-            // claimsIdentity.AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, trustedEmployersAsJson, JsonClaimValueTypes.Json));
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+
+            httpContextAccessor.HttpContext.User.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         // else
         // {
