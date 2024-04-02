@@ -31,18 +31,6 @@ public class AccessCohortAuthorizationHelper(
     {
         var user = httpContextAccessor.HttpContext?.User;
 
-        if (user == null)
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User is null.");
-            return false;
-        }
-
-        if (!user.Identity.IsAuthenticated)
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User not authenticated.");
-            return false;
-        }
-
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(user.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
