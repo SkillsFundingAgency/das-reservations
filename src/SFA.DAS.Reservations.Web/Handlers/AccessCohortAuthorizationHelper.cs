@@ -53,12 +53,12 @@ public class AccessCohortAuthorizationHelper(
             return false;
         }
 
-        var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
+        // var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
+        //
+        // Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
-        Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
-
-        if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
+       // if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
