@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
+using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
@@ -53,14 +54,14 @@ public class AccessCohortAuthorizationHelper(
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId value null or empty.");
             return false;
         }
-        
+
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId: {AccountLegalEntityPublicHashedId}.", accountLegalEntityPublicHashedId);
 
-        var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
-        
+        var trustedAccountClaim = httpContextAccessor.HttpContext.User.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+
+        Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedAccounts;
+
         return false;
-        
-        // Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
         // if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         //{
@@ -88,7 +89,7 @@ public class AccessCohortAuthorizationHelper(
         //
         // var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
         //
-        // claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
+        //claimsIdentity.AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         //}
         // else
         // {
