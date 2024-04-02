@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Web.Handlers;
 
 public interface IAccessCohortAuthorizationHelper
 {
-    Task<bool> IsAuthorised();
+    bool IsAuthorised();
 }
 
 public class AccessCohortAuthorizationHelper(
@@ -27,7 +27,7 @@ public class AccessCohortAuthorizationHelper(
     IEncodingService encodingService,
     IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
 {
-    public async Task<bool> IsAuthorised()
+    public bool IsAuthorised()
     {
         logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() claims: {claims}",
             JsonConvert.SerializeObject(httpContextAccessor.HttpContext.User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
@@ -73,14 +73,11 @@ public class AccessCohortAuthorizationHelper(
             {
                 throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
             }
-            
-            return false;
-            
-            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            //
-            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-           
-            
+
+            var legalEntitiesWithPermissionResponse = outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId).GetAwaiter().GetResult();
+
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+
             // trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
             //
             // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedAccounts);
