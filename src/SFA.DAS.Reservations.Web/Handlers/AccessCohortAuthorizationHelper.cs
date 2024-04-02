@@ -61,7 +61,7 @@ public class AccessCohortAuthorizationHelper(
 
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedAccounts;
 
-        //if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
+        if (string.IsNullOrEmpty(trustedAccountClaim))
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
@@ -107,5 +107,7 @@ public class AccessCohortAuthorizationHelper(
         // var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
         //
         // return trustedAccounts.ContainsKey(accountLegalEntityId);
+
+        return false;
     }
 }
