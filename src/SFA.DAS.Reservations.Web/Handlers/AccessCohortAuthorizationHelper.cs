@@ -50,43 +50,47 @@ public class AccessCohortAuthorizationHelper(
         var accountLegalEntityPublicHashedId = accountLegalEntityPublicHashedIdFromUrl?.ToString();
         if (string.IsNullOrEmpty(accountLegalEntityPublicHashedId))
         {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId value null or empty.");
             return false;
         }
+        
+        logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() accountLegalEntityPublicHashedId: {AccountLegalEntityPublicHashedId}.", accountLegalEntityPublicHashedId);
+
+        return false;
 
         // var trustedAccountClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.TrustedEmployerAccounts))?.Value;
         //
         // Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedEmployers;
 
 
-       // if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
+        // if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
+        //{
+        // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
+        //
+        // var providerIdClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn))?.Value;
+        //
+        // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
+        //
+        // if (!int.TryParse(providerIdClaim, out var providerId))
+        // {
+        //     throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+        // }
 
-            var providerIdClaim = httpContextAccessor.HttpContext.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn))?.Value;
 
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
+        // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+        //
+        // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
-            if (!int.TryParse(providerIdClaim, out var providerId))
-            {
-                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            }
-            
-            return false;
 
-            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            //
-            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-
-            
-            //
-            // trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-            //
-            // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
-            //
-            // var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
-            //
-            // claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
-        }
+        //
+        // trustedEmployers = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+        //
+        // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedEmployers);
+        //
+        // var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
+        //
+        // claimsIdentity.AddClaim(new Claim(ProviderClaims.TrustedEmployerAccounts, trustedEmployersAsJson, JsonClaimValueTypes.Json));
+        //}
         // else
         // {
         //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
@@ -105,7 +109,5 @@ public class AccessCohortAuthorizationHelper(
         // var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
         //
         // return trustedEmployers.ContainsKey(accountLegalEntityId);
-
-        return false;
     }
 }
