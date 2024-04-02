@@ -61,7 +61,7 @@ public class AccessCohortAuthorizationHelper(
 
         Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto> trustedAccounts;
 
-        if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
+        //if (trustedAccountClaim == null || string.IsNullOrEmpty(trustedAccountClaim))
         {
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() no trusted account claims found. Retrieving from outerApi.");
 
@@ -69,40 +69,43 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() ProviderIdClaim value: {Id}.", providerIdClaim);
 
-            if (!int.TryParse(providerIdClaim, out var providerId))
-            {
-                throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            }
-
-            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
-
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
-
-            var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedAccounts);
-
-            var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
-
-            claimsIdentity.AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, trustedEmployersAsJson, JsonClaimValueTypes.Json));
+            return false;
+            
+            // if (!int.TryParse(providerIdClaim, out var providerId))
+            // {
+            //     throw new ApplicationException($"Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+            // }
+            //
+            //
+            // var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+            //
+            // logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
+            //
+            // trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+            //
+            // var trustedEmployersAsJson = JsonConvert.SerializeObject(trustedAccounts);
+            //
+            // var claimsIdentity = httpContextAccessor.HttpContext.User.Identities.First();
+            //
+            // claimsIdentity.AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, trustedEmployersAsJson, JsonClaimValueTypes.Json));
         }
-        else
-        {
-            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
-
-            try
-            {
-                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
-            }
-            catch (JsonSerializationException exception)
-            {
-                logger.LogError(exception, "Could not deserialize trusted accounts claim for provider.");
-                return false;
-            }
-        }
-
-        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
-
-        return trustedAccounts.ContainsKey(accountLegalEntityId);
+        // else
+        // {
+        //     logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() trusted account claims found: {Claims}.", trustedAccountClaim);
+        //
+        //     try
+        //     {
+        //         trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetAccountProviderLegalEntitiesWithCreateCohortResponse.AccountProviderLegalEntityDto>>(trustedAccountClaim);
+        //     }
+        //     catch (JsonSerializationException exception)
+        //     {
+        //         logger.LogError(exception, "Could not deserialize trusted accounts claim for provider.");
+        //         return false;
+        //     }
+        // }
+        //
+        // var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId, EncodingType.AccountLegalEntityId);
+        //
+        // return trustedAccounts.ContainsKey(accountLegalEntityId);
     }
 }
