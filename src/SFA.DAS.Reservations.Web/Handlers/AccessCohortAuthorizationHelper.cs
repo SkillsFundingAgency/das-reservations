@@ -53,7 +53,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts;
+        Dictionary<long, GetAccountLegalEntitiesForProviderItem> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -68,7 +68,7 @@ public class AccessCohortAuthorizationHelper(
 
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
+            trustedAccounts = legalEntitiesWithPermissionResponse.ProviderPermissions
                 .DistinctBy(x => x.AccountId)
                 .ToDictionary(x => x.AccountId);
 
@@ -80,7 +80,7 @@ public class AccessCohortAuthorizationHelper(
 
             try
             {
-                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem>>(trustedAccountClaim);
+                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {

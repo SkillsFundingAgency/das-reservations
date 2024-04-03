@@ -126,7 +126,7 @@ public class WhenDeterminingIsAuthorized
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
         AccessCohortAuthorizationHelper sut,
-        GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
+        GetAccountLegalEntitiesForProviderResponse response)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
@@ -153,7 +153,7 @@ public class WhenDeterminingIsAuthorized
         using (new AssertionScope())
         {
             claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)));
         }
     }
     
@@ -165,7 +165,7 @@ public class WhenDeterminingIsAuthorized
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
         AccessCohortAuthorizationHelper sut,
-        GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
+        GetAccountLegalEntitiesForProviderResponse response)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
@@ -175,8 +175,8 @@ public class WhenDeterminingIsAuthorized
             })
         });
         
-        response.AccountProviderLegalEntities.Add(new GetProviderAccountLegalEntityWithCreatCohortItem{ AccountId = 111});
-        response.AccountProviderLegalEntities.Add(new GetProviderAccountLegalEntityWithCreatCohortItem{ AccountId = 111});
+        response.ProviderPermissions.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
+        response.ProviderPermissions.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
 
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
 
@@ -195,7 +195,7 @@ public class WhenDeterminingIsAuthorized
         using (new AssertionScope())
         {
             claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.DistinctBy(x=> x.AccountId).ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.DistinctBy(x=> x.AccountId).ToDictionary(x => x.AccountId)));
         }
     }
 
@@ -207,14 +207,14 @@ public class WhenDeterminingIsAuthorized
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
         AccessCohortAuthorizationHelper sut,
-        GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
+        GetAccountLegalEntitiesForProviderResponse response)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -234,7 +234,7 @@ public class WhenDeterminingIsAuthorized
 
             var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)));
         }
     }
 
@@ -247,7 +247,7 @@ public class WhenDeterminingIsAuthorized
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
         AccessCohortAuthorizationHelper sut,
-        GetAccountProviderLegalEntitiesWithCreateCohortResponse response,
+        GetAccountLegalEntitiesForProviderResponse response,
         [Frozen] Mock<IEncodingService> encodingService)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -255,7 +255,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -279,14 +279,14 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        List<GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts,
+        List<GetAccountLegalEntitiesForProviderItem> trustedAccounts,
         [Frozen] Mock<IEncodingService> encodingService)
     {
-        trustedAccounts.Add(new GetProviderAccountLegalEntityWithCreatCohortItem { AccountId = accountLegalEntityId });
+        trustedAccounts.Add(new GetAccountLegalEntitiesForProviderItem { AccountId = accountLegalEntityId });
 
-        var response = new GetAccountProviderLegalEntitiesWithCreateCohortResponse
+        var response = new GetAccountLegalEntitiesForProviderResponse
         {
-            AccountProviderLegalEntities = trustedAccounts,
+            ProviderPermissions = trustedAccounts,
         };
 
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -294,7 +294,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
             })
         });
 
