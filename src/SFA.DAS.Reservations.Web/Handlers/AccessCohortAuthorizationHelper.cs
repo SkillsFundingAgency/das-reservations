@@ -97,6 +97,10 @@ public class AccessCohortAuthorizationHelper(
         
         logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
 
-        return trustedAccounts.ContainsKey(accountLegalEntityId);
+        var accountLegalEntityIdFound = trustedAccounts.ContainsKey(accountLegalEntityId);
+        
+        logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityIdFound);
+
+        return accountLegalEntityIdFound;
     }
 }
