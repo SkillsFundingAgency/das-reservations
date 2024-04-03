@@ -9,8 +9,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Domain.Interfaces;
-using SFA.DAS.Reservations.Domain.Providers.Api;
+using SFA.DAS.Reservations.Application.Providers.Services;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
@@ -25,7 +25,7 @@ public class AccessCohortAuthorizationHelper(
     ILogger<AccessCohortAuthorizationHelper> logger,
     IHttpContextAccessor httpContextAccessor,
     IEncodingService encodingService,
-    IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
+    IProviderService providerService) : IAccessCohortAuthorizationHelper
 {
     public async Task<bool> IsAuthorised()
     {
@@ -52,7 +52,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts;
+        Dictionary<long, AccountLegalEntity> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -65,13 +65,8 @@ public class AccessCohortAuthorizationHelper(
                 throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
             }
 
-            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-
-            // Duplicate AccountId's are returned by the provider relationships API.
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
-                .DistinctBy(x => x.AccountId)
-                .ToDictionary(x => x.AccountId);
-
+            trustedAccounts = (await providerService.GetTrustedEmployers((uint)providerId)).ToDictionary(x => x.AccountId);
+            
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         else
@@ -80,7 +75,7 @@ public class AccessCohortAuthorizationHelper(
 
             try
             {
-                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem>>(trustedAccountClaim);
+                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, AccountLegalEntity>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {
@@ -90,12 +85,12 @@ public class AccessCohortAuthorizationHelper(
         }
 
         var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
-        
+
         logger.LogInformation("{TypeName} trusted accounts {trustedAccounts}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
         logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
 
         var accountLegalEntityIdFound = trustedAccounts.ContainsKey(accountLegalEntityId);
-        
+
         logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityIdFound);
 
         return accountLegalEntityIdFound;
