@@ -156,6 +156,48 @@ public class WhenDeterminingIsAuthorized
             claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
         }
     }
+    
+    [Test, MoqAutoData]
+    public async Task ThenCallsToOuterApiWhenUserIsProviderAndTrustedEmployersClaimIsEmptyAndSavesResultToClaimsWhenThereAreDuplicateAccountIds(
+        int ukprn,
+        string accountLegalEntityHashedId,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        AccessCohortAuthorizationHelper sut,
+        GetAccountProviderLegalEntitiesWithCreateCohortResponse response)
+    {
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
+            })
+        });
+        
+        response.AccountProviderLegalEntities.Add(new GetProviderAccountLegalEntityWithCreatCohortItem{ AccountId = 111});
+        response.AccountProviderLegalEntities.Add(new GetProviderAccountLegalEntityWithCreatCohortItem{ AccountId = 111});
+
+        var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
+
+        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+        outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
+
+        var actual = await sut.IsAuthorised();
+
+        actual.Should().BeFalse();
+
+        outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
+
+        var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+
+        using (new AssertionScope())
+        {
+            claimResult.Should().NotBeEmpty();
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.DistinctBy(x=> x.AccountId).ToDictionary(x => x.AccountId)));
+        }
+    }
 
     [Test, MoqAutoData]
     public async Task ThenDoesNotCallToOuterApiWhenUserIsProviderAndTrustedEmployersClaimIsPopulated(

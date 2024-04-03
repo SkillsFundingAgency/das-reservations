@@ -75,7 +75,10 @@ public class AccessCohortAuthorizationHelper(
 
             logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() response from APIM: {response}.", JsonConvert.SerializeObject(legalEntitiesWithPermissionResponse));
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities.ToDictionary(x => x.AccountId);
+            // Duplicate AccountId's are returned by the provider relationships API.
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
+                .DistinctBy(x=> x.AccountId)
+                .ToDictionary(x => x.AccountId);
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
