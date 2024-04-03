@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
-using SFA.DAS.Reservations.Application.Providers.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
@@ -67,6 +66,8 @@ public class AccessCohortAuthorizationHelper(
             }
 
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+            
+            logger.LogInformation("{TypeName} outerApi response: {Response}.", nameof(AccessCohortAuthorizationHelper), legalEntitiesWithPermissionResponse);
 
             trustedAccounts = legalEntitiesWithPermissionResponse.ProviderPermissions
                 .DistinctBy(x => x.AccountId)
