@@ -264,7 +264,7 @@ public class WhenDeterminingIsAuthorized
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
-        encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.AccountLegalEntityId)).Returns(accountLegalEntityId);
+        encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.PublicAccountLegalEntityId)).Returns(accountLegalEntityId);
 
         var actual = await sut.IsAuthorised();
 
@@ -303,7 +303,7 @@ public class WhenDeterminingIsAuthorized
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
-        encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.AccountLegalEntityId)).Returns(accountLegalEntityId);
+        encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.PublicAccountLegalEntityId)).Returns(accountLegalEntityId);
 
         var sut = new AccessCohortAuthorizationHelper(Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), httpContextAccessor.Object, encodingService.Object, outerService.Object);
 
@@ -311,7 +311,7 @@ public class WhenDeterminingIsAuthorized
 
         using (new AssertionScope())
         {
-            encodingService.Verify(x => x.Decode(It.Is<string>(y => y.Equals(accountLegalEntityHashedId)), EncodingType.AccountLegalEntityId), Times.Once);
+            encodingService.Verify(x => x.Decode(It.Is<string>(y => y.Equals(accountLegalEntityHashedId)), EncodingType.PublicAccountLegalEntityId), Times.Once);
             actual.Should().BeTrue();
         }
     }

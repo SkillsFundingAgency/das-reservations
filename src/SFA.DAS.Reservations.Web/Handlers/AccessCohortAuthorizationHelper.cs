@@ -89,7 +89,7 @@ public class AccessCohortAuthorizationHelper(
             }
         }
 
-        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.AccountLegalEntityId);
+        var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
 
         return trustedAccounts.ContainsKey(accountLegalEntityId);
     }
