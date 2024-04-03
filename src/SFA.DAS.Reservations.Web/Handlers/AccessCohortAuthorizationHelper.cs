@@ -35,6 +35,12 @@ public class AccessCohortAuthorizationHelper(
             JsonConvert.SerializeObject(user.Claims.ToDictionary(claim => claim.Type, claim => claim.Value))
         );
 
+        if (!user.Claims.Any())
+        {
+            logger.LogInformation("AccessCohortAuthorizationHelper.IsAuthorised() User Claims are empty.");
+            return false;
+        }
+
         var isEmployerUser = user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
 
         if (isEmployerUser)

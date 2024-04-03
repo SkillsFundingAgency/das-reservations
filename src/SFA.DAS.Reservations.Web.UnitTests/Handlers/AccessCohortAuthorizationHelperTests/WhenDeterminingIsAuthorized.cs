@@ -25,6 +25,27 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.AccessCohortAuthorizationH
 public class WhenDeterminingIsAuthorized
 {
     [Test, MoqAutoData]
+    public async Task ThenReturnsFalseWhenUserClaimsAreEmpty(
+        int ukprn,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        long accountLegalEntityHashedId,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        AccessCohortAuthorizationHelper sut)
+    {
+        var claimsPrinciple = new ClaimsPrincipal();
+
+        var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var actual = await sut.IsAuthorised();
+
+        actual.Should().BeFalse();
+    }
+
+    [Test, MoqAutoData]
     public async Task ThenReturnsFalseWhenUserIsProviderAndAccountLegalEntityIdIsMissingFromRoute(
         int ukprn,
         AccessCohortRequirement requirement,
@@ -39,7 +60,7 @@ public class WhenDeterminingIsAuthorized
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString())
             })
         });
-        
+
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
@@ -47,7 +68,7 @@ public class WhenDeterminingIsAuthorized
 
         actual.Should().BeFalse();
     }
-    
+
     [Test, MoqAutoData]
     public async Task ThenReturnsTrueWhenUserIsEmployerUser(
         int ukprn,
@@ -63,7 +84,7 @@ public class WhenDeterminingIsAuthorized
                 new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, "AAACVVV")
             })
         });
-        
+
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
