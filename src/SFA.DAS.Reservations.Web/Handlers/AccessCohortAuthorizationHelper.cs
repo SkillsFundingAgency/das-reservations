@@ -69,9 +69,9 @@ public class AccessCohortAuthorizationHelper(
             
             logger.LogInformation("{TypeName} outerApi response: {Response}.", nameof(AccessCohortAuthorizationHelper), legalEntitiesWithPermissionResponse);
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.ProviderPermissions
-                .DistinctBy(x => x.AccountId)
-                .ToDictionary(x => x.AccountId);
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
+                .DistinctBy(x => x.AccountLegalEntityId)
+                .ToDictionary(x => x.AccountLegalEntityId);
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }

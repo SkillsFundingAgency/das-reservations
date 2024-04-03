@@ -153,7 +153,10 @@ public class WhenDeterminingIsAuthorized
         using (new AssertionScope())
         {
             claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities
+                .DistinctBy(x=> x.AccountLegalEntityId)
+                .ToDictionary(x => x.AccountLegalEntityId))
+            );
         }
     }
     
@@ -175,8 +178,8 @@ public class WhenDeterminingIsAuthorized
             })
         });
         
-        response.ProviderPermissions.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
-        response.ProviderPermissions.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
+        response.AccountProviderLegalEntities.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
+        response.AccountProviderLegalEntities.Add(new GetAccountLegalEntitiesForProviderItem{ AccountId = 111});
 
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
 
@@ -195,7 +198,10 @@ public class WhenDeterminingIsAuthorized
         using (new AssertionScope())
         {
             claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.DistinctBy(x=> x.AccountId).ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities
+                .DistinctBy(x=> x.AccountLegalEntityId)
+                .ToDictionary(x => x.AccountLegalEntityId))
+            );
         }
     }
 
@@ -214,7 +220,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -234,7 +240,7 @@ public class WhenDeterminingIsAuthorized
 
             var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)));
+            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)));
         }
     }
 
@@ -255,7 +261,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 
@@ -286,7 +292,7 @@ public class WhenDeterminingIsAuthorized
 
         var response = new GetAccountLegalEntitiesForProviderResponse
         {
-            ProviderPermissions = trustedAccounts,
+            AccountProviderLegalEntities = trustedAccounts,
         };
 
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -294,7 +300,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.ProviderPermissions.ToDictionary(x => x.AccountId)))
+                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities.ToDictionary(x => x.AccountId)))
             })
         });
 
