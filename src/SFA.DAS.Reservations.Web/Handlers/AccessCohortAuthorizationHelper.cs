@@ -10,7 +10,8 @@ using Newtonsoft.Json;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Providers.Services;
-using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
@@ -25,7 +26,7 @@ public class AccessCohortAuthorizationHelper(
     ILogger<AccessCohortAuthorizationHelper> logger,
     IHttpContextAccessor httpContextAccessor,
     IEncodingService encodingService,
-    IProviderService providerService) : IAccessCohortAuthorizationHelper
+    IReservationsOuterService outerService) : IAccessCohortAuthorizationHelper
 {
     public async Task<bool> IsAuthorised()
     {
@@ -52,7 +53,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, AccountLegalEntity> trustedAccounts;
+        Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -65,8 +66,12 @@ public class AccessCohortAuthorizationHelper(
                 throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
             }
 
-            trustedAccounts = (await providerService.GetTrustedEmployers((uint)providerId)).ToDictionary(x => x.AccountId);
-            
+            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
+                .DistinctBy(x => x.AccountId)
+                .ToDictionary(x => x.AccountId);
+
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         else
@@ -75,7 +80,7 @@ public class AccessCohortAuthorizationHelper(
 
             try
             {
-                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, AccountLegalEntity>>(trustedAccountClaim);
+                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetProviderAccountLegalEntityWithCreatCohortItem>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {
