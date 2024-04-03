@@ -72,11 +72,7 @@ public class AccessCohortAuthorizationHelper(
                 .DistinctBy(x => x.AccountId)
                 .ToDictionary(x => x.AccountId);
 
-            var trustedAccountsAsJson = JsonConvert.SerializeObject(trustedAccounts);
-            
-            logger.LogInformation("{TypeName} trusted accountId's {AccountIds}.", nameof(AccessCohortAuthorizationHelper), trustedAccountsAsJson);
-            
-            user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, trustedAccountsAsJson, JsonClaimValueTypes.Json));
+            user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         else
         {
@@ -95,6 +91,7 @@ public class AccessCohortAuthorizationHelper(
 
         var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
         
+        logger.LogInformation("{TypeName} trusted accounts {trustedAccounts}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
         logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
 
         var accountLegalEntityIdFound = trustedAccounts.ContainsKey(accountLegalEntityId);
