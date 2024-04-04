@@ -291,7 +291,6 @@ public class WhenDeterminingIsAuthorized
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
 
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
-        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
         encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.PublicAccountLegalEntityId)).Returns(accountLegalEntityId);
