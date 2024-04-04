@@ -178,7 +178,7 @@ public class WhenDeterminingIsAuthorized
 
         outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
 
-        var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+        var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.TrustedAccounts);
 
         using (new AssertionScope())
         {
@@ -202,7 +202,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
+                new Claim(ProviderClaims.TrustedAccounts, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
             })
         });
 
@@ -220,7 +220,7 @@ public class WhenDeterminingIsAuthorized
 
             outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Never);
 
-            var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+            var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.TrustedAccounts);
 
             claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities));
         }
@@ -243,7 +243,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
+                new Claim(ProviderClaims.TrustedAccounts, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
             })
         });
 
@@ -282,7 +282,7 @@ public class WhenDeterminingIsAuthorized
             new ClaimsIdentity(new[]
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, ukprn.ToString()),
-                new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
+                new Claim(ProviderClaims.TrustedAccounts, JsonConvert.SerializeObject(response.AccountProviderLegalEntities))
             })
         });
 

@@ -31,67 +31,45 @@ public class AccessCohortAuthorizationHelper(
     {
         var user = httpContextAccessor.HttpContext?.User;
 
-        if (!user.Claims.Any())
+        if (ClaimsAreEmptyFor(user))
         {
             logger.LogInformation("{TypeName} User Claims are empty.", nameof(AccessCohortAuthorizationHelper));
             return false;
         }
 
-        var isEmployerUser = user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
-
-        if (isEmployerUser)
+        if (IsEmployer(user))
         {
             return true;
         }
 
-        if (!httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out var accountLegalEntityPublicHashedId))
+        if (!TryGetAccountLegalEntityPublicHashedId(out var accountLegalEntityPublicHashedId))
         {
             logger.LogInformation("{TypeName} AccountLegalEntityPublicHashedId value was not found on the route.", nameof(AccessCohortAuthorizationHelper));
             return false;
         }
 
-        var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
+        var trustedAccountClaim = user.GetClaimValue(ProviderClaims.TrustedAccounts);
 
         List<GetAccountLegalEntitiesForProviderItem> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
-            logger.LogInformation("{TypeName} no trusted account claims found. Retrieving from outerApi.", nameof(AccessCohortAuthorizationHelper));
+            trustedAccounts = await GetAccountLegalEntitiesFromOuterApi(user);
 
-            var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
-
-            if (!int.TryParse(providerIdClaim, out var providerId))
-            {
-                throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-            }
-
-            var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities;
-
-            logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
-
-            user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
+            AddTrustedAccountsToClaims(user, trustedAccounts);
         }
         else
         {
-            logger.LogInformation("{TypeName} trusted account claims found.", nameof(AccessCohortAuthorizationHelper));
-            
-            try
+            trustedAccounts = GetAccountLegalEntitiesFromClaims(trustedAccountClaim);
+           
+            if (trustedAccounts == null)
             {
-                trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
-                logger.LogInformation("{TypeName} trusted account claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
-            }
-            catch (JsonSerializationException exception)
-            {
-                logger.LogError(exception, "{TypeName} Could not deserialize trusted accounts claim for provider.", nameof(AccessCohortAuthorizationHelper));
                 return false;
             }
         }
 
         var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
 
-        logger.LogInformation("{TypeName} trusted accounts {trustedAccounts}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
         logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
 
         var accountLegalEntityIdFound = trustedAccounts.Exists(x => x.AccountLegalEntityId == accountLegalEntityId);
@@ -99,5 +77,64 @@ public class AccessCohortAuthorizationHelper(
         logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityIdFound);
 
         return accountLegalEntityIdFound;
+    }
+
+    private static bool ClaimsAreEmptyFor(ClaimsPrincipal user)
+    {
+        return !user.Claims.Any();
+    }
+
+    private static void AddTrustedAccountsToClaims(ClaimsPrincipal user, List<GetAccountLegalEntitiesForProviderItem> trustedAccounts)
+    {
+        user.Identities
+            .First()
+            .AddClaim(new Claim(ProviderClaims.TrustedAccounts, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
+    }
+
+    private static bool IsEmployer(ClaimsPrincipal user)
+    {
+        return user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
+    }
+
+    private bool TryGetAccountLegalEntityPublicHashedId(out object accountLegalEntityPublicHashedId)
+    {
+        return httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out accountLegalEntityPublicHashedId);
+    }
+
+    private async Task<List<GetAccountLegalEntitiesForProviderItem>> GetAccountLegalEntitiesFromOuterApi(ClaimsPrincipal user)
+    {
+        logger.LogInformation("{TypeName} no trusted account claims found. Retrieving from outerApi.", nameof(AccessCohortAuthorizationHelper));
+
+        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+
+        if (!int.TryParse(providerIdClaim, out var providerId))
+        {
+            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+        }
+
+        var response = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
+        
+        logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(response.AccountProviderLegalEntities));
+
+        return response.AccountProviderLegalEntities;
+    }
+
+    private List<GetAccountLegalEntitiesForProviderItem> GetAccountLegalEntitiesFromClaims(string trustedAccountClaim)
+    {
+        List<GetAccountLegalEntitiesForProviderItem> trustedAccounts;
+        logger.LogInformation("{TypeName} trusted account claims found.", nameof(AccessCohortAuthorizationHelper));
+            
+        try
+        {
+            trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
+            logger.LogInformation("{TypeName} trusted account claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
+        }
+        catch (JsonSerializationException exception)
+        {
+            logger.LogError(exception, "{TypeName} Could not deserialize trusted accounts claim for provider.", nameof(AccessCohortAuthorizationHelper));
+            return null;
+        }
+
+        return trustedAccounts;
     }
 }
