@@ -52,7 +52,7 @@ public class AccessCohortAuthorizationHelper(
 
         var trustedAccountClaim = user.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
 
-        Dictionary<long, GetAccountLegalEntitiesForProviderItem> trustedAccounts;
+        List<GetAccountLegalEntitiesForProviderItem> trustedAccounts;
 
         if (string.IsNullOrEmpty(trustedAccountClaim))
         {
@@ -69,9 +69,8 @@ public class AccessCohortAuthorizationHelper(
             
             logger.LogInformation("{TypeName} outerApi response: {Response}.", nameof(AccessCohortAuthorizationHelper), legalEntitiesWithPermissionResponse);
 
-            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities
-                .DistinctBy(x => x.AccountLegalEntityId)
-                .ToDictionary(x => x.AccountLegalEntityId);
+            trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities;
+                
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
@@ -81,7 +80,7 @@ public class AccessCohortAuthorizationHelper(
 
             try
             {
-                trustedAccounts = JsonConvert.DeserializeObject<Dictionary<long, GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
+                trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
             }
             catch (JsonSerializationException exception)
             {
@@ -95,7 +94,7 @@ public class AccessCohortAuthorizationHelper(
         logger.LogInformation("{TypeName} trusted accounts {trustedAccounts}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
         logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
 
-        var accountLegalEntityIdFound = trustedAccounts.ContainsKey(accountLegalEntityId);
+        var accountLegalEntityIdFound = trustedAccounts.Exists(x=> x.AccountLegalEntityId == accountLegalEntityId);
 
         logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityIdFound);
 
