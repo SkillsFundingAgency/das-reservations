@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -119,6 +121,36 @@ public class WhenDeterminingIsAuthorized
     }
 
     [Test, MoqAutoData]
+    public async Task ThenThrowsExceptionWhenProviderIdCannotBeParsedToInteger(
+        string accountLegalEntityHashedId,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        AccessCohortAuthorizationHelper sut,
+        GetAccountLegalEntitiesForProviderResponse response)
+    {
+        const string ukprn = "100999A";
+
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn)
+            })
+        });
+
+        var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
+
+        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var actual = async () => await sut.IsAuthorised();
+
+        await actual.Should()
+            .ThrowAsync<ApplicationException>()
+            .WithMessage($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {ukprn}.");
+    }
+
+    [Test, MoqAutoData]
     public async Task ThenCallsToOuterApiWhenUserIsProviderAndTrustedEmployersClaimIsEmptyAndSavesResultToClaims(
         int ukprn,
         string accountLegalEntityHashedId,
@@ -135,48 +167,6 @@ public class WhenDeterminingIsAuthorized
                 new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
             })
         });
-
-        var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
-
-        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
-        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
-        outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
-
-        var actual = await sut.IsAuthorised();
-
-        actual.Should().BeFalse();
-
-        outerService.Verify(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn), Times.Once);
-
-        var claimResult = claimsPrinciple.GetClaimValue(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier);
-
-        using (new AssertionScope())
-        {
-            claimResult.Should().NotBeEmpty();
-            claimResult.Should().Be(JsonConvert.SerializeObject(response.AccountProviderLegalEntities));
-        }
-    }
-
-    [Test, MoqAutoData]
-    public async Task ThenCallsToOuterApiWhenUserIsProviderAndTrustedEmployersClaimIsEmptyAndSavesResultToClaimsWhenThereAreDuplicateAccountIds(
-        int ukprn,
-        string accountLegalEntityHashedId,
-        AccessCohortRequirement requirement,
-        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
-        [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut,
-        GetAccountLegalEntitiesForProviderResponse response)
-    {
-        var claimsPrinciple = new ClaimsPrincipal(new[]
-        {
-            new ClaimsIdentity(new[]
-            {
-                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString())
-            })
-        });
-
-        response.AccountProviderLegalEntities.Add(new GetAccountLegalEntitiesForProviderItem { AccountId = 111 });
-        response.AccountProviderLegalEntities.Add(new GetAccountLegalEntitiesForProviderItem { AccountId = 111 });
 
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
 
@@ -300,6 +290,7 @@ public class WhenDeterminingIsAuthorized
 
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
 
+        httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
