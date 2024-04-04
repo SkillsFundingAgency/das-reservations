@@ -67,19 +67,20 @@ public class AccessCohortAuthorizationHelper(
 
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
 
-            logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), legalEntitiesWithPermissionResponse.AccountProviderLegalEntities);
-
             trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities;
+
+            logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
 
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         else
         {
             logger.LogInformation("{TypeName} trusted account claims found.", nameof(AccessCohortAuthorizationHelper));
-
+            
             try
             {
                 trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
+                logger.LogInformation("{TypeName} trusted account claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
             }
             catch (JsonSerializationException exception)
             {
