@@ -6,7 +6,7 @@ public class GetAccountLegalEntitiesForProviderRequest : IGetApiRequest
 {
     private readonly long _ukprn;
     
-    public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}/accountlegalentities";
+    public string GetUrl => $"{BaseUrl}provideraccounts/{_ukprn}/legalentities-with-create-cohort";
     public string BaseUrl { get; }
 
     public GetAccountLegalEntitiesForProviderRequest(string apiBaseUrl, long ukprn)

@@ -111,6 +111,8 @@ public class AccessCohortAuthorizationHelper(
         {
             throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
         }
+        
+        logger.LogInformation("{TypeName} providerId: {id}.", nameof(AccessCohortAuthorizationHelper), providerId.ToString());
 
         var response = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
         
