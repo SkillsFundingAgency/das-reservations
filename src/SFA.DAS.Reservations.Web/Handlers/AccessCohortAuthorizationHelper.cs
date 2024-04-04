@@ -66,9 +66,11 @@ public class AccessCohortAuthorizationHelper(
             }
 
             var legalEntitiesWithPermissionResponse = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-            
+
+            logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), legalEntitiesWithPermissionResponse.AccountProviderLegalEntities);
+
             trustedAccounts = legalEntitiesWithPermissionResponse.AccountProviderLegalEntities;
-                
+
             user.Identities.First().AddClaim(new Claim(ProviderClaims.AssociatedAccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
         }
         else
@@ -88,6 +90,13 @@ public class AccessCohortAuthorizationHelper(
 
         var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
 
-        return trustedAccounts.Exists(x=> x.AccountLegalEntityId == accountLegalEntityId);
+        logger.LogInformation("{TypeName} trusted accounts {trustedAccounts}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
+        logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityId);
+
+        var accountLegalEntityIdFound = trustedAccounts.Exists(x => x.AccountLegalEntityId == accountLegalEntityId);
+
+        logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(AccessCohortAuthorizationHelper), accountLegalEntityIdFound);
+
+        return accountLegalEntityIdFound;
     }
 }
