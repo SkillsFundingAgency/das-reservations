@@ -13,8 +13,6 @@ public static class AuthorizationServiceRegistrations
 {
     public static void AddAuthorizationServices(this IServiceCollection services)
     {
-        services.AddTransient<IAuthorizationValueProvider, AuthorizationValueProvider>();
-        
         services.AddAuthorization(options =>
         {
             options.AddPolicy(PolicyNames.HasEmployerAccount, policy =>
