@@ -22,7 +22,7 @@ public class AccessCohortAuthorizationHelper(
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
 {
-    public Task<bool> CanAccessCohort()
+    public async Task<bool> CanAccessCohort()
     {
         var user = httpContextAccessor.HttpContext?.User;
         
@@ -32,7 +32,7 @@ public class AccessCohortAuthorizationHelper(
         
         if (user.IsEmployer())
         {
-            return Task.FromResult(true);
+            return true;
         }
         
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
@@ -41,7 +41,7 @@ public class AccessCohortAuthorizationHelper(
             
         var providerId = GetProviderId(user);
         
-        return cachedOuterApiService.CanAccessCohort(providerId, cohortId);
+        return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
 
     private static int GetProviderId(ClaimsPrincipal user)
