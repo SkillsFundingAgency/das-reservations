@@ -194,7 +194,7 @@ public class SelectReservationsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = nameof(PolicyNames.CreateCohort))]
+    [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
     [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
     [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
     public async Task<IActionResult> PostSelectReservation(
@@ -366,10 +366,8 @@ public class SelectReservationsController : Controller
         {
             return _urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
         }
-        else
-        {
-            return _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                viewModel.CohortReference, journeyData: viewModel.JourneyData);
-        }
+
+        return _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+            viewModel.CohortReference, journeyData: viewModel.JourneyData);
     }
 }

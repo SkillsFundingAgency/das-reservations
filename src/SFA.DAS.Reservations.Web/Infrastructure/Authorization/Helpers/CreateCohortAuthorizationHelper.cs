@@ -29,6 +29,10 @@ public class CreateCohortAuthorizationHelper(
     public async Task<bool> CanCreateCohort()
     {
         var user = httpContextAccessor.HttpContext?.User;
+        
+        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(CreateCohortAuthorizationHelper),
+            user.Claims.ToDictionary(x => x.Type, y=> y.Value)
+        );
 
         if (ClaimsAreEmptyFor(user))
         {
