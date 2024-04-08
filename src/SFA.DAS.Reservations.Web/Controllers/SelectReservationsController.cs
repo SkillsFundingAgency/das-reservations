@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -56,6 +57,8 @@ public class SelectReservationsController : Controller
         ReservationsRouteModel routeModel,
         SelectReservationViewModel viewModel)
     {
+        _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
+
         var backUrl = GetBackUrl(routeModel, viewModel);
         try
         {
@@ -275,19 +278,21 @@ public class SelectReservationsController : Controller
             {
                 return View("ProviderFundingPaused", backUrl);
             }
+
             return View("EmployerFundingPaused", backUrl);
         }
+
         var routeName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
         if (!routeModel.UkPrn.HasValue)
         {
             routeName = RouteNames.EmployerSelectCourseRuleCheck;
         }
-            
+
         return RedirectToRoute(routeName, routeModel);
     }
 
-    private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn,string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
-    {  
+    private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn, string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
+    {
         var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
         {
             AccountId = accountId,
@@ -310,7 +315,7 @@ public class SelectReservationsController : Controller
                 cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
                 transferSenderId, encodedPledgeApplicationId, journeyData);
         }
-            
+
         return string.Empty;
     }
 
@@ -367,5 +372,4 @@ public class SelectReservationsController : Controller
                 viewModel.CohortReference, journeyData: viewModel.JourneyData);
         }
     }
-
 }

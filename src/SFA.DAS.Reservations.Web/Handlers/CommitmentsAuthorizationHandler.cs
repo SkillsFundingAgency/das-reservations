@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Services;
@@ -14,14 +16,24 @@ public interface ICommitmentsAuthorisationHandler
     Task<bool> CanAccessCohort();
 }
 
-public class CommitmentsAuthorisationHandler(ICachedReservationsOuterService cachedOuterApiService, IHttpContextAccessor httpContextAccessor, IEncodingService encodingService) : ICommitmentsAuthorisationHandler
+public class CommitmentsAuthorisationHandler(
+    ICachedReservationsOuterService cachedOuterApiService, 
+    IHttpContextAccessor httpContextAccessor, 
+    ILogger<CommitmentsAuthorisationHandler> logger,
+    IEncodingService encodingService) : ICommitmentsAuthorisationHandler
 {
     public Task<bool> CanAccessCohort()
     {
-        var providerId = GetProviderId();
-
+        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(CommitmentsAuthorisationHandler),
+            httpContextAccessor.HttpContext.User.Claims.ToDictionary(x => x.Type, y=> y.Value)
+            );
+        
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
 
+        logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(CommitmentsAuthorisationHandler), cohortId);
+            
+        var providerId = GetProviderId();
+        
         return cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
 
