@@ -81,17 +81,17 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IAuthorizationHandler, HasEmployerViewerUserRoleOrIsProvider>();
             services.AddSingleton<IAuthorizationHandler, MinimumServiceClaimRequirementHandler>();
             services.AddSingleton<IAuthorizationHandler, AccountActiveAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, CreateCohortAuthorizationHandler>();
+            
+            services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
+            services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
             
             services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
             services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 
             services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, TrainingProviderAllRolesAuthorizationHandler>();
-            
-            services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
-            services.AddSingleton<IAuthorizationHandler, CreateCohortAuthorizationHandler>();
-            services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
-            services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
         }
     }
 }
