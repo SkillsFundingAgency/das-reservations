@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -24,22 +25,24 @@ public class CommitmentsAuthorisationHandler(
 {
     public Task<bool> CanAccessCohort()
     {
+        var user = httpContextAccessor.HttpContext?.User;
+        
         logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(CommitmentsAuthorisationHandler),
-            httpContextAccessor.HttpContext.User.Claims.ToDictionary(x => x.Type, y=> y.Value)
+            user.Claims.ToDictionary(x => x.Type, y=> y.Value)
             );
         
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(CommitmentsAuthorisationHandler), cohortId);
             
-        var providerId = GetProviderId();
+        var providerId = GetProviderId(user);
         
         return cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
 
-    private int GetProviderId()
+    private static int GetProviderId(ClaimsPrincipal user)
     {
-        var providerIdClaim = httpContextAccessor.HttpContext.User.GetClaimValue(ProviderClaims.ProviderUkprn);
+        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
 
         if (!int.TryParse(providerIdClaim, out var providerId))
         {

@@ -57,8 +57,6 @@ public class SelectReservationsController : Controller
         ReservationsRouteModel routeModel,
         SelectReservationViewModel viewModel)
     {
-        _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
-
         var backUrl = GetBackUrl(routeModel, viewModel);
         try
         {
@@ -203,6 +201,8 @@ public class SelectReservationsController : Controller
         ReservationsRouteModel routeModel,
         SelectReservationViewModel viewModel)
     {
+        _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
+        
         var backUrl = GetBackUrl(routeModel, viewModel);
         var isEmployerSelect = _configuration["AuthType"] != null &&
                                _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
