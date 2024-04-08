@@ -31,6 +31,11 @@ public class CommitmentsAuthorisationHandler(
             user.Claims.ToDictionary(x => x.Type, y=> y.Value)
             );
         
+        if (user.IsEmployer())
+        {
+            return Task.FromResult(true);
+        }
+        
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(CommitmentsAuthorisationHandler), cohortId);
