@@ -16,9 +16,9 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
-using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.AccessCohortAuthorizationHelperTests;

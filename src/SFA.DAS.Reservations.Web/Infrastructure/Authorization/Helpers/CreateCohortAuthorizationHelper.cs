@@ -12,9 +12,8 @@ using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Web.Extensions;
-using SFA.DAS.Reservations.Web.Infrastructure;
 
-namespace SFA.DAS.Reservations.Web.Handlers;
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
 
 public interface ICreateCohortAuthorizationHelper
 {

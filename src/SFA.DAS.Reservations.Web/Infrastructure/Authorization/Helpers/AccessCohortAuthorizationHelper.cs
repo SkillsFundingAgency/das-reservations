@@ -8,26 +8,25 @@ using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Extensions;
-using SFA.DAS.Reservations.Web.Infrastructure;
 
-namespace SFA.DAS.Reservations.Web.Handlers;
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
 
-public interface ICommitmentsAuthorisationHandler
+public interface IAccessCohortAuthorizationHelper
 {
     Task<bool> CanAccessCohort();
 }
 
-public class CommitmentsAuthorisationHandler(
+public class AccessCohortAuthorizationHelper(
     ICachedReservationsOuterService cachedOuterApiService, 
     IHttpContextAccessor httpContextAccessor, 
-    ILogger<CommitmentsAuthorisationHandler> logger,
-    IEncodingService encodingService) : ICommitmentsAuthorisationHandler
+    ILogger<AccessCohortAuthorizationHelper> logger,
+    IEncodingService encodingService) : IAccessCohortAuthorizationHelper
 {
     public Task<bool> CanAccessCohort()
     {
         var user = httpContextAccessor.HttpContext?.User;
         
-        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(CommitmentsAuthorisationHandler),
+        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper),
             user.Claims.ToDictionary(x => x.Type, y=> y.Value)
             );
         
@@ -38,7 +37,7 @@ public class CommitmentsAuthorisationHandler(
         
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
 
-        logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(CommitmentsAuthorisationHandler), cohortId);
+        logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
             
         var providerId = GetProviderId(user);
         
@@ -51,7 +50,7 @@ public class CommitmentsAuthorisationHandler(
 
         if (!int.TryParse(providerIdClaim, out var providerId))
         {
-            throw new ApplicationException($"{nameof(CommitmentsAuthorisationHandler)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
         }
 
         return providerId;
