@@ -2,17 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using SFA.DAS.Encoding;
+using SFA.DAS.Reservations.Web.Extensions;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure;
-
-public static class RouteValueKeys
-{
-    public const string ProviderId = nameof(ProviderId);
-    public const string UkPrn = nameof(UkPrn);
-    public const string AccountLegalEntityPublicHashedId = nameof(AccountLegalEntityPublicHashedId);
-    public const string CohortReference = nameof(CohortReference);
-    public const string ApprenticeshipId = "apprenticeshipHashedId";
-}
 
 public interface IAuthorizationValueProvider
 {
@@ -41,7 +33,7 @@ public class AuthorizationValueProvider(IHttpContextAccessor httpContextAccessor
     
     public long GetProviderId()
     {
-        if (!TryGetValueFromHttpContext(RouteValueKeys.ProviderId, out var value))
+        if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(RouteValueKeys.ProviderId, out var value))
         {
             return 0;
         }
@@ -56,7 +48,7 @@ public class AuthorizationValueProvider(IHttpContextAccessor httpContextAccessor
     
     private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
     {
-        if (!TryGetValueFromHttpContext(keyName, out var encodedValue))
+        if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(keyName, out var encodedValue))
         {
             return 0;
         }
@@ -71,7 +63,7 @@ public class AuthorizationValueProvider(IHttpContextAccessor httpContextAccessor
     
     private long? FindAndDecodeValue(string key, EncodingType encodingType)
     {
-        if (!TryGetValueFromHttpContext(key, out var encodedValue))
+        if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(key, out var encodedValue))
         {
             return null;
         }
@@ -82,31 +74,5 @@ public class AuthorizationValueProvider(IHttpContextAccessor httpContextAccessor
         }
 
         return value;
-    }
-    
-    private bool TryGetValueFromHttpContext(string key, out string value)
-    {
-        value = null;
-
-        // for testing
-        if (httpContextAccessor.HttpContext == null)
-        {
-            return false;
-        }
-
-        if (httpContextAccessor.HttpContext.GetRouteData().Values.TryGetValue(key, out var routeValue))
-        {
-            value = (string)routeValue;
-        }
-        else if (httpContextAccessor.HttpContext.Request.Query.TryGetValue(key, out var queryStringValue))
-        {
-            value = queryStringValue;
-        }
-        else if (httpContextAccessor.HttpContext.Request.HasFormContentType && httpContextAccessor.HttpContext.Request.Form.TryGetValue(key, out var formValue))
-        {
-            value = formValue;
-        }
-
-        return !string.IsNullOrWhiteSpace(value);
     }
 }

@@ -14,6 +14,19 @@ public class CacheStorageService : ICacheStorageService
     {
         _distributedCache = distributedCache;
     }
+    
+    /// <summary>
+    /// Returns NULL instead of throwing exception if cached item not found.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public async Task<T> SafeRetrieveFromCache<T>(string key)
+    {
+        var json = await _distributedCache.GetStringAsync(key);
+            
+        return json == null ? default : JsonConvert.DeserializeObject<T>(json);
+    }
 
     public async Task SaveToCache<T>(string key, T item, TimeSpan expirationTimeSpan)
     {
@@ -24,7 +37,7 @@ public class CacheStorageService : ICacheStorageService
             AbsoluteExpirationRelativeToNow = expirationTimeSpan
         });
     }
-        
+    
     public async Task SaveToCache<T>(string key, T item, int expirationInHours)
     {
         await SaveToCache(key, item, TimeSpan.FromHours(expirationInHours));

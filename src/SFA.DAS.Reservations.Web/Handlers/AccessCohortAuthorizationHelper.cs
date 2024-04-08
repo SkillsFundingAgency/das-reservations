@@ -11,7 +11,7 @@ using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
-using SFA.DAS.Reservations.Infrastructure.Services;
+using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Handlers;
@@ -37,7 +37,7 @@ public class AccessCohortAuthorizationHelper(
             return false;
         }
 
-        if (IsEmployer(user))
+        if (user.IsEmployer())
         {
             return true;
         }
@@ -61,7 +61,7 @@ public class AccessCohortAuthorizationHelper(
         else
         {
             trustedAccounts = GetAccountLegalEntitiesFromClaims(trustedAccountClaim);
-           
+
             if (trustedAccounts == null)
             {
                 return false;
@@ -91,11 +91,6 @@ public class AccessCohortAuthorizationHelper(
             .AddClaim(new Claim(ProviderClaims.TrustedAccounts, JsonConvert.SerializeObject(trustedAccounts), JsonClaimValueTypes.Json));
     }
 
-    private static bool IsEmployer(ClaimsPrincipal user)
-    {
-        return user.HasClaim(x => x.Type.Equals(EmployerClaims.AccountsClaimsTypeIdentifier));
-    }
-
     private bool TryGetAccountLegalEntityPublicHashedId(out object accountLegalEntityPublicHashedId)
     {
         return httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue(RouteValueKeys.AccountLegalEntityPublicHashedId, out accountLegalEntityPublicHashedId);
@@ -111,12 +106,8 @@ public class AccessCohortAuthorizationHelper(
         {
             throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
         }
-        
-        logger.LogInformation("{TypeName} providerId: {id}.", nameof(AccessCohortAuthorizationHelper), providerId.ToString());
 
         var response = await outerService.GetAccountProviderLegalEntitiesWithCreateCohort(providerId);
-        
-        logger.LogInformation("{TypeName} outerApi response AccountLegalEntities: {Response}.", nameof(AccessCohortAuthorizationHelper), JsonConvert.SerializeObject(response.AccountProviderLegalEntities));
 
         return response.AccountProviderLegalEntities;
     }
@@ -125,7 +116,7 @@ public class AccessCohortAuthorizationHelper(
     {
         List<GetAccountLegalEntitiesForProviderItem> trustedAccounts;
         logger.LogInformation("{TypeName} trusted account claims found.", nameof(AccessCohortAuthorizationHelper));
-            
+
         try
         {
             trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);

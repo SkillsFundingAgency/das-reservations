@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using SFA.DAS.CommitmentsV2.Types;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 
@@ -9,4 +10,5 @@ public interface IReservationsOuterService
     Task<GetTransferValidityResponse> GetTransferValidity(long senderId, long receiverId, int? pledgeApplicationId = null);
     Task<ProviderAccountResponse> GetProviderStatus(long ukprn);
     Task<GetAccountLegalEntitiesForProviderResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn);
+    Task<bool> CanAccessCohort(long partyId, long cohortId);
 }

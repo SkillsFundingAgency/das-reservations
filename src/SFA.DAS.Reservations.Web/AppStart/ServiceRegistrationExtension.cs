@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Infrastructure.Repositories;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Infrastructure.TagHelpers;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart;
@@ -43,7 +44,9 @@ public static class ServiceRegistrationExtension
         
         services.AddTransient<HttpClient>();
         services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
+        services.AddTransient<ICachedReservationsOuterService, CachedReservationsOuterService>();
         services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
+        services.AddTransient<ICommitmentsAuthorisationHandler, ICommitmentsAuthorisationHandler>();
 
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));

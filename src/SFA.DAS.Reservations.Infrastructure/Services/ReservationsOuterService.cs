@@ -32,4 +32,13 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
 
         return await apiClient.Get<GetAccountLegalEntitiesForProviderResponse>(request);
     }
+    
+    public async Task<bool> CanAccessCohort(long partyId, long cohortId)
+    {
+        var content = new GetCohortAccessRequest(_config.ApiBaseUrl, partyId, cohortId);
+
+        var response = await apiClient.Get<GetCohortAccessResponse>(content);
+
+        return response.HasCohortAccess;
+    }
 }
