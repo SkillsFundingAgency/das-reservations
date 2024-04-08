@@ -10,8 +10,9 @@ using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using AccountApiConfiguration = SFA.DAS.Reservations.Infrastructure.Configuration.AccountApiConfiguration;
-using ProviderAuthorizationHandler = SFA.DAS.Reservations.Web.Infrastructure.ProviderAuthorizationHandler;
+using ProviderAuthorizationHandler = SFA.DAS.Reservations.Web.Infrastructure.Authorization.ProviderAuthorizationHandler;
 
 namespace SFA.DAS.Reservations.Web.AppStart
 {
@@ -89,7 +90,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             
             services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, CreateCohortAuthorizationHandler>();
-            services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
+            services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
         }
     }
 }

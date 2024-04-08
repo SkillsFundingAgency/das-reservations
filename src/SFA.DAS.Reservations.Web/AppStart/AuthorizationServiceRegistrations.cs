@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.GovUK.Auth.Authentication;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 namespace SFA.DAS.Reservations.Web.AppStart;
 

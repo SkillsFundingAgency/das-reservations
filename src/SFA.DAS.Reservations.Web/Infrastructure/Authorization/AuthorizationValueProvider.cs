@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Web.Extensions;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure;
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 public interface IAuthorizationValueProvider
 {

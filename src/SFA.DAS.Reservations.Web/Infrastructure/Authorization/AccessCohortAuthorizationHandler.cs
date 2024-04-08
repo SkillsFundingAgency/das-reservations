@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Handlers;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure;
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 public class AccessCohortAuthorizationHandler(ICommitmentsAuthorisationHandler commitmentsAuthorisationHandler, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<AccessCohortRequirement>
 {

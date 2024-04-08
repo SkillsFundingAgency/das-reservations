@@ -18,6 +18,7 @@ using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Handlers;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.AccessCohortAuthorizationHelperTests;
@@ -31,7 +32,7 @@ public class WhenDeterminingIsAuthorized
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         long accountLegalEntityHashedId,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut)
+        CreateCohortAuthorizationHelper sut)
     {
         var claimsPrinciple = new ClaimsPrincipal();
 
@@ -40,7 +41,7 @@ public class WhenDeterminingIsAuthorized
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeFalse();
     }
@@ -51,7 +52,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut)
+        CreateCohortAuthorizationHelper sut)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
@@ -64,7 +65,7 @@ public class WhenDeterminingIsAuthorized
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeFalse();
     }
@@ -75,7 +76,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut)
+        CreateCohortAuthorizationHelper sut)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
@@ -88,7 +89,7 @@ public class WhenDeterminingIsAuthorized
         var httpContext = new DefaultHttpContext(new FeatureCollection()) { User = claimsPrinciple };
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeTrue();
     }
@@ -99,7 +100,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut)
+        CreateCohortAuthorizationHelper sut)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
         {
@@ -113,7 +114,7 @@ public class WhenDeterminingIsAuthorized
 
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeFalse();
     }
@@ -123,7 +124,7 @@ public class WhenDeterminingIsAuthorized
         string accountLegalEntityHashedId,
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
-        AccessCohortAuthorizationHelper sut,
+        CreateCohortAuthorizationHelper sut,
         GetAccountLegalEntitiesForProviderResponse response)
     {
         const string ukprn = "100999A";
@@ -141,11 +142,11 @@ public class WhenDeterminingIsAuthorized
         httpContext.Request.RouteValues.Add(RouteValueKeys.AccountLegalEntityPublicHashedId, accountLegalEntityHashedId);
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
 
-        var actual = async () => await sut.IsAuthorised();
+        var actual = async () => await sut.CanCreateCohort();
 
         await actual.Should()
             .ThrowAsync<ApplicationException>()
-            .WithMessage($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {ukprn}.");
+            .WithMessage($"{nameof(CreateCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {ukprn}.");
     }
 
     [Test, MoqAutoData]
@@ -155,7 +156,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut,
+        CreateCohortAuthorizationHelper sut,
         GetAccountLegalEntitiesForProviderResponse response)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -172,7 +173,7 @@ public class WhenDeterminingIsAuthorized
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeFalse();
 
@@ -194,7 +195,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut,
+        CreateCohortAuthorizationHelper sut,
         GetAccountLegalEntitiesForProviderResponse response)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -212,7 +213,7 @@ public class WhenDeterminingIsAuthorized
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         using (new AssertionScope())
         {
@@ -234,7 +235,7 @@ public class WhenDeterminingIsAuthorized
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
         [Frozen] Mock<IReservationsOuterService> outerService,
-        AccessCohortAuthorizationHelper sut,
+        CreateCohortAuthorizationHelper sut,
         GetAccountLegalEntitiesForProviderResponse response,
         [Frozen] Mock<IEncodingService> encodingService)
     {
@@ -254,7 +255,7 @@ public class WhenDeterminingIsAuthorized
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
         encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.PublicAccountLegalEntityId)).Returns(accountLegalEntityId);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         actual.Should().BeFalse();
     }
@@ -293,9 +294,9 @@ public class WhenDeterminingIsAuthorized
         outerService.Setup(x => x.GetAccountProviderLegalEntitiesWithCreateCohort(ukprn)).ReturnsAsync(response);
         encodingService.Setup(x => x.Decode(accountLegalEntityHashedId, EncodingType.PublicAccountLegalEntityId)).Returns(accountLegalEntityId);
 
-        var sut = new AccessCohortAuthorizationHelper(Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), httpContextAccessor.Object, encodingService.Object, outerService.Object);
+        var sut = new CreateCohortAuthorizationHelper(Mock.Of<ILogger<CreateCohortAuthorizationHelper>>(), httpContextAccessor.Object, encodingService.Object, outerService.Object);
 
-        var actual = await sut.IsAuthorised();
+        var actual = await sut.CanCreateCohort();
 
         using (new AssertionScope())
         {

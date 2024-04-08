@@ -11,6 +11,7 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Testing.AutoFixture;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.TrainingProviderAllRolesRequirementHandlerTest
 {

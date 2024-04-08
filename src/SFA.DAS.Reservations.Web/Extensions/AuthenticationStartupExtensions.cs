@@ -9,6 +9,7 @@ using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 namespace SFA.DAS.Reservations.Web.Extensions;
 

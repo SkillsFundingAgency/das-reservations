@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 namespace SFA.DAS.Reservations.Web.Infrastructure
 {

@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.AppStart;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization
 {
     public class TrainingProviderAllRolesAuthorizationHandler : AuthorizationHandler<TrainingProviderAllRolesRequirement>
     {

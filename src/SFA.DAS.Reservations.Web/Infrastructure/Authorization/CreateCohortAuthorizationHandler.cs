@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using SFA.DAS.Reservations.Web.Handlers;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure;
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
-public class CreateCohortAuthorizationHandler(IAccessCohortAuthorizationHelper helper) : AuthorizationHandler<CreateCohortRequirement>
+public class CreateCohortAuthorizationHandler(ICreateCohortAuthorizationHelper helper) : AuthorizationHandler<CreateCohortRequirement>
 {
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CreateCohortRequirement requirement)
     {
-        if (!await helper.IsAuthorised())
+        if (!await helper.CanCreateCohort())
         {
             return;
         }
