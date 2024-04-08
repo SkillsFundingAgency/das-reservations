@@ -88,6 +88,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IAuthorizationHandler, TrainingProviderAllRolesAuthorizationHandler>();
             
             services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, CreateCohortAuthorizationHandler>();
             services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
         }
     }

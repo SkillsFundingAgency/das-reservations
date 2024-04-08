@@ -15,7 +15,7 @@ public class AccessCohortAuthorizationHandler(ICommitmentsAuthorisationHandler c
             context.Succeed(requirement);
             return;
         }
-        
+
         if (!await commitmentsAuthorisationHandler.CanAccessCohort())
         {
             return;

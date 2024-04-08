@@ -194,7 +194,7 @@ public class SelectReservationsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
+    [Authorize(Policy = nameof(PolicyNames.CreateCohort))]
     [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
     [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
     public async Task<IActionResult> PostSelectReservation(
