@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Extensions;
@@ -17,7 +15,7 @@ public interface IAccessCohortAuthorizationHelper
 }
 
 public class AccessCohortAuthorizationHelper(
-    ICachedReservationsOuterService cachedOuterApiService,
+   // ICachedReservationsOuterService cachedOuterApiService,
     IHttpContextAccessor httpContextAccessor,
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
@@ -30,7 +28,7 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), claimsValues);
 
-        if (user.IsEmployer())
+        if (claimsValues.ContainsKey(EmployerClaims.AccountsClaimsTypeIdentifier))
         {
             return true;
         }
@@ -41,14 +39,16 @@ public class AccessCohortAuthorizationHelper(
 
         claimsValues.TryGetValue(ProviderClaims.ProviderUkprn, out var providerIdClaim);
 
-        if (!int.TryParse(providerIdClaim, out var providerId))
+        if (!long.TryParse(providerIdClaim, out var providerId))
         {
             throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
         }
 
         logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
 
-        return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
+        return false;
+
+        // return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
 
     private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
