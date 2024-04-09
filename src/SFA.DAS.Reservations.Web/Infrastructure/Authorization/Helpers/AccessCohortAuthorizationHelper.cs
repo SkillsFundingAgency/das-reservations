@@ -17,34 +17,35 @@ public interface IAccessCohortAuthorizationHelper
 }
 
 public class AccessCohortAuthorizationHelper(
-   // ICachedReservationsOuterService cachedOuterApiService, 
-    IHttpContextAccessor httpContextAccessor, 
+    // ICachedReservationsOuterService cachedOuterApiService, 
+    IHttpContextAccessor httpContextAccessor,
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
 {
     public async Task<bool> CanAccessCohort()
     {
         var user = httpContextAccessor.HttpContext?.User;
-        
+
         logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper),
-            user.Claims.ToDictionary(x => x.Type, y=> y.Value)
-            );
+            user.Claims.ToDictionary(x => x.Type, y => y.Value)
+        );
+
+        // if (user.IsEmployer())
+        // {
+        //     return true;
+        // }
+
+        var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
+
+        logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
         return false;
-        
-    //     if (user.IsEmployer())
-    //     {
-    //         return true;
-    //     }
-    //     
-    //     var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
-    //
-    //     logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
-    //         
-    //     var providerId = GetProviderId(user);
-    //     
-    //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
-     }
+
+        //     var providerId = GetProviderId(user);
+        //     
+        //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
+    }
+
     //
     // private static int GetProviderId(ClaimsPrincipal user)
     // {
@@ -57,19 +58,19 @@ public class AccessCohortAuthorizationHelper(
     //
     //     return providerId;
     // }
-    //
-    // private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
-    // {
-    //     if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(keyName, out var encodedValue))
-    //     {
-    //         return 0;
-    //     }
-    //
-    //     if (!encodingService.TryDecode(encodedValue, encodedType, out var id))
-    //     {
-    //         throw new UnauthorizedAccessException($"Failed to decode '{keyName}' value '{encodedValue}' using encoding type '{encodedType}'");
-    //     }
-    //
-    //     return id;
-    // }
+    
+    private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
+    {
+        if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(keyName, out var encodedValue))
+        {
+            return 0;
+        }
+
+        if (!encodingService.TryDecode(encodedValue, encodedType, out var id))
+        {
+            throw new UnauthorizedAccessException($"Failed to decode '{keyName}' value '{encodedValue}' using encoding type '{encodedType}'");
+        }
+
+        return id;
+    }
 }
