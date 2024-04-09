@@ -7,6 +7,9 @@ public record GetCohortAccessRequest : IGetApiRequest
 {
     private readonly long _providerId;
     private readonly long _cohortId;
+    
+    public string GetUrl => $"{BaseUrl}authorization/{_providerId}/can-access-cohort/{_cohortId}";
+    public string BaseUrl { get; }
 
     public GetCohortAccessRequest(string apiBaseUrl, long providerId, long CohortId)
     {
@@ -15,8 +18,4 @@ public record GetCohortAccessRequest : IGetApiRequest
         
         BaseUrl = apiBaseUrl.EndsWith('/') ? apiBaseUrl : apiBaseUrl + "/";
     }
-
-    public string GetUrl => $"authorization/{_providerId}/can-access-cohort/{_cohortId}";
-    public string BaseUrl { get; }
-  
 }

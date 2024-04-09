@@ -21,9 +21,9 @@ using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.AccessCohortAuthorizationHelperTests;
+namespace SFA.DAS.Reservations.Web.UnitTests.Handlers.CreateCohortAuthorizationHelperTests;
 
-public class WhenDeterminingIsAuthorized
+public class WhenDeterminingCanCreateCohort
 {
     [Test, MoqAutoData]
     public async Task ThenReturnsFalseWhenUserClaimsAreEmpty(
