@@ -17,7 +17,7 @@ public interface IAccessCohortAuthorizationHelper
 }
 
 public class AccessCohortAuthorizationHelper(
-    //ICachedReservationsOuterService cachedOuterApiService, 
+    ICachedReservationsOuterService cachedOuterApiService,
     IHttpContextAccessor httpContextAccessor,
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
@@ -26,9 +26,9 @@ public class AccessCohortAuthorizationHelper(
     {
         var user = httpContextAccessor.HttpContext?.User;
 
-        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper),
-            user.Claims.ToDictionary(x => x.Type, y => y.Value)
-        );
+        var claimsValues = user.Claims.ToDictionary(x => x.Type, y => y.Value);
+
+        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), claimsValues);
 
         if (user.IsEmployer())
         {
@@ -39,7 +39,7 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
-        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+        claimsValues.TryGetValue(ProviderClaims.ProviderUkprn, out var providerIdClaim);
 
         if (!int.TryParse(providerIdClaim, out var providerId))
         {
@@ -48,23 +48,9 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
 
-        return false;
-        
-        //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
+        return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
-    
-    //private int GetProviderId(ClaimsPrincipal user)
-    //{
-    //    var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
 
-    //    if (!int.TryParse(providerIdClaim, out var providerId))
-    //    {
-    //        throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-    //    }
-
-    //    return providerId;
-    //}
-    
     private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
     {
         if (!httpContextAccessor.HttpContext.TryGetValueFromHttpContext(keyName, out var encodedValue))
