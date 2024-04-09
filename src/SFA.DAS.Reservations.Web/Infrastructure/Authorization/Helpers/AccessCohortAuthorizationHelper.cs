@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Extensions;
@@ -23,18 +24,16 @@ public class AccessCohortAuthorizationHelper(
     public async Task<bool> CanAccessCohort()
     {
         var user = httpContextAccessor.HttpContext?.User;
-
-        var claimsValues = user.Claims.ToDictionary(x => x.Type, y => y.Value);
-
-        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), claimsValues);
-
+ 
+        // If the user is redirected to a controller action from another site (very likely) and this is method is executed, the claims will be empty until the middleware has
+        // re-authenticated the user. Once authentication is confirmed this method will be executed again with the claims populated and will run properly.
         if (user.ClaimsAreEmpty())
         {
             logger.LogInformation("{TypeName} User Claims are empty.", nameof(AccessCohortAuthorizationHelper));
             return false;
         }
 
-        if (claimsValues.ContainsKey(EmployerClaims.AccountsClaimsTypeIdentifier))
+        if (user.IsEmployer())
         {
             return true;
         }
@@ -43,7 +42,7 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
         
-        claimsValues.TryGetValue(ProviderClaims.ProviderUkprn, out var providerIdClaim);
+        var providerIdClaim =  user.GetClaimValue(ProviderClaims.ProviderUkprn);
 
         if (!long.TryParse(providerIdClaim, out var providerId))
         {

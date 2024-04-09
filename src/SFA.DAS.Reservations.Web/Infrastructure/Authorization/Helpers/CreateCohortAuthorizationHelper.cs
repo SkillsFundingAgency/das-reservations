@@ -30,10 +30,8 @@ public class CreateCohortAuthorizationHelper(
     {
         var user = httpContextAccessor.HttpContext?.User;
         
-        logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(CreateCohortAuthorizationHelper),
-            user.Claims.ToDictionary(x => x.Type, y=> y.Value)
-        );
-
+        // If the user is redirected to a controller action from another site (very likely) and this is method is executed, the claims will be empty until the middleware has
+        // re-authenticated the user. Once authentication is confirmed this method will be executed again with the claims populated and will run properly.
         if (user.ClaimsAreEmpty())
         {
             logger.LogInformation("{TypeName} User Claims are empty.", nameof(CreateCohortAuthorizationHelper));
