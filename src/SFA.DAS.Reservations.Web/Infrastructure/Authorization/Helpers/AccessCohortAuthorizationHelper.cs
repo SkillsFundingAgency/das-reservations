@@ -17,7 +17,7 @@ public interface IAccessCohortAuthorizationHelper
 }
 
 public class AccessCohortAuthorizationHelper(
-    ICachedReservationsOuterService cachedOuterApiService, 
+    //ICachedReservationsOuterService cachedOuterApiService, 
     IHttpContextAccessor httpContextAccessor,
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
@@ -39,7 +39,12 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
-        var providerId = GetProviderId();
+        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+
+        if (!int.TryParse(providerIdClaim, out var providerId))
+        {
+            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+        }
 
         logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
 
@@ -48,17 +53,17 @@ public class AccessCohortAuthorizationHelper(
         //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
     
-    private int GetProviderId()
-    {
-        var providerIdClaim = httpContextAccessor.HttpContext?.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
-    
-        if (!int.TryParse(providerIdClaim, out var providerId))
-        {
-            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-        }
-    
-        return providerId;
-    }
+    //private int GetProviderId(ClaimsPrincipal user)
+    //{
+    //    var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+
+    //    if (!int.TryParse(providerIdClaim, out var providerId))
+    //    {
+    //        throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+    //    }
+
+    //    return providerId;
+    //}
     
     private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
     {
