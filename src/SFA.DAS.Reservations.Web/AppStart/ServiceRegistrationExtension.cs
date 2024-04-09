@@ -29,7 +29,7 @@ public static class ServiceRegistrationExtension
         if (string.IsNullOrEmpty(configuration["IsIntegrationTest"]))
         {
             services.AddSingleton<IApiClient, ApiClient>();
-            services.AddScoped<IEncodingService, EncodingService>();
+            services.AddSingleton<IEncodingService, EncodingService>();
         }
 
         services.AddSingleton<IProviderService, ProviderService>();

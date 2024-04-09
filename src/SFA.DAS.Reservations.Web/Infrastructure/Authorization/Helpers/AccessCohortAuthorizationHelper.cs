@@ -27,24 +27,24 @@ public class AccessCohortAuthorizationHelper(
         var claimsValues = user.Claims.ToDictionary(x => x.Type, y => y.Value);
 
         logger.LogInformation("{TypeName} User Claims: {Claims}.", nameof(AccessCohortAuthorizationHelper), claimsValues);
-
-        if (claimsValues.ContainsKey(EmployerClaims.AccountsClaimsTypeIdentifier))
-        {
-            return true;
-        }
-
-        var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
-
-        logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
-
-        claimsValues.TryGetValue(ProviderClaims.ProviderUkprn, out var providerIdClaim);
-
-        if (!long.TryParse(providerIdClaim, out var providerId))
-        {
-            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-        }
-
-        logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
+        //
+        // if (claimsValues.ContainsKey(EmployerClaims.AccountsClaimsTypeIdentifier))
+        // {
+        //     return true;
+        // }
+        //
+        // var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
+        //
+        // logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
+        //
+        // claimsValues.TryGetValue(ProviderClaims.ProviderUkprn, out var providerIdClaim);
+        //
+        // if (!long.TryParse(providerIdClaim, out var providerId))
+        // {
+        //     throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+        // }
+        //
+        // logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
 
         return false;
 
