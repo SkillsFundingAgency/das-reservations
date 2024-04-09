@@ -30,34 +30,33 @@ public class AccessCohortAuthorizationHelper(
             user.Claims.ToDictionary(x => x.Type, y => y.Value)
         );
 
-        // if (user.IsEmployer())
-        // {
-        //     return true;
-        // }
+        if (user.IsEmployer())
+        {
+            return true;
+        }
 
         var cohortId = GetAndDecodeValueIfExists(RouteValueKeys.CohortReference, EncodingType.CohortReference);
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
+        var providerId = GetProviderId(user);
+        
         return false;
-
-        //     var providerId = GetProviderId(user);
-        //     
+        
         //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
-
-    //
-    // private static int GetProviderId(ClaimsPrincipal user)
-    // {
-    //     var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
-    //
-    //     if (!int.TryParse(providerIdClaim, out var providerId))
-    //     {
-    //         throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
-    //     }
-    //
-    //     return providerId;
-    // }
+    
+    private static int GetProviderId(ClaimsPrincipal user)
+    {
+        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+    
+        if (!int.TryParse(providerIdClaim, out var providerId))
+        {
+            throw new ApplicationException($"{nameof(AccessCohortAuthorizationHelper)} Unable to parse providerId from ukprn claim value: {providerIdClaim}.");
+        }
+    
+        return providerId;
+    }
     
     private long GetAndDecodeValueIfExists(string keyName, EncodingType encodedType)
     {
