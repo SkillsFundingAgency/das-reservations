@@ -39,16 +39,16 @@ public class AccessCohortAuthorizationHelper(
 
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
-        var providerId = GetProviderId(user);
+        var providerId = GetProviderId();
         
         return false;
         
         //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
     }
     
-    private static int GetProviderId(ClaimsPrincipal user)
+    private int GetProviderId()
     {
-        var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
+        var providerIdClaim = httpContextAccessor.HttpContext?.User.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;
     
         if (!int.TryParse(providerIdClaim, out var providerId))
         {
