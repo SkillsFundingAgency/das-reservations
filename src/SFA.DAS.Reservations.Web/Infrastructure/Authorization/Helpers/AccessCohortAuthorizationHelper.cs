@@ -40,7 +40,9 @@ public class AccessCohortAuthorizationHelper(
         logger.LogInformation("{TypeName} CohortId: {Id}.", nameof(AccessCohortAuthorizationHelper), cohortId);
 
         var providerId = GetProviderId();
-        
+
+        logger.LogInformation("{TypeName} ProviderId: {Id}.", nameof(AccessCohortAuthorizationHelper), providerId);
+
         return false;
         
         //     return await cachedOuterApiService.CanAccessCohort(providerId, cohortId);
