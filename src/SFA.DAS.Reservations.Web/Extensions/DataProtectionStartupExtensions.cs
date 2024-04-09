@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -8,7 +9,7 @@ namespace SFA.DAS.Reservations.Web.Extensions;
 
 public static class DataProtectionStartupExtensions
 {
-    public static IServiceCollection AddDataProtection(this IServiceCollection services, ReservationsWebConfiguration configuration, IHostEnvironment environment, bool isEmployerAuth)
+    public static IServiceCollection AddDataProtection(this IServiceCollection services, ReservationsWebConfiguration configuration, IWebHostEnvironment environment, bool isEmployerAuth)
     {
         if (environment.IsDevelopment())
         {

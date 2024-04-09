@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EAS.Account.Api.Client;
@@ -15,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
         public static void AddEmployerAccountApi(
             this IServiceCollection services, 
             IConfiguration configuration,
-            IHostEnvironment env)
+            IWebHostEnvironment env)
         {
             if (env.IsDevelopment() && configuration.UseStubs())
             {

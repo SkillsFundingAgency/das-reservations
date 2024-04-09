@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,9 +22,9 @@ namespace SFA.DAS.Reservations.Web;
 public class Startup
 {
     private readonly IConfiguration _configuration;
-    private readonly IHostEnvironment _environment;
+    private readonly IWebHostEnvironment _environment;
 
-    public Startup(IConfiguration configuration, IHostEnvironment environment)
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         _configuration = configuration.BuildDasConfiguration();
         _environment = environment;
@@ -140,7 +141,7 @@ public class Startup
         }
     }
 
-    public void Configure(IApplicationBuilder app, IHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {

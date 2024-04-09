@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
@@ -11,7 +12,7 @@ public static class HstsStartup
 {
     public static IApplicationBuilder UseDasHsts(this IApplicationBuilder app)
     {
-        var hostingEnvironment = app.ApplicationServices.GetService<IHostEnvironment>();
+        var hostingEnvironment = app.ApplicationServices.GetService<IWebHostEnvironment>();
 
         if (!hostingEnvironment.IsDevelopment())
         {

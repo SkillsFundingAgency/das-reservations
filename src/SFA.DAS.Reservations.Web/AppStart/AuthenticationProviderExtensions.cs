@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,14 +20,14 @@ namespace SFA.DAS.Reservations.Web.AppStart;
 public static class AuthenticationProviderExtensions
 {
     public static void AddAndConfigureProviderAuthentication(
-        this IServiceCollection services,
-        ProviderIdamsConfiguration idamsConfiguration,
-        IConfiguration config,
-        IHostEnvironment env)
+        this IServiceCollection services, 
+        ProviderIdamsConfiguration idamsConfiguration, 
+        IConfiguration config, 
+        IWebHostEnvironment env)
     {
         var cookieOptions = new Action<CookieAuthenticationOptions>(options =>
         {
-            options.CookieManager = new ChunkingCookieManager { ChunkSize = 3000 };
+            options.CookieManager = new ChunkingCookieManager {ChunkSize = 3000};
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.AccessDeniedPath = "/error/403";
         });
@@ -35,27 +36,36 @@ public static class AuthenticationProviderExtensions
         {
             services.AddProviderIdamsStubAuthentication(cookieOptions, new OpenIdConnectEvents
             {
-                OnTokenValidated = async ctx => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); }
+                OnTokenValidated = async (ctx) =>
+                {
+                    await PopulateProviderClaims(ctx.HttpContext, ctx.Principal);
+                }
             });
         }
         else
         {
             services.AddAuthentication(sharedOptions =>
                 {
-                    sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    sharedOptions.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    sharedOptions.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+                    sharedOptions.DefaultScheme =
+                        CookieAuthenticationDefaults.AuthenticationScheme;
+                    sharedOptions.DefaultSignInScheme =
+                        CookieAuthenticationDefaults.AuthenticationScheme;
+                    sharedOptions.DefaultChallengeScheme =
+                        WsFederationDefaults.AuthenticationScheme;
                 })
                 .AddWsFederation(options =>
                 {
                     options.MetadataAddress = idamsConfiguration.MetadataAddress;
                     options.Wtrealm = idamsConfiguration.Wtrealm;
                     options.CallbackPath = "/{ukprn}/reservations";
-                    options.Events.OnSecurityTokenValidated = async ctx => { await PopulateProviderClaims(ctx.HttpContext, ctx.Principal); };
+                    options.Events.OnSecurityTokenValidated = async (ctx) =>
+                    {
+                        await PopulateProviderClaims(ctx.HttpContext, ctx.Principal);
+                    };
                 }).AddCookie(cookieOptions);
         }
     }
-    
+
     private static Task PopulateProviderClaims(HttpContext httpContext, ClaimsPrincipal principal)
     {
         var providerId = principal.Claims.First(c => c.Type.Equals(ProviderClaims.ProviderUkprn)).Value;

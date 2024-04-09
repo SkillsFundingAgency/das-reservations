@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -36,7 +37,7 @@ public class TestServiceProvider : IServiceProvider
 
         startup.ConfigureServices(serviceCollection);
         serviceCollection.ConfigureTestServiceCollection(configuration, null);
-        serviceCollection.AddTransient<IHostEnvironment, TestHostEnvironment>();
+        serviceCollection.AddTransient<IWebHostEnvironment, TestHostEnvironment>();
         RegisterControllers(serviceCollection);
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -166,7 +167,7 @@ public class TestServiceProvider : IServiceProvider
     }
 }
 
-public class TestHostEnvironment : IHostEnvironment
+public class TestHostEnvironment : IWebHostEnvironment
 {
     public IFileProvider WebRootFileProvider { get; set; }
     public string WebRootPath { get; set; }
