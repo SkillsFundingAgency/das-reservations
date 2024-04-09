@@ -62,11 +62,6 @@ public class AccessCohortAuthorizationHelper(
             return 0;
         }
 
-        if (!encodingService.TryDecode(encodedValue, encodedType, out var id))
-        {
-            throw new UnauthorizedAccessException($"Failed to decode '{keyName}' value '{encodedValue}' using encoding type '{encodedType}'");
-        }
-
-        return id;
+        return encodingService.Decode(encodedValue, encodedType);
     }
 }
