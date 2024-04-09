@@ -42,9 +42,9 @@ public static class ServiceRegistrationExtension
         services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
         
         services.AddTransient<HttpClient>();
-        services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
-        services.AddTransient<ICachedReservationsOuterService, CachedReservationsOuterService>();
-        services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
+        services.AddSingleton<IReservationsOuterService, ReservationsOuterService>();
+        services.AddSingleton<ICachedReservationsOuterService, CachedReservationsOuterService>();
+        services.AddSingleton<IReservationsOuterApiClient, ReservationsOuterApiClient>();
         
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
