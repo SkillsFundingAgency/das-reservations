@@ -7,51 +7,51 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Exceptions\**"/>
-        <Compile Remove="Pages\**"/>
-        <Content Remove="Exceptions\**"/>
-        <Content Remove="Pages\**"/>
-        <EmbeddedResource Remove="Exceptions\**"/>
-        <EmbeddedResource Remove="Pages\**"/>
-        <None Remove="Exceptions\**"/>
-        <None Remove="Pages\**"/>
+        <Compile Remove="Exceptions\**" />
+        <Compile Remove="Pages\**" />
+        <Content Remove="Exceptions\**" />
+        <Content Remove="Pages\**" />
+        <EmbeddedResource Remove="Exceptions\**" />
+        <EmbeddedResource Remove="Pages\**" />
+        <None Remove="Exceptions\**" />
+        <None Remove="Pages\**" />
         <Content Update="appsettings.development.json">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Identity" Version="1.10.4"/>
-        <PackageReference Include="MediatR" Version="12.2.0"/>
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0"/>
+        <PackageReference Include="Azure.Identity" Version="1.10.4" />
+        <PackageReference Include="MediatR" Version="12.2.0" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.28" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="6.0.28"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.28"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.17"/>
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.28"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.4.1" />
-        <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89"/>
-        <PackageReference Include="System.Drawing.Common" Version="8.0.3"/>
-        <PackageReference Include="System.Net.Http" Version="4.3.4"/>
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8"/>
-        <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1"/>
-        <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84"/>
-        <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76"/>
-        <PackageReference Include="SFA.DAS.GovUK.Auth" Version="17.1.80"/>
-        <PackageReference Include="SFA.DAS.Http" Version="3.2.69"/>
-        <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1"/>
-        <PackageReference Include="SFA.DAS.Provider.Idams.Stub.Extensions" Version="1.0.14"/>
-        <PackageReference Include="StackExchange.Redis" Version="2.2.4"/>
-        <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0"/>
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0"/>
-        <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="6.0.28" />
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.28" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.17" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.28" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1" />
+        <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89" />
+        <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
+        <PackageReference Include="System.Net.Http" Version="4.3.4" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
+        <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
+        <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
+        <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
+        <PackageReference Include="SFA.DAS.GovUK.Auth" Version="17.1.80" />
+        <PackageReference Include="SFA.DAS.Http" Version="3.2.69" />
+        <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
+        <PackageReference Include="SFA.DAS.Provider.Idams.Stub.Extensions" Version="1.0.14" />
+        <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+        <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+        <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj"/>
-        <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj"/>
+        <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj" />
+        <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -70,7 +70,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
 </Project>
