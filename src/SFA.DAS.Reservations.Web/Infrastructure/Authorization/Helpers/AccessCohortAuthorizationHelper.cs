@@ -17,7 +17,7 @@ public interface IAccessCohortAuthorizationHelper
 }
 
 public class AccessCohortAuthorizationHelper(
-    // ICachedReservationsOuterService cachedOuterApiService, 
+    ICachedReservationsOuterService cachedOuterApiService, 
     IHttpContextAccessor httpContextAccessor,
     ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
