@@ -34,7 +34,7 @@ public class CreateCohortAuthorizationHelper(
             user.Claims.ToDictionary(x => x.Type, y=> y.Value)
         );
 
-        if (ClaimsAreEmptyFor(user))
+        if (user.ClaimsAreEmpty())
         {
             logger.LogInformation("{TypeName} User Claims are empty.", nameof(CreateCohortAuthorizationHelper));
             return false;
@@ -81,12 +81,7 @@ public class CreateCohortAuthorizationHelper(
 
         return accountLegalEntityIdFound;
     }
-
-    private static bool ClaimsAreEmptyFor(ClaimsPrincipal user)
-    {
-        return !user.Claims.Any();
-    }
-
+    
     private static void AddTrustedAccountsToClaims(ClaimsPrincipal user, List<GetAccountLegalEntitiesForProviderItem> trustedAccounts)
     {
         user.Identities
