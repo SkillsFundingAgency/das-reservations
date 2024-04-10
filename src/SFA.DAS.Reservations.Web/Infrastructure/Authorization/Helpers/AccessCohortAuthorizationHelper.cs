@@ -22,7 +22,6 @@ public interface IAccessCohortAuthorizationHelper
 public class AccessCohortAuthorizationHelper(
     IReservationsOuterService outerApiService,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<AccessCohortAuthorizationHelper> logger,
     IEncodingService encodingService) : IAccessCohortAuthorizationHelper
 {
     public async Task<bool> CanAccessCohort()
@@ -33,7 +32,6 @@ public class AccessCohortAuthorizationHelper(
         // re-authenticated the user. Once authentication is confirmed this method will be executed again with the claims populated and will run properly.
         if (user.ClaimsAreEmpty())
         {
-            logger.LogWarning("{TypeName} User Claims are empty.", nameof(AccessCohortAuthorizationHelper));
             return false;
         }
 

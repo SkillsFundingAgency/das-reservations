@@ -34,7 +34,6 @@ public class CreateCohortAuthorizationHelper(
         // re-authenticated the user. Once authentication is confirmed this method will be executed again with the claims populated and will run properly.
         if (user.ClaimsAreEmpty())
         {
-            logger.LogInformation("{TypeName} User Claims are empty.", nameof(CreateCohortAuthorizationHelper));
             return false;
         }
 
@@ -45,7 +44,7 @@ public class CreateCohortAuthorizationHelper(
 
         if (!TryGetAccountLegalEntityPublicHashedId(out var accountLegalEntityPublicHashedId))
         {
-            logger.LogInformation("{TypeName} AccountLegalEntityPublicHashedId value was not found on the route.", nameof(CreateCohortAuthorizationHelper));
+            logger.LogWarning("{TypeName} AccountLegalEntityPublicHashedId value was not found on the route.", nameof(CreateCohortAuthorizationHelper));
             return false;
         }
 
@@ -71,13 +70,7 @@ public class CreateCohortAuthorizationHelper(
 
         var accountLegalEntityId = encodingService.Decode(accountLegalEntityPublicHashedId?.ToString(), EncodingType.PublicAccountLegalEntityId);
 
-        logger.LogInformation("{TypeName} accountLegalEntityId from Route: {accountLegalEntityId}.", nameof(CreateCohortAuthorizationHelper), accountLegalEntityId);
-
-        var accountLegalEntityIdFound = trustedAccounts.Exists(x => x.AccountLegalEntityId == accountLegalEntityId);
-
-        logger.LogInformation("{TypeName} accountLegalEntityIdFound: {accountLegalEntityIdFound}.", nameof(CreateCohortAuthorizationHelper), accountLegalEntityIdFound);
-
-        return accountLegalEntityIdFound;
+        return trustedAccounts.Exists(x => x.AccountLegalEntityId == accountLegalEntityId);
     }
     
     private static void AddTrustedAccountsToClaims(ClaimsPrincipal user, List<GetAccountLegalEntitiesForProviderItem> trustedAccounts)
@@ -94,8 +87,6 @@ public class CreateCohortAuthorizationHelper(
 
     private async Task<List<GetAccountLegalEntitiesForProviderItem>> GetAccountLegalEntitiesFromOuterApi(ClaimsPrincipal user)
     {
-        logger.LogInformation("{TypeName} no trusted account claims found. Retrieving from outerApi.", nameof(CreateCohortAuthorizationHelper));
-
         var providerIdClaim = user.GetClaimValue(ProviderClaims.ProviderUkprn);
 
         if (!int.TryParse(providerIdClaim, out var providerId))
@@ -111,12 +102,10 @@ public class CreateCohortAuthorizationHelper(
     private List<GetAccountLegalEntitiesForProviderItem> GetAccountLegalEntitiesFromClaims(string trustedAccountClaim)
     {
         List<GetAccountLegalEntitiesForProviderItem> trustedAccounts;
-        logger.LogInformation("{TypeName} trusted account claims found.", nameof(CreateCohortAuthorizationHelper));
-
+        
         try
         {
             trustedAccounts = JsonConvert.DeserializeObject<List<GetAccountLegalEntitiesForProviderItem>>(trustedAccountClaim);
-            logger.LogInformation("{TypeName} trusted account claims: {Claims}.", nameof(CreateCohortAuthorizationHelper), JsonConvert.SerializeObject(trustedAccounts));
         }
         catch (JsonSerializationException exception)
         {

@@ -144,7 +144,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
@@ -191,7 +191,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
@@ -241,7 +241,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
@@ -287,7 +287,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
@@ -335,7 +335,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
@@ -386,7 +386,7 @@ public class WhenDeterminingCanAccessCohort
         outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
-        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
