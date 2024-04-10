@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
+using SFA.DAS.DfESignIn.Auth.Extensions;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
@@ -113,13 +117,13 @@ public class WhenDeterminingCanAccessCohort
     }
 
     [Test, MoqAutoData]
-    public async Task ThenCallsToCachedOuterApiWhenUserIsProviderAndCohortRefIsOnRoute(
+    public async Task ThenCallsToOuterApiWhenUserIsProviderAndCohortRefIsOnRouteAndClaimsAreMissingAndAddsClaims(
         long ukprn,
         string cohortRef,
         long cohortId,
         AccessCohortRequirement requirement,
         [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
-        [Frozen] Mock<ICachedReservationsOuterService> outerService,
+        [Frozen] Mock<IReservationsOuterService> outerService,
         [Frozen] Mock<IEncodingService> encodingService)
     {
         var claimsPrinciple = new ClaimsPrincipal(new[]
@@ -134,15 +138,269 @@ public class WhenDeterminingCanAccessCohort
         httpContext.User = claimsPrinciple;
         httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
-        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(true);
+
+        const bool canAccessCohort = true;
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
         encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
 
         var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
 
         var actual = await sut.CanAccessCohort();
 
-        actual.Should().Be(true);
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
 
-        outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Once);
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Once);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+        }
+    }
+
+    [Test, MoqAutoData]
+    public async Task ThenCallsToOuterApiWhenUserIsProviderAndCohortRefIsOnRouteAndUpdatesClaims(
+        long ukprn,
+        string cohortRef,
+        long cohortId,
+        Dictionary<long, bool> existingResults,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        [Frozen] Mock<IEncodingService> encodingService)
+    {
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString()),
+                new Claim(ProviderClaims.AccessibleCohorts, JsonConvert.SerializeObject(existingResults))
+            })
+        });
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.User = claimsPrinciple;
+        httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        const bool canAccessCohort = true;
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
+        encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
+
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+
+        var actual = await sut.CanAccessCohort();
+
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
+
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Once);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+            claimsValues.Count.Should().Be(existingResults.Count + 1);
+        }
+    }
+
+    [Test, MoqAutoData]
+    public async Task ThenDoesntAddDuplicateToClaimsWhenCohortIdAlreadyExists(
+        long ukprn,
+        string cohortRef,
+        long cohortId,
+        Dictionary<long, bool> existingResults,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        [Frozen] Mock<IEncodingService> encodingService)
+    {
+        const bool canAccessCohort = true;
+
+        existingResults.Add(cohortId, canAccessCohort);
+
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString()),
+                new Claim(ProviderClaims.AccessibleCohorts, JsonConvert.SerializeObject(existingResults))
+            })
+        });
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.User = claimsPrinciple;
+        httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
+        encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
+
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+
+        var actual = await sut.CanAccessCohort();
+
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
+
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Never);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+            claimsValues.Count.Should().Be(existingResults.Count);
+        }
+    }
+
+    [Test, MoqAutoData]
+    public async Task ThenDoesAddClaimWhenCanAccessCohortIsFalseAndClaimDoesntExist(
+        long ukprn,
+        string cohortRef,
+        long cohortId,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        [Frozen] Mock<IEncodingService> encodingService)
+    {
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString()),
+            })
+        });
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.User = claimsPrinciple;
+        httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        const bool canAccessCohort = false;
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
+        encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
+
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+
+        var actual = await sut.CanAccessCohort();
+
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
+
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Once);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+            claimsValues.Count.Should().Be(1);
+        }
+    }
+
+    [Test, MoqAutoData]
+    public async Task ThenDoesAddCohortIdWhenCanAccessCohortIsFalseAndClaimDoesExist(
+        long ukprn,
+        string cohortRef,
+        long cohortId,
+        Dictionary<long, bool> existingResults,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        [Frozen] Mock<IEncodingService> encodingService)
+    {
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString()),
+                new Claim(ProviderClaims.AccessibleCohorts, JsonConvert.SerializeObject(existingResults))
+            })
+        });
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.User = claimsPrinciple;
+        httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        const bool canAccessCohort = false;
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
+        encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
+
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+
+        var actual = await sut.CanAccessCohort();
+
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
+
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Once);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+            claimsValues.Count.Should().Be(existingResults.Count + 1);
+        }
+    }
+
+    [Test, MoqAutoData]
+    public async Task ThenDoesNotCallOuterApiWhenCohortIdIsInAccessibleCohortClaim(
+        long ukprn,
+        string cohortRef,
+        long cohortId,
+        Dictionary<long, bool> existingResults,
+        AccessCohortRequirement requirement,
+        [Frozen] Mock<IHttpContextAccessor> httpContextAccessor,
+        [Frozen] Mock<IReservationsOuterService> outerService,
+        [Frozen] Mock<IEncodingService> encodingService)
+    {
+        const bool canAccessCohort = true;
+
+        existingResults.Add(cohortId, canAccessCohort);
+
+        var claimsPrinciple = new ClaimsPrincipal(new[]
+        {
+            new ClaimsIdentity(new[]
+            {
+                new Claim(ProviderClaims.ProviderUkprn, ukprn.ToString()),
+                new Claim(ProviderClaims.AccessibleCohorts, JsonConvert.SerializeObject(existingResults))
+            })
+        });
+
+        var httpContext = new DefaultHttpContext();
+        httpContext.User = claimsPrinciple;
+        httpContext.Request.QueryString = new QueryString($"?{RouteValueKeys.CohortReference}={cohortRef}");
+        httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+
+        outerService.Setup(x => x.CanAccessCohort(ukprn, cohortId)).ReturnsAsync(canAccessCohort);
+        encodingService.Setup(x => x.Decode(cohortRef, EncodingType.CohortReference)).Returns(cohortId);
+
+        var sut = new AccessCohortAuthorizationHelper(outerService.Object, httpContextAccessor.Object, Mock.Of<ILogger<AccessCohortAuthorizationHelper>>(), encodingService.Object);
+
+        var actual = await sut.CanAccessCohort();
+
+        using (new AssertionScope())
+        {
+            actual.Should().Be(canAccessCohort);
+
+            outerService.Verify(x => x.CanAccessCohort(ukprn, cohortId), Times.Never);
+            claimsPrinciple.HasClaim(x => x.Type.Equals(ProviderClaims.AccessibleCohorts)).Should().BeTrue();
+
+            var claimsValues = JsonConvert.DeserializeObject<Dictionary<long, bool>>(claimsPrinciple.GetClaimValue(ProviderClaims.AccessibleCohorts));
+            var canAccessCohortClaimResult = claimsValues[cohortId];
+            canAccessCohortClaimResult.Should().Be(canAccessCohort);
+            claimsValues.Count.Should().Be(existingResults.Count);
+        }
     }
 }

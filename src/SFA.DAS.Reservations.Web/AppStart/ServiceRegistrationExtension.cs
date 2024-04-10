@@ -43,7 +43,6 @@ public static class ServiceRegistrationExtension
         
         services.AddTransient<HttpClient>();
         services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
-        services.AddTransient<ICachedReservationsOuterService, CachedReservationsOuterService>();
         services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
         
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
