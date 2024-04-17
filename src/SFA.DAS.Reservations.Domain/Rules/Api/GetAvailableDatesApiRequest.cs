@@ -11,6 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Rules.Api
         }
         public string BaseUrl { get; }
         public long AccountLegalEntityId{ get; }
-        public string GetUrl => $"{BaseUrl}rules/available-dates/{AccountLegalEntityId}";
+        public string GetUrl => $"{BaseUrl}/rules/available-dates/{AccountLegalEntityId}";
     }
 }

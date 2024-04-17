@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
         {
             var actual = new GetAvailableDatesApiRequest(baseUrl, accountLegalEntityId);
 
-            actual.GetUrl.Should().Be($"{baseUrl}rules/available-dates/{accountLegalEntityId}");
+            actual.GetUrl.Should().Be($"{baseUrl}/rules/available-dates/{accountLegalEntityId}");
         }
     }
 }
