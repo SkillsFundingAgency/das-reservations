@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
     {
         private GetAvailableDatesQuery _query;
         private GetAvailableDatesQueryHandler _handler;
-        private Mock<IFundingRulesService> _service;
+        private Mock<IReservationsOuterService> _service;
         private GetAvailableDatesApiResponse _expectedApiResponse;
 
         [SetUp]
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             _query = fixture.Create<GetAvailableDatesQuery>();
             _expectedApiResponse = fixture.Create<GetAvailableDatesApiResponse>();
 
-            _service = new Mock<IFundingRulesService>();
+            _service = new Mock<IReservationsOuterService>();
             _service
                 .Setup(s => s.GetAvailableDates(_query.AccountLegalEntityId))
                 .ReturnsAsync(_expectedApiResponse);

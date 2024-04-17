@@ -5,20 +5,20 @@ using AutoFixture;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.FundingRules.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 {
     public class WhenGettingAvailableDates
     {
-        private IFundingRulesService _service;
-        private Mock<IApiClient> _apiClient;
-        private Mock<IOptions<ReservationsApiConfiguration>> _options;
+        private IReservationsOuterService _service;
+        private Mock<IReservationsOuterApiClient> _apiClient;
+        private Mock<IOptions<ReservationsOuterApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
         private List<TrainingDateModel> _expectedAvailableDates;
         private long _accountLegalEntityId;
@@ -30,27 +30,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 
             _accountLegalEntityId = fixture.Create<long>();
             _expectedAvailableDates = fixture.Create<List<TrainingDateModel>>();
-            
-            _apiClient = new Mock<IApiClient>();
+
+            _apiClient = new Mock<IReservationsOuterApiClient>();
             _apiClient.Setup(x =>
                     x.Get<GetAvailableDatesApiResponse>(
                         It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}api/rules/available-dates/{_accountLegalEntityId}"))))
+                                $"{ExpectedBaseUrl}rules/available-dates/{_accountLegalEntityId}"))))
                 .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
                     AvailableDates = _expectedAvailableDates
                 });
 
-            var config = new ReservationsApiConfiguration
+            var config = new ReservationsOuterApiConfiguration
             {
-                Url = ExpectedBaseUrl
+                ApiBaseUrl = ExpectedBaseUrl
             };
 
-            _options = new Mock<IOptions<ReservationsApiConfiguration>>();
+            _options = new Mock<IOptions<ReservationsOuterApiConfiguration>>();
             _options.Setup(opt => opt.Value).Returns(config);
 
-            _service = new FundingRulesService(_apiClient.Object, _options.Object);
+            _service = new ReservationsOuterService(_apiClient.Object, _options.Object);
         }
 
         [Test]

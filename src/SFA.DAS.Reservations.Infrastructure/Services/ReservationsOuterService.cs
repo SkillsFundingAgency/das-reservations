@@ -4,6 +4,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
@@ -31,6 +32,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
         public async Task<ProviderAccountResponse> GetProviderStatus(long ukprn)
         {
             return await _apiClient.Get<ProviderAccountResponse>(new GetProviderStatusDetails(_config.ApiBaseUrl, ukprn));
+        }
+
+        public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId)
+        {
+            return await _apiClient.Get<GetAvailableDatesApiResponse>(new GetAvailableDatesApiRequest(_config.ApiBaseUrl, accountLegalEntityId));
         }
     }
 }

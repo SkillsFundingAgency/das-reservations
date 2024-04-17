@@ -24,9 +24,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
         {
             await trainingDateService.GetTrainingDates(accountLegalEntityId);
 
-            mockMediator.Verify(x=>x.Send(
-                It.Is<GetAvailableDatesQuery>(query => query.AccountLegalEntityId == accountLegalEntityId), 
-                It.IsAny<CancellationToken>()), 
+            mockMediator.Verify(x => x.Send(
+                It.Is<GetAvailableDatesQuery>(query => query.AccountLegalEntityId == accountLegalEntityId),
+                It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId);
 
             Assert.IsNotNull(dates);
-            Assert.AreEqual(expectedAvailableDates.Count,dates.Count());
+            Assert.AreEqual(expectedAvailableDates.Count, dates.AvailableDates.Count());
         }
     }
 }

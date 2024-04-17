@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -219,7 +220,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task Then_It_Returns_The_Apprenticeship_Training_View_With_Mapped_Values(
             ReservationsRouteModel routeModel,
-            IEnumerable<TrainingDateModel> expectedStartDates,
+            GetAvailableDatesResult expectedStartDatesResult,
             GetCoursesResult getCoursesResult,
             GetCachedReservationResult cachedReservationResult,
             long accountLegalEntityId,
@@ -242,11 +243,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Returns(accountLegalEntityId);
             mockStartDateService
                 .Setup(service => service.GetTrainingDates(accountLegalEntityId))
-                .ReturnsAsync(expectedStartDates);
-            var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
+                .ReturnsAsync(expectedStartDatesResult);
+            var mappedDates = expectedStartDatesResult
+                .AvailableDates
+                .Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
+
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
             routeModel.FromReview = false;
-            var expectedPastStartDate = new TrainingDateViewModel(new TrainingDateModel { StartDate = DateTime.UtcNow.AddMonths(-1) });
+            var expectedPastStartDate = new TrainingDateViewModel(new TrainingDateModel { StartDate = expectedStartDatesResult.PreviousMonth.StartDate });
 
             var result = await controller.ApprenticeshipTraining(routeModel);
 
@@ -349,7 +353,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ((ApprenticeshipTrainingViewModel)result.Model).IsProvider.Should().BeFalse();
         }
 
-        private IEnumerable<TrainingDateModel> GetMockTrainingDates()
+        private GetAvailableDatesResult GetMockTrainingDates()
         {
             var trainingDates = new List<TrainingDateModel>();
 
@@ -364,7 +368,19 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 });
             }
 
-            return trainingDates;
+            var previousMonth = DateTime.Now.AddMonths(-1);
+            var nextMonth = previousMonth.AddMonths(2);
+            var nextMonthLastDay = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
+
+            return new GetAvailableDatesResult()
+            {
+                AvailableDates = trainingDates,
+                PreviousMonth = new TrainingDateModel
+                {
+                    StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+                    EndDate = new DateTime(nextMonth.Year, nextMonth.Month, nextMonthLastDay)
+                }
+            };
         }
     }
 }

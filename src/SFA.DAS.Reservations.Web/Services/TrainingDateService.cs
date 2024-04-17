@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Web.Services
 {
@@ -15,12 +13,12 @@ namespace SFA.DAS.Reservations.Web.Services
             _mediator = mediator;
         }
 
-        public async Task<IEnumerable<TrainingDateModel>> GetTrainingDates(long accountLegalEntityId)
+        public async Task<GetAvailableDatesResult> GetTrainingDates(long accountLegalEntityId)
         {
             var datesToUse = await _mediator.Send(new GetAvailableDatesQuery
-                {AccountLegalEntityId = accountLegalEntityId});
-            
-            return await Task.FromResult(datesToUse.AvailableDates);
+            { AccountLegalEntityId = accountLegalEntityId });
+
+            return await Task.FromResult(datesToUse);
         }
     }
 }
