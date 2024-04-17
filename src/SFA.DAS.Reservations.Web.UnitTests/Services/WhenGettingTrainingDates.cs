@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -35,18 +34,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Services
             long accountLegalEntityId,
             [Frozen] Mock<IMediator> mockMediator,
             IList<TrainingDateModel> expectedAvailableDates,
+            TrainingDateModel previousMonth,
             TrainingDateService trainingDateService)
         {
             mockMediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GetAvailableDatesResult
                 {
+                    PreviousMonth = previousMonth,
                     AvailableDates = expectedAvailableDates
                 });
 
             var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId);
 
             Assert.IsNotNull(dates);
-            Assert.AreEqual(expectedAvailableDates.Count, dates.AvailableDates.Count());
+            Assert.AreEqual(expectedAvailableDates.Count, dates.AvailableDates.Count);
+            Assert.AreEqual(previousMonth, dates.PreviousMonth);
         }
     }
 }

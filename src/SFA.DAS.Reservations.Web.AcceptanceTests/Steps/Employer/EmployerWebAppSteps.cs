@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         public void GivenAnEmployerWebAppIsRunning()
         {
             ArrangeApiClient();
+            ArrangeReservationOuterService();
         }
     }
 }

@@ -42,6 +42,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             //Assert
             actual.AvailableDates.Should().BeEquivalentTo(_expectedApiResponse.AvailableDates);
         }
+        
+        [Test]
+        public async Task Then_The_PreviousMonth_Is_Returned()
+        {
+            //Act
+            var actual = await _handler.Handle(_query, new CancellationToken());
+
+            //Assert
+            actual.PreviousMonth.Should().BeEquivalentTo(_expectedApiResponse.PreviousMonth);
+        }
 
         [Test]
         public void Then_Throws_Exception_If_One_Occurs()
