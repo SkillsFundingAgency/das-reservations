@@ -353,7 +353,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ((ApprenticeshipTrainingViewModel)result.Model).IsProvider.Should().BeFalse();
         }
 
-        private GetAvailableDatesResult GetMockTrainingDates()
+        private static GetAvailableDatesResult GetMockTrainingDates()
         {
             var trainingDates = new List<TrainingDateModel>();
 

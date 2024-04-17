@@ -566,7 +566,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actual.RouteName.Should().Be(RouteNames.EmployerIndex);
         }
 
-        private GetAvailableDatesResult GetMockTrainingDates()
+        private static GetAvailableDatesResult GetMockTrainingDates()
         {
             var trainingDates = new List<TrainingDateModel>();
 
