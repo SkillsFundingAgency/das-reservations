@@ -21,7 +21,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
         private Mock<IOptions<ReservationsOuterApiConfiguration>> _options;
         private const string ExpectedBaseUrl = "https://test.local/";
         private List<TrainingDateModel> _expectedAvailableDates;
-        private TrainingDateModel _previousMonth;
         private long _accountLegalEntityId;
 
         [SetUp]
@@ -31,17 +30,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 
             _accountLegalEntityId = fixture.Create<long>();
             _expectedAvailableDates = fixture.Create<List<TrainingDateModel>>();
-            _previousMonth = fixture.Create<TrainingDateModel>();
 
             _apiClient = new Mock<IReservationsOuterApiClient>();
             _apiClient.Setup(x =>
                     x.Get<GetAvailableDatesApiResponse>(
                         It.Is<GetAvailableDatesApiRequest>(c =>
                             c.GetUrl.Equals(
-                                $"{ExpectedBaseUrl}rules/available-dates/{_accountLegalEntityId}"))))
+                                $"{ExpectedBaseUrl}/rules/available-dates/{_accountLegalEntityId}"))))
                 .ReturnsAsync(new GetAvailableDatesApiResponse
                 {
-                    PreviousMonth = _previousMonth,
                     AvailableDates = _expectedAvailableDates
                 });
 
@@ -65,7 +62,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(_expectedAvailableDates, result.AvailableDates);
-            Assert.AreEqual(_previousMonth, result.PreviousMonth);
         }
 
         [Test]

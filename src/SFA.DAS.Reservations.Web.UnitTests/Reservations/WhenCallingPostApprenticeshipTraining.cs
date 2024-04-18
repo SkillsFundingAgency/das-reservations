@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation;
@@ -566,9 +565,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actual.RouteName.Should().Be(RouteNames.EmployerIndex);
         }
 
-        private static GetAvailableDatesResult GetMockTrainingDates()
+        private static IEnumerable<TrainingDateModel> GetMockTrainingDates()
         {
-            var trainingDates = new List<TrainingDateModel>();
+            var previousMonth = DateTime.Now.AddMonths(-1);
+            var nextMonth = previousMonth.AddMonths(2);
+            var nextMonthLastDay = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
+
+            var previousMonthModel = new TrainingDateModel
+            {
+                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+                EndDate = new DateTime(nextMonth.Year, nextMonth.Month, nextMonthLastDay)
+            };
+
+            var trainingDates = new List<TrainingDateModel>
+            {
+                previousMonthModel
+            };
 
             for (int i = 0; i < 3; i++)
             {
@@ -580,19 +592,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     EndDate = endDate
                 });
             }
-            var previousMonth = DateTime.Now.AddMonths(-1);
-            var nextMonth = previousMonth.AddMonths(2);
-            var nextMonthLastDay = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
 
-            return new GetAvailableDatesResult()
-            {
-                AvailableDates = trainingDates,
-                PreviousMonth = new TrainingDateModel
-                {
-                    StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
-                    EndDate = new DateTime(nextMonth.Year, nextMonth.Month, nextMonthLastDay)
-                }
-            };
+            return trainingDates;
         }
     }
 }

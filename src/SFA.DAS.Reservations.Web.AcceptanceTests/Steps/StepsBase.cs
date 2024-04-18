@@ -73,13 +73,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                .ReturnsAsync(
                    new GetAvailableDatesApiResponse
                    {
-                       PreviousMonth = new TrainingDateModel
-                       {
-                           StartDate = DateTime.UtcNow.AddMonths(-1),
-                           EndDate = DateTime.UtcNow.AddMonths(1)
-                       },
                        AvailableDates = new List<TrainingDateModel>
                        {
+                            new()
+                            {
+                                StartDate = DateTime.UtcNow.AddMonths(-1),
+                                EndDate = DateTime.UtcNow.AddMonths(1)
+                            },
                             new() {
                                 StartDate = DateTime.UtcNow.AddMonths(1),
                                 EndDate = DateTime.UtcNow.AddMonths(3)

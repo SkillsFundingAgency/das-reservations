@@ -20,8 +20,7 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDate
 
             return new GetAvailableDatesResult
             {
-                AvailableDates = availableDates.AvailableDates,
-                PreviousMonth = availableDates.PreviousMonth
+                AvailableDates = availableDates.AvailableDates
             };
         }
     }
