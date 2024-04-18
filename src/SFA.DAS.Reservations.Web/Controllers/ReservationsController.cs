@@ -474,7 +474,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
 
             if (dates != null && dates.Any())
             {
-                previousMonth = dates.FirstOrDefault();
+                previousMonth = dates.First();
                 dates = dates.Skip(1);
             }
 
