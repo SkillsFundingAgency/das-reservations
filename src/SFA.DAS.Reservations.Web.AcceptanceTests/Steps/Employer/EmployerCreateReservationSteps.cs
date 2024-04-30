@@ -135,7 +135,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                 StartDate = trainingDateViewModel.SerializedModel,
                 AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
             };
-
+          
             TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                 .Result as ViewResult;
         }

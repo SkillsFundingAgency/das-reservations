@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.FundingRules.Commands.MarkRuleAsRead;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
-using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationCourse;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
@@ -132,7 +131,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                 //todo: error handling if fails validation e.g. id not found, redirect to index.
             }
 
-            var hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId) 
+            var hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId)
                 ? routeModel.EmployerAccountId
                 : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
 
@@ -185,7 +184,7 @@ namespace SFA.DAS.Reservations.Web.Controllers
                         hashedEmployerAccountId);
 
                     return View("ApprenticeshipTraining", model);
-                }                
+                }
 
                 if (isProvider)
                 {
@@ -471,14 +470,19 @@ namespace SFA.DAS.Reservations.Web.Controllers
             var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
 
             var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
+            var previousMonth = new TrainingDateModel();
+
+            if (dates != null && dates.Any())
+            {
+                previousMonth = dates.First();
+                dates = dates.Skip(1);
+            }
 
             var possibleDates = activeGlobalRule == null
                 ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
                 : dates.Where(d => d.StartDate >= activeGlobalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
 
-            var previousMonth = DateTime.UtcNow.AddMonths(-1);
-            var pastTrainingStartDate = new TrainingDateModel { StartDate = previousMonth, EndDate = previousMonth.AddMonths(2) };
-            var pastTrainingStartDateVm = new TrainingDateViewModel(pastTrainingStartDate, pastTrainingStartDate.Equals(selectedTrainingDate));
+            var pastTrainingStartDateVm = new TrainingDateViewModel(previousMonth, previousMonth.Equals(selectedTrainingDate));
 
             return new ApprenticeshipTrainingViewModel
             {

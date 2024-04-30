@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
-using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 {
@@ -21,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
     {
         protected readonly IServiceProvider Services;
         protected readonly TestData TestData;
-        
+
         public StepsBase(TestServiceProvider serviceProvider, TestData testData)
         {
             Services = serviceProvider;
@@ -40,13 +39,21 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             SetupLevyApiClientResponses(mock);
         }
 
+        protected void ArrangeReservationOuterService()
+        {
+            var reservationsClient = Services.GetService<IReservationsOuterService>();
+            var mockReservations = Mock.Get(reservationsClient);
+
+            SetUpReservationServiceResponses(mockReservations);
+        }
+
         private void SetupLevyApiClientResponses(Mock<IApiClient> mock)
         {
             mock.Setup(x => x.Get<AccountReservationStatusResponse>(It.Is<AccountReservationStatusRequest>(c => c.AccountId.Equals(TestDataValues.LevyAccountId))))
                 .ReturnsAsync(new AccountReservationStatusResponse
                 {
                     CanAutoCreateReservations = true,
-                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{{TestDataValues.LevyAccountLegalEntityId,true}}
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool> { { TestDataValues.LevyAccountLegalEntityId, true } }
                 });
         }
 
@@ -56,46 +63,52 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 .ReturnsAsync(new AccountReservationStatusResponse
                 {
                     CanAutoCreateReservations = false,
-                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool>{{TestDataValues.NonLevyAccountLegalEntityId,true}}
+                    AccountLegalEntityAgreementStatus = new Dictionary<long, bool> { { TestDataValues.NonLevyAccountLegalEntityId, true } }
                 });
+        }
+
+        private void SetUpReservationServiceResponses(Mock<IReservationsOuterService> mock)
+        {
+            mock.Setup(x => x.GetAvailableDates(TestData.AccountLegalEntity.AccountLegalEntityId))
+               .ReturnsAsync(
+                   new GetAvailableDatesApiResponse
+                   {
+                       AvailableDates = new List<TrainingDateModel>
+                       {
+                            new()
+                            {
+                                StartDate = DateTime.UtcNow.AddMonths(-1),
+                                EndDate = DateTime.UtcNow.AddMonths(1)
+                            },
+                            new() {
+                                StartDate = DateTime.UtcNow.AddMonths(1),
+                                EndDate = DateTime.UtcNow.AddMonths(3)
+                            }
+                       }
+                   });
         }
 
         private void SetupSharedApiClientResponses(Mock<IApiClient> mock)
         {
             mock.Setup(x => x.GetAll<AccountLegalEntity>(It.IsAny<GetAccountLegalEntitiesRequest>()))
-                .ReturnsAsync(new List<AccountLegalEntity> {TestData.AccountLegalEntity});
+                .ReturnsAsync(new List<AccountLegalEntity> { TestData.AccountLegalEntity });
             mock.Setup(x => x.Get<GetAccountFundingRulesApiResponse>(It.IsAny<GetAccountFundingRulesApiRequest>()))
-                .ReturnsAsync(new GetAccountFundingRulesApiResponse {GlobalRules = new List<GlobalRule>()});
+                .ReturnsAsync(new GetAccountFundingRulesApiResponse { GlobalRules = new List<GlobalRule>() });
             mock.Setup(x => x.Get<GetFundingRulesApiResponse>(It.IsAny<GetFundingRulesApiRequest>()))
-                .ReturnsAsync(new GetFundingRulesApiResponse {GlobalRules = new List<GlobalRule>()});
+                .ReturnsAsync(new GetFundingRulesApiResponse { GlobalRules = new List<GlobalRule>() });
 
-            mock.Setup(x =>x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
+            mock.Setup(x => x.Create<CreateReservationResponse>(It.IsAny<ReservationApiRequest>()))
                 .ReturnsAsync((ReservationApiRequest request) => new CreateReservationResponse { Id = request.Id });
 
             mock.Setup(x => x.Get<GetCoursesApiResponse>(It.IsAny<GetCoursesApiRequest>())).ReturnsAsync(
                 new GetCoursesApiResponse
                 {
-                    Courses = new List<Course> {TestData.Course}
+                    Courses = new List<Course> { TestData.Course }
                 });
 
             mock.Setup(x => x.GetAll<GetReservationResponse>(
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
-            mock.Setup(x => x.Get<GetAvailableDatesApiResponse>(
-                    It.Is<GetAvailableDatesApiRequest>(
-                        c => c.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId))))
-                .ReturnsAsync(
-                    new GetAvailableDatesApiResponse
-                    {
-                        AvailableDates = new List<TrainingDateModel>
-                        {
-                            new TrainingDateModel
-                            {
-                                StartDate = DateTime.UtcNow.AddMonths(1),
-                                EndDate = DateTime.UtcNow.AddMonths(3)
-                            }
-                        }
-                    });
             mock.Setup(x =>
                     x.GetAll<AccountLegalEntity>(
                         It.Is<GetTrustedEmployersRequest>(c => c.Id.Equals(TestData.ReservationRouteModel.UkPrn))))
@@ -112,7 +125,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                     }
                 });
         }
-        
+
         protected void SetupNonLevyEmployerTestData()
         {
             TestData.UserId = Guid.NewGuid();
@@ -141,7 +154,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 StartDate = DateTime.UtcNow.AddMonths(1),
                 EndDate = DateTime.UtcNow.AddMonths(3)
             };
-            
+
             TestData.Reservations = new List<GetReservationResponse>();
         }
 
@@ -173,7 +186,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 StartDate = DateTime.UtcNow.AddMonths(1),
                 EndDate = DateTime.UtcNow.AddMonths(3)
             };
-            
+
             TestData.Reservations = new List<GetReservationResponse>();
         }
 
@@ -204,7 +217,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                 StartDate = DateTime.UtcNow.AddMonths(1),
                 EndDate = DateTime.UtcNow.AddMonths(3)
             };
-            
+
             TestData.Reservations = new List<GetReservationResponse>();
         }
     }

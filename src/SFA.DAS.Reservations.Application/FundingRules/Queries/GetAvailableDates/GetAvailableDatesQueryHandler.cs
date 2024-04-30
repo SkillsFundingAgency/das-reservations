@@ -5,18 +5,18 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates
 {
-    public class GetAvailableDatesQueryHandler :IRequestHandler<GetAvailableDatesQuery,GetAvailableDatesResult>
+    public class GetAvailableDatesQueryHandler : IRequestHandler<GetAvailableDatesQuery, GetAvailableDatesResult>
     {
-        private readonly IFundingRulesService _fundingRulesService;
+        private readonly IReservationsOuterService _reservationOuterService;
 
-        public GetAvailableDatesQueryHandler(IFundingRulesService fundingRulesService)
+        public GetAvailableDatesQueryHandler(IReservationsOuterService reservationOuterService)
         {
-            _fundingRulesService = fundingRulesService;
+            _reservationOuterService = reservationOuterService;
         }
 
         public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
         {
-            var availableDates = await _fundingRulesService.GetAvailableDates(request.AccountLegalEntityId);
+            var availableDates = await _reservationOuterService.GetAvailableDates(request.AccountLegalEntityId);
 
             return new GetAvailableDatesResult
             {

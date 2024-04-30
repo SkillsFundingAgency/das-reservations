@@ -242,11 +242,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Returns(accountLegalEntityId);
             mockStartDateService
                 .Setup(service => service.GetTrainingDates(accountLegalEntityId))
-                .ReturnsAsync(expectedStartDates);
+                .ReturnsAsync(expectedStartDates.OrderBy(x => x.StartDate));
+
             var mappedDates = expectedStartDates.Select(startDateModel => new TrainingDateViewModel(startDateModel)).OrderBy(model => model.StartDate);
+            var expectedPastStartViewModel = mappedDates.FirstOrDefault();
+            mappedDates = mappedDates.Skip(1).OrderBy(model => model.StartDate);
+
             var mappedCourses = getCoursesResult.Courses.Select(course => new CourseViewModel(course));
             routeModel.FromReview = false;
-            var expectedPastStartDate = new TrainingDateViewModel(new TrainingDateModel { StartDate = DateTime.UtcNow.AddMonths(-1) });
 
             var result = await controller.ApprenticeshipTraining(routeModel);
 
@@ -262,7 +265,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.BackLink.Should().Be(RouteNames.ProviderConfirmEmployer);
             viewModel.AccountLegalEntityPublicHashedId.Should()
                 .Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
-            viewModel.PastStartDate.Id.Should().Be(expectedPastStartDate.Id);
+            viewModel.PastStartDate.Id.Should().Be(expectedPastStartViewModel.Id);
         }
 
         [Test, MoqAutoData]
@@ -349,9 +352,22 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             ((ApprenticeshipTrainingViewModel)result.Model).IsProvider.Should().BeFalse();
         }
 
-        private IEnumerable<TrainingDateModel> GetMockTrainingDates()
+        private static IEnumerable<TrainingDateModel> GetMockTrainingDates()
         {
-            var trainingDates = new List<TrainingDateModel>();
+            var previousMonth = DateTime.Now.AddMonths(-1);
+            var nextMonth = previousMonth.AddMonths(2);
+            var nextMonthLastDay = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
+
+            var previousMonthModel = new TrainingDateModel
+            {
+                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+                EndDate = new DateTime(nextMonth.Year, nextMonth.Month, nextMonthLastDay)
+            };
+
+            var trainingDates = new List<TrainingDateModel>
+            {
+                previousMonthModel
+            };
 
             for (int i = 0; i < 3; i++)
             {

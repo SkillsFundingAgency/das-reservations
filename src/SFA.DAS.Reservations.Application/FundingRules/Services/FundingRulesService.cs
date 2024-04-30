@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -24,15 +23,6 @@ namespace SFA.DAS.Reservations.Application.FundingRules.Services
             var request = new GetFundingRulesApiRequest(_options.Value.Url);
 
             var response = await _apiClient.Get<GetFundingRulesApiResponse>(request);
-
-            return response;
-        }
-
-        public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId)
-        {
-            var request = new GetAvailableDatesApiRequest(_options.Value.Url, accountLegalEntityId);
-
-            var response = await _apiClient.Get<GetAvailableDatesApiResponse>(request);
 
             return response;
         }
