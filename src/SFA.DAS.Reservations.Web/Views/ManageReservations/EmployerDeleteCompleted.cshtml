@@ -4,9 +4,10 @@
     ViewData["Title"] = "Reservations";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/delete-completed";
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
-<a asp-route="@RouteNames.EmployerManage" class="govuk-back-link">Back</a>
+<a asp-route="@RouteNames.EmployerManage" asp-route-employerAccountId="@employerAccountId" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
