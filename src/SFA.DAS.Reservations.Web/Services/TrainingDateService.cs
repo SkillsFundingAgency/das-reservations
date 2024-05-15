@@ -18,8 +18,8 @@ namespace SFA.DAS.Reservations.Web.Services
         public async Task<IEnumerable<TrainingDateModel>> GetTrainingDates(long accountLegalEntityId)
         {
             var datesToUse = await _mediator.Send(new GetAvailableDatesQuery
-                {AccountLegalEntityId = accountLegalEntityId});
-            
+            { AccountLegalEntityId = accountLegalEntityId });
+
             return await Task.FromResult(datesToUse.AvailableDates);
         }
     }

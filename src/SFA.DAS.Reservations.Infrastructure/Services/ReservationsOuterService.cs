@@ -4,6 +4,7 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
@@ -40,5 +41,10 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         var response = await apiClient.Get<GetCohortAccessResponse>(content);
 
         return response.HasCohortAccess;
+    }
+
+    public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId)
+    {
+        return await apiClient.Get<GetAvailableDatesApiResponse>(new GetAvailableDatesApiRequest(_config.ApiBaseUrl, accountLegalEntityId));
     }
 }

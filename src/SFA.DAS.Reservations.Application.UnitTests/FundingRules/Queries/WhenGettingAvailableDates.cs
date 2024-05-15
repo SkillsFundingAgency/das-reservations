@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
     {
         private GetAvailableDatesQuery _query;
         private GetAvailableDatesQueryHandler _handler;
-        private Mock<IFundingRulesService> _service;
+        private Mock<IReservationsOuterService> _service;
         private GetAvailableDatesApiResponse _expectedApiResponse;
 
         [SetUp]
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             _query = fixture.Create<GetAvailableDatesQuery>();
             _expectedApiResponse = fixture.Create<GetAvailableDatesApiResponse>();
 
-            _service = new Mock<IFundingRulesService>();
+            _service = new Mock<IReservationsOuterService>();
             _service
                 .Setup(s => s.GetAvailableDates(_query.AccountLegalEntityId))
                 .ReturnsAsync(_expectedApiResponse);
@@ -41,6 +41,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 
             //Assert
             actual.AvailableDates.Should().BeEquivalentTo(_expectedApiResponse.AvailableDates);
+        }
+
+        [Test]
+        public async Task Then_The_PreviousMonth_Is_Returned()
+        {
+            //Act
+            var actual = await _handler.Handle(_query, new CancellationToken());
+
+            //Assert
+            actual.Should().BeEquivalentTo(_expectedApiResponse);
         }
 
         [Test]
