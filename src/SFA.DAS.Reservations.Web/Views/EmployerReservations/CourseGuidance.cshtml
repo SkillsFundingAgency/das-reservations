@@ -3,9 +3,15 @@
     ViewData["Title"] = "You must select a course to reserve apprenticeship funding";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/course-guidance";
+   
+    var routeData = new Dictionary<string, string>
+    {
+        {"employerAccountId", (string)ViewContext.RouteData.Values["employerAccountId"]},
+        {"id", (string)ViewContext.RouteData.Values["id"]}
+    };
 }
 
-<a asp-route="@Model.BackRouteName" class="govuk-back-link">Back</a>
+<a asp-route="@Model.BackRouteName" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">

@@ -3,11 +3,12 @@
     ViewData["Title"] = "Select apprenticeship training course";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/select-course";
+    string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
 }
 
 @if (string.IsNullOrEmpty(Model.CohortReference) && !Model.IsEmptyCohortFromSelect)
 {
-    <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+    <a asp-route="@Model.BackLink" asp-route-employerAccountId="@employerAccountId" class="govuk-back-link">Back</a>
 }
 else
 {

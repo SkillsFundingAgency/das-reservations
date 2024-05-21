@@ -24,7 +24,9 @@
 
     var routeData = new Dictionary<string, string>
     {
-        {"CohortReference",Model.CohortRef}
+        {"CohortReference",Model.CohortRef},
+        {"employerAccountId", (string)ViewContext.RouteData.Values["employerAccountId"]},
+        {"id", (string)ViewContext.RouteData.Values["id"]}
     };
 
     if (Model.IsProvider)
