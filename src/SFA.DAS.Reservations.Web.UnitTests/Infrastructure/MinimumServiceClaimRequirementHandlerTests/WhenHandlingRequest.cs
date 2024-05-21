@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Web.Infrastructure;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.MinimumServiceClaimRequirementHandlerTests
 {

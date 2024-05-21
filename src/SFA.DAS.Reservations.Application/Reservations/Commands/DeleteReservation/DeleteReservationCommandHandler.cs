@@ -8,7 +8,6 @@ using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation
 {
@@ -28,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
             _apiClient = apiClient;
         }
 
-        public async Task<Unit> Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
+        public async Task Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
 
@@ -42,8 +41,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservati
 
             var apiRequest = new ReservationApiRequest(_apiOptions.Value.Url, command.ReservationId, command.DeletedByEmployer);
             await _apiClient.Delete(apiRequest);
-
-            return Unit.Value;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿@using SFA.DAS.Reservations.Web.Infrastructure
-
-@if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+﻿@if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
 {
     if (ViewContext.RouteData.Values["UkPrn"] != null && !string.IsNullOrEmpty(ViewContext.RouteData.Values["UkPrn"].ToString()))
     {

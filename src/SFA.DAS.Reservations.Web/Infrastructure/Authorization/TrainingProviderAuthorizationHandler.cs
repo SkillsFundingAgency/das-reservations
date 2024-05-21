@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using SFA.DAS.Reservations.Domain.Interfaces;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.Reservations.Web.Infrastructure
+namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization
 {
     /// <summary>
     /// Interface to define contracts related to Training Provider Authorization Handlers.

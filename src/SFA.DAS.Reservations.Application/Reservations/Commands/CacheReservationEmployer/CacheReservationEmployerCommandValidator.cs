@@ -2,87 +2,82 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.Reservations.Application.Employers.Queries;
-using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
-using SFA.DAS.Reservations.Application.Providers.Queries;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer
+namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
+
+public class CacheReservationEmployerCommandValidator : IValidator<CacheReservationEmployerCommand>
 {
-    public class CacheReservationEmployerCommandValidator : IValidator<CacheReservationEmployerCommand>
+    private readonly IFundingRulesService _rulesService;
+    private readonly IMediator _mediator;
+
+    public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService, IMediator mediator)
     {
-        private IFundingRulesService _rulesService;
-        private readonly IMediator _mediator;
+        _rulesService = rulesService;
+        _mediator = mediator;
+    }
 
-        public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService, IMediator mediator)
+    public async Task<ValidationResult> ValidateAsync(CacheReservationEmployerCommand command)
+    {
+        var result = new ValidationResult();
+
+        if (command.Id == Guid.Empty)
         {
-            _rulesService = rulesService;
-            _mediator = mediator;
+            result.AddError(nameof(command.Id));
         }
 
-        public async Task<ValidationResult> ValidateAsync(CacheReservationEmployerCommand command)
+        if (command.AccountId == default(long))
         {
-            var result = new ValidationResult();
-
-            if (command.Id == Guid.Empty)
+            result.AddError(nameof(command.AccountId));
+        }
+        else
+        {
+            var accountFundingRulesApiResponse = await _rulesService.GetAccountFundingRules(command.AccountId);
+            if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
+                accountFundingRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
             {
-                result.AddError(nameof(command.Id));
+                result.FailedRuleValidation = true;
             }
 
-            if (command.AccountId == default(long))
+            var globalRulesApiResponse = await _rulesService.GetFundingRules();
+            if (globalRulesApiResponse.GlobalRules != null 
+                && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) 
+                && globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom) > 0)
             {
-                result.AddError(nameof(command.AccountId));
-            }
-            else
-            {
-                var accountFundingRulesApiResponse = await _rulesService.GetAccountFundingRules(command.AccountId);
-                if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
-                    accountFundingRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
-                {
-                    result.FailedRuleValidation = true;
-                }
-
-                var globalRulesApiResponse = await _rulesService.GetFundingRules();
-                if (globalRulesApiResponse.GlobalRules != null 
-                    && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) 
-                    && globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom) > 0)
-                {
-                    result.FailedGlobalRuleValidation = true;
-                }
-
+                result.FailedGlobalRuleValidation = true;
             }
 
-            if (command.AccountLegalEntityId == default(long))
-            {
-                result.AddError(nameof(command.AccountLegalEntityId));
-            }
+        }
 
-            if (string.IsNullOrWhiteSpace(command.AccountLegalEntityName))
-            {
-                result.AddError(nameof(command.AccountLegalEntityName));
-            }
+        if (command.AccountLegalEntityId == default(long))
+        {
+            result.AddError(nameof(command.AccountLegalEntityId));
+        }
 
-            if (string.IsNullOrWhiteSpace(command.AccountLegalEntityPublicHashedId))
-            {
-                result.AddError(nameof(command.AccountLegalEntityPublicHashedId));
-            }
+        if (string.IsNullOrWhiteSpace(command.AccountLegalEntityName))
+        {
+            result.AddError(nameof(command.AccountLegalEntityName));
+        }
 
-            if (command.UkPrn.HasValue && !command.IsEmptyCohortFromSelect)
-            {
-                var accounts = await _mediator.Send(
-                    new GetTrustedEmployersQuery { UkPrn = command.UkPrn.Value });
+        if (string.IsNullOrWhiteSpace(command.AccountLegalEntityPublicHashedId))
+        {
+            result.AddError(nameof(command.AccountLegalEntityPublicHashedId));
+        }
+
+        if (command.UkPrn.HasValue && !command.IsEmptyCohortFromSelect)
+        {
+            var accounts = await _mediator.Send(
+                new GetTrustedEmployersQuery { UkPrn = command.UkPrn.Value });
                 
-                var matchedAccount = accounts?.Employers?.SingleOrDefault(employer =>
-                    employer.AccountLegalEntityPublicHashedId == command.AccountLegalEntityPublicHashedId);
+            var matchedAccount = accounts?.Employers?.SingleOrDefault(employer =>
+                employer.AccountLegalEntityPublicHashedId == command.AccountLegalEntityPublicHashedId);
 
-                result.FailedAuthorisationValidation = matchedAccount == null;
-            }
-
-            return result;
+            result.FailedAuthorisationValidation = matchedAccount == null;
         }
+
+        return result;
     }
 }

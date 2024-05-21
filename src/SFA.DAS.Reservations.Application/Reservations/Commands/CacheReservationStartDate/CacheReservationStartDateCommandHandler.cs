@@ -7,7 +7,6 @@ using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Exceptions;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationStartDate
 {
@@ -27,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             _cachedReservationRepository = cachedReservationRepository;
         }
 
-        public async Task<Unit> Handle(CacheReservationStartDateCommand command, CancellationToken cancellationToken)
+        public async Task Handle(CacheReservationStartDateCommand command, CancellationToken cancellationToken)
         {
             var queryValidationResult = await _validator.ValidateAsync(command);
 
@@ -55,7 +54,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
             cachedReservation.TrainingDate = command.TrainingDate;
             
             await _cacheStorageService.SaveToCache(command.Id.ToString(), cachedReservation, 1);
-            return Unit.Value;
         }
     }
 }

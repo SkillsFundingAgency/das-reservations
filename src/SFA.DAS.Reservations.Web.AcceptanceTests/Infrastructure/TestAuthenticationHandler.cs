@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Authentication;
 using SFA.DAS.Reservations.Infrastructure.Services;
-using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
 {
