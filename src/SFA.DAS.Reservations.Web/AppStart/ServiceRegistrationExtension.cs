@@ -40,11 +40,12 @@ public static class ServiceRegistrationExtension
         services.AddTransient<ICacheStorageService, CacheStorageService>();
         services.AddTransient<IFundingRulesService, FundingRulesService>();
         services.AddTransient<IReservationAuthorisationService, ReservationAuthorisationService>();
-        
+
         services.AddTransient<HttpClient>();
         services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
         services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
-        
+        services.AddTransient<IProviderRelationshipsOuterApiClient, ProviderRelationshipsOuterApiClient>();
+
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));
     }

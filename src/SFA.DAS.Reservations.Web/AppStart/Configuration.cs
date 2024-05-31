@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
@@ -20,22 +19,22 @@ namespace SFA.DAS.Reservations.Web.AppStart
     public static class ConfigurationExtensions
     {
         private const string EncodingConfigKey = "SFA.DAS.Encoding";
-        
+
         public static void AddEmployerConfiguration(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration,
             IWebHostEnvironment environment)
         {
             services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
-            
+
             services.AddSingleton<IAuthorizationHandler, EmployerAccountAuthorizationHandler>();
 
             AddSharedConfiguration(services, configuration, environment);
         }
 
         public static void AddProviderConfiguration(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration,
             IWebHostEnvironment environment)
         {
@@ -43,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
             services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-            
+
             AddSharedConfiguration(services, configuration, environment);
         }
 
@@ -70,9 +69,12 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
             services.Configure<AccountApiConfiguration>(configuration.GetSection("AccountApi"));
             services.AddSingleton(config => config.GetService<IOptions<AccountApiConfiguration>>().Value);
-            
+
             services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
+
+            services.Configure<ProviderRelationshipsOuterApiConfiguration>(configuration.GetSection("ProviderRelationshipsApi"));
+            services.AddSingleton(config => config.GetService<IOptions<ProviderRelationshipsOuterApiConfiguration>>().Value);
 
             services.AddEmployerAccountApi(configuration, environment);
 
@@ -83,10 +85,10 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.AddSingleton<IAuthorizationHandler, MinimumServiceClaimRequirementHandler>();
             services.AddSingleton<IAuthorizationHandler, AccountActiveAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
-            
+
             services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
             services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
-            
+
             services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
             services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 
