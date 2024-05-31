@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.ProviderRelationships;
+using SFA.DAS.Reservations.Domain.ProviderRelationships.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
@@ -18,8 +19,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
         private const uint ExpectedUkPrn = 12345;
 
         private ProviderPermissionsService _providerPermissionsService;
-        private Mock<IProviderRelationshipsApiClient> _providerRelationsApiClient;
+        private Mock<IProviderRelationshipsOuterApiClient> _providerRelationsApiClient;
         private List<Employer> _expectedEmployers;
+        private IOptions<ProviderRelationshipsOuterApiConfiguration> _options;
 
         [SetUp]
         public void Arrange()
@@ -46,17 +48,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                 }
             };
 
-            _providerRelationsApiClient = new Mock<IProviderRelationshipsApiClient>();
-            _providerPermissionsService = new ProviderPermissionsService(_providerRelationsApiClient.Object);
+            _options = Mock.Of<IOptions<ProviderRelationshipsOuterApiConfiguration>>(x => x.Value == new ProviderRelationshipsOuterApiConfiguration());
+            _providerRelationsApiClient = new Mock<IProviderRelationshipsOuterApiClient>();
+            _providerPermissionsService = new ProviderPermissionsService(_providerRelationsApiClient.Object, _options);
 
-            _providerRelationsApiClient.Setup(c => c.GetAccountProviderLegalEntitiesWithPermission(
+            _providerRelationsApiClient.Setup(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(
                 It.Is<GetAccountProviderLegalEntitiesWithPermissionRequest>(r =>
-                    r.Operation == Operation.CreateCohort &&
-                    r.Ukprn == ExpectedUkPrn), It.IsAny<CancellationToken>())).ReturnsAsync(new GetAccountProviderLegalEntitiesWithPermissionResponse
-            {
-                AccountProviderLegalEntities = new[]
+                    r.Operations.Contains(Operation.CreateCohort) &&
+                    r.Ukprn == ExpectedUkPrn))).ReturnsAsync(new GetAccountProviderLegalEntitiesWithPermissionResponse
+                    {
+                        AccountProviderLegalEntities = new[]
                 {
-                    new AccountProviderLegalEntityDto
+                    new AccountProviderLegalEntity
                     {
                         AccountId = 1,
                         AccountPublicHashedId = "ABC111",
@@ -65,7 +68,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                         AccountLegalEntityName = "entity 1",
                         AccountName = "account 1"
                     },
-                    new AccountProviderLegalEntityDto
+                    new AccountProviderLegalEntity
                     {
                         AccountId = 2,
                         AccountPublicHashedId = "ABC222",
@@ -75,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                         AccountName = "account 2"
                     }
                 }
-            });
+                    });
         }
 
         [Test]
@@ -88,13 +91,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             }
             catch (Exception)
             {
-               //Swallow exception as we test for this in a different test
+                //Swallow exception as we test for this in a different test
             };
 
             //Assert
-            _providerRelationsApiClient.Verify(c => c.GetAccountProviderLegalEntitiesWithPermission(
-                It.IsAny<GetAccountProviderLegalEntitiesWithPermissionRequest>(), 
-                It.IsAny<CancellationToken>()), Times.Never);
+            _providerRelationsApiClient.Verify(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionRequest>(
+                It.IsAny<GetAccountProviderLegalEntitiesWithPermissionRequest>()), Times.Never);
 
             Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
         }

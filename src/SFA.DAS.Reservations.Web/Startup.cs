@@ -102,7 +102,7 @@ public class Startup
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
         services.AddMediatRValidation();
         services.AddCommitmentsApi();
-        services.AddProviderRelationsApi(_configuration, _environment);
+        services.AddProviderRelationshipsOuterApi(_configuration, _environment);
 
         if (_configuration["Environment"] == "LOCAL" || _configuration["Environment"] == "DEV")
         {

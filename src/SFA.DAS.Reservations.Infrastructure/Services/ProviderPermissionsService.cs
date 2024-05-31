@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
-using SFA.DAS.ProviderRelationships.Types.Models;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.ProviderRelationships;
+using SFA.DAS.Reservations.Domain.ProviderRelationships.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services
 {
-    public class ProviderPermissionsService : IProviderPermissionsService
+    public class ProviderPermissionsService(IProviderRelationshipsOuterApiClient apiClient, IOptions<ProviderRelationshipsOuterApiConfiguration> options)
+        : IProviderPermissionsService
     {
-        private readonly IProviderRelationshipsApiClient _apiClient;
-
-        public ProviderPermissionsService(IProviderRelationshipsApiClient apiClient)
-        {
-            _apiClient = apiClient;
-        }
+        private readonly ProviderRelationshipsOuterApiConfiguration _config = options.Value;
 
         public async Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn)
         {
@@ -26,12 +24,12 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                 throw new ArgumentException("Ukprn must be set to a non default value", nameof(ukPrn));
             }
 
-            var trustedEmployers = await _apiClient.GetAccountProviderLegalEntitiesWithPermission(
-                new GetAccountProviderLegalEntitiesWithPermissionRequest
-                {
-                    Operation = Operation.CreateCohort,
-                    Ukprn = ukPrn
-                });
+            List<Operation> operations = new List<Operation> { Operation.CreateCohort };
+
+            var request =
+                new GetAccountProviderLegalEntitiesWithPermissionRequest(_config.ApiBaseUrl, operations, (int)ukPrn);
+
+            var trustedEmployers = await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
 
             return trustedEmployers?.AccountProviderLegalEntities?.Select(e => new Employer
             {

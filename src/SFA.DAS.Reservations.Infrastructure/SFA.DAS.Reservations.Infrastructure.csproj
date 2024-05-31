@@ -15,11 +15,11 @@
         <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="4.1.763" />
         <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
         <PackageReference Include="SFA.DAS.Http" Version="3.2.69" />
-        <PackageReference Include="SFA.DAS.ProviderRelationships.Api.Client" Version="4.0.19" />
         <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
         <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+        <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
     </ItemGroup>
 
     <ItemGroup>

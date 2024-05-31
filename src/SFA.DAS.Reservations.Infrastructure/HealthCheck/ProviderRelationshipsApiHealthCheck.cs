@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Http;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
+using SFA.DAS.Reservations.Domain.ProviderRelationships.Api;
+using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Extensions;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
@@ -14,11 +14,11 @@ namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
     public class ProviderRelationshipsApiHealthCheck : IHealthCheck
     {
         private const string HealthCheckResultDescription = "ProviderRelationships Api check";
-        private readonly IProviderRelationshipsApiClient _apiClient;
+        private readonly IProviderRelationshipsOuterApiClient _apiClient;
         private readonly ILogger<ProviderRelationshipsApiHealthCheck> _logger;
 
         public ProviderRelationshipsApiHealthCheck(
-            IProviderRelationshipsApiClient apiClient,
+            IProviderRelationshipsOuterApiClient apiClient,
             ILogger<ProviderRelationshipsApiHealthCheck> logger)
         {
             _apiClient = apiClient;
@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
             try
             {
                 var timer = Stopwatch.StartNew();
-                await _apiClient.GetAccountProviderLegalEntitiesWithPermission(new GetAccountProviderLegalEntitiesWithPermissionRequest());
+                await _apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionRequest>(new GetAccountProviderLegalEntitiesWithPermissionRequest());
                 timer.Stop();
 
                 var durationString = timer.Elapsed.ToHumanReadableString();
