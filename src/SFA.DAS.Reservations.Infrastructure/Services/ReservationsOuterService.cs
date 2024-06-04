@@ -64,7 +64,7 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         var request =
             new GetAccountProviderLegalEntitiesWithPermissionRequest(_config.ApiBaseUrl, operations, (int)ukPrn);
 
-        var trustedEmployers = await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
+        var trustedEmployers = GetTrustedEmployers(request).Result;
 
         return trustedEmployers?.AccountProviderLegalEntities?.Select(e => new Employer
         {
@@ -76,5 +76,11 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
             AccountLegalEntityName = e.AccountLegalEntityName
         }).ToArray();
 
+    }
+
+    private async Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetTrustedEmployers(
+        GetAccountProviderLegalEntitiesWithPermissionRequest request)
+    {
+        return await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
     }
 }
