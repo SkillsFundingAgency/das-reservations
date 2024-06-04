@@ -52,21 +52,14 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         return await apiClient.Get<GetAvailableDatesApiResponse>(new GetAvailableDatesApiRequest(_config.ApiBaseUrl, accountLegalEntityId));
     }
 
-    public async Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn)
+    public IEnumerable<Employer> GetTrustedEmployers(uint ukPrn)
     {
         if (ukPrn == default(uint))
         {
             throw new ArgumentException("Ukprn must be set to a non default value", nameof(ukPrn));
         }
 
-        List<Operation> operations = new List<Operation> { Operation.CreateCohort };
-
-        var request =
-            new GetAccountProviderLegalEntitiesWithPermissionRequest(_config.ApiBaseUrl, operations, (int)ukPrn);
-
-        var trustedEmployers = GetTrustedEmployers(request).Result;
-
-        return trustedEmployers?.AccountProviderLegalEntities?.Select(e => new Employer
+        return GetTrustedEmployersFromOuterApi(ukPrn).Result?.AccountProviderLegalEntities?.Select(e => new Employer
         {
             AccountId = e.AccountId,
             AccountPublicHashedId = e.AccountPublicHashedId,
@@ -78,9 +71,13 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
 
     }
 
-    private async Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetTrustedEmployers(
-        GetAccountProviderLegalEntitiesWithPermissionRequest request)
+    private async Task<GetAccountProviderLegalEntitiesWithPermissionResponse> GetTrustedEmployersFromOuterApi(uint ukPrn)
     {
+        List<Operation> operations = new List<Operation> { Operation.CreateCohort };
+
+        var request =
+            new GetAccountProviderLegalEntitiesWithPermissionRequest(_config.ApiBaseUrl, operations, (int)ukPrn);
+
         return await apiClient.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(request);
     }
 }

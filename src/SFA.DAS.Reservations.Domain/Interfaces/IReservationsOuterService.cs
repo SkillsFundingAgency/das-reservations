@@ -14,5 +14,5 @@ public interface IReservationsOuterService
     Task<GetAccountLegalEntitiesForProviderResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn);
     Task<bool> CanAccessCohort(long partyId, long cohortId);
     Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId);
-    Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn);
+    IEnumerable<Employer> GetTrustedEmployers(uint ukPrn);
 }
