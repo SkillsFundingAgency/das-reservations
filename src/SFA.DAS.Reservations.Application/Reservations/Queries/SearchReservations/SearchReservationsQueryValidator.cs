@@ -7,11 +7,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
 {
     public class SearchReservationsQueryValidator : IValidator<SearchReservationsQuery>
     {
-        private readonly IProviderPermissionsService _providerPermissionsService;
+        private readonly IReservationsOuterService _reservationsOuterService;
 
-        public SearchReservationsQueryValidator(IProviderPermissionsService providerPermissionsService)
+        public SearchReservationsQueryValidator(IReservationsOuterService reservationsOuterService)
         {
-            _providerPermissionsService = providerPermissionsService;
+            _reservationsOuterService = reservationsOuterService;
         }
 
         public async Task<ValidationResult> ValidateAsync(SearchReservationsQuery query)
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.SearchReservatio
                 return validationResult;
             }
 
-            var result = await _providerPermissionsService.GetTrustedEmployers(query.ProviderId);
+            var result = await _reservationsOuterService.GetTrustedEmployers(query.ProviderId);
 
             if (result == null || !result.Any())
             {

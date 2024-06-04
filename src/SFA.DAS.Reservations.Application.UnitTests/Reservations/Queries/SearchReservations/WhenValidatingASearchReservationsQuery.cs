@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
         [Test, MoqAutoData]
         public async Task Then_Is_Not_Valid_If_No_UkPrn_Is_Set(
             SearchReservationsQuery query,
-            [Frozen] Mock<IProviderPermissionsService> providerPermissionService,
+            [Frozen] Mock<IReservationsOuterService> reservationsOuterService,
             SearchReservationsQueryValidator validator)
         {
             query.ProviderId = 0;
@@ -26,17 +26,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
 
             result.IsValid().Should().BeFalse();
             result.ErrorList.Should().Contain("ProviderId|ProviderId has not been supplied");
-            providerPermissionService.Verify(x=>x.GetTrustedEmployers(It.IsAny<uint>()), Times.Never);
+            reservationsOuterService.Verify(x => x.GetTrustedEmployers(It.IsAny<uint>()), Times.Never);
         }
 
         [Test, MoqAutoData]
         public async Task Then_Is_Valid_When_Provider_Has_Permissions(
             SearchReservationsQuery query,
-            [Frozen] Mock<IProviderPermissionsService> providerPermissionService,
+            [Frozen] Mock<IReservationsOuterService> reservationsOuterService,
             SearchReservationsQueryValidator validator)
         {
-            providerPermissionService.Setup(x => x.GetTrustedEmployers(query.ProviderId))
-                .ReturnsAsync(new List<Employer>{new Employer()});
+            reservationsOuterService.Setup(x => x.GetTrustedEmployers(query.ProviderId))
+                .ReturnsAsync(new List<Employer> { new Employer() });
 
             var result = await validator.ValidateAsync(query);
 
@@ -47,10 +47,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
         [Test, MoqAutoData]
         public async Task Then_If_Provider_Has_No_Permission_Value_Is_Set_Then_Failed_Authorisation_Is_Set_To_True(
             SearchReservationsQuery query,
-            [Frozen] Mock<IProviderPermissionsService> providerPermissionService,
+            [Frozen] Mock<IReservationsOuterService> reservationsOuterService,
             SearchReservationsQueryValidator validator)
         {
-            providerPermissionService.Setup(x => x.GetTrustedEmployers(query.ProviderId))
+            reservationsOuterService.Setup(x => x.GetTrustedEmployers(query.ProviderId))
                 .ReturnsAsync(new List<Employer>());
 
             var result = await validator.ValidateAsync(query);

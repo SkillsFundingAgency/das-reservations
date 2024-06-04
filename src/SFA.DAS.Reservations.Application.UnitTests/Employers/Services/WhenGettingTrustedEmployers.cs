@@ -6,8 +6,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Employers;
-using SFA.DAS.Reservations.Domain.ProviderRelationships;
-using SFA.DAS.Reservations.Domain.ProviderRelationships.Api;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Reservations.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
@@ -18,10 +19,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
     {
         private const uint ExpectedUkPrn = 12345;
 
-        private ProviderPermissionsService _providerPermissionsService;
-        private Mock<IProviderRelationshipsOuterApiClient> _providerRelationsApiClient;
+        private IReservationsOuterService _reservationsOuterService;
+        private Mock<IReservationsOuterApiClient> _reservationsOuterApiClient;
         private List<Employer> _expectedEmployers;
-        private IOptions<ProviderRelationshipsOuterApiConfiguration> _options;
+        private IOptions<ReservationsOuterApiConfiguration> _options;
 
         [SetUp]
         public void Arrange()
@@ -48,11 +49,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                 }
             };
 
-            _options = Mock.Of<IOptions<ProviderRelationshipsOuterApiConfiguration>>(x => x.Value == new ProviderRelationshipsOuterApiConfiguration());
-            _providerRelationsApiClient = new Mock<IProviderRelationshipsOuterApiClient>();
-            _providerPermissionsService = new ProviderPermissionsService(_providerRelationsApiClient.Object, _options);
+            _options = Mock.Of<IOptions<ReservationsOuterApiConfiguration>>(x => x.Value == new ReservationsOuterApiConfiguration());
+            _reservationsOuterApiClient = new Mock<IReservationsOuterApiClient>();
+            _reservationsOuterService = new ReservationsOuterService(_reservationsOuterApiClient.Object, _options);
 
-            _providerRelationsApiClient.Setup(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(
+            _reservationsOuterApiClient.Setup(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionResponse>(
                 It.Is<GetAccountProviderLegalEntitiesWithPermissionRequest>(r =>
                     r.Operations.Contains(Operation.CreateCohort) &&
                     r.Ukprn == ExpectedUkPrn))).ReturnsAsync(new GetAccountProviderLegalEntitiesWithPermissionResponse
@@ -87,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             //Act
             try
             {
-                await _providerPermissionsService.GetTrustedEmployers(default(uint));
+                await _reservationsOuterService.GetTrustedEmployers(default(uint));
             }
             catch (Exception)
             {
@@ -95,17 +96,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             };
 
             //Assert
-            _providerRelationsApiClient.Verify(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionRequest>(
+            _reservationsOuterApiClient.Verify(c => c.Get<GetAccountProviderLegalEntitiesWithPermissionRequest>(
                 It.IsAny<GetAccountProviderLegalEntitiesWithPermissionRequest>()), Times.Never);
 
-            Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
+            Assert.ThrowsAsync<ArgumentException>(() => _reservationsOuterService.GetTrustedEmployers(default(uint)));
         }
 
         [Test]
         public async Task Then_All_Trusted_Employers_Are_Returned()
         {
             //Act
-            var result = await _providerPermissionsService.GetTrustedEmployers(ExpectedUkPrn);
+            var result = await _reservationsOuterService.GetTrustedEmployers(ExpectedUkPrn);
 
             //Assert
             result.Should().BeEquivalentTo(_expectedEmployers);

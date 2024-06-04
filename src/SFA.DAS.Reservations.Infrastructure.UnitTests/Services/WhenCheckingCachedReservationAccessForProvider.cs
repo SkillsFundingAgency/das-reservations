@@ -18,29 +18,29 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
         private ReservationAuthorisationService _service;
         private CachedReservation _reservation;
         private Employer _employer;
-        private Mock<IProviderPermissionsService> _providerPermissionService;
+        private Mock<IReservationsOuterService> _reservationsOuterService;
 
         [SetUp]
         public void Arrange()
         {
             var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization{ConfigureMembers = true});
+                .Customize(new AutoMoqCustomization { ConfigureMembers = true });
 
             _reservation = fixture.Create<CachedReservation>();
             _employer = fixture.Create<Employer>();
-            _providerPermissionService = new Mock<IProviderPermissionsService>();
-            _service = new ReservationAuthorisationService(_providerPermissionService.Object);
+            _reservationsOuterService = new Mock<IReservationsOuterService>();
+            _service = new ReservationAuthorisationService(_reservationsOuterService.Object);
 
             _reservation.AccountLegalEntityId = _employer.AccountLegalEntityId;
 
-            _providerPermissionService.Setup(s => s.GetTrustedEmployers(It.IsAny<uint>()))
-                .ReturnsAsync(new List<Employer> {_employer});
+            _reservationsOuterService.Setup(s => s.GetTrustedEmployers(It.IsAny<uint>()))
+                .ReturnsAsync(new List<Employer> { _employer });
         }
 
         [Test, AutoData]
         public void Then_Allows_Access_If_UkPrn_Matches()
         {
-           //Arrange
+            //Arrange
             var providerUkPrn = _reservation.UkPrn.Value;
 
             //Act
@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
             var providerUkPrn = _reservation.UkPrn.Value;
 
             //Act + Assert
-            var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(providerUkPrn, (CachedReservation) null));
+            var exception = Assert.Throws<ArgumentException>(() => _service.ProviderReservationAccessAllowed(providerUkPrn, (CachedReservation)null));
             exception.ParamName.Should().Be("reservation");
         }
 

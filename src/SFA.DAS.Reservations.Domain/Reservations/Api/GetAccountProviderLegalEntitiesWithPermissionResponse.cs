@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SFA.DAS.Reservations.Domain.ProviderRelationships.Api;
+namespace SFA.DAS.Reservations.Domain.Reservations.Api;
 public class GetAccountProviderLegalEntitiesWithPermissionResponse
 {
     public IEnumerable<AccountProviderLegalEntity> AccountProviderLegalEntities { get; set; }

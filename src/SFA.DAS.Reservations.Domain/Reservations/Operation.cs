@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Reservations.Domain.ProviderRelationships;
+﻿namespace SFA.DAS.Reservations.Domain.Reservations;
 public enum Operation
 {
     CreateCohort,

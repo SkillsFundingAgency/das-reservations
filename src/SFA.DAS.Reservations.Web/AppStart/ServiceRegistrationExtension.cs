@@ -22,7 +22,6 @@ public static class ServiceRegistrationExtension
     {
         services.AddSingleton(serviceParameters);
         services.AddScoped<LevyNotPermittedFilter>();
-        services.AddScoped<IProviderPermissionsService, ProviderPermissionsService>();
         services.AddScoped<IExternalUrlHelper, ExternalUrlHelper>();
         services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
 
@@ -44,7 +43,6 @@ public static class ServiceRegistrationExtension
         services.AddTransient<HttpClient>();
         services.AddTransient<IReservationsOuterService, ReservationsOuterService>();
         services.AddTransient<IReservationsOuterApiClient, ReservationsOuterApiClient>();
-        services.AddTransient<IProviderRelationshipsOuterApiClient, ProviderRelationshipsOuterApiClient>();
 
         services.AddTransient<ICachedReservationRespository, CachedReservationRepository>();
         services.AddTransient(typeof(ISessionStorageService<>), typeof(SessionStorageService<>));

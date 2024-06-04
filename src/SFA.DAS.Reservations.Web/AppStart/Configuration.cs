@@ -73,9 +73,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
             services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 
-            services.Configure<ProviderRelationshipsOuterApiConfiguration>(configuration.GetSection("ProviderRelationshipsApi"));
-            services.AddSingleton(config => config.GetService<IOptions<ProviderRelationshipsOuterApiConfiguration>>().Value);
-
             services.AddEmployerAccountApi(configuration, environment);
 
             services.AddSingleton<IAuthorizationHandler, HasProviderOrEmployerAccountAuthorisationHandler>();

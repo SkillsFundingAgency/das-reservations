@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
-using SFA.DAS.CommitmentsV2.Types;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -13,4 +14,5 @@ public interface IReservationsOuterService
     Task<GetAccountLegalEntitiesForProviderResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn);
     Task<bool> CanAccessCohort(long partyId, long cohortId);
     Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId);
+    Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn);
 }

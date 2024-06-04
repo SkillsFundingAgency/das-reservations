@@ -9,11 +9,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class ReservationAuthorisationService : IReservationAuthorisationService
     {
-        private readonly IProviderPermissionsService _providerPermissionsService;
+        private readonly IReservationsOuterService _reservationsOuterService;
 
-        public ReservationAuthorisationService(IProviderPermissionsService providerPermissionsService)
+        public ReservationAuthorisationService(IReservationsOuterService reservationsOuterService)
         {
-            _providerPermissionsService = providerPermissionsService;
+            _reservationsOuterService = reservationsOuterService;
         }
 
         public bool ProviderReservationAccessAllowed(uint ukPrn, CachedReservation reservation)
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 
             if (ukPrn == default(uint))
             {
-                throw new ArgumentException("ukPrn is not set",nameof(ukPrn));
+                throw new ArgumentException("ukPrn is not set", nameof(ukPrn));
             }
 
             return ukPrn == reservation.UkPrn;
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                 return false;
             }
 
-            var trustedList = await _providerPermissionsService.GetTrustedEmployers(ukPrn);
+            var trustedList = await _reservationsOuterService.GetTrustedEmployers(ukPrn);
 
             if (trustedList.All(e => e.AccountLegalEntityId != reservation.AccountLegalEntityId))
             {
