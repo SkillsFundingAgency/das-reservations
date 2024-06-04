@@ -27,13 +27,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             //Arrange
             validator.Setup(x => x.ValidateAsync(It.IsAny<CreateReservationLevyEmployerCommand>()))
-                .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string> {{"", ""}}});
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string> { { "", "" } } });
             //Act
-            Assert.ThrowsAsync<ValidationException>(() =>  handler.Handle(request, CancellationToken.None));
+            Assert.ThrowsAsync<ValidationException>(() => handler.Handle(request, CancellationToken.None));
 
             //Assert
             validator.Verify(x => x.ValidateAsync(request), Times.Once());
-            
+
         }
 
         [Test, MoqAutoData]
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             //Arrange
             validator.Setup(x => x.ValidateAsync(It.IsAny<CreateReservationLevyEmployerCommand>()))
-                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>( ),FailedTransferReceiverCheck = true});
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>(), FailedTransferReceiverCheck = true });
 
             //Act
             Assert.ThrowsAsync<TransferSenderNotAllowedException>(() => handler.Handle(request, CancellationToken.None));
@@ -67,8 +67,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             request.TransferSenderId = null;
             validator.Setup(x => x.ValidateAsync(request))
                 .ReturnsAsync(new ValidationResult
-                    {ValidationDictionary = new Dictionary<string, string>(),
-                        FailedAutoReservationCheck = true});
+                {
+                    ValidationDictionary = new Dictionary<string, string>(),
+                    FailedAutoReservationCheck = true
+                });
             service.Setup(x =>
                     x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
                 .ReturnsAsync(new CreateReservationResponse { Id = id });
@@ -80,9 +82,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<Guid?>()), Times.Never);
             Assert.IsNull(result);
         }
-        
+
         [Test, MoqAutoData]
-        public async Task Then_If_The_Account_Is_Not_A_Levy_Account_And_The_Agreement_Is_Not_Signed_Then_An_Exception_Is_Thrown(
+        public void Then_If_The_Account_Is_Not_A_Levy_Account_And_The_Agreement_Is_Not_Signed_Then_An_Exception_Is_Thrown(
             CreateReservationLevyEmployerCommand request,
             Guid id,
             [Frozen] Mock<IValidator<CreateReservationLevyEmployerCommand>> validator,
@@ -94,8 +96,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             request.TransferSenderId = null;
             validator.Setup(x => x.ValidateAsync(request))
                 .ReturnsAsync(new ValidationResult
-                {ValidationDictionary = new Dictionary<string, string>(),
-                    FailedAutoReservationCheck = true, FailedAgreementSignedCheck = true});
+                {
+                    ValidationDictionary = new Dictionary<string, string>(),
+                    FailedAutoReservationCheck = true,
+                    FailedAgreementSignedCheck = true
+                });
             service.Setup(x =>
                     x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
                 .ReturnsAsync(new CreateReservationResponse { Id = id });
@@ -126,13 +131,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             service.Setup(x =>
                     x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId))
-                .ReturnsAsync(new CreateReservationResponse {Id = id});
+                .ReturnsAsync(new CreateReservationResponse { Id = id });
 
             //Act
             var result = await handler.Handle(request, CancellationToken.None);
-            
+
             //Assert
-            service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId));
+            service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId));
             Assert.AreEqual(id, result.ReservationId);
         }
 

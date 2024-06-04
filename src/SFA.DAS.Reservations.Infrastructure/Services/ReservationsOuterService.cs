@@ -52,14 +52,16 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
         return await apiClient.Get<GetAvailableDatesApiResponse>(new GetAvailableDatesApiRequest(_config.ApiBaseUrl, accountLegalEntityId));
     }
 
-    public IEnumerable<Employer> GetTrustedEmployers(uint ukPrn)
+    public async Task<IEnumerable<Employer>> GetTrustedEmployers(uint ukPrn)
     {
         if (ukPrn == default(uint))
         {
             throw new ArgumentException("Ukprn must be set to a non default value", nameof(ukPrn));
         }
 
-        return GetTrustedEmployersFromOuterApi(ukPrn).Result?.AccountProviderLegalEntities?.Select(e => new Employer
+        var trustedEmployers = await GetTrustedEmployersFromOuterApi(ukPrn);
+
+        return trustedEmployers.AccountProviderLegalEntities?.Select(e => new Employer
         {
             AccountId = e.AccountId,
             AccountPublicHashedId = e.AccountPublicHashedId,
