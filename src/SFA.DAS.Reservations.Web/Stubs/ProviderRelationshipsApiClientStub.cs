@@ -21,9 +21,11 @@ namespace SFA.DAS.Reservations.Web.Stubs
             CancellationToken cancellationToken = new CancellationToken())
         {
             const int accountId = 1;
+            const int megaCorpaccountId = 8194;
             const int accountLegalEntityId1 = 123;
             const int accountLegalEntityId2 = 456;
             const int accountLegalEntityId3 = 789;
+            const int accountLegalEntityId4 = 2818;
 
             return Task.FromResult(new GetAccountProviderLegalEntitiesWithPermissionResponse
             {
@@ -57,6 +59,16 @@ namespace SFA.DAS.Reservations.Web.Stubs
                         AccountLegalEntityId = accountLegalEntityId3,
                         AccountLegalEntityPublicHashedId = _encodingService.Encode(accountLegalEntityId3, EncodingType.PublicAccountLegalEntityId),
                         AccountLegalEntityName = "Legal Entity 3",
+                        AccountProviderId = withPermissionRequest.Ukprn
+                    },
+                    new AccountProviderLegalEntityDto
+                    {
+                        AccountId = megaCorpaccountId,
+                        AccountPublicHashedId = _encodingService.Encode(megaCorpaccountId,EncodingType.PublicAccountId),
+                        AccountName = "MegaCorp Inc",
+                        AccountLegalEntityId = accountLegalEntityId4,
+                        AccountLegalEntityPublicHashedId = _encodingService.Encode(accountLegalEntityId4, EncodingType.PublicAccountLegalEntityId),
+                        AccountLegalEntityName = "Mega Corp Bank",
                         AccountProviderId = withPermissionRequest.Ukprn
                     }
                 }
