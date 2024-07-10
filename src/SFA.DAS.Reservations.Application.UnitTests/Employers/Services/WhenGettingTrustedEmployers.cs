@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
         private const uint ExpectedUkPrn = 12345;
 
         private ProviderPermissionsService _providerPermissionsService;
-        private Mock<IReservationsOuterService> _providerRelationsApiClient;
+        private Mock<IReservationsOuterService> _reservationsOuterService;
         private List<Employer> _expectedEmployers;
 
         [SetUp]
@@ -44,10 +44,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                 }
             };
 
-            _providerRelationsApiClient = new Mock<IReservationsOuterService>();
-            _providerPermissionsService = new ProviderPermissionsService(_providerRelationsApiClient.Object);
+            _reservationsOuterService = new Mock<IReservationsOuterService>();
+            _providerPermissionsService = new ProviderPermissionsService(_reservationsOuterService.Object);
 
-            _providerRelationsApiClient.Setup(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
+            _reservationsOuterService.Setup(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
                 ExpectedUkPrn)).ReturnsAsync(new GetAccountLegalEntitiesForProviderResponse
                 {
                     AccountProviderLegalEntities = new List<GetAccountLegalEntitiesForProviderItem>
@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             };
 
             //Assert
-            _providerRelationsApiClient.Verify(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
+            _reservationsOuterService.Verify(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
                 ExpectedUkPrn), Times.Never);
 
             Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
