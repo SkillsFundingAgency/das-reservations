@@ -2,29 +2,30 @@ jobs:
 - job: CodeBuild
   pool:
     name: DAS - Continuous Integration Agents
-    demands: LATEST_DOTNET_VERSION -equals 3.1
-    workspace:
-      clean: all
   variables:
-  - name: BuildConfiguration
-    value: release
   - group: BUILD Management Resources
+  - name: buildConfiguration
+    value: release
+  workspace:
+    clean: all
   steps:
   - template: azure-pipelines-templates/build/step/gitversion.yml@das-platform-building-blocks
 
   - template: azure-pipelines-templates/build/step/app-build.yml@das-platform-building-blocks
     parameters:
-      SonarCloud: true
       SonarCloudProjectKey: SkillsFundingAgency_das-reservations
+      ContinueOnVulnerablePackageScanError: true
 
   - task: DotNetCoreCLI@2
     displayName: 'Publish Website'
     inputs:
       command: publish
-      publishWebProjects: false
-      projects: 'src/SFA.DAS.Reservations.Web/SFA.DAS.Reservations.Web.csproj'
+      publishWebProjects: true
+      projects: src/${{ parameters.SolutionBaseName }}.Web/${{ parameters.SolutionBaseName }}.Web.csproj
       arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-      
+      modifyOutputPath: true
+      zipAfterPublish: true
+
   - task: CopyFiles@2
     displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
     inputs:
@@ -37,3 +38,4 @@ jobs:
     displayName: 'Publish Artifact'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)/publish'
+      artifactName: ${{ parameters.SolutionBaseName }}
