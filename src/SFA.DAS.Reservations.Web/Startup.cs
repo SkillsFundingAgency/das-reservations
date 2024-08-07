@@ -102,7 +102,6 @@ public class Startup
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
         services.AddMediatRValidation();
         services.AddCommitmentsApi();
-        services.AddProviderRelationsApi(_configuration, _environment);
 
         if (_configuration["Environment"] == "LOCAL" || _configuration["Environment"] == "DEV")
         {
@@ -128,10 +127,6 @@ public class Startup
             services.AddHealthChecks()
                 .AddCheck<ReservationsApiHealthCheck>(
                     "Reservation Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] { "ready" })
-                .AddCheck<ProviderRelationshipsApiHealthCheck>(
-                    "ProviderRelationships Api",
                     failureStatus: HealthStatus.Unhealthy,
                     tags: new[] { "ready" })
                 .AddCheck<AccountApiHealthCheck>(

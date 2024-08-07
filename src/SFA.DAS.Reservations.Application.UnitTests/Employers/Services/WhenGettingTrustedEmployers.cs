@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Employers;
+using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Infrastructure.Services;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
@@ -18,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
         private const uint ExpectedUkPrn = 12345;
 
         private ProviderPermissionsService _providerPermissionsService;
-        private Mock<IProviderRelationshipsApiClient> _providerRelationsApiClient;
+        private Mock<IReservationsOuterService> _reservationsOuterService;
         private List<Employer> _expectedEmployers;
 
         [SetUp]
@@ -46,17 +44,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                 }
             };
 
-            _providerRelationsApiClient = new Mock<IProviderRelationshipsApiClient>();
-            _providerPermissionsService = new ProviderPermissionsService(_providerRelationsApiClient.Object);
+            _reservationsOuterService = new Mock<IReservationsOuterService>();
+            _providerPermissionsService = new ProviderPermissionsService(_reservationsOuterService.Object);
 
-            _providerRelationsApiClient.Setup(c => c.GetAccountProviderLegalEntitiesWithPermission(
-                It.Is<GetAccountProviderLegalEntitiesWithPermissionRequest>(r =>
-                    r.Operation == Operation.CreateCohort &&
-                    r.Ukprn == ExpectedUkPrn), It.IsAny<CancellationToken>())).ReturnsAsync(new GetAccountProviderLegalEntitiesWithPermissionResponse
-            {
-                AccountProviderLegalEntities = new[]
+            _reservationsOuterService.Setup(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
+                ExpectedUkPrn)).ReturnsAsync(new GetAccountLegalEntitiesForProviderResponse
                 {
-                    new AccountProviderLegalEntityDto
+                    AccountProviderLegalEntities = new List<GetAccountLegalEntitiesForProviderItem>
+                {
+                    new GetAccountLegalEntitiesForProviderItem
                     {
                         AccountId = 1,
                         AccountPublicHashedId = "ABC111",
@@ -65,7 +61,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                         AccountLegalEntityName = "entity 1",
                         AccountName = "account 1"
                     },
-                    new AccountProviderLegalEntityDto
+                    new GetAccountLegalEntitiesForProviderItem
                     {
                         AccountId = 2,
                         AccountPublicHashedId = "ABC222",
@@ -75,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
                         AccountName = "account 2"
                     }
                 }
-            });
+                });
         }
 
         [Test]
@@ -88,13 +84,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Employers.Services
             }
             catch (Exception)
             {
-               //Swallow exception as we test for this in a different test
+                //Swallow exception as we test for this in a different test
             };
 
             //Assert
-            _providerRelationsApiClient.Verify(c => c.GetAccountProviderLegalEntitiesWithPermission(
-                It.IsAny<GetAccountProviderLegalEntitiesWithPermissionRequest>(), 
-                It.IsAny<CancellationToken>()), Times.Never);
+            _reservationsOuterService.Verify(c => c.GetAccountProviderLegalEntitiesWithCreateCohort(
+                ExpectedUkPrn), Times.Never);
 
             Assert.ThrowsAsync<ArgumentException>(() => _providerPermissionsService.GetTrustedEmployers(default(uint)));
         }

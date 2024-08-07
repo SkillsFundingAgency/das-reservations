@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.ProviderRelationships.Api.Client;
-using SFA.DAS.ProviderRelationships.Types.Dtos;
-using SFA.DAS.ProviderRelationships.Types.Models;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
 
@@ -12,9 +9,9 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
 {
     public class ProviderPermissionsService : IProviderPermissionsService
     {
-        private readonly IProviderRelationshipsApiClient _apiClient;
+        private readonly IReservationsOuterService _apiClient;
 
-        public ProviderPermissionsService(IProviderRelationshipsApiClient apiClient)
+        public ProviderPermissionsService(IReservationsOuterService apiClient)
         {
             _apiClient = apiClient;
         }
@@ -26,12 +23,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
                 throw new ArgumentException("Ukprn must be set to a non default value", nameof(ukPrn));
             }
 
-            var trustedEmployers = await _apiClient.GetAccountProviderLegalEntitiesWithPermission(
-                new GetAccountProviderLegalEntitiesWithPermissionRequest
-                {
-                    Operation = Operation.CreateCohort,
-                    Ukprn = ukPrn
-                });
+            var trustedEmployers = await _apiClient.GetAccountProviderLegalEntitiesWithCreateCohort(ukPrn);
+
 
             return trustedEmployers?.AccountProviderLegalEntities?.Select(e => new Employer
             {
