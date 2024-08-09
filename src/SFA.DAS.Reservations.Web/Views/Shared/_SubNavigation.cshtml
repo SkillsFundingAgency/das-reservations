@@ -2,25 +2,25 @@
 {
     if (ViewContext.RouteData.Values["UkPrn"] != null && !string.IsNullOrEmpty(ViewContext.RouteData.Values["UkPrn"].ToString()))
     {
-        <nav class="das-navigation">
+        <nav class="das-navigation" aria-label="Apprenticeship service options">
             <div class="govuk-width-container">
                 <ul class="das-navigation__list">
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="Account" class="das-navigation__link">Home</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Apprentice requests</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-route="@RouteNames.ProviderManage" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link das-navigation__link--current">Manage funding</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="apprentices" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Manage your apprentices</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a class="das-navigation__link" asp-external-controller="" asp-external-subdomain="recruit" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]">Recruit apprentices</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="Agreements" asp-external-id="@ViewContext.RouteData.Values["UkPrn"]" class="das-navigation__link">Organisations and agreements</a>
                     </li>
                    
@@ -37,16 +37,16 @@ else
         <nav class="das-navigation">
             <div class="govuk-width-container">
                 <ul class="das-navigation__list ">
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Home</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="finance" asp-external-subdomain="finance" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Finance</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="" asp-external-subdomain="recruit" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Adverts</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         @if (string.Equals(ViewContext.RouteData.Values["action"].ToString(), "manage", StringComparison.CurrentCultureIgnoreCase))
                         {
                             <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--current">Your funding reservations</a>
@@ -56,16 +56,16 @@ else
                             <a asp-route="@RouteNames.EmployerManage" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your funding reservations</a>
                         }
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Apprentices</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-action="view" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your team</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="agreements" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link">Your organisations and agreements</a>
                     </li>
-                    <li class="das-navigation__list-item">
+                    <li class="das-navigation__list-item" role="menuitem">
                         <a asp-external-controller="schemes" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" class="das-navigation__link das-navigation__link--last">PAYE schemes</a>
                     </li>
                 </ul>
