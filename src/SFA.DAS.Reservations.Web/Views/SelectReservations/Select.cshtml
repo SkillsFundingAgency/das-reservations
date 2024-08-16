@@ -26,7 +26,7 @@
 
             <partial name="_PageErrorsOverview" />
 
-            <h1 class="govuk-heading-xl">Choose a Reservation</h1>
+            <h1 class="govuk-heading-l">Choose a Reservation</h1>
 
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
@@ -36,10 +36,7 @@
                 <input asp-for="JourneyData" type="hidden"/>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                            Which reservation would you like to use?
-                        </legend>
+                    <fieldset class="govuk-fieldset">                    
                         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("SelectedReservationId"))
                         {
                             <span id="confirm-error" class="govuk-error-message">
@@ -66,8 +63,11 @@
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0","9")">
                                 <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
-                                    Create a new reservation
+                                    Reserve new funding
                                 </label>
+                                <span class="govuk-hint govuk-radios__hint">
+                                    Continue adding apprentice details
+                                </span>
                             </div>
 
                         </div>
