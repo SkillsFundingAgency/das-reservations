@@ -39,9 +39,10 @@ else
             }
             else
             {
-                <h1 class="govuk-heading-xl">Reservation limit reached</h1>
-                <p class="govuk-body">You have reached the limit of the number of funding reservations you can make.</p>
-                <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]" tabindex="1" class="govuk-button">Return to account</a>
+                <h1 class="govuk-heading-l">You cannot create another funding reservation</h1>
+                <p class="govuk-body">You have reached the maximum funding reservations you can make.</p>
+
+                <p class="govuk-body">You can delete any draft apprentices using a reservation in <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.</p>
             }
 
         </div>
