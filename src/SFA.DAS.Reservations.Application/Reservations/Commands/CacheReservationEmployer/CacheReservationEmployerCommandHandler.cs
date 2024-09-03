@@ -45,6 +45,11 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 throw new GlobalReservationRuleException(command.AccountId);
             }
 
+            if (command.CreateViaAutoReservation)
+            {
+                throw new MustCreateViaAutoReservationRouteException();
+            }
+
             var reservation = new CachedReservation
             {
                 Id = command.Id,

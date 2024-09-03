@@ -202,7 +202,7 @@ public class SelectReservationsController : Controller
         SelectReservationViewModel viewModel)
     {
         _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
-        
+        var createViaAutoReservation = false;
         var backUrl = GetBackUrl(routeModel, viewModel);
         var isEmployerSelect = _configuration["AuthType"] != null &&
                                _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
@@ -236,6 +236,11 @@ public class SelectReservationsController : Controller
             return Redirect(addApprenticeUrl);
         }
 
+        if (isEmployerSelect && string.IsNullOrWhiteSpace(viewModel.CohortReference) && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
+        {
+            createViaAutoReservation = true;
+        }
+
         try
         {
             CacheReservationEmployerCommand cacheReservationEmployerCommand;
@@ -257,6 +262,7 @@ public class SelectReservationsController : Controller
                 cacheReservationEmployerCommand = await BuildEmployerReservationCacheCommand(
                     routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
                     viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
+                cacheReservationEmployerCommand.CreateViaAutoReservation = createViaAutoReservation;
             }
 
             await _mediator.Send(cacheReservationEmployerCommand);
@@ -266,6 +272,15 @@ public class SelectReservationsController : Controller
         catch (ReservationLimitReachedException)
         {
             return View("ReservationLimitReached", backUrl);
+        }
+        catch (MustCreateViaAutoReservationRouteException)
+        {
+            var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
+                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId.Value, null,
+                viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
+                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
+
+            return RedirectToRoute(continueRoute);
         }
         catch (ProviderNotAuthorisedException e)
         {

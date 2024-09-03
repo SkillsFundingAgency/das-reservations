@@ -462,5 +462,48 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             result.Model.Should().Be(confirmEmployerUrl);
         }
+
+        [Test, MoqAutoData]
+        public async Task And_MustCreateViaAutoReservationRouteException_Is_Thrown_Then_Redirect_With_Null_Reservation_For_Employer(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            string cohortDetailsUrl,
+            long expectedAccountId,
+            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IConfiguration> configuration,
+            [NoAutoProperties] SelectReservationsController controller)
+        {
+
+            configuration.Setup(x => x["AuthType"]).Returns("employer");
+            routeModel.UkPrn = null;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            viewModel.CohortReference = null;
+            routeModel.Id = Guid.Empty;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x => x.Send(It.Is<CacheReservationEmployerCommand>(p=> p.CreateViaAutoReservation == true), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MustCreateViaAutoReservationRouteException());
+
+            mockUrlHelper.Setup(x => x.GenerateAddApprenticeUrl(null, routeModel.AccountLegalEntityPublicHashedId, "",
+                viewModel.ProviderId,
+                null, viewModel.CohortReference, routeModel.EmployerAccountId, true, "",
+                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData)).Returns("https://addroute");
+
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+
+            //Assert
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be("https://addroute");
+        }
     }
 }

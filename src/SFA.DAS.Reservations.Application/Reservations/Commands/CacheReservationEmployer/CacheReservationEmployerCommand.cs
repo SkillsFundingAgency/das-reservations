@@ -15,6 +15,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
         public string CohortRef { get; set; }
         public bool EmployerHasSingleLegalEntity  { get; set; }
         public bool IsEmptyCohortFromSelect { get; set; }
-        public string JourneyData { get; set; }        
+        public string JourneyData { get; set; }
+        public bool CreateViaAutoReservation { get; set; }
     }
 }
