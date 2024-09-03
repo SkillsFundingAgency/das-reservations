@@ -10,5 +10,3 @@ namespace SFA.DAS.Reservations.Application.Exceptions
         }
     }
 }
-
-
