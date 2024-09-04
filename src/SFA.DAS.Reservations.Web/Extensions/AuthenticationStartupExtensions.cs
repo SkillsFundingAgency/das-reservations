@@ -45,20 +45,8 @@ public static class AuthenticationStartupExtensions
 
     public static IServiceCollection SetupEmployerAuth(this IServiceCollection services, IConfiguration configuration)
     {
-        if (configuration["ReservationsWeb:UseGovSignIn"] != null && configuration["ReservationsWeb:UseGovSignIn"]
-                .Equals("true", StringComparison.CurrentCultureIgnoreCase))
-        {
-            services.Configure<GovUkOidcConfiguration>(configuration.GetSection("GovUkOidcConfiguration"));
-            services.AddAndConfigureGovUkAuthentication(configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler), "", "/SignIn-Stub");
-        }
-        else
-        {
-            var identityServerConfiguration = configuration
-                .GetSection("Identity")
-                .Get<IdentityServerConfiguration>();
-            services.AddAndConfigureEmployerAuthentication(identityServerConfiguration);
-        }
-
+        services.Configure<GovUkOidcConfiguration>(configuration.GetSection("GovUkOidcConfiguration"));
+        services.AddAndConfigureGovUkAuthentication(configuration, typeof(EmployerAccountPostAuthenticationClaimsHandler), "", "/SignIn-Stub");
         return services;
     }
 }

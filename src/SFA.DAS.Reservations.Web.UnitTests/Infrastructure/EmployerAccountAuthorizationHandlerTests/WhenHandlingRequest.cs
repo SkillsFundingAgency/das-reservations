@@ -231,47 +231,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
         }
 
         [Test, MoqAutoData]
-        public async Task ThenSucceedsIfEmployerAccountIdIsFoundAfterAccountIdRefresh(
-            [Frozen] Mock<IEmployerAccountService> employerAccountService, 
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration, 
-            EmployerAccountRequirement requirement,
-            DefaultHttpContext contextFilter,
-            EmployerAccountAuthorizationHandler handler)
-        {
-            //Assign
-            configuration.Object.Value.UseGovSignIn = false;
-            var employerAccounts = new Dictionary<string, EmployerIdentifier>();
-            var employerAccountClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(employerAccounts));
-
-            var userId = Guid.NewGuid().ToString();
-            var userClaim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, userId);
-            
-            var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[] {employerAccountClaim, userClaim})});
-
-            var context = new AuthorizationHandlerContext(new[] {requirement}, claimsPrinciple, contextFilter);
-            var filter = context.Resource as DefaultHttpContext;
-            filter.Request.RouteValues.Add(RouteValues.EmployerAccountId, 1234);
-
-            var employerIdentifier = new EmployerIdentifier
-            {
-                AccountId = "1234", 
-                EmployerName = "Test Corp", 
-                Role = "Owner"
-            };
-            var refreshedEmployerAccounts = new Dictionary<string, EmployerIdentifier>{{"1234", employerIdentifier}};
-            var refreshedEmployerAccountClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(refreshedEmployerAccounts));
-            
-            employerAccountService.Setup(s => s.GetClaim(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<Claim>{refreshedEmployerAccountClaim});
-
-            //Act
-            await handler.HandleAsync(context);
-
-            //Assert
-            Assert.IsTrue(context.HasSucceeded);
-        }
-        
-        [Test, MoqAutoData]
         public async Task ThenSucceedsIfEmployerAccountIdIsFoundAfterAccountIdRefreshForGovSignIn(
             string email,
             [Frozen] Mock<IEmployerAccountService> employerAccountService, 
@@ -281,7 +240,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Infrastructure.EmployerAccountAutho
             EmployerAccountAuthorizationHandler handler)
         {
             //Assign
-            configuration.Object.Value.UseGovSignIn = true;
             var employerAccounts = new Dictionary<string, EmployerIdentifier>();
             var employerAccountClaim = new Claim(EmployerClaims.AccountsClaimsTypeIdentifier, JsonConvert.SerializeObject(employerAccounts));
 

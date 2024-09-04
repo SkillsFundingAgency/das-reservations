@@ -79,7 +79,10 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("ReservationsOuterApi:SubscriptionKey", ""),
                 new KeyValuePair<string, string>("ReservationsOuterApi:Version", "1.0"),
                 new KeyValuePair<string, string>("ProviderRelationshipsApi:ApiBaseUrl", "https://local.test.com"),
-                new KeyValuePair<string, string>("CommitmentsApiClient:ApiBaseUrl", "https://local.test.com")
+                new KeyValuePair<string, string>("CommitmentsApiClient:ApiBaseUrl", "https://local.test.com"),
+                new KeyValuePair<string, string>("GovUkOidcConfiguration:BaseUrl", "https://local.test.com"),
+                new KeyValuePair<string, string>("GovUkOidcConfiguration:ClientId", "test"),
+                new KeyValuePair<string, string>("GovUkOidcConfiguration:KeyVaultIdentifier", "https://local.test.com"),
             }
         };
 

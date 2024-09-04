@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Encoding;
+using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -68,10 +69,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
             serviceCollection.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
-            serviceCollection.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
-            serviceCollection.AddSingleton(config => config.GetService<IOptions<IdentityServerConfiguration>>().Value);
             serviceCollection.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
+            serviceCollection.Configure<GovUkOidcConfiguration>(configuration.GetSection("GovUkOidcConfiguration"));
+            serviceCollection.AddSingleton(config => config.GetService<IOptions<GovUkOidcConfiguration>>().Value);
 
 
             var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
