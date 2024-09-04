@@ -125,16 +125,31 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             VerifyLevyReservationCreated();
         }
 
-        private void VerifyAddApprenticeQueryParams(RedirectResult redirectResult)
+        [Then(@"I am redirected to the add apprentice page with no cohort ref and no reservation")]
+        public void ThenIAmRedirectedToTheAddApprenticePageWithNoCohortRefAndNoReservation()
+        {
+            var redirectResult = _actionResult as RedirectResult;
+
+            Assert.IsNotNull(redirectResult);
+            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?"));
+            var queryParams = new Uri(redirectResult.Url).ParseQueryString();
+            Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
+            VerifyAddApprenticeQueryParams(redirectResult, false);
+        }
+
+
+        private void VerifyAddApprenticeQueryParams(RedirectResult redirectResult, bool expectReservationId = true)
         {
             var uri = new Uri(redirectResult.Url);
             var queryParams = uri.ParseQueryString();
             Assert.AreEqual("true", queryParams["autocreated"]);
             Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, queryParams["accountLegalEntityHashedId"]);
             Assert.AreEqual(_viewModel.TransferSenderId, queryParams["transferSenderId"]);
-            Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
+            if (expectReservationId)
+            {
+                Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
+            }
         }
-
 
         private void VerifyLevyReservationCreated()
         {

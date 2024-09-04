@@ -499,11 +499,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 viewModel.EncodedPledgeApplicationId, viewModel.JourneyData)).Returns("https://addroute");
 
             //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectToRouteResult;
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
 
             //Assert
             result.Should().NotBeNull();
-            result.RouteName.Should().Be("https://addroute");
+            result.Url.Should().Be("https://addroute");
         }
     }
 }

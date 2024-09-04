@@ -12,9 +12,10 @@ Scenario: Reservations available to select
 
 Scenario: Reservations not available to select
 	Given I am a non levy employer
+	And I have no cohort reference
 	And an employer web app is running
 	When I view the select reservation screen
-	Then I am redirected to the create reservation page
+	Then I am redirected to the add apprentice page with no cohort ref and no reservation
 	
 Scenario: Employer comes through via transfer journey and ignores selection
 	Given I am a non levy employer

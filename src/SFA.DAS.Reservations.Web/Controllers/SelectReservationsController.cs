@@ -116,6 +116,16 @@ public class SelectReservationsController : Controller
                 return View(ViewNames.Select, viewModel);
             }
 
+            if (IsThisAnEmployer() && string.IsNullOrWhiteSpace(viewModel.CohortReference))
+            {
+                var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
+                    routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
+                    viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
+                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
+
+                return Redirect(continueRoute);
+            }
+
             await _mediator.Send(cacheReservationEmployerCommand);
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
@@ -204,8 +214,7 @@ public class SelectReservationsController : Controller
         _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
         var createViaAutoReservation = false;
         var backUrl = GetBackUrl(routeModel, viewModel);
-        var isEmployerSelect = _configuration["AuthType"] != null &&
-                               _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+        var isEmployerSelect = IsThisAnEmployer();
 
         if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
         {
@@ -276,11 +285,11 @@ public class SelectReservationsController : Controller
         catch (MustCreateViaAutoReservationRouteException)
         {
             var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
-                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId.Value, null,
+                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
                 "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
 
-            return RedirectToRoute(continueRoute);
+            return Redirect(continueRoute);
         }
         catch (ProviderNotAuthorisedException e)
         {
@@ -306,6 +315,12 @@ public class SelectReservationsController : Controller
         return RedirectToRoute(routeName, routeModel);
     }
 
+    private bool IsThisAnEmployer()
+    {
+        return _configuration["AuthType"] != null &&
+               _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+    }
+
     private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn, string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
     {
         var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
@@ -322,8 +337,7 @@ public class SelectReservationsController : Controller
 
         if (levyReservation != null)
         {
-            var isEmployerSelect = _configuration["AuthType"] != null &&
-                                   _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+            var isEmployerSelect = IsThisAnEmployer();
 
             return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                 accountLegalEntityPublicHashedId, "", ukPrn, null,
