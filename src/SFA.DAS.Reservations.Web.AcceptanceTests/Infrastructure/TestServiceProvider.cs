@@ -79,6 +79,7 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:KeyVaultIdentifier", "https://local.test.com"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:LoginSlidingExpiryTimeOutInMinutes", "30"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:GovLoginSessionConnectionString", "https://local.test.com"),
+                new KeyValuePair<string, string>("ResourceEnvironmentName", "test"),
             }
         };
 
