@@ -20,13 +20,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization
     {
         private readonly IEmployerAccountService _accountsService;
         private readonly ILogger<EmployerAccountAuthorizationHandler> _logger;
-        private readonly ReservationsWebConfiguration _configuration;
 
         public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService, ILogger<EmployerAccountAuthorizationHandler> logger, IOptions<ReservationsWebConfiguration> configuration)
         {
             _accountsService = accountsService;
             _logger = logger;
-            _configuration = configuration.Value;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerAccountRequirement requirement)
