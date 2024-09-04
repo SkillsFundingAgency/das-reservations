@@ -55,7 +55,7 @@ public class TestServiceProvider : IServiceProvider
             InitialData = new[]
             {
                 new KeyValuePair<string, string>("ConfigurationStorageConnectionString", "UseDevelopmentStorage=true;"),
-                new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding"),
+                new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding,SFA.DAS.Employer.GovSignIn"),
                 new KeyValuePair<string, string>("Environment", "DEV"),
                 new KeyValuePair<string, string>("Version", "1.0"),
                 new KeyValuePair<string, string>("UseStubs", "true"),
@@ -69,12 +69,6 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("ReservationsWeb:FindApprenticeshipTrainingUrl", $"https://test"),
                 new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test"),
                 new KeyValuePair<string, string>("ReservationsWeb:UseDfESignIn", "false"),
-                new KeyValuePair<string, string>("Identity:Scopes", "one two"),
-                new KeyValuePair<string, string>("Identity:ClientId", "test"),
-                new KeyValuePair<string, string>("Identity:ClientSecret", "test"),
-                new KeyValuePair<string, string>("Identity:ChangePasswordUrl", "test/{0}/"),
-                new KeyValuePair<string, string>("Identity:ChangeEmailUrl", "test/{0}/"),
-                new KeyValuePair<string, string>("Identity:BaseAddress", "https://test.identity"),
                 new KeyValuePair<string, string>("ReservationsOuterApi:ApiBaseUrl", "https://local.test.com"),
                 new KeyValuePair<string, string>("ReservationsOuterApi:SubscriptionKey", ""),
                 new KeyValuePair<string, string>("ReservationsOuterApi:Version", "1.0"),
@@ -83,6 +77,8 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:BaseUrl", "https://local.test.com"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:ClientId", "test"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:KeyVaultIdentifier", "https://local.test.com"),
+                new KeyValuePair<string, string>("GovUkOidcConfiguration:LoginSlidingExpiryTimeOutInMinutes", "30"),
+                new KeyValuePair<string, string>("GovUkOidcConfiguration:GovLoginSessionConnectionString", "https://local.test.com"),
             }
         };
 
