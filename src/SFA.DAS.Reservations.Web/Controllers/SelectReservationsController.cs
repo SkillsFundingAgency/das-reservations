@@ -245,7 +245,7 @@ public class SelectReservationsController : Controller
             return Redirect(addApprenticeUrl);
         }
 
-        if (isEmployerSelect && string.IsNullOrWhiteSpace(viewModel.CohortReference) && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
+        if (isEmployerSelect && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
         {
             createViaAutoReservation = true;
         }
