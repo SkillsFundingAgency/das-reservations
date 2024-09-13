@@ -93,6 +93,7 @@ public class SelectReservationsController : Controller
                 cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                 routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
                 routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId);
+
             if (!string.IsNullOrEmpty(redirectResult))
             {
                 if (redirectResult == RouteNames.Error500)
@@ -116,7 +117,7 @@ public class SelectReservationsController : Controller
                 return View(ViewNames.Select, viewModel);
             }
 
-            if (IsThisAnEmployer() && string.IsNullOrWhiteSpace(viewModel.CohortReference))
+            if (IsThisAnEmployer())
             {
                 var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
