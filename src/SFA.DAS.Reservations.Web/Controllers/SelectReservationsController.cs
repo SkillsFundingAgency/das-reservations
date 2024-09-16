@@ -244,7 +244,7 @@ public class SelectReservationsController : Controller
             viewModel.AvailableReservations = availableReservationsResult.Reservations
                 .Select(reservation => new AvailableReservationViewModel(reservation));
 
-            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select an option");
+            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select funding or reserve new funding");
 
             viewModel.BackLink = backUrl;
 
