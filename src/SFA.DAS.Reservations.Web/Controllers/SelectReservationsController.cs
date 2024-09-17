@@ -91,8 +91,11 @@ public class SelectReservationsController : Controller
                     routeModel.EmployerAccountId, routeModel.AccountLegalEntityPublicHashedId,
                     viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
             }
-            
-            moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
+
+            if (IsThisAnEmployer())
+            {
+                moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
+            }
 
             var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                 viewModel.TransferSenderId, viewModel.JourneyData,
