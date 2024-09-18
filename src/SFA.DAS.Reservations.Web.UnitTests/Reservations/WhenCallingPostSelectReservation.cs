@@ -464,7 +464,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
-        public async Task And_MustCreateViaAutoReservationRouteException_Is_Thrown_Then_Redirect_With_Null_Reservation_For_Employer(
+        public async Task And_Is_New_Cohort_MustCreateViaAutoReservationRouteException_Is_Thrown_Then_Redirect_With_Null_Reservation_For_Employer(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
             GetLegalEntitiesResponse employersResponse,
@@ -476,7 +476,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [Frozen] Mock<IConfiguration> configuration,
             [NoAutoProperties] SelectReservationsController controller)
         {
-
             configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.UkPrn = null;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -504,6 +503,51 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Assert
             result.Should().NotBeNull();
             result.Url.Should().Be("https://addroute");
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Is_Existing_Cohort_And_MustCreateViaAutoReservationRouteException_Is_Thrown_Then_Redirect_With_Null_Reservation_For_Employer(
+                ReservationsRouteModel routeModel,
+                SelectReservationViewModel viewModel,
+                GetLegalEntitiesResponse employersResponse,
+                string cohortDetailsUrl,
+                long expectedAccountId,
+                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+                [Frozen] Mock<IMediator> mockMediator,
+                [Frozen] Mock<IEncodingService> encodingService,
+                [Frozen] Mock<IConfiguration> configuration,
+                [NoAutoProperties] SelectReservationsController controller)
+        {
+            configuration.Setup(x => x["AuthType"]).Returns("employer");
+            routeModel.UkPrn = null;
+            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            routeModel.Id = Guid.Empty;
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
+                .Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator.Setup(x =>
+                    x.Send(It.Is<CacheReservationEmployerCommand>(p => p.CreateViaAutoReservation == true),
+                        It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MustCreateViaAutoReservationRouteException());
+
+            mockUrlHelper.Setup(x => x.GenerateAddApprenticeUrl(null, routeModel.AccountLegalEntityPublicHashedId, "",
+                viewModel.ProviderId,
+                null, viewModel.CohortReference, routeModel.EmployerAccountId,
+                string.IsNullOrEmpty(viewModel.CohortReference), "",
+                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData)).Returns("https://add-another-route");
+
+            //Act
+            var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Url.Should().Be("https://add-another-route");
         }
     }
 }

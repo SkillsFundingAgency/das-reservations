@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.Reservations.Application.Employers.Queries.GetLegalEntities;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservationLevyEmployer;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
@@ -18,6 +19,7 @@ using SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheRese
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -58,6 +60,8 @@ public class SelectReservationsController : Controller
         SelectReservationViewModel viewModel)
     {
         var backUrl = GetBackUrl(routeModel, viewModel);
+        var moreReservationsAvailable = true;
+
         try
         {
             var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
@@ -88,11 +92,17 @@ public class SelectReservationsController : Controller
                     viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
             }
 
+            if (IsThisAnEmployer())
+            {
+                moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
+            }
+
             var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                 viewModel.TransferSenderId, viewModel.JourneyData,
                 cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                 routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
                 routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId);
+
             if (!string.IsNullOrEmpty(redirectResult))
             {
                 if (redirectResult == RouteNames.Error500)
@@ -116,8 +126,13 @@ public class SelectReservationsController : Controller
                 return View(ViewNames.Select, viewModel);
             }
 
-            if (IsThisAnEmployer() && string.IsNullOrWhiteSpace(viewModel.CohortReference))
+            if (IsThisAnEmployer())
             {
+                if (!moreReservationsAvailable)
+                {
+                    return View("ReservationLimitReached", backUrl);
+                }
+
                 var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
@@ -202,6 +217,14 @@ public class SelectReservationsController : Controller
         }
     }
 
+    private async Task<bool> MoreReservationsAreAvailable(string employerAccountId)
+    {
+        var accountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
+
+        var response = await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
+        return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
@@ -224,7 +247,7 @@ public class SelectReservationsController : Controller
             viewModel.AvailableReservations = availableReservationsResult.Reservations
                 .Select(reservation => new AvailableReservationViewModel(reservation));
 
-            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select an option");
+            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select funding or reserve new funding");
 
             viewModel.BackLink = backUrl;
 
@@ -245,7 +268,7 @@ public class SelectReservationsController : Controller
             return Redirect(addApprenticeUrl);
         }
 
-        if (isEmployerSelect && string.IsNullOrWhiteSpace(viewModel.CohortReference) && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
+        if (isEmployerSelect && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
         {
             createViaAutoReservation = true;
         }
@@ -338,6 +361,12 @@ public class SelectReservationsController : Controller
         if (levyReservation != null)
         {
             var isEmployerSelect = IsThisAnEmployer();
+
+            if (isEmployerSelect)
+            {
+
+            }
+
 
             return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                 accountLegalEntityPublicHashedId, "", ukPrn, null,

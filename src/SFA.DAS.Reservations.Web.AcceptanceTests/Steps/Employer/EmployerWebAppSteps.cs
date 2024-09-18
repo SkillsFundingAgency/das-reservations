@@ -19,5 +19,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             ArrangeApiClient();
             ArrangeReservationOuterService();
         }
+
+        [Given(@"an employer web app is running, but reservation limit reached")]
+        public void GivenAnEmployerWebAppIsRunningButReservationLimitReached()
+        {
+            ArrangeApiClientWithReservationLimitReached();
+            ArrangeReservationOuterService();
+
+        }
     }
 }

@@ -16,6 +16,12 @@ Scenario: Reservations not available to select
 	And an employer web app is running
 	When I view the select reservation screen
 	Then I am redirected to the add apprentice page with no cohort ref and no reservation
+
+Scenario: Reservations not available to select and no more reservations are available
+	Given I am a non levy employer
+	And an employer web app is running, but reservation limit reached
+	When I view the select reservation screen
+	Then I am redirected to message saying I have reached my reservation limit
 	
 Scenario: Employer comes through via transfer journey and ignores selection
 	Given I am a non levy employer
