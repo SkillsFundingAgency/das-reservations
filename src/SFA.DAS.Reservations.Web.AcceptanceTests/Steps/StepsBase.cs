@@ -39,6 +39,19 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
             SetupLevyApiClientResponses(mock);
         }
 
+        protected void ArrangeApiClientWithReservationLimitReached()
+        {
+            var apiClient = Services.GetService<IApiClient>();
+            var mock = Mock.Get(apiClient);
+
+            SetupSharedApiClientResponses(mock);
+            SetupFundingRulesApiClientAsLimitReachedResponses(mock);
+
+            SetupNonLevyApiClientResponses(mock);
+
+            SetupLevyApiClientResponses(mock);
+        }
+
         protected void ArrangeReservationOuterService()
         {
             var reservationsClient = Services.GetService<IReservationsOuterService>();
@@ -125,6 +138,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
                     }
                 });
         }
+
+        private void SetupFundingRulesApiClientAsLimitReachedResponses(Mock<IApiClient> mock)
+        {
+            var list = new List<GlobalRule>();
+            list.Add(new GlobalRule { RuleType = GlobalRuleType.ReservationLimit });
+            mock.Setup(x => x.Get<GetAccountFundingRulesApiResponse>(It.IsAny<GetAccountFundingRulesApiRequest>()))
+                .ReturnsAsync(new GetAccountFundingRulesApiResponse { GlobalRules = list });
+        }
+
 
         protected void SetupNonLevyEmployerTestData()
         {
