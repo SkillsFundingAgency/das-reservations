@@ -30,6 +30,7 @@ using SFA.DAS.Reservations.Web.Services;
 using SFA.DAS.Testing.AutoFixture;
 using Microsoft.AspNetCore.Http;
 using SFA.DAS.Reservations.Infrastructure.Services;
+using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 
 namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 {
@@ -1248,6 +1249,62 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actualModel.AvailableReservations.Should().BeEquivalentTo(
                 reservationsResult.Reservations
                     .Select(reservation => new AvailableReservationViewModel(reservation)));
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_There_Are_No_More_Reservations_Available_In_Addition_To_These_Few_For_The_Employer(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetLegalEntitiesResponse employersResponse,
+            [Frozen] Mock<IMediator> mockMediator,
+            long expectedAccountId,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [Frozen] Mock<IConfiguration> configuration,
+            List<Reservation> reservations,
+            [NoAutoProperties] SelectReservationsController controller)
+        {
+            //Arrange
+            routeModel.Id = Guid.Empty;
+            routeModel.UkPrn = null;
+            configuration.Setup(x => x["AuthType"]).Returns("employer");
+            var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> {claim}));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+                    {User = user}
+            };
+            encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
+                .Returns(expectedAccountId);
+            var matchedEmployer = employersResponse.AccountLegalEntities.First();
+            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+            mockMediator
+                .Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((CreateReservationLevyEmployerResult) null);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetLegalEntitiesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(employersResponse);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAccountFundingRulesQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((GetAccountFundingRulesResult) null);
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.Is<GetAvailableReservationsQuery>(c => c.AccountId.Equals(expectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetAvailableReservationsResult {Reservations = reservations});
+
+            //Act
+            var result = await controller.SelectReservation(routeModel, viewModel) as ViewResult;
+
+            //Assert
+            result.ViewName.Should().Be(ViewNames.Select);
+            var actualModel = result.Model as SelectReservationViewModel;
+            actualModel.Should().NotBeNull();
+            actualModel.MoreReservationsAvailable.Should().BeTrue();
         }
     }
 }

@@ -25,6 +25,22 @@
         <div class="govuk-grid-column-two-thirds">
 
             <partial name="_PageErrorsOverview" />
+            
+            @if (!Model.MoreReservationsAvailable)
+            {
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            Important
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        < class="govuk-notification-banner__heading">
+                            You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
+                            <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                    </div>
+                </div>
+            }
 
             <h1 class="govuk-heading-l">Choose a Reservation</h1>
 
@@ -55,21 +71,20 @@
                                         Created in @availableReservation.CreatedDateDescription
                                     </span>
                                 </div>
-
                             }
-
-                            <div class="govuk-radios__divider">or</div>
-
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0","9")">
-                                <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
-                                    Reserve new funding
-                                </label>
-                                <span class="govuk-hint govuk-radios__hint">
-                                    Continue adding apprentice details
-                                </span>
-                            </div>
-
+                            @if (Model.MoreReservationsAvailable)
+                            {
+                                <div class="govuk-radios__divider">or</div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0", "9")">
+                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
+                                        Reserve new funding
+                                    </label>
+                                    <span class="govuk-hint govuk-radios__hint">
+                                        Continue adding apprentice details
+                                    </span>
+                                </div>
+                            }
                         </div>
                     </fieldset>
                 </div>
