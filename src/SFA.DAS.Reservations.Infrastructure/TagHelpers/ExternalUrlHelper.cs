@@ -30,7 +30,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
         return FormatUrl(baseUrl, urlParameters);
     }
 
-    public string GenerateAddApprenticeUrl(Guid reservationId, string accountLegalEntityPublicHashedId,
+    public string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId,
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "", string encodedPledgeApplicationId= "", string journeyData = "")
     {

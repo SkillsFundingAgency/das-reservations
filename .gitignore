@@ -271,3 +271,4 @@ desktop.ini
 App.Debug.config
 
 src/SFA.DAS.Reservations.Web/appsettings.Development.json
+*.ncrunchsolution

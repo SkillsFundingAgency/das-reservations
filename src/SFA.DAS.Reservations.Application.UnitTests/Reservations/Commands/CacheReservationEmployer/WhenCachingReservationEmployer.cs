@@ -53,6 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             {
                 GlobalRules = new List<GlobalRule>()
             };
+            command.CreateViaAutoReservation = false;
 
             _mockFundingRulesService.Setup(m => m.GetAccountFundingRules(It.IsAny<long>()))
                 .ReturnsAsync(response);
@@ -130,6 +131,26 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
         
         [Test, AutoData]
+        public void And_The_Command_Has_CreateViaAutoReservation_Set_Then_Does_Not_Cache_Reservation(
+            CacheReservationEmployerCommand command)
+        {
+            GetAccountFundingRulesApiResponse response = new GetAccountFundingRulesApiResponse()
+            {
+                GlobalRules = new List<GlobalRule>()
+            };
+
+            command.UkPrn = null;
+            command.EmployerHasSingleLegalEntity = true;
+            command.CreateViaAutoReservation = true;
+
+            _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
+                .ReturnsAsync(response);
+            
+            //Act
+             Assert.ThrowsAsync<MustCreateViaAutoReservationRouteException>(() => _commandHandler.Handle(command, CancellationToken.None));
+        }
+
+        [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Does_Not_Cache_Reservation(
             CacheReservationEmployerCommand command,
             ValidationResult validationResult,
@@ -141,13 +162,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             _mockValidator
                 .Setup(validator => validator.ValidateAsync(command))
                 .ReturnsAsync(validationResult);
-            
+
             //Act
-             Assert.ThrowsAsync<ValidationException>(() => _commandHandler.Handle(command, CancellationToken.None));
+            Assert.ThrowsAsync<ValidationException>(() => _commandHandler.Handle(command, CancellationToken.None));
 
             //Assert
             _mockCacheStorageService.Verify(s => s.SaveToCache(It.IsAny<string>(), It.IsAny<CachedReservation>(), It.IsAny<int>()), Times.Never);
         }
+
 
         [Test, AutoData]
         public async Task Then_Calls_Cache_Service_To_Save_Reservation(CacheReservationEmployerCommand command)
@@ -159,6 +181,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             command.UkPrn = null;
             command.EmployerHasSingleLegalEntity = true;
+            command.CreateViaAutoReservation = false;
 
             _mockFundingRulesService.Setup(c => c.GetAccountFundingRules(It.IsAny<long>()))
                 .ReturnsAsync(response);
