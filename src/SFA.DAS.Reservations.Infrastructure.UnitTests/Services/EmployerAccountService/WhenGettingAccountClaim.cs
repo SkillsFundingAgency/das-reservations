@@ -13,7 +13,6 @@ using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Testing.AutoFixture;
-using EmployerIdentifier = SFA.DAS.Reservations.Domain.Authentication.EmployerIdentifier;
 
 namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccountService;
 
@@ -34,14 +33,13 @@ public class WhenGettingAccountClaim
         outerApiConfiguration.Object.Value.ApiBaseUrl = "https://tempuri.org";
         var expectedRequest =
             new GetUserAccountsRequest(outerApiConfiguration.Object.Value.ApiBaseUrl, userId, email);
-        configuration.Object.Value.UseGovSignIn = true;
         reservationsOuterApiClient.Setup(x => x.Get<GetUserAccountsResponse>(
-                It.Is<GetUserAccountsRequest>(c=>c.GetUrl.Equals(expectedRequest.GetUrl))))
+                It.Is<GetUserAccountsRequest>(c => c.GetUrl.Equals(expectedRequest.GetUrl))))
             .ReturnsAsync(getUserAccountsResponse);
 
         var actual = await employerAccountService.GetClaim(userId, claimType, email);
 
-        var actualValue = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(actual.FirstOrDefault(c=>c.Type.Equals(claimType)).Value);
+        var actualValue = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(actual.FirstOrDefault(c => c.Type.Equals(claimType)).Value);
         foreach (var employerIdentifier in actualValue)
         {
             employerIdentifier.Value.Should().BeEquivalentTo(getUserAccountsResponse.UserAccounts.SingleOrDefault(c => c.AccountId.Equals(employerIdentifier.Key)));
@@ -50,7 +48,7 @@ public class WhenGettingAccountClaim
         actual.FirstOrDefault(c => c.Type.Equals(ClaimTypes.AuthorizationDecision))?.Value.Should().BeNullOrEmpty();
         actual.FirstOrDefault(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))?.Value.Should().Be(getUserAccountsResponse.UserId);
     }
-        
+
     [Test, MoqAutoData]
     public async Task Then_If_Gov_SignIn_Gets_Claim_Values_From_Outer_Api_And_Suspended_Is_Marked_Correctly(
         string userId,
@@ -66,14 +64,13 @@ public class WhenGettingAccountClaim
         outerApiConfiguration.Object.Value.ApiBaseUrl = "https://tempuri.org";
         var expectedRequest =
             new GetUserAccountsRequest(outerApiConfiguration.Object.Value.ApiBaseUrl, userId, email);
-        configuration.Object.Value.UseGovSignIn = true;
         reservationsOuterApiClient.Setup(x => x.Get<GetUserAccountsResponse>(
-                It.Is<GetUserAccountsRequest>(c=>c.GetUrl.Equals(expectedRequest.GetUrl))))
+                It.Is<GetUserAccountsRequest>(c => c.GetUrl.Equals(expectedRequest.GetUrl))))
             .ReturnsAsync(getUserAccountsResponse);
 
         var actual = await employerAccountService.GetClaim(userId, claimType, email);
 
-        var actualValue = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(actual.FirstOrDefault(c=>c.Type.Equals(claimType)).Value);
+        var actualValue = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(actual.FirstOrDefault(c => c.Type.Equals(claimType)).Value);
         foreach (var employerIdentifier in actualValue)
         {
             employerIdentifier.Value.Should().BeEquivalentTo(getUserAccountsResponse.UserAccounts.SingleOrDefault(c => c.AccountId.Equals(employerIdentifier.Key)));
