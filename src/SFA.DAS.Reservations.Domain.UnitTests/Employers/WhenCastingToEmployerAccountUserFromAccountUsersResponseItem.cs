@@ -11,7 +11,7 @@ public class WhenCastingToEmployerAccountUserFromAccountUsersResponseItem
     [Test, AutoData]
     public void Then(AccountUsersResponseItem source)
     {
-        EmployerAccountUser result = source;
+        var result = (EmployerAccountUser)source;
 
         result.Should().BeEquivalentTo(source);
     }

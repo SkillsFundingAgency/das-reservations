@@ -7,7 +7,7 @@ public record GetAccountUsersApiResponse
     public List<AccountUsersResponseItem> AccountUsers { get; set; }
 }
 
-public record AccountUsersResponseItem
+public class AccountUsersResponseItem
 {
     public string UserRef { get; set; }
     public string Email { get; set; }
