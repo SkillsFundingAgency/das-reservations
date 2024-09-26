@@ -130,8 +130,6 @@ public class Startup
                     failureStatus: HealthStatus.Unhealthy,
                     tags: ["ready"]);
         }
-
-        services.AddApplicationInsightsTelemetry();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

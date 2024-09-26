@@ -347,8 +347,8 @@
                   "value": "[parameters('loggingRedisConnectionString')]"
                 },
                 {
-                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                  "value": "[reference(concat(variables('providerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
+                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                  "value": "[reference(concat(variables('providerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                 },
                 {
                   "name": "AuthType",

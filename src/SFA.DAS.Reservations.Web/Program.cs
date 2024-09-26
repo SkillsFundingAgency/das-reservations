@@ -17,5 +17,6 @@ public class Program
         WebHost
             .CreateDefaultBuilder(args)
             .UseStartup<Startup>()
+            .UseApplicationInsights()
             .UseNLog();
 }
