@@ -10,6 +10,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Api;
 public class ApiClient(IOptions<ReservationsApiConfiguration> apiConfigurationOptions) : ApiClientBase, IApiClient
 {
     private readonly ReservationsApiConfiguration _reservationsApiClientConfiguration = apiConfigurationOptions.Value;
+    // Make use of built-in token caching with AzureServiceTokenProvider.
+    private static readonly AzureServiceTokenProvider TokenProvider = new();
 
     public override async Task<string> Ping()
     {
@@ -47,8 +49,7 @@ public class ApiClient(IOptions<ReservationsApiConfiguration> apiConfigurationOp
 
     private static async Task<string> GetManagedIdentityAuthenticationResult(string resource)
     {
-        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-        return await azureServiceTokenProvider.GetAccessTokenAsync(resource);
+        return await TokenProvider.GetAccessTokenAsync(resource);
     }
 
     private static bool IsClientCredentialConfiguration(string clientId, string clientSecret, string tenant)
