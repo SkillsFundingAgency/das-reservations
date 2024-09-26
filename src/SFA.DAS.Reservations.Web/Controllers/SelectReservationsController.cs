@@ -28,30 +28,15 @@ using SFA.DAS.Reservations.Web.Services;
 namespace SFA.DAS.Reservations.Web.Controllers;
 
 [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
-public class SelectReservationsController : Controller
+public class SelectReservationsController(
+    IMediator mediator,
+    ILogger<ReservationsController> logger,
+    IEncodingService encodingService,
+    IConfiguration configuration,
+    IExternalUrlHelper urlHelper,
+    IUserClaimsService userClaimsService)
+    : Controller
 {
-    private readonly IMediator _mediator;
-    private readonly ILogger<ReservationsController> _logger;
-    private readonly IEncodingService _encodingService;
-    private readonly IExternalUrlHelper _urlHelper;
-    private readonly IConfiguration _configuration;
-    private readonly IUserClaimsService _userClaimsService;
-
-    public SelectReservationsController(IMediator mediator,
-        ILogger<ReservationsController> logger,
-        IEncodingService encodingService,
-        IConfiguration configuration,
-        IExternalUrlHelper urlHelper,
-        IUserClaimsService userClaimsService)
-    {
-        _mediator = mediator;
-        _logger = logger;
-        _encodingService = encodingService;
-        _urlHelper = urlHelper;
-        _userClaimsService = userClaimsService;
-        _configuration = configuration;
-    }
-
     [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
     [Route("{ukPrn}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.ProviderSelect)]
     [Route("accounts/{employerAccountId}/reservations/{accountLegalEntityPublicHashedId}/select", Name = RouteNames.EmployerSelect)]
@@ -69,7 +54,7 @@ public class SelectReservationsController : Controller
             Guid? userId = null;
             if (routeModel.UkPrn.HasValue)
             {
-                var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
+                var response = await mediator.Send(new GetProviderCacheReservationCommandQuery
                 {
                     AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                     CohortRef = routeModel.CohortReference,
@@ -113,7 +98,7 @@ public class SelectReservationsController : Controller
                 return Redirect(redirectResult);
             }
 
-            var availableReservationsResult = await _mediator.Send(
+            var availableReservationsResult = await mediator.Send(
                 new GetAvailableReservationsQuery { AccountId = cacheReservationEmployerCommand.AccountId });
 
             if (availableReservationsResult.Reservations != null &&
@@ -133,7 +118,7 @@ public class SelectReservationsController : Controller
                     return View("ReservationLimitReached", backUrl);
                 }
 
-                var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
+                var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
                     "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
@@ -141,7 +126,7 @@ public class SelectReservationsController : Controller
                 return Redirect(continueRoute);
             }
 
-            await _mediator.Send(cacheReservationEmployerCommand);
+            await mediator.Send(cacheReservationEmployerCommand);
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
 
@@ -149,12 +134,12 @@ public class SelectReservationsController : Controller
         }
         catch (ValidationException e)
         {
-            _logger.LogWarning(e, "Validation error trying to render select reservation.");
+            logger.LogWarning(e, "Validation error trying to render select reservation.");
             return RedirectToRoute(RouteNames.Error500);
         }
         catch (ProviderNotAuthorisedException e)
         {
-            _logger.LogWarning(e,
+            logger.LogWarning(e,
                 $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
             return View("NoPermissions", backUrl);
         }
@@ -173,23 +158,22 @@ public class SelectReservationsController : Controller
         }
         catch (AccountLegalEntityNotFoundException e)
         {
-            _logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
+            logger.LogWarning($"Account legal entity not found [{e.AccountLegalEntityPublicHashedId}].");
             return RedirectToRoute(RouteNames.Error404);
         }
         catch (AccountLegalEntityInvalidException ex)
         {
-            _logger.LogWarning(ex.Message);
+            logger.LogWarning(ex.Message);
             return RedirectToRoute(RouteNames.Error500);
         }
         catch (TransferSenderNotAllowedException e)
         {
-            _logger.LogWarning(e,
-                $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+            logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
             return RedirectToRoute(RouteNames.Error500);
         }
         catch (EmployerAgreementNotSignedException e)
         {
-            _logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
+            logger.LogWarning(e, $"AccountId: {e.AccountId} does not have a signed agreement for ALE {e.AccountLegalEntityId}).");
 
             var routeName = RouteNames.EmployerTransactorSignAgreement;
             if (routeModel.UkPrn.HasValue)
@@ -198,7 +182,7 @@ public class SelectReservationsController : Controller
             }
             else
             {
-                if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+                if (userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
                         EmployerUserRole.Owner, User.Claims))
                 {
                     routeName = RouteNames.EmployerOwnerSignAgreement;
@@ -212,16 +196,16 @@ public class SelectReservationsController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error trying to render select reservation.");
+            logger.LogError(e, "Error trying to render select reservation.");
             return RedirectToRoute(RouteNames.Error500);
         }
     }
 
     private async Task<bool> MoreReservationsAreAvailable(string employerAccountId)
     {
-        var accountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
+        var accountId = encodingService.Decode(employerAccountId, EncodingType.AccountId);
 
-        var response = await _mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
+        var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
         return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
     }
 
@@ -234,14 +218,14 @@ public class SelectReservationsController : Controller
         ReservationsRouteModel routeModel,
         SelectReservationViewModel viewModel)
     {
-        _logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
+        logger.LogInformation("{TypeName} routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
         var createViaAutoReservation = false;
         var backUrl = GetBackUrl(routeModel, viewModel);
         var isEmployerSelect = IsThisAnEmployer();
 
         if (!viewModel.SelectedReservationId.HasValue || viewModel.SelectedReservationId == Guid.Empty)
         {
-            var availableReservationsResult = await _mediator.Send(
+            var availableReservationsResult = await mediator.Send(
                 new GetAvailableReservationsQuery { AccountId = viewModel.AccountId });
 
             viewModel.AvailableReservations = availableReservationsResult.Reservations
@@ -257,9 +241,9 @@ public class SelectReservationsController : Controller
         if (viewModel.SelectedReservationId != Guid.Empty &&
             viewModel.SelectedReservationId != Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
         {
-            var reservation = await _mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
+            var reservation = await mediator.Send(new GetReservationQuery { Id = viewModel.SelectedReservationId.Value });
 
-            var url = _urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
+            var url = urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect, journeyData: viewModel.JourneyData);
 
@@ -279,7 +263,7 @@ public class SelectReservationsController : Controller
 
             if (routeModel.UkPrn.HasValue)
             {
-                var response = await _mediator.Send(new GetProviderCacheReservationCommandQuery
+                var response = await mediator.Send(new GetProviderCacheReservationCommandQuery
                 {
                     AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
                     CohortRef = routeModel.CohortReference,
@@ -297,7 +281,7 @@ public class SelectReservationsController : Controller
                 cacheReservationEmployerCommand.CreateViaAutoReservation = createViaAutoReservation;
             }
 
-            await _mediator.Send(cacheReservationEmployerCommand);
+            await mediator.Send(cacheReservationEmployerCommand);
 
             routeModel.Id = cacheReservationEmployerCommand.Id;
         }
@@ -307,7 +291,7 @@ public class SelectReservationsController : Controller
         }
         catch (MustCreateViaAutoReservationRouteException)
         {
-            var continueRoute = _urlHelper.GenerateAddApprenticeUrl(null,
+            var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                 routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
                 "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
@@ -316,7 +300,7 @@ public class SelectReservationsController : Controller
         }
         catch (ProviderNotAuthorisedException e)
         {
-            _logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
+            logger.LogWarning(e, $"Provider (UKPRN: {e.UkPrn}) does not has access to create a reservation for legal entity for account (Id: {e.AccountId}).");
             return View("NoPermissions", backUrl);
         }
         catch (GlobalReservationRuleException)
@@ -340,19 +324,19 @@ public class SelectReservationsController : Controller
 
     private bool IsThisAnEmployer()
     {
-        return _configuration["AuthType"] != null &&
-               _configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+        return configuration["AuthType"] != null &&
+               configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
     }
 
     private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn, string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
     {
-        var levyReservation = await _mediator.Send(new CreateReservationLevyEmployerCommand
+        var levyReservation = await mediator.Send(new CreateReservationLevyEmployerCommand
         {
             AccountId = accountId,
-            TransferSenderId = string.IsNullOrEmpty(transferSenderId) ? (long?)null : _encodingService.Decode(transferSenderId, EncodingType.PublicAccountId),
+            TransferSenderId = string.IsNullOrEmpty(transferSenderId) ? (long?)null : encodingService.Decode(transferSenderId, EncodingType.PublicAccountId),
             TransferSenderEmployerAccountId = transferSenderId,
             UserId = userId,
-            AccountLegalEntityId = _encodingService.Decode(
+            AccountLegalEntityId = encodingService.Decode(
                 accountLegalEntityPublicHashedId,
                 EncodingType.PublicAccountLegalEntityId),
             EncodedPledgeApplicationId = encodedPledgeApplicationId
@@ -368,7 +352,7 @@ public class SelectReservationsController : Controller
             }
 
 
-            return _urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
+            return urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                 accountLegalEntityPublicHashedId, "", ukPrn, null,
                 cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
                 transferSenderId, encodedPledgeApplicationId, journeyData);
@@ -381,8 +365,8 @@ public class SelectReservationsController : Controller
         string employerAccountId, string accountLegalEntityPublicHashedId, string cohortRef,
         uint? providerId, string journeyData)
     {
-        var accountId = _encodingService.Decode(employerAccountId, EncodingType.AccountId);
-        var accountLegalEntity = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = accountId });
+        var accountId = encodingService.Decode(employerAccountId, EncodingType.AccountId);
+        var accountLegalEntity = await mediator.Send(new GetLegalEntitiesQuery { AccountId = accountId });
         var legalEntity = accountLegalEntity.AccountLegalEntities.SingleOrDefault(c =>
             c.AccountLegalEntityPublicHashedId.Equals(accountLegalEntityPublicHashedId));
 
@@ -410,7 +394,7 @@ public class SelectReservationsController : Controller
         long? result = null;
         if (!string.IsNullOrEmpty(cohortReference))
         {
-            result = _encodingService.Decode(cohortReference, EncodingType.CohortReference);
+            result = encodingService.Decode(cohortReference, EncodingType.CohortReference);
         }
 
         return result;
@@ -418,14 +402,14 @@ public class SelectReservationsController : Controller
 
     private string GetBackUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
     {
-        if (_configuration["AuthType"] != null &&
-            _configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase)
+        if (configuration["AuthType"] != null &&
+            configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase)
             && string.IsNullOrWhiteSpace(viewModel.CohortReference) && routeModel.UkPrn.HasValue)
         {
-            return _urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
+            return urlHelper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId);
         }
 
-        return _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+        return urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
             viewModel.CohortReference, journeyData: viewModel.JourneyData);
     }
 }
