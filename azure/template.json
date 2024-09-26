@@ -40,7 +40,7 @@
     },
     "configNames": {
       "type": "string",
-      "defaultValue": "SFA.DAS.Reservations.Web,SFA.DAS.EmployerAccountAPI:AccountApi,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding,SFA.DAS.Employer.GovSignIn,SFA.DAS.Provider.DfeSignIn"
+      "defaultValue": "SFA.DAS.Reservations.Web,SFA.DAS.ProviderRelationships.Api.ClientV2,SFA.DAS.Encoding,SFA.DAS.Employer.GovSignIn,SFA.DAS.Provider.DfeSignIn"
     },
     "version": {
       "type": "string",
@@ -347,8 +347,8 @@
                   "value": "[parameters('loggingRedisConnectionString')]"
                 },
                 {
-                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                  "value": "[reference(concat(variables('providerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
+                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                  "value": "[reference(concat(variables('providerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
                 },
                 {
                   "name": "AuthType",
