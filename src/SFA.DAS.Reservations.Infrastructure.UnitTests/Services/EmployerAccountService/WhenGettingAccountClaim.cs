@@ -37,7 +37,6 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             outerApiConfiguration.Object.Value.ApiBaseUrl = "https://tempuri.org";
             var expectedRequest =
                 new GetUserAccountsRequest(outerApiConfiguration.Object.Value.ApiBaseUrl, userId, email);
-            configuration.Object.Value.UseGovSignIn = true;
             reservationsOuterApiClient.Setup(x => x.Get<GetUserAccountsResponse>(
                     It.Is<GetUserAccountsRequest>(c=>c.GetUrl.Equals(expectedRequest.GetUrl))))
                 .ReturnsAsync(getUserAccountsResponse);
@@ -71,7 +70,6 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             outerApiConfiguration.Object.Value.ApiBaseUrl = "https://tempuri.org";
             var expectedRequest =
                 new GetUserAccountsRequest(outerApiConfiguration.Object.Value.ApiBaseUrl, userId, email);
-            configuration.Object.Value.UseGovSignIn = true;
             reservationsOuterApiClient.Setup(x => x.Get<GetUserAccountsResponse>(
                     It.Is<GetUserAccountsRequest>(c=>c.GetUrl.Equals(expectedRequest.GetUrl))))
                 .ReturnsAsync(getUserAccountsResponse);
@@ -87,40 +85,6 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services.EmployerAccount
             accountsApi.Verify(x=>x.GetAccountUsers(It.IsAny<string>()), Times.Never);
             actual.FirstOrDefault(c => c.Type.Equals(ClaimTypes.AuthorizationDecision))?.Value.Should().Be("Suspended");
             actual.FirstOrDefault(c => c.Type.Equals(EmployerClaims.IdamsUserIdClaimTypeIdentifier))?.Value.Should().Be(getUserAccountsResponse.UserId);
-        }
-
-        [Test, RecursiveMoqAutoData]
-        public async Task Then_If_Not_Gov_SignIn_Gets_Claims_From_Accounts_Api(
-            string userId,
-            string claimType,
-            string email,
-            string hashedId,
-            string accountName,
-            List<TeamMemberViewModel> teamMemberViewModels,
-            [Frozen] Mock<IAccountApiClient> accountsApi,
-            [Frozen] Mock<IReservationsOuterApiClient> reservationsOuterApiClient,
-            [Frozen] Mock<IOptions<ReservationsWebConfiguration>> configuration,
-            Infrastructure.Services.EmployerAccountService employerAccountService)
-        {
-            var accountDetailViewModel = new List<AccountDetailViewModel>();
-            accountDetailViewModel.Add(new AccountDetailViewModel
-            {
-                HashedAccountId = hashedId,
-                DasAccountName = accountName,
-            });
-            configuration.Object.Value.UseGovSignIn = false;
-            teamMemberViewModels.First().UserRef = userId;
-            accountsApi.Setup(x => x.GetUserAccounts(userId)).ReturnsAsync(accountDetailViewModel);
-            accountsApi.Setup(x => x.GetAccountUsers(accountDetailViewModel.First().HashedAccountId)).ReturnsAsync(teamMemberViewModels);
-            
-            var actual = await employerAccountService.GetClaim(userId, claimType, email);
-            
-            var actualValue = JsonConvert.DeserializeObject<Dictionary<string, EmployerIdentifier>>(actual.FirstOrDefault(c=>c.Type.Equals(claimType)).Value);
-            actualValue.First().Value.AccountId.Should().Be(accountDetailViewModel.First().HashedAccountId);
-            actualValue.First().Value.Role.Should().Be(teamMemberViewModels.First().Role);
-            actualValue.First().Value.EmployerName.Should().Be(accountDetailViewModel.First().DasAccountName);
-            reservationsOuterApiClient.Verify(x=>x.Get<GetUserAccountsResponse>(It.IsAny<GetUserAccountsRequest>()), Times.Never);
-            actual.FirstOrDefault(c => c.Type.Equals(ClaimTypes.AuthorizationDecision))?.Value.Should().BeNullOrEmpty();
         }
     }
 }

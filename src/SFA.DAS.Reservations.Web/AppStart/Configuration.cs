@@ -26,9 +26,6 @@ namespace SFA.DAS.Reservations.Web.AppStart
             IConfiguration configuration,
             IWebHostEnvironment environment)
         {
-            services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
-            services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
-            
             services.AddSingleton<IAuthorizationHandler, EmployerAccountAuthorizationHandler>();
 
             AddSharedConfiguration(services, configuration, environment);

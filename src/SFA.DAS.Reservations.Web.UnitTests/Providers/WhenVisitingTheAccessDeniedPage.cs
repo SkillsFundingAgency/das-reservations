@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
         private bool _useDfESignIn;
         private string _dashboardUrl;
-        public ErrorController Sut { get; set; }
+        private ErrorController Sut { get; set; }
 
         [Test]
         [TestCase("test", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
@@ -29,13 +29,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             _useDfESignIn = fixture.Create<bool>();
             _dashboardUrl = fixture.Create<string>();
 
-            fixture.Customize<ReservationsWebConfiguration>(c => c.With(x =>x.UseDfESignIn, _useDfESignIn));
-            fixture.Customize<ReservationsWebConfiguration>(c => c.With(x => x.DashboardUrl, _dashboardUrl));
-
-            var mockReservationsConfig = fixture.Create<ReservationsWebConfiguration>();
+            var mockReservationsConfig = new ReservationsWebConfiguration
+            {
+                UseDfESignIn = _useDfESignIn,
+                DashboardUrl = _dashboardUrl
+            };
 
             _configuration = new Mock<IConfiguration>();
-            _reservationsConfiguration = new Mock<IOptions<ReservationsWebConfiguration>>();
+            _reservationsConfiguration = fixture.Freeze<Mock<IOptions<ReservationsWebConfiguration>>>();
 
             _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
             _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);

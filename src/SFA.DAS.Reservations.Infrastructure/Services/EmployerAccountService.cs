@@ -21,43 +21,32 @@ namespace SFA.DAS.Reservations.Infrastructure.Services
         private readonly IAccountApiClient _accountApiClient;
         private readonly IReservationsOuterApiClient _reservationsOuterApiClient;
         private readonly ReservationsOuterApiConfiguration _outerApiConfiguration;
-        private readonly ReservationsWebConfiguration _configuration;
 
-        public EmployerAccountService(IAccountApiClient accountApiClient, IOptions<ReservationsWebConfiguration> configuration, IReservationsOuterApiClient reservationsOuterApiClient,IOptions<ReservationsOuterApiConfiguration> outerApiConfiguration)
+        public EmployerAccountService(IAccountApiClient accountApiClient, IReservationsOuterApiClient reservationsOuterApiClient,IOptions<ReservationsOuterApiConfiguration> outerApiConfiguration)
         {
             _accountApiClient = accountApiClient;
             _reservationsOuterApiClient = reservationsOuterApiClient;
             _outerApiConfiguration = outerApiConfiguration.Value;
-            _configuration = configuration.Value;
         }
 
         public async Task<List<Claim>> GetClaim(string userId, string claimType, string email)
         {
-            IEnumerable<EmployerIdentifier> accounts;
             var claims = new List<Claim>();
-            if (_configuration.UseGovSignIn)
+            var apiResponse =
+                await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email));
+            if (apiResponse.IsSuspended)
             {
-                var apiResponse =
-                    await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email));
-                if (apiResponse.IsSuspended)
-                {
-                    claims.Add(new Claim(ClaimTypes.AuthorizationDecision, "Suspended"));
-                }
-                
-                claims.Add(new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, apiResponse.UserId));
-                
-                accounts = apiResponse.UserAccounts.Select(c => new EmployerIdentifier
-                {
-                    Role = c.Role,
-                    AccountId = c.AccountId,
-                    EmployerName = c.EmployerName
-                });
+                claims.Add(new Claim(ClaimTypes.AuthorizationDecision, "Suspended"));
             }
-            else
+            
+            claims.Add(new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, apiResponse.UserId));
+            
+            var accounts = apiResponse.UserAccounts.Select(c => new EmployerIdentifier
             {
-                accounts = await GetEmployerIdentifiersAsync(userId);
-                accounts = await GetUserRoles(accounts, userId);    
-            }
+                Role = c.Role,
+                AccountId = c.AccountId,
+                EmployerName = c.EmployerName
+            });
             
 
             var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
