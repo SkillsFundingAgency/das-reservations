@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,12 +9,15 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SFA.DAS.EAS.Account.Api.Client;
 using SFA.DAS.Encoding;
+using SFA.DAS.GovUK.Auth.Configuration;
+using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
+using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
@@ -62,16 +66,17 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure
             serviceCollection.AddSingleton(reservationsService.Object);
             serviceCollection.AddSingleton(urlHelper.Object);
             serviceCollection.AddSingleton<IUserClaimsService, UserClaimsService>();
+            serviceCollection.AddSingleton<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
             serviceCollection.Configure<ReservationsApiConfiguration>(configuration.GetSection("ReservationsApi"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
             serviceCollection.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
-            serviceCollection.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
-            serviceCollection.AddSingleton(config => config.GetService<IOptions<IdentityServerConfiguration>>().Value);
             serviceCollection.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
             serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
+            serviceCollection.Configure<GovUkOidcConfiguration>(configuration.GetSection("GovUkOidcConfiguration"));
+            serviceCollection.AddSingleton(config => config.GetService<IOptions<GovUkOidcConfiguration>>().Value);
 
 
             var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());

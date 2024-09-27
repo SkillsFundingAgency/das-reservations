@@ -20,13 +20,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization
     {
         private readonly IEmployerAccountService _accountsService;
         private readonly ILogger<EmployerAccountAuthorizationHandler> _logger;
-        private readonly ReservationsWebConfiguration _configuration;
 
         public EmployerAccountAuthorizationHandler(IEmployerAccountService accountsService, ILogger<EmployerAccountAuthorizationHandler> logger, IOptions<ReservationsWebConfiguration> configuration)
         {
             _accountsService = accountsService;
             _logger = logger;
-            _configuration = configuration.Value;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EmployerAccountRequirement requirement)
@@ -74,14 +72,11 @@ namespace SFA.DAS.Reservations.Web.Infrastructure.Authorization
 
             if (employerAccounts == null || !employerAccounts.ContainsKey(accountIdFromUrl))
             {
-                var requiredIdClaim = _configuration.UseGovSignIn
-                    ? ClaimTypes.NameIdentifier : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
-
-                if (!context.User.HasClaim(c => c.Type.Equals(requiredIdClaim)))
+                if (!context.User.HasClaim(c => c.Type.Equals(ClaimTypes.NameIdentifier)))
                     return false;
 
                 var userClaim = context.User.Claims
-                    .First(c => c.Type.Equals(requiredIdClaim));
+                    .First(c => c.Type.Equals(ClaimTypes.NameIdentifier));
                 var email = context.User.Claims.FirstOrDefault(c => c.Type.Equals(ClaimTypes.Email))?.Value;
 
                 var userId = userClaim.Value;
