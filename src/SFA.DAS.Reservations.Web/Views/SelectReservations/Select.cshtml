@@ -35,8 +35,13 @@
                         </h2>
                     </div>
                     <div class="govuk-notification-banner__content">
-                        You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
-                        <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                        <div class="govuk-notification-banner__heading">
+                            You cannot create a new funding reservation
+                        </div>
+                        <p>
+                            You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
+                            <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                        </p>
                     </div>
                 </div>
             }
