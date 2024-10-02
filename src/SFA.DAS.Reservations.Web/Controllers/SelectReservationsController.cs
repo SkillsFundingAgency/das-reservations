@@ -108,6 +108,7 @@ public class SelectReservationsController(
                     .Select(reservation => new AvailableReservationViewModel(reservation));
                 viewModel.AccountId = cacheReservationEmployerCommand.AccountId;
                 viewModel.BackLink = backUrl;
+                viewModel.MoreReservationsAvailable = moreReservationsAvailable;
                 return View(ViewNames.Select, viewModel);
             }
 
