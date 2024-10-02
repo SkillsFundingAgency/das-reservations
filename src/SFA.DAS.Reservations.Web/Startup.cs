@@ -66,11 +66,11 @@ public class Startup
         {
             if (_configuration.IsEmployerAuth())
             {
-                services.AddEmployerConfiguration(_configuration, _environment);
+                services.AddEmployerConfiguration(_configuration);
             }
             else if (_configuration.IsProviderAuth())
             {
-                services.AddProviderConfiguration(_configuration, _environment);
+                services.AddProviderConfiguration(_configuration);
             }
         }
 
@@ -128,11 +128,7 @@ public class Startup
                 .AddCheck<ReservationsApiHealthCheck>(
                     "Reservation Api",
                     failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] { "ready" })
-                .AddCheck<AccountApiHealthCheck>(
-                    "Accounts Api",
-                    failureStatus: HealthStatus.Unhealthy,
-                    tags: new[] { "ready" });
+                    tags: ["ready"]);
         }
     }
 
