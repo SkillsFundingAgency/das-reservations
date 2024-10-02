@@ -18,28 +18,23 @@ namespace SFA.DAS.Reservations.Web.AppStart;
 public static class ConfigurationExtensions
 {
     private const string EncodingConfigKey = "SFA.DAS.Encoding";
-        
-    public static void AddEmployerConfiguration(
-        this IServiceCollection services, 
-        IConfiguration configuration)
+
+    public static void AddEmployerConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
-        services.AddSingleton(cfg => cfg.GetService<IOptions<IdentityServerConfiguration>>().Value);
-            
         services.AddSingleton<IAuthorizationHandler, EmployerAccountAuthorizationHandler>();
 
         AddSharedConfiguration(services, configuration);
     }
 
     public static void AddProviderConfiguration(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.Configure<ProviderIdamsConfiguration>(configuration.GetSection("ProviderIdams"));
         services.AddSingleton(cfg => cfg.GetService<IOptions<ProviderIdamsConfiguration>>().Value);
 
         services.AddSingleton<IAuthorizationHandler, ProviderAuthorizationHandler>();
-            
+
         AddSharedConfiguration(services, configuration);
     }
 
@@ -63,7 +58,7 @@ public static class ConfigurationExtensions
         services.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
         services.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
         services.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
-            
+
         services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
         services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 
@@ -76,10 +71,10 @@ public static class ConfigurationExtensions
         services.AddSingleton<IAuthorizationHandler, MinimumServiceClaimRequirementHandler>();
         services.AddSingleton<IAuthorizationHandler, AccountActiveAuthorizationHandler>();
         services.AddSingleton<IAuthorizationHandler, AccessCohortAuthorizationHandler>();
-            
+
         services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
         services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
-            
+
         services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
         services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 

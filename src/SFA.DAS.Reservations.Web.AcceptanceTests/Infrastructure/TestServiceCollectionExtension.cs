@@ -69,8 +69,6 @@ public static class TestServiceCollectionExtension
         serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsApiConfiguration>>().Value);
         serviceCollection.Configure<ReservationsWebConfiguration>(configuration.GetSection("ReservationsWeb"));
         serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsWebConfiguration>>().Value);
-        serviceCollection.Configure<IdentityServerConfiguration>(configuration.GetSection("Identity"));
-        serviceCollection.AddSingleton(config => config.GetService<IOptions<IdentityServerConfiguration>>().Value);
         serviceCollection.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
         serviceCollection.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 
