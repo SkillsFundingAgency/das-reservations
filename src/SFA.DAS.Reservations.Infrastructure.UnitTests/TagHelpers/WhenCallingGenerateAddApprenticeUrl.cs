@@ -122,13 +122,43 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         public void Then_Uses_Unapproved_Add_Apprentice_For_Select_Journey_With_Empty_Cohort(
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
-            string accountHashedId,
-            string courseId,
+            string accountHashedId,           
             uint ukPrn,
             DateTime startDate,
             [Frozen] ReservationsWebConfiguration webConfig,
             [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+
+            var originalConfigUrl = webConfig.EmployerApprenticeUrl;
+            webConfig.EmployerApprenticeUrl = $"https://{webConfig.EmployerApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                null,
+                ukPrn,
+                startDate,
+                "",
+                accountHashedId,
+                true);
+
+            Assert.AreEqual(
+                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&providerId={ukPrn}&startMonthYear={startDate:MMyyyy}",
+                actualUrl);
+        }
+
+        [Test, MoqAutoData]
+        public void Then_Uses_Unapproved_Add_Apprentice_For_Select_Journey_With_CourseId_And_Empty_Cohort(
+           Guid reservationId,
+           string accountLegalEntityPublicHashedId,
+           string accountHashedId,
+           string courseId,
+           uint ukPrn,
+           DateTime startDate,
+           [Frozen] ReservationsWebConfiguration webConfig,
+           [Frozen] Mock<IConfiguration> config,
+           ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("employer");
 
@@ -145,10 +175,10 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 true);
 
             Assert.AreEqual(
-                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&providerId={ukPrn}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
+                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/select-delivery-model?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&providerId={ukPrn}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
                 actualUrl);
         }
-        
+
         [Test, MoqAutoData]
         public void Then_Uses_AddApprentice_Action_With_No_Cohort_Ref_When_There_Is_No_Cohort_Ref(
             Guid reservationId,

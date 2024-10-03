@@ -89,8 +89,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
             id = ukPrn.ToString();
         }
         else if (ukPrn.HasValue)
-        {
-            action = "add/apprentice";
+        {          
+            action = string.IsNullOrEmpty(courseId) ? "add/apprentice" : "add/select-delivery-model";
             id = accountHashedId;
         }
         else
