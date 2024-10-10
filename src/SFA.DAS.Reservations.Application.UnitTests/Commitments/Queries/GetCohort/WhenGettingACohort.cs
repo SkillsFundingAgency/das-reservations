@@ -81,7 +81,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
             var actualException = Assert.ThrowsAsync<Exception>(() => handler.Handle(query, CancellationToken.None));
 
             //Assert
-            //Assert.AreEqual(exception, actualException);
             actualException.Should().Be(exception);
         }
 
