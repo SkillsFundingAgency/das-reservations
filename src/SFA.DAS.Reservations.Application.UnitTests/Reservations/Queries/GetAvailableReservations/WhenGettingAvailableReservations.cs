@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
     public class WhenGettingAvailableReservations
     {
         [Test, MoqAutoData]
-        public void And_Invalid_Then_Throws_ValidationException(
+        public async Task And_Invalid_Then_Throws_ValidationException(
             long accountId,
             string propertyName,
             [Frozen] ValidationResult validationResult,
@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
 
             Func<Task> act = async () => { await handler.Handle(query, CancellationToken.None); };
 
-            act.Should().ThrowExactly<ValidationException>()
+            (await act.Should().ThrowExactlyAsync<ValidationException>())
                 .Which.ValidationResult.MemberNames.First(c => c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 

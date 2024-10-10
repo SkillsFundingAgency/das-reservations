@@ -66,7 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, AutoData]
-        public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
+        public async Task And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
             CacheReservationEmployerCommand command,
             ValidationResult validationResult,
             string propertyName)
@@ -82,8 +82,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
             //Assert
-            act.Should().ThrowExactly<ValidationException>()
-                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+            (await act.Should().ThrowExactlyAsync<ValidationException>())
+                .Which.ValidationResult.MemberNames.First(c => c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 
         [Test, AutoData]
@@ -125,9 +125,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             //Act + Assert
             var exception = Assert.ThrowsAsync<ProviderNotAuthorisedException>( () => _commandHandler.Handle(command, CancellationToken.None));
-            
-            Assert.AreEqual(command.AccountId, exception.AccountId);
-            Assert.AreEqual(command.UkPrn, exception.UkPrn);
+
+            exception.AccountId.Should().Be(command.AccountId);
+            exception.UkPrn.Should().Be(command.UkPrn);
         }
         
         [Test, AutoData]
