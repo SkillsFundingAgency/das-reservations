@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetNextUnreadGlobalFundingRule;
@@ -51,8 +52,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             //Act
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
-           //Assert
-           Assert.AreEqual(_expectedGlobalRule, actual.Rule);
+            //Assert
+            actual.Rule.Should().Be(_expectedGlobalRule);
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken()));
 
             //Assert
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().Be(expectedException);
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNull(actual.Rule);
+            actual.Rule.Should().BeNull();
         }
 
         [Test]
@@ -118,7 +119,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = UkPrn.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNull(actual.Rule);
+            actual.Rule.Should().BeNull();
         }
 
         [Test]
@@ -151,7 +152,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNull(actual.Rule);
+            actual.Rule.Should().BeNull();
         }
 
         [Test]
@@ -184,7 +185,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = userId.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNull(actual.Rule);
+            actual.Rule.Should().BeNull();
         }
 
         [Test]
@@ -218,8 +219,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNotNull(actual.Rule);
-            Assert.AreEqual(rule, actual.Rule);
+            actual.Rule.Should().NotBeNull();
+            actual.Rule.Should().Be(rule);
         }
 
         [Test]
@@ -264,8 +265,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var actual = await _handler.Handle(new GetNextUnreadGlobalFundingRuleQuery{Id = ukPrn.ToString()}, new CancellationToken());
 
             //Assert
-            Assert.IsNotNull(actual.Rule);
-            Assert.AreEqual(expectedRule, actual.Rule);
+            actual.Rule.Should().NotBeNull();
+            actual.Rule.Should().Be(expectedRule);
         }
     }
 }

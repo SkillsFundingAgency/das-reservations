@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -30,11 +31,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             result.AccountRules.Add(expectedActiveRule);
 
             //Assert
-            Assert.AreEqual(1, result.AccountRules.Count);
-            Assert.AreEqual(1, result.ActiveAccountRules.Count());
+            result.AccountRules.Count.Should().Be(1);
+            result.ActiveAccountRules.Count().Should().Be(1);
 
             var activeRule = result.ActiveAccountRules.First();
-            Assert.AreEqual(expectedActiveRule, activeRule);
+            activeRule.Should().Be(expectedActiveRule);
         }
 
         [Test]
@@ -55,11 +56,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             result.GlobalRules.Add(expectedGlobalRule);
 
             //Assert
-            Assert.AreEqual(1, result.GlobalRules.Count);
-            Assert.AreEqual(1, result.ActiveGlobalRules.Count());
+            result.GlobalRules.Count.Should().Be(1);
+            result.ActiveGlobalRules.Count().Should().Be(1);
 
             var activeRule = result.ActiveGlobalRules.First();
-            Assert.AreEqual(expectedGlobalRule, activeRule);
+            activeRule.Should().Be(expectedGlobalRule);
         }
 
         [Test]
@@ -82,8 +83,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             result.AccountRules.Add(expectedActiveRule);
 
             //Assert
-            Assert.AreEqual(1, result.AccountRules.Count);
-            Assert.IsEmpty(result.ActiveAccountRules);
+            result.AccountRules.Count.Should().Be(1);
+            result.ActiveAccountRules.Should().BeEmpty();
         }
 
         
@@ -105,8 +106,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             result.GlobalRules.Add(expectedGlobalRule);
 
             //Assert
-            Assert.AreEqual(1, result.GlobalRules.Count);
-            Assert.IsEmpty(result.ActiveGlobalRules);
+            result.GlobalRules.Count.Should().Be(1);
+            result.ActiveGlobalRules.Should().BeEmpty();
         }
     }
 }

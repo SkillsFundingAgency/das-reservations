@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Encoding;
@@ -81,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalE
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(_expectedLegalEntity, result.LegalEntity);
+            result.LegalEntity.Should().Be(_expectedLegalEntity);
         }
 
         [Test]
@@ -108,7 +109,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalE
             var exception = Assert.ThrowsAsync<Exception>(() => _handler.Handle(_query, CancellationToken.None));
 
             //Assert
-            Assert.AreEqual(expectedException, exception);
+            exception.Should().Be(expectedException);
         }
 
         [Test]
@@ -124,7 +125,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetLegalE
             var exception = Assert.ThrowsAsync<Exception>(() => _handler.Handle(_query, CancellationToken.None));
 
             //Assert
-            Assert.AreEqual(expectedException, exception);
+            exception.Should().Be(expectedException);
         }
 
 

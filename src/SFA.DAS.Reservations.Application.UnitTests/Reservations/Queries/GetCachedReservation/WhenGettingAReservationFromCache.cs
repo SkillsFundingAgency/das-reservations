@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries;
@@ -73,9 +74,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             var actual = await _handler.Handle(command, new CancellationToken());
 
             //Assert
-            Assert.AreEqual(_cachedReservation.Id, actual.Id);
-            Assert.AreEqual(_cachedReservation.TrainingDate, actual.TrainingDate);
-            Assert.AreEqual(_cachedReservation.CohortRef, actual.CohortRef);
+            actual.Id.Should().Be(_cachedReservation.Id);
+            actual.TrainingDate.Should().Be(_cachedReservation.TrainingDate);
+            actual.CohortRef.Should().Be(_cachedReservation.CohortRef);
 
             _cacheReservationRepository.Verify(r => r.GetProviderReservation(command.Id, command.UkPrn), Times.Once);
             _cacheReservationRepository.Verify(r => r.GetEmployerReservation(It.IsAny<Guid>()), Times.Never);
@@ -98,11 +99,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             var actual = await _handler.Handle(command, new CancellationToken());
 
             //Assert
-            Assert.AreEqual(_cachedReservation.Id, actual.Id);
-            Assert.AreEqual(_cachedReservation.TrainingDate, actual.TrainingDate);
-            Assert.AreEqual(_cachedReservation.CohortRef, actual.CohortRef);
-            Assert.AreEqual(_cachedReservation.IsEmptyCohortFromSelect, actual.IsEmptyCohortFromSelect);
-            Assert.AreEqual(_cachedReservation.UkPrn, actual.UkPrn);
+            actual.Id.Should().Be(_cachedReservation.Id);
+            actual.TrainingDate.Should().Be(_cachedReservation.TrainingDate);
+            actual.CohortRef.Should().Be(_cachedReservation.CohortRef);
+            actual.IsEmptyCohortFromSelect.Should().Be(_cachedReservation.IsEmptyCohortFromSelect);
+            actual.UkPrn.Should().Be(_cachedReservation.UkPrn);
 
             _cacheReservationRepository.Verify(r => r.GetEmployerReservation(command.Id), Times.Once);
             _cacheReservationRepository.Verify(r => r.GetProviderReservation(It.IsAny<Guid>(), It.IsAny<uint>()), Times.Never);

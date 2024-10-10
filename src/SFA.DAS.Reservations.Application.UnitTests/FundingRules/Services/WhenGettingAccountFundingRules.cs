@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -58,8 +59,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             var result = await _service.GetAccountFundingRules(ExpectedAccountId);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedGlobalRules, result.GlobalRules);
+            result.Should().NotBeNull();
+            result.GlobalRules.Should().BeEquivalentTo(_expectedGlobalRules);
         }
 
         [Test]
@@ -74,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 
             //Act + Assert
             var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAccountFundingRules(ExpectedAccountId));
-            Assert.AreEqual(exception, actualException);
+            actualException.Should().Be(exception);
         }
     }
 }

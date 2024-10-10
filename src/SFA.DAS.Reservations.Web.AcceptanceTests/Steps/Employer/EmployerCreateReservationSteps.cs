@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -82,8 +83,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             {
                 var result = TestData.ActionResult as RedirectToRouteResult;
 
-                Assert.IsNotNull(result);
-                Assert.AreEqual(RouteNames.EmployerSelectCourse, result.RouteName);
+                result.Should().NotBeNull();
+                result.RouteName.Should().Be(RouteNames.EmployerSelectCourse);
             }
         }
 
@@ -100,8 +101,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             var result = controller.PostSelectCourse(TestData.ReservationRouteModel, postSelectCourseViewModel)
                     .Result as RedirectToRouteResult;
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerApprenticeshipTraining, result.RouteName);
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.EmployerApprenticeshipTraining);
         }
 
         [Given(@"I have a reservation start date of (.*)")]
@@ -121,8 +122,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             var result = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                         .Result as RedirectToRouteResult;
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerReview, result.RouteName);
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.EmployerReview);
         }
 
         [When(@"I do not choose a start date")]
@@ -153,8 +154,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var result = PostReviewStep(true) as RedirectToRouteResult;
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(RouteNames.EmployerCompleted, result.RouteName);
+            result.Should().NotBeNull();
+            result.RouteName.Should().Be(RouteNames.EmployerCompleted);
         }
 
         [When(@"I review my reservation and I do not confirm")]
@@ -162,7 +163,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var result = PostReviewStep(false) as RedirectResult;
 
-            Assert.IsNotNull(result);
+            result.Should().NotBeNull();
             _reviewRedirectUrl = result.Url;
         }
 
@@ -170,8 +171,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         public void ThenIAmShownAValidationMessage(string viewName)
         {
             var result = TestData.ActionResult as ViewResult;
-            Assert.IsTrue(result.ViewData.ModelState.ErrorCount!=0);
-            Assert.AreEqual(viewName,result.ViewName);
+            (result.ViewData.ModelState.ErrorCount!=0).Should().BeTrue();
+            result.ViewName.Should().Be(viewName);
         }
 
         [Then(@"The reservation is created")]
@@ -200,15 +201,15 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         [Then(@"redirected to employer dashboard")]
         public void ThenRedirectedToEmployerDashboard()
         {
-            Assert.AreEqual($"https://accounts.{TestDataValues.EmployerDashboardUrl}/accounts/{TestDataValues.EmployerAccountId}/teams",_reviewRedirectUrl);
+            _reviewRedirectUrl.Should().Be($"https://accounts.{TestDataValues.EmployerDashboardUrl}/accounts/{TestDataValues.EmployerAccountId}/teams");
         }
 
         [Then(@"I am shown a message saying I have reached my reservation limit")]
         public void ThenIAmShownAMessageSayingIHaveReachedMyReservationLimit()
         {
             var actualViewResult = TestData.ActionResult as ViewResult;
-            Assert.IsNotNull(actualViewResult);
-            Assert.AreEqual("ReservationLimitReached", actualViewResult.ViewName);
+            actualViewResult.Should().NotBeNull();
+            actualViewResult.ViewName.Should().Be("ReservationLimitReached");
         }
 
         private IActionResult PostReviewStep(bool reserve)

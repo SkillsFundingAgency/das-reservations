@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,8 +70,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var expectedViewName = "EmployerFundingPaused";
             var actualView = TestData.ActionResult as ViewResult;
-            Assert.NotNull(actualView);
-            Assert.AreEqual(expectedViewName, actualView?.ViewName);
+            actualView.Should().NotBeNull();
+            expectedViewName.Should().Be(actualView?.ViewName);
         }
 
         [Then(@"I am shown that there are upcoming restrictions in place")]
@@ -81,16 +82,16 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             
             var expectedStartResultViewName = "Index";
             var actualView = TestData.ActionResult as ViewResult;
-            Assert.NotNull(actualView);
-            Assert.AreEqual(expectedStartResultViewName, actualView.ViewName);
+            actualView.Should().NotBeNull();
+            expectedStartResultViewName.Should().Be(actualView.ViewName);
 
             var expectedIndexResultViewName = "FundingRestrictionNotification";
             var controller = Services.GetService<EmployerReservationsController>();
             controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { _claim }));
             controller.Url = mockUrlHelper.Object;
             TestData.ActionResult = controller.Index(TestData.ReservationRouteModel).Result;
-            Assert.NotNull(TestData.ActionResult);
-            Assert.AreEqual(expectedIndexResultViewName, (TestData.ActionResult as ViewResult)?.ViewName);
+            TestData.ActionResult.Should().NotBeNull();
+            expectedIndexResultViewName.Should().Be((TestData.ActionResult as ViewResult)?.ViewName);
         }
 
         [Then(@"I am able to dismiss them")]
@@ -107,8 +108,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                 RouteName = RouteNames.EmployerStart
             };
             TestData.ActionResult = controller.SaveRuleNotificationChoice(TestData.ReservationRouteModel, fundingRestrictionViewModel).Result;
-            Assert.NotNull(TestData.ActionResult);
-            Assert.AreEqual(RouteNames.EmployerStart, (TestData.ActionResult as RedirectToRouteResult)?.RouteName);
+            TestData.ActionResult.Should().NotBeNull();
+            (TestData.ActionResult as RedirectToRouteResult)?.RouteName.Should().Be(RouteNames.EmployerStart);
         }
 
         public EmployerRestrictionsSteps(EmployerTestServiceProvider serviceProvider, TestData testData) : base(serviceProvider, testData)

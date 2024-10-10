@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -26,11 +27,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
             
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(urlParameters);
-            
-            Assert.AreEqual(
-                $"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}" +
-                         $"/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}", 
-                actualUrl);
+
+            actualUrl.Should().Be($"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}" +
+                                      $"/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}");
         }
 
         [Test, MoqAutoData]
@@ -47,9 +46,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateAddApprenticeUrl(urlParameters);
 
-            Assert.AreEqual(
-                $"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}",
-                actualUrl);
+            actualUrl.Should().Be($"https://{urlParameters.SubDomain}.{originalConfigUrl}/{urlParameters.Folder}/{urlParameters.Id}/{urlParameters.Controller}/{urlParameters.Action}{urlParameters.QueryString}");
         }
 
         [Test, MoqAutoData]
@@ -77,11 +74,10 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 cohortRef,
                 "");
 
-            Assert.AreEqual(
+            actualUrl.Should().Be(
                 $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
                          $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
-                         $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
-                actualUrl);
+                         $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}");
         }
         
         [Test, MoqAutoData]
@@ -111,11 +107,10 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 journeyData: journeyData);
 
-            Assert.AreEqual(
+            actualUrl.Should().Be(
                 $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
                 $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
-                $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&journeyData={journeyData}",
-                actualUrl);
+                $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&journeyData={journeyData}");
         }
 
         [Test, MoqAutoData]
@@ -144,9 +139,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 accountHashedId,
                 true);
 
-            Assert.AreEqual(
-                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&providerId={ukPrn}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&providerId={ukPrn}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}");
         }
         
         [Test, MoqAutoData]
@@ -173,9 +167,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 "");
 
-            Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}");
         }
 
 
@@ -202,9 +195,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 "");
 
-            Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&autocreated=true");
         }
 
         [Test, MoqAutoData]
@@ -229,9 +221,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 accountHashedId);
 
-            Assert.AreEqual(
-                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&autocreated=true",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&autocreated=true");
         }
 
         [Test, MoqAutoData]
@@ -261,9 +252,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 false,
                 transferSenderId);
 
-            Assert.AreEqual(
-                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}");
         }
     }
 }

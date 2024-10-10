@@ -14,15 +14,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             GetProviderCacheReservationCommandQueryValidator validator)
         {
             query.UkPrn = default(uint);
-            
+
             var result = await validator.ValidateAsync(query);
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
-            
+
             result.ValidationDictionary
                 .Should().ContainKey(nameof(GetProviderCacheReservationCommandQuery.UkPrn))
-                .WhichValue.Should()
+                .WhoseValue.Should()
                 .Be($"{nameof(GetProviderCacheReservationCommandQuery.UkPrn)} has not been supplied");
         }
 
@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             GetProviderCacheReservationCommandQueryValidator validator)
         {
             query.AccountLegalEntityPublicHashedId = null;
-            
+
             var result = await validator.ValidateAsync(query);
 
             result.IsValid().Should().BeFalse();
@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
 
             result.ValidationDictionary
                 .Should().ContainKey(nameof(GetProviderCacheReservationCommandQuery.AccountLegalEntityPublicHashedId))
-                .WhichValue.Should()
+                .WhoseValue.Should()
                 .Be($"{nameof(GetProviderCacheReservationCommandQuery.AccountLegalEntityPublicHashedId)} has not been supplied");
         }
 
