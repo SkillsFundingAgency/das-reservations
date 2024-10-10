@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
@@ -22,10 +23,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Extensions.ValidationResult
 
             //Act
             var targetValidationResult = sourceValidationResult.ConvertToDataAnnotationsValidationResult();
-            
+
 
             //Assert
-            Assert.AreEqual(expectedErrorMessage, targetValidationResult.ErrorMessage);
+            targetValidationResult.ErrorMessage.Should().Be(expectedErrorMessage);
         }
     }
 }

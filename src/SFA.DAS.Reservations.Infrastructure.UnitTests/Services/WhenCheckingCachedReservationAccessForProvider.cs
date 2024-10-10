@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
             var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
         [Test, AutoData]
@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Services
             var result = _service.ProviderReservationAccessAllowed(providerUkPrn, _reservation);
 
             //Assert
-            Assert.IsFalse(result);
+            result.Should().BeFalse();
         }
 
         [Test, AutoData]

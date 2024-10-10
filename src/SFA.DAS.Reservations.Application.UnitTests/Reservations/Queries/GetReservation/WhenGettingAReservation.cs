@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -109,13 +110,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
 
             //Assert
             _reservationAuthorisationService.Verify(s => s.ProviderReservationAccessAllowed(command.UkPrn, _response), Times.Once);
-            
-            Assert.AreEqual(_expectedReservationId, actual.ReservationId);
-            Assert.AreEqual(_expectedStartDate, actual.StartDate);
-            Assert.AreEqual(_expectedExpiryDate, actual.ExpiryDate);
-            Assert.AreEqual(ExpectedLegalEntityId, actual.AccountLegalEntityId);
-            Assert.AreEqual(ExpectedLegalEntityName, actual.AccountLegalEntityName);
-            Assert.AreEqual(ExpectedProviderId, actual.UkPrn);
+
+            actual.ReservationId.Should().Be(_expectedReservationId);
+            actual.StartDate.Should().Be(_expectedStartDate);
+            actual.ExpiryDate.Should().Be(_expectedExpiryDate);
+            actual.AccountLegalEntityId.Should().Be(ExpectedLegalEntityId);
+            actual.AccountLegalEntityName.Should().Be(ExpectedLegalEntityName);
+            actual.UkPrn.Should().Be(ExpectedProviderId);
         }
 
         [Test]

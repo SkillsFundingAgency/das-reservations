@@ -1,4 +1,5 @@
 ﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -25,9 +26,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateDashboardUrl(accountId);
 
-            Assert.AreEqual(
-                $"https://accounts.{originalConfigUrl}/accounts/{accountId}/teams",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"https://accounts.{originalConfigUrl}/accounts/{accountId}/teams");
         }
 
 
@@ -43,8 +43,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateDashboardUrl();
 
-            Assert.AreEqual(
-                $"{webConfig.DashboardUrl}/Account",actualUrl);
+            actualUrl.Should().Be(
+                $"{webConfig.DashboardUrl}/Account");
         }
     }
 }

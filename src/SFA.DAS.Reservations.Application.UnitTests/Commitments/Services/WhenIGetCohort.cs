@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
             var result = await service.GetCohort(cohort.CohortId);
 
             //Assert
-           Assert.AreEqual(cohort, result);
+            result.Should().Be(cohort);
         }
 
         [Test, MoqAutoData]
@@ -68,7 +69,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Services
             var actualException = Assert.ThrowsAsync<Exception>(() => service.GetCohort(cohort.CohortId));
 
             //Assert
-            Assert.AreEqual(exception, actualException);
+            actualException.Should().Be(exception);
         }
     }
 }

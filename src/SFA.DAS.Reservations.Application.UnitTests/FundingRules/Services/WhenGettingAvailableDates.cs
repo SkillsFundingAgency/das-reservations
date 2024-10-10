@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -60,8 +61,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             var result = await _service.GetAvailableDates(_accountLegalEntityId);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedAvailableDates, result.AvailableDates);
+            result.Should().NotBeNull();
+            result.AvailableDates.Should().BeEquivalentTo(_expectedAvailableDates);
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
 
             //Act + Assert
             var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAvailableDates(_accountLegalEntityId));
-            Assert.AreEqual(exception, actualException);
+            actualException.Should().Be(exception);
         }
     }
 }
