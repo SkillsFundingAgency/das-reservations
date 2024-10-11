@@ -70,9 +70,6 @@
     "sharedManagementResourceGroup": {
       "type": "string"
     },
-    "loggingRedisConnectionString": {
-      "type": "securestring"
-    },
     "featureToggleOn": {
       "type": "string"
     },
@@ -226,10 +223,6 @@
                   "value": "[parameters('cdnUrl')]"
                 },
                 {
-                  "name": "LoggingRedisConnectionString",
-                  "value": "[parameters('loggingRedisConnectionString')]"
-                },
-                {
                   "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                   "value": "[reference(concat(variables('employerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                 },
@@ -341,10 +334,6 @@
                 {
                   "name": "Cdn:Url",
                   "value": "[parameters('cdnUrl')]"
-                },
-                {
-                  "name": "LoggingRedisConnectionString",
-                  "value": "[parameters('loggingRedisConnectionString')]"
                 },
                 {
                   "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
