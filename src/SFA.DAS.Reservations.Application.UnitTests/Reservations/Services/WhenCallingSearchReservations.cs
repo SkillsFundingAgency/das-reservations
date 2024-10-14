@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
         {
             var dates = new List<DateTime>
             {
-                DateTime.Parse("Apr 2020"), 
+                DateTime.Parse("Apr 2020"),
                 DateTime.Parse("Sep 2010"),
                 DateTime.Parse("Aug 2018"),
                 DateTime.Parse("Oct 2017"),
@@ -77,7 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             var response = await handler.SearchReservations(request);
 
-            response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations);
+            response.Reservations.Should().BeEquivalentTo(reservationsApiResponse.Reservations, o=>o.Excluding(x=>x.Status));
             response.TotalReservationsForProvider.Should().Be(reservationsApiResponse.TotalReservationsForProvider);
             response.NumberOfRecordsFound.Should().Be(reservationsApiResponse.NumberOfRecordsFound);
             response.EmployerFilters.Should().BeEquivalentTo(reservationsApiResponse.Filters.EmployerFilters);

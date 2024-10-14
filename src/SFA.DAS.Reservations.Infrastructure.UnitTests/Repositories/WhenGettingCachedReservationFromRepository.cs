@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -58,7 +59,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Repositories
             var result = await _repository.GetProviderReservation(Guid.NewGuid(), 1);
 
             //Assert
-            Assert.AreEqual(_reservation, result);
+            result.Should().Be(_reservation);
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Repositories
         {
             //Act + assert
             var exception = Assert.ThrowsAsync<ArgumentException>(() => _repository.GetProviderReservation(Guid.Empty, 1));
-            Assert.AreEqual("id", exception.ParamName);
+            exception.ParamName.Should().Be("id");
 
             _cacheService.Verify(s => s.RetrieveFromCache<CachedReservation>(It.IsAny<string>()), Times.Never);
             _authorisationService.Verify(s => s.ProviderReservationAccessAllowed(It.IsAny<uint>(), It.IsAny<CachedReservation>()), Times.Never);
@@ -107,7 +108,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.Repositories
         {
             //Act + assert
             var exception = Assert.ThrowsAsync<ArgumentException>(() => _repository.GetProviderReservation(Guid.NewGuid(), default(uint)));
-            Assert.AreEqual("ukPrn", exception.ParamName);
+            exception.ParamName.Should().Be("ukPrn");
 
             _cacheService.Verify(s => s.RetrieveFromCache<CachedReservation>(It.IsAny<string>()), Times.Never);
             _authorisationService.Verify(s => s.ProviderReservationAccessAllowed(It.IsAny<uint>(), It.IsAny<CachedReservation>()), Times.Never);

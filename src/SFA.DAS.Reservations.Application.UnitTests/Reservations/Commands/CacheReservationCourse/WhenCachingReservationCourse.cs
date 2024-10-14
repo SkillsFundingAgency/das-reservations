@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         }
 
         [Test, AutoData]
-        public void And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
+        public async Task And_The_Command_Is_Not_Valid_Then_Throws_ArgumentException(
             CacheReservationCourseCommand command,
             ValidationResult validationResult,
             string propertyName)
@@ -90,11 +90,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             Func<Task> act = async () => { await _commandHandler.Handle(command, CancellationToken.None); };
 
             //Assert
-            act.Should().ThrowExactly<ValidationException>()
-                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+            (await act.Should().ThrowExactlyAsync<ValidationException>())
+                .Which.ValidationResult.MemberNames.First(c => c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 
-        
         [Test, AutoData]
         public void And_The_Command_Is_Not_Valid_Then_Does_Not_Get_Cached_Reservation(
             CacheReservationCourseCommand command,
@@ -216,7 +215,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var exception = Assert.ThrowsAsync<CachedReservationNotFoundException>(() =>
                 _commandHandler.Handle(command, CancellationToken.None));
 
-            Assert.AreEqual(expectedException, exception);
+            exception.Should().Be(expectedException);
         }
     }
 }

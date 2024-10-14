@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Delet
         }
 
         [Test, MoqAutoData]
-        public void And_Command_Not_Valid_Then_Throws_ValidationException(
+        public async Task And_Command_Not_Valid_Then_Throws_ValidationException(
             DeleteReservationCommand command,
             string propertyName,
             ValidationResult validationResult,
@@ -54,8 +54,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Delet
 
             Func<Task> act = async () => { await handler.Handle(command, CancellationToken.None); };
 
-            act.Should().ThrowExactly<ValidationException>()
-                .Which.ValidationResult.MemberNames.First(c=>c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
+            (await act.Should().ThrowExactlyAsync<ValidationException>())
+                .Which.ValidationResult.MemberNames.First(c => c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 
         [Test, MoqAutoData]

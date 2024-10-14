@@ -89,9 +89,9 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         [Then(@"(.*) reservations are selectable")]
         public void ThenReservationsAreSelectable(int numberOfReservations)
         {
-            Assert.IsNotNull(_actualModel, "View model has not been set");
-            Assert.IsNotNull(_actualModel.AvailableReservations, "Reservations have not been set");
-            Assert.AreEqual(numberOfReservations, _actualModel.AvailableReservations.Count());
+            _actualModel.Should().NotBeNull("View model has not been set");
+            _actualModel.AvailableReservations.Should().NotBeNull("Reservations have not been set");
+            _actualModel.AvailableReservations.Count().Should().Be(numberOfReservations);
         }
 
         
@@ -100,11 +100,11 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var redirectResult = _actionResult as RedirectToRouteResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.AreEqual(RouteNames.EmployerSelectCourseRuleCheck, redirectResult.RouteName);
-            Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, redirectResult.RouteValues["AccountLegalEntityPublicHashedId"]);
-            Assert.AreEqual(TestData.ReservationRouteModel.CohortReference, redirectResult.RouteValues["CohortReference"]);
-            Assert.AreEqual(TestData.ReservationRouteModel.EmployerAccountId, redirectResult.RouteValues["EmployerAccountId"]);
+            redirectResult.Should().NotBeNull();
+            redirectResult.RouteName.Should().Be(RouteNames.EmployerSelectCourseRuleCheck);
+            redirectResult.RouteValues["AccountLegalEntityPublicHashedId"].Should().Be(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId);
+            redirectResult.RouteValues["CohortReference"].Should().Be(TestData.ReservationRouteModel.CohortReference);
+            redirectResult.RouteValues["EmployerAccountId"].Should().Be(TestData.ReservationRouteModel.EmployerAccountId);
         }
         
         [Then(@"I am redirected to the add apprentice page")]
@@ -112,8 +112,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var redirectResult = _actionResult as RedirectResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId="));
+            redirectResult.Should().NotBeNull();
+            redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/{TestDataValues.CohortReference}/apprentices/add?reservationId=").Should().BeTrue();
 
             VerifyAddApprenticeQueryParams(redirectResult);
 
@@ -125,10 +125,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var redirectResult = _actionResult as RedirectResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?"));
+            redirectResult.Should().NotBeNull();
+            redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?").Should().BeTrue();
             var queryParams = new Uri(redirectResult.Url).ParseQueryString();
-            Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
+            queryParams["providerId"].Should().Be(TestDataValues.ProviderId.ToString());
             VerifyAddApprenticeQueryParams(redirectResult);
 
             VerifyLevyReservationCreated();
@@ -139,10 +139,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var redirectResult = _actionResult as RedirectResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.IsTrue(redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?"));
+            redirectResult.Should().NotBeNull();
+            redirectResult.Url.StartsWith($"https://{TestDataValues.EmployerApprenticeUrl}/{TestData.ReservationRouteModel.EmployerAccountId}/unapproved/add/apprentice?").Should().BeTrue();
             var queryParams = new Uri(redirectResult.Url).ParseQueryString();
-            Assert.AreEqual(TestDataValues.ProviderId.ToString(), queryParams["providerId"]);
+            queryParams["providerId"].Should().Be(TestDataValues.ProviderId.ToString());
             VerifyAddApprenticeQueryParams(redirectResult, false);
         }
 
@@ -151,7 +151,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var viewResult = _actionResult as ViewResult;
 
-            Assert.IsNotNull(viewResult);
+            viewResult.Should().NotBeNull();
             viewResult.ViewName.Should().Be("ReservationLimitReached");
         }
 
@@ -160,12 +160,12 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var uri = new Uri(redirectResult.Url);
             var queryParams = uri.ParseQueryString();
-            Assert.AreEqual("true", queryParams["autocreated"]);
-            Assert.AreEqual(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId, queryParams["accountLegalEntityHashedId"]);
-            Assert.AreEqual(_viewModel.TransferSenderId, queryParams["transferSenderId"]);
+            queryParams["autocreated"].Should().Be("true");
+            queryParams["accountLegalEntityHashedId"].Should().Be(TestData.ReservationRouteModel.AccountLegalEntityPublicHashedId);
+            queryParams["transferSenderId"].Should().Be(_viewModel.TransferSenderId);
             if (expectReservationId)
             {
-                Assert.IsTrue(Guid.Parse(queryParams["reservationId"]) != Guid.Empty);
+                (Guid.Parse(queryParams["reservationId"]) != Guid.Empty).Should().BeTrue();
             }
         }
 

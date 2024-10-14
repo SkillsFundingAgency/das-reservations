@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Exceptions;
@@ -78,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             //Assert
             service.Verify(x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<long?>(), It.IsAny<Guid?>()), Times.Never);
-            Assert.IsNull(result);
+            result.Should().BeNull();
         }
         
         [Test, MoqAutoData]
@@ -133,7 +134,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             
             //Assert
             service.Verify( x => x.CreateReservationLevyEmployer(It.IsAny<Guid>(), request.AccountId, request.AccountLegalEntityId, request.TransferSenderId, request.UserId));
-            Assert.AreEqual(id, result.ReservationId);
+            result.ReservationId.Should().Be(id);
         }
 
     }

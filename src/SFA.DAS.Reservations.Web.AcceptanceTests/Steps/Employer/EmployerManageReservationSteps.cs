@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -70,40 +71,42 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                 It.IsAny<ReservationApiRequest>())).ReturnsAsync(TestData.Reservations);
 
             var actual = controller.EmployerManage(TestData.ReservationRouteModel).Result as ViewResult;
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
             _actualModel = actual.Model as ManageViewModel;
         }
 
         [Then(@"(.*) reservations are displayed")]
         public void ThenReservationsAreDisplayed(int numberOfReservations)
         {
-            Assert.IsNotNull(_actualModel, "View model has not been set");
-            Assert.IsNotNull(_actualModel.Reservations, "Reservations have not been set");
-            Assert.AreEqual(numberOfReservations, _actualModel.Reservations.Count);
+            _actualModel.Should().NotBeNull();
+
+            _actualModel.Should().NotBeNull("View model has not been set");
+            _actualModel.Reservations.Should().NotBeNull("Reservations have not been set");
+            numberOfReservations.Should().Be(_actualModel.Reservations.Count);
         }
 
         [Then(@"I am able to delete the reservation")]
         public void ThenIAmAbleToDeleteTheReservation()
         {
-            Assert.IsTrue(_actualModel.Reservations.First().CanProviderDeleteReservation);
+            _actualModel.Reservations.First().CanProviderDeleteReservation.Should().BeTrue();
         }
 
         [Then(@"I am not able to delete the reservation")]
         public void ThenIAmNotAbleToDeleteTheReservation()
         {
-            Assert.AreEqual(string.Empty, _actualModel.Reservations.First().DeleteRouteName);
+            _actualModel.Reservations.First().DeleteRouteName.Should().BeEmpty();
         }
 
         [Then(@"I am able to add an apprentice")]
         public void ThenIAmAbleToAddAnApprentice()
         {
-            Assert.AreNotEqual(string.Empty, _actualModel.Reservations.First().ApprenticeUrl);
+            _actualModel.Reservations.First().ApprenticeUrl.Should().NotBeEmpty();
         }
 
         [Then(@"I am not able to add an apprentice")]
         public void ThenIAmNotAbleToAddAnApprentice()
         {
-            Assert.AreEqual(string.Empty, _actualModel.Reservations.First().ApprenticeUrl);
+            _actualModel.Reservations.First().ApprenticeUrl.Should().BeEmpty();
         }
     }
 }

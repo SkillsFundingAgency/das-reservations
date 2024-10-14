@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Services;
@@ -55,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             var result = await service.CreateReservationLevyEmployer(id, accountId, accountLegalEntityId, null, userId);
 
             //Assert
-            Assert.AreEqual(id, result.Id);
+            result.Id.Should().Be(id);
         }
     }
 }
