@@ -85,7 +85,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
             
         if (ukPrn.HasValue && !isEmptyEmployerCohort)
         {
-            action = "add/apprentice";
+            action = string.IsNullOrEmpty(courseId) ? "add/apprentice" : "add/select-delivery-model";
             id = ukPrn.ToString();
         }
         else if (ukPrn.HasValue)
