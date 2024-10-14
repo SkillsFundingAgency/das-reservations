@@ -118,7 +118,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_Unapproved_Add_Apprentice_For_Select_Journey_With_Empty_Cohort(
+        public void Then_Uses_Unapproved_Add_Apprentice_For_Select_Journey_With_Empty_Cohort_and_No_CourseId(
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
             string accountHashedId,
@@ -148,7 +148,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_Unapproved_Add_Apprentice_For_Select_Journey_With_CourseId_And_Empty_Cohort(
+        public void Then_Uses_Unapproved_SelectDeliveryModel_For_Select_Journey_With_CourseId_And_Empty_Cohort(
            Guid reservationId,
            string accountLegalEntityPublicHashedId,
            string accountHashedId,
@@ -179,7 +179,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_AddApprentice_Action_With_No_Cohort_Ref_When_There_Is_No_Cohort_Ref(
+        public void Then_Uses_SelectDeliveryModel_Action_With_No_Cohort_Ref_When_There_Is_No_Cohort_Ref(
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
             string courseId,
