@@ -202,7 +202,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 "");
 
-            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}";
+            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/select-delivery-model?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}";
             actualUrl.Should().Be(expectedUrl);
         }
 
@@ -287,7 +287,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 false,
                 transferSenderId);
 
-            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}";
+            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/select-delivery-model?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}";
             actualUrl.Should().Be(expectedUrl);
         }
     }
