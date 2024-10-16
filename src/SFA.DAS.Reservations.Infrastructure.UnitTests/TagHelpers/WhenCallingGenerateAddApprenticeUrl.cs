@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 cohortRef,
                 "");
 
-            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add/select-delivery-model?" +
+            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
                          $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
                          $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}";
 
@@ -110,7 +110,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 journeyData: journeyData);
 
-            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add/select-delivery-model?" +
+            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/{cohortRef}/apprentices/add?" +
                 $"reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}" +
                 $"&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&journeyData={journeyData}";
 
@@ -179,7 +179,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_SelectDeliveryModel_Action_With_No_Cohort_Ref_When_There_Is_No_Cohort_Ref(
+        public void Then_Uses_Add_Apprentice_Action_With_No_Cohort_Ref_When_There_Is_No_Cohort_Ref(
             Guid reservationId,
             string accountLegalEntityPublicHashedId,
             string courseId,

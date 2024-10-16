@@ -102,7 +102,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
         if (!string.IsNullOrEmpty(cohortRef))
         {
             controller += $"/{cohortRef}";
-            action = string.IsNullOrEmpty(courseId) ? "apprentices/add" : "apprentices/add/select-delivery-model";
+            action = !string.IsNullOrEmpty(courseId) && !string.IsNullOrEmpty(accountHashedId) 
+                ? "apprentices/add/select-delivery-model" :"apprentices/add";
         }
 
         var urlParameters = new UrlParameters
