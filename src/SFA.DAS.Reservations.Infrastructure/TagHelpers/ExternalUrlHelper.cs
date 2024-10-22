@@ -89,8 +89,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
             id = ukPrn.ToString();
         }
         else if (ukPrn.HasValue)
-        {
-            action = "add/apprentice";
+        {          
+            action = string.IsNullOrEmpty(courseId) ? "add/apprentice" : "add/select-delivery-model";
             id = accountHashedId;
         }
         else
@@ -102,7 +102,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
         if (!string.IsNullOrEmpty(cohortRef))
         {
             controller += $"/{cohortRef}";
-            action = "apprentices/add";
+            action = !string.IsNullOrEmpty(courseId) && !string.IsNullOrEmpty(accountHashedId) 
+                ? "apprentices/add/select-delivery-model" :"apprentices/add";
         }
 
         var urlParameters = new UrlParameters
