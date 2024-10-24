@@ -27,189 +27,206 @@ using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 using SFA.DAS.Reservations.Web.Services;
 
-namespace SFA.DAS.Reservations.Web.Controllers
+namespace SFA.DAS.Reservations.Web.Controllers;
+
+[Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
+[ServiceFilter(typeof(LevyNotPermittedFilter))]
+[Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
+public class EmployerReservationsController : ReservationsBaseController
 {
-    [Authorize(Policy = nameof(PolicyNames.HasEmployerAccount))]
-    [ServiceFilter(typeof(LevyNotPermittedFilter))]
-    [Route("accounts/{employerAccountId}/reservations", Name = RouteNames.EmployerIndex)]
-    public class EmployerReservationsController : ReservationsBaseController
+    private readonly IMediator _mediator;
+    private readonly IEncodingService _encodingService;
+    private readonly IExternalUrlHelper _urlHelper;
+    private readonly ILogger<EmployerReservationsController> _logger;
+    private readonly IUserClaimsService _userClaimsService;
+    private readonly ReservationsWebConfiguration _config;
+
+    public EmployerReservationsController(
+        IMediator mediator, 
+        IEncodingService encodingService, 
+        IOptions<ReservationsWebConfiguration> options, 
+        IExternalUrlHelper urlHelper,
+        ILogger<EmployerReservationsController> logger,
+        IUserClaimsService userClaimsService) : base(mediator)
     {
-        private readonly IMediator _mediator;
-        private readonly IEncodingService _encodingService;
-        private readonly IExternalUrlHelper _urlHelper;
-        private readonly ILogger<EmployerReservationsController> _logger;
-        private readonly IUserClaimsService _userClaimsService;
-        private readonly ReservationsWebConfiguration _config;
+        _mediator = mediator;
+        _encodingService = encodingService;
+        _urlHelper = urlHelper;
+        _logger = logger;
+        _userClaimsService = userClaimsService;
+        _config = options.Value;
+    }
 
-        public EmployerReservationsController(
-            IMediator mediator, 
-            IEncodingService encodingService, 
-            IOptions<ReservationsWebConfiguration> options, 
-            IExternalUrlHelper urlHelper,
-            ILogger<EmployerReservationsController> logger,
-            IUserClaimsService userClaimsService) : base(mediator)
+    public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
+    {
+        var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage), RouteNames.EmployerSaveRuleNotificationChoiceNoReservation);
+
+        if (viewResult == null)
         {
-            _mediator = mediator;
-            _encodingService = encodingService;
-            _urlHelper = urlHelper;
-            _logger = logger;
-            _userClaimsService = userClaimsService;
-            _config = options.Value;
+            return RedirectToRoute(RouteNames.EmployerStart, routeModel);
         }
 
-        public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
-        {
-            var viewResult = await CheckNextGlobalRule(RouteNames.EmployerStart, EmployerClaims.IdamsUserIdClaimTypeIdentifier, Url.RouteUrl(RouteNames.EmployerManage), RouteNames.EmployerSaveRuleNotificationChoiceNoReservation);
+        return viewResult;
+    }
 
-            if (viewResult == null)
+    [HttpGet]
+    [Route("start",Name = RouteNames.EmployerStart)]
+    public async Task<IActionResult> Start(ReservationsRouteModel routeModel)
+    {
+        try
+        {
+            var viewModel = new EmployerStartViewModel
             {
-                return RedirectToRoute(RouteNames.EmployerStart, routeModel);
+                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
+                ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
+            };
+
+            var accountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+
+            var response = await _mediator.Send(new GetAccountFundingRulesQuery{ AccountId = accountId});
+            var activeGlobalRule = response?.ActiveRule;
+
+            if (activeGlobalRule == null)
+            {
+                return View("Index", viewModel);
             }
 
-            return viewResult;
-
-        }
-
-        [HttpGet]
-        [Route("start",Name = RouteNames.EmployerStart)]
-        public async Task<IActionResult> Start(ReservationsRouteModel routeModel)
-        {
-            try
+            switch (activeGlobalRule.RuleType)
             {
-                var viewModel = new EmployerStartViewModel
-                {
-                    FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl,
-                    ApprenticeshipFundingRulesUrl = _config.ApprenticeshipFundingRulesUrl
-                };
+                case GlobalRuleType.FundingPaused:
+                    return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
 
-                var accountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
-
-                var response = await _mediator.Send(new GetAccountFundingRulesQuery{ AccountId = accountId});
-                var activeGlobalRule = response?.ActiveRule;
-
-	            if (activeGlobalRule == null)
-	            {
-	                return View("Index", viewModel);
-	            }
-
-                switch (activeGlobalRule.RuleType)
-                {
-                    case GlobalRuleType.FundingPaused:
-                        return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
-
-                    case GlobalRuleType.ReservationLimit:
-                        return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
-                    default:
-                        viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule); 
-                        return View("Index", viewModel);
-                }
-            }
-            catch (ValidationException e)
-            {
-                _logger.LogInformation(e, e.Message);
-                return RedirectToRoute(RouteNames.Error500);
+                case GlobalRuleType.ReservationLimit:
+                    return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+                default:
+                    viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule); 
+                    return View("Index", viewModel);
             }
         }
-
-        [HttpGet]
-        [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
-        public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
+        catch (ValidationException e)
         {
-            try
-            {
-                GetCachedReservationResult cachedResponse = null;
-                if (routeModel.Id.HasValue)
-                {
-                    cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
-                }
+            _logger.LogInformation(e, e.Message);
+            return RedirectToRoute(RouteNames.Error500);
+        }
+    }
 
-                var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+    [HttpGet]
+    [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
+    public async Task<IActionResult> SelectLegalEntity(ReservationsRouteModel routeModel)
+    {
+        try
+        {
+            GetCachedReservationResult cachedResponse = null;
+            if (routeModel.Id.HasValue)
+            {
+                cachedResponse = await _mediator.Send(new GetCachedReservationQuery {Id = routeModel.Id.Value});
+            }
+
+            var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
                 
-                if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
+            if (legalEntitiesResponse.AccountLegalEntities.Count() == 1)
+            {
+                var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
+
+                if (!accountLegalEntity.AgreementSigned)
                 {
-                    var accountLegalEntity = legalEntitiesResponse.AccountLegalEntities.First();
-
-                    if (!accountLegalEntity.AgreementSigned)
-                    {
-                        return RedirectToSignAgreement(routeModel, RouteNames.EmployerIndex);
-                    }
-
-                    await CacheReservation(routeModel, accountLegalEntity, true);
-                    return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
+                    return RedirectToSignAgreement(routeModel, RouteNames.EmployerIndex);
                 }
 
-                var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
-                return View("SelectLegalEntity", viewModel);
-            }
-            catch (ReservationLimitReachedException)
-            {
-                return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
-            }
-            catch (GlobalReservationRuleException)
-            {
-                return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                return RedirectToRoute(RouteNames.Error500);
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
-        public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
-                    var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
-                    return View("SelectLegalEntity", requestViewModel);
-                }
-
-                var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
-                var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
-                var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
-                    model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
-
-                if (!selectedAccountLegalEntity.AgreementSigned)
-                {
-                    return RedirectToSignAgreement(routeModel, RouteNames.EmployerSelectLegalEntity);
-                }
-
-                await CacheReservation(routeModel, selectedAccountLegalEntity);
-
+                await CacheReservation(routeModel, accountLegalEntity, true);
                 return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
             }
-            catch (ValidationException e)
-            {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
 
+            var viewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, cachedResponse?.AccountLegalEntityPublicHashedId);
+            return View("SelectLegalEntity", viewModel);
+        }
+        catch (ReservationLimitReachedException)
+        {
+            return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+        }
+        catch (GlobalReservationRuleException)
+        {
+            return View("EmployerFundingPaused", GenerateLimitReachedBackLink(routeModel));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return RedirectToRoute(RouteNames.Error500);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("select-legal-entity/{id?}", Name = RouteNames.EmployerSelectLegalEntity)]
+    public async Task<IActionResult> PostSelectLegalEntity(ReservationsRouteModel routeModel, ConfirmLegalEntityViewModel viewModel)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
                 var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
                 var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
                 return View("SelectLegalEntity", requestViewModel);
             }
-            catch (ReservationLimitReachedException)
+
+            var decodedAccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId);
+            var response = await _mediator.Send(new GetLegalEntitiesQuery {AccountId = decodedAccountId });
+            var selectedAccountLegalEntity = response.AccountLegalEntities.Single(model =>
+                model.AccountLegalEntityPublicHashedId == viewModel.LegalEntity);
+
+            if (!selectedAccountLegalEntity.AgreementSigned)
             {
-                return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+                return RedirectToSignAgreement(routeModel, RouteNames.EmployerSelectLegalEntity);
             }
-            catch (GlobalReservationRuleException)
-            {
-                return View("EmployerFundingPaused");
-            }
+
+            await CacheReservation(routeModel, selectedAccountLegalEntity);
+
+            return RedirectToRoute(RouteNames.EmployerSelectCourse, routeModel);
         }
-        
-        [HttpGet]
-        [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
-        public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
+        catch (ValidationException e)
         {
-            var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, routeModel.FromReview);
+            foreach (var member in e.ValidationResult.MemberNames)
+            {
+                ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+            }
+
+            var legalEntitiesResponse = await _mediator.Send(new GetLegalEntitiesQuery { AccountId = _encodingService.Decode(routeModel.EmployerAccountId, EncodingType.AccountId) });
+            var requestViewModel = new SelectLegalEntityViewModel(routeModel, legalEntitiesResponse.AccountLegalEntities, viewModel.LegalEntity);
+            return View("SelectLegalEntity", requestViewModel);
+        }
+        catch (ReservationLimitReachedException)
+        {
+            return View("ReservationLimitReached", GenerateLimitReachedBackLink(routeModel));
+        }
+        catch (GlobalReservationRuleException)
+        {
+            return View("EmployerFundingPaused");
+        }
+    }
+        
+    [HttpGet]
+    [Route("{id}/select-course",Name = RouteNames.EmployerSelectCourse)]
+    public async Task<IActionResult> SelectCourse(ReservationsRouteModel routeModel)
+    {
+        var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, routeModel.FromReview);
+
+        if (viewModel == null)
+        {
+            return View("Index");
+        }
+
+        return View("SelectCourse",viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
+    public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, PostSelectCourseViewModel postViewModel)
+    {
+        if (!ModelState.IsValid)
+        {
+
+            var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown);
 
             if (viewModel == null)
             {
@@ -219,216 +236,200 @@ namespace SFA.DAS.Reservations.Web.Controllers
             return View("SelectCourse",viewModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("{id}/select-course", Name = RouteNames.EmployerSelectCourse)]
-        public async Task<IActionResult> PostSelectCourse(ReservationsRouteModel routeModel, PostSelectCourseViewModel postViewModel)
+        if (postViewModel.ApprenticeTrainingKnown == false)
         {
-            if (!ModelState.IsValid)
-            {
-
-                var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown);
-
-                if (viewModel == null)
-                {
-                    return View("Index");
-                }
-
-                return View("SelectCourse",viewModel);
-            }
-
-            if (postViewModel.ApprenticeTrainingKnown == false)
-            {
-                return RedirectToRoute(RouteNames.EmployerCourseGuidance, routeModel);
-            }
-
-            try
-            {
-                await _mediator.Send(new CacheReservationCourseCommand
-                {
-                    Id = routeModel.Id.Value,
-                    SelectedCourseId = postViewModel.SelectedCourseId
-
-                });
-
-                return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
-                {
-                    Id = routeModel.Id,
-                    EmployerAccountId = routeModel.EmployerAccountId,
-                    CohortReference = routeModel.CohortReference
-                });
-            }
-            catch (ValidationException e)
-            {
-                foreach (var member in e.ValidationResult.MemberNames)
-                {
-                    ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
-                }
-
-                var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown, true);
-
-
-                return View("SelectCourse", viewModel);
-            }
-            catch (CachedReservationNotFoundException)
-            {
-                throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
-            }
+            return RedirectToRoute(RouteNames.EmployerCourseGuidance, routeModel);
         }
 
-        [HttpGet]
-        [Route("{id}/course-guidance", Name = RouteNames.EmployerCourseGuidance)]
-        public IActionResult CourseGuidance(ReservationsRouteModel routeModel)
+        try
         {
-            var model = new CourseGuidanceViewModel
+            await _mediator.Send(new CacheReservationCourseCommand
             {
-                DashboardUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
-                BackRouteName = RouteNames.EmployerSelectCourse,
-                ProviderPermissionsUrl = _urlHelper.GenerateUrl(new UrlParameters
-                {
-                    SubDomain = "permissions",
-                    Controller = "providers",
-                    Id = routeModel.EmployerAccountId,
-                    Folder = "accounts"
-                }),
-                FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl
-            };
+                Id = routeModel.Id.Value,
+                SelectedCourseId = postViewModel.SelectedCourseId
 
-            return View("CourseGuidance", model);
+            });
+
+            return RedirectToRoute(RouteNames.EmployerApprenticeshipTraining, new ReservationsRouteModel
+            {
+                Id = routeModel.Id,
+                EmployerAccountId = routeModel.EmployerAccountId,
+                CohortReference = routeModel.CohortReference
+            });
         }
-
-        [HttpGet]
-        [Route("owner-sign-agreement", Name = RouteNames.EmployerOwnerSignAgreement)]
-        public IActionResult OwnerSignAgreement(ReservationsRouteModel routeModel)
+        catch (ValidationException e)
         {
+            foreach (var member in e.ValidationResult.MemberNames)
+            {
+                ModelState.AddModelError(member.Split('|')[0], member.Split('|')[1]);
+            }
+
+            var viewModel = await BuildEmployerSelectCourseViewModel(routeModel, postViewModel.ApprenticeTrainingKnown, true);
+
+
+            return View("SelectCourse", viewModel);
+        }
+        catch (CachedReservationNotFoundException)
+        {
+            throw new ArgumentException("Reservation not found", nameof(routeModel.Id));
+        }
+    }
+
+    [HttpGet]
+    [Route("{id}/course-guidance", Name = RouteNames.EmployerCourseGuidance)]
+    public IActionResult CourseGuidance(ReservationsRouteModel routeModel)
+    {
+        var model = new CourseGuidanceViewModel
+        {
+            DashboardUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+            BackRouteName = RouteNames.EmployerSelectCourse,
+            ProviderPermissionsUrl = _urlHelper.GenerateUrl(new UrlParameters
+            {
+                SubDomain = "permissions",
+                Controller = "providers",
+                Id = routeModel.EmployerAccountId,
+                Folder = "accounts"
+            }),
+            FindApprenticeshipTrainingUrl = _config.FindApprenticeshipTrainingUrl
+        };
+
+        return View("CourseGuidance", model);
+    }
+
+    [HttpGet]
+    [Route("owner-sign-agreement", Name = RouteNames.EmployerOwnerSignAgreement)]
+    public IActionResult OwnerSignAgreement(ReservationsRouteModel routeModel)
+    {
+        var model = new SignAgreementViewModel
+        {
+            BackRouteName = routeModel.PreviousPage,
+            IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
+        };
+            
+        return View("OwnerSignAgreement", model);
+    }
+
+    [HttpGet]
+    [Route("transactor-sign-agreement", Name = RouteNames.EmployerTransactorSignAgreement)]
+    public async Task<IActionResult> TransactorSignAgreement(ReservationsRouteModel routeModel)
+    {
+        try
+        {
+            var decodedAccountId = _encodingService.Decode(
+                routeModel.EmployerAccountId, 
+                EncodingType.AccountId);
+
+            var users = await _mediator.Send(new GetAccountUsersQuery
+            {
+                AccountId = decodedAccountId
+            });
+
+            var owners = users.AccountUsers
+                .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                .OrderBy(user => user.Name)
+                .Select(user => (EmployerAccountUserViewModel) user);
+
             var model = new SignAgreementViewModel
             {
                 BackRouteName = routeModel.PreviousPage,
+                OwnersOfThisAccount = owners,
                 IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
             };
-            
-            return View("OwnerSignAgreement", model);
+
+            return View("TransactorSignAgreement", model);
         }
-
-        [HttpGet]
-        [Route("transactor-sign-agreement", Name = RouteNames.EmployerTransactorSignAgreement)]
-        public async Task<IActionResult> TransactorSignAgreement(ReservationsRouteModel routeModel)
+        catch (Exception e)
         {
-            try
-            {
-                var decodedAccountId = _encodingService.Decode(
-                    routeModel.EmployerAccountId, 
-                    EncodingType.AccountId);
-
-                var users = await _mediator.Send(new GetAccountUsersQuery
-                {
-                    AccountId = decodedAccountId
-                });
-
-                var owners = users.AccountUsers
-                    .Where(user => user.Role.Equals(EmployerUserRole.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                    .OrderBy(user => user.Name)
-                    .Select(user => (EmployerAccountUserViewModel) user);
-
-                var model = new SignAgreementViewModel
-                {
-                    BackRouteName = routeModel.PreviousPage,
-                    OwnersOfThisAccount = owners,
-                    IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
-                };
-
-                return View("TransactorSignAgreement", model);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error attempting to show the transactor sign agreement page.");
-                return RedirectToRoute(RouteNames.Error500);
-            }
+            _logger.LogError(e, "Error attempting to show the transactor sign agreement page.");
+            return RedirectToRoute(RouteNames.Error500);
         }
+    }
 
-        private RedirectToRouteResult RedirectToSignAgreement(ReservationsRouteModel routeModel, string previousRouteName)
-        {
-            if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
+    private RedirectToRouteResult RedirectToSignAgreement(ReservationsRouteModel routeModel, string previousRouteName)
+    {
+        if (_userClaimsService.UserIsInRole(routeModel.EmployerAccountId,
                 EmployerUserRole.Owner, User.Claims))
-            {
-                routeModel.PreviousPage = previousRouteName;
-                return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
-            }
-
+        {
             routeModel.PreviousPage = previousRouteName;
-            return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
+            return RedirectToRoute(RouteNames.EmployerOwnerSignAgreement, routeModel);
         }
 
-        private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
-            ReservationsRouteModel routeModel,
-            bool? apprenticeTrainingKnownOrFromReview,
-            bool failedValidation = false)
+        routeModel.PreviousPage = previousRouteName;
+        return RedirectToRoute(RouteNames.EmployerTransactorSignAgreement, routeModel);
+    }
+
+    private async Task<EmployerSelectCourseViewModel> BuildEmployerSelectCourseViewModel(
+        ReservationsRouteModel routeModel,
+        bool? apprenticeTrainingKnownOrFromReview,
+        bool failedValidation = false)
+    {
+        var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
+        if (cachedReservation == null)
         {
-            var cachedReservation = await _mediator.Send(new GetCachedReservationQuery { Id = routeModel.Id.Value });
-            if (cachedReservation == null)
-            {
-                return null;
-            }
-
-            var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
-
-            var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, failedValidation? null : cachedReservation.CourseId));
-
-            var viewModel = new EmployerSelectCourseViewModel
-            {
-                ReservationId = routeModel.Id.Value,
-                Courses = courseViewModels,
-                BackLink = GenerateBackLink(routeModel, cachedReservation),
-                CohortReference = cachedReservation.CohortRef,
-                ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview,
-                IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect
-            };
-
-            return viewModel;
+            return null;
         }
+
+        var getCoursesResponse = await _mediator.Send(new GetCoursesQuery());
+
+        var courseViewModels = getCoursesResponse.Courses.Select(course => new CourseViewModel(course, failedValidation? null : cachedReservation.CourseId));
+
+        var viewModel = new EmployerSelectCourseViewModel
+        {
+            ReservationId = routeModel.Id.Value,
+            Courses = courseViewModels,
+            BackLink = GenerateBackLink(routeModel, cachedReservation),
+            CohortReference = cachedReservation.CohortRef,
+            ApprenticeTrainingKnown = !string.IsNullOrEmpty(cachedReservation.CourseId) ? true : apprenticeTrainingKnownOrFromReview,
+            IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect
+        };
+
+        return viewModel;
+    }
         
-        private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
-        {
-            var reservationId = routeModel.Id ?? Guid.NewGuid();
+    private async Task CacheReservation(ReservationsRouteModel routeModel, AccountLegalEntity accountLegalEntity, bool employerHasSingleLegalEntity = false)
+    {
+        var reservationId = routeModel.Id ?? Guid.NewGuid();
             
-            await _mediator.Send(new CacheReservationEmployerCommand
-            {
-                Id = reservationId,
-                AccountId = accountLegalEntity.AccountId,
-                AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId,
-                EmployerHasSingleLegalEntity = employerHasSingleLegalEntity
-            });
-
-            routeModel.Id = reservationId;
-        }
-
-
-        private string GenerateBackLink(ReservationsRouteModel routeModel, GetCachedReservationResult result)
+        await _mediator.Send(new CacheReservationEmployerCommand
         {
-            if (!string.IsNullOrEmpty(result.CohortRef) || result.IsEmptyCohortFromSelect)
-            {
-                return _urlHelper.GenerateCohortDetailsUrl(result.UkPrn, routeModel.EmployerAccountId, result.CohortRef, result.IsEmptyCohortFromSelect, string.Empty, result.AccountLegalEntityPublicHashedId);
-            }
+            Id = reservationId,
+            AccountId = accountLegalEntity.AccountId,
+            AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+            AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName,
+            AccountLegalEntityPublicHashedId = accountLegalEntity.AccountLegalEntityPublicHashedId,
+            EmployerHasSingleLegalEntity = employerHasSingleLegalEntity
+        });
 
-            if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
-                return RouteNames.EmployerReview;
-            
-            if (result.EmployerHasSingleLegalEntity)
-                return RouteNames.EmployerStart;
+        routeModel.Id = reservationId;
+    }
 
-            return RouteNames.EmployerSelectLegalEntity;
-        }
-
-        private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
+    private string GenerateBackLink(ReservationsRouteModel routeModel, GetCachedReservationResult result)
+    {
+        if (!string.IsNullOrEmpty(result.CohortRef) || result.IsEmptyCohortFromSelect)
         {
-            if (!string.IsNullOrEmpty(routeModel.CohortReference))
-            {
-                return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
-            }
-
-            return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
+            return _urlHelper.GenerateCohortDetailsUrl(result.UkPrn, routeModel.EmployerAccountId, result.CohortRef, result.IsEmptyCohortFromSelect, string.Empty, result.AccountLegalEntityPublicHashedId);
         }
+
+        if (routeModel.FromReview.HasValue && routeModel.FromReview.Value)
+        {
+            return RouteNames.EmployerReview;
+        }
+
+        if (result.EmployerHasSingleLegalEntity)
+        {
+            return RouteNames.EmployerStart;
+        }
+
+        return RouteNames.EmployerSelectLegalEntity;
+    }
+
+    private string GenerateLimitReachedBackLink(ReservationsRouteModel routeModel)
+    {
+        if (!string.IsNullOrEmpty(routeModel.CohortReference))
+        {
+            return _urlHelper.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId, routeModel.CohortReference);
+        }
+
+        return Url.RouteUrl(RouteNames.EmployerManage, routeModel);
     }
 }

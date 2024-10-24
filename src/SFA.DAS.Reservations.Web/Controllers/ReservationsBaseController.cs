@@ -7,47 +7,38 @@ using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
 
-namespace SFA.DAS.Reservations.Web.Controllers
+namespace SFA.DAS.Reservations.Web.Controllers;
+
+public abstract class ReservationsBaseController(IMediator mediator) : Controller
 {
-    public abstract class ReservationsBaseController : Controller
+    [NonAction]
+    protected async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink, string postRouteName)
     {
-        private readonly IMediator _mediator;
 
-        protected ReservationsBaseController(IMediator mediator)
+        var isProvider = claimName == ProviderClaims.ProviderUkprn;
+
+        var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(claimName));
+        var response = await mediator.Send(new GetNextUnreadGlobalFundingRuleQuery { Id = userAccountIdClaim.Value });
+
+        var nextGlobalRuleId = response?.Rule?.Id;
+        var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
+
+        if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
         {
-            _mediator = mediator;
+            return null;
         }
 
-        [NonAction]
-        protected async Task<ViewResult> CheckNextGlobalRule(string redirectRouteName, string claimName, string backLink, string postRouteName)
+        var viewModel = new FundingRestrictionNotificationViewModel
         {
+            RuleId = nextGlobalRuleId.Value,
+            TypeOfRule = RuleType.GlobalRule,
+            RestrictionStartDate = nextGlobalRuleStartDate.Value,
+            BackLink = backLink,
+            RouteName = redirectRouteName,
+            IsProvider = isProvider,
+            PostRouteName = postRouteName
+        };
 
-            var isProvider = claimName == ProviderClaims.ProviderUkprn;
-
-            var userAccountIdClaim = User.Claims.First(c => c.Type.Equals(claimName));
-            var response = await _mediator.Send(new GetNextUnreadGlobalFundingRuleQuery { Id = userAccountIdClaim.Value });
-
-            var nextGlobalRuleId = response?.Rule?.Id;
-            var nextGlobalRuleStartDate = response?.Rule?.ActiveFrom;
-
-            if (!nextGlobalRuleId.HasValue || nextGlobalRuleId.Value == 0 || !nextGlobalRuleStartDate.HasValue)
-            {
-                return null;
-            }
-
-            var viewModel = new FundingRestrictionNotificationViewModel
-            {
-                RuleId = nextGlobalRuleId.Value,
-                TypeOfRule = RuleType.GlobalRule,
-                RestrictionStartDate = nextGlobalRuleStartDate.Value,
-                BackLink = backLink,
-                RouteName = redirectRouteName,
-                IsProvider = isProvider,
-                PostRouteName = postRouteName
-            };
-
-            return View("FundingRestrictionNotification", viewModel);
-        }
-
+        return View("FundingRestrictionNotification", viewModel);
     }
 }
