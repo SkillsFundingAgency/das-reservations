@@ -1,4 +1,5 @@
 ﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -23,9 +24,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn,"",cohortRef);
 
-            Assert.AreEqual(
-                $"{options.ApprenticeUrl}/{ukprn}/unapproved/{cohortRef}/details",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"{options.ApprenticeUrl}/{ukprn}/unapproved/{cohortRef}/details");
         }
 
         [Test, MoqAutoData]
@@ -40,9 +40,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, "", true);
 
-            Assert.AreEqual(
-                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign");
         }
 
         [Test, MoqAutoData]
@@ -58,9 +57,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(null, accountId, cohortRef);
 
-            Assert.AreEqual(
-                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/{cohortRef}",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/{cohortRef}");
         }
 
         [Test, MoqAutoData]
@@ -77,9 +75,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, string.Empty, hashedAccountLegalEntityId);
 
-            Assert.AreEqual(
-                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?providerId={ukprn}&accountLegalEntityHashedId={hashedAccountLegalEntityId}",
-                actualUrl);
+            actualUrl.Should().Be(
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?providerId={ukprn}&accountLegalEntityHashedId={hashedAccountLegalEntityId}");
         }
         
         [Test, MoqAutoData]
@@ -96,10 +93,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, journeyData);
 
-            Assert.AreEqual(
+            actualUrl.Should().Be(
                 $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?" +
-                         $"providerId={ukprn}&journeyData={journeyData}",
-                actualUrl);
+                         $"providerId={ukprn}&journeyData={journeyData}");
         }
     }
 }

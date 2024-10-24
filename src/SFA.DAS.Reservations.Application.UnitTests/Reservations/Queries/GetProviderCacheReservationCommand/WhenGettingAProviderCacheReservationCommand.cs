@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Moq;
 using NUnit.Framework;
@@ -121,12 +122,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.IsNotNull(result.Command);
-            Assert.AreEqual(_expectedEmployer.AccountLegalEntityName, result.Command.AccountLegalEntityName);
-            Assert.AreEqual(_expectedEmployer.AccountLegalEntityPublicHashedId, result.Command.AccountLegalEntityPublicHashedId);
-            Assert.AreEqual(_expectedEmployer.AccountLegalEntityId, result.Command.AccountLegalEntityId);
-            Assert.AreEqual(_expectedEmployer.AccountId, result.Command.AccountId);
-            Assert.AreEqual(_expectedEmployer.AccountName, result.Command.AccountName);
+            result.Command.Should().NotBeNull();
+            result.Command.AccountLegalEntityName.Should().Be(_expectedEmployer.AccountLegalEntityName);
+            result.Command.AccountLegalEntityPublicHashedId.Should().Be(_expectedEmployer.AccountLegalEntityPublicHashedId);
+            result.Command.AccountLegalEntityId.Should().Be(_expectedEmployer.AccountLegalEntityId);
+            result.Command.AccountId.Should().Be(_expectedEmployer.AccountId);
+            result.Command.AccountName.Should().Be(_expectedEmployer.AccountName);
         }
 
         [Test]
@@ -167,11 +168,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.IsNotNull(result.Command);
-            Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityName, result.Command.AccountLegalEntityName);
-            Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityPublicHashedId, result.Command.AccountLegalEntityPublicHashedId);
-            Assert.AreEqual(_expectedAccountLegalEntity.AccountLegalEntityId, result.Command.AccountLegalEntityId);
-            Assert.AreEqual(_expectedAccountLegalEntity.AccountId, result.Command.AccountId);
+            result.Command.Should().NotBeNull();
+            result.Command.AccountLegalEntityName.Should().Be(_expectedAccountLegalEntity.AccountLegalEntityName);
+            result.Command.AccountLegalEntityPublicHashedId.Should().Be(_expectedAccountLegalEntity.AccountLegalEntityPublicHashedId);
+            result.Command.AccountLegalEntityId.Should().Be(_expectedAccountLegalEntity.AccountLegalEntityId);
+            result.Command.AccountId.Should().Be(_expectedAccountLegalEntity.AccountId);
         }
 
         [Test]

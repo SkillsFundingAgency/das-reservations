@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -68,7 +69,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Services
             var actualException = Assert.ThrowsAsync<Exception>(() => _service.MarkRuleAsRead("1", 2, RuleType.GlobalRule));
 
             //assign
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().Be(expectedException);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using NLog.Web;
 
 namespace SFA.DAS.Reservations.Web;
 
@@ -17,6 +16,5 @@ public class Program
         WebHost
             .CreateDefaultBuilder(args)
             .UseStartup<Startup>()
-            .UseApplicationInsights()
-            .UseNLog();
+            .UseApplicationInsights();
 }

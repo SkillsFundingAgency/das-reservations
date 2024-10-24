@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -62,7 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Services.Provider
             var actualEntity = await _service.GetAccountLegalEntityById(23);
 
             //Assert
-            Assert.AreEqual(_expectedLegalEntity, actualEntity);
+            actualEntity.Should().Be(_expectedLegalEntity);
         }
 
         [Test]
@@ -78,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Services.Provider
             var actualException = Assert.ThrowsAsync<WebException>(() => _service.GetAccountLegalEntityById(23));
 
             //Assert
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().BeEquivalentTo(expectedException);
         }
     }
 }

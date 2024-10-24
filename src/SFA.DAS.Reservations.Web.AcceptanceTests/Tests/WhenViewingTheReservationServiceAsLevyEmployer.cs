@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -53,9 +54,9 @@ public class WhenViewingTheReservationServiceAsLevyEmployer
     {
         //Act
         var result = await _client.GetAsync($"/accounts/{TestDataValues.LevyHashedAccountId}/reservations");
-            
+
         //Assert
-        Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-        Assert.IsTrue(result.RequestMessage.RequestUri.ToString().Contains($"/error/403"));
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.RequestMessage.RequestUri.ToString().Contains($"/error/403").Should().BeTrue();
     }
 }

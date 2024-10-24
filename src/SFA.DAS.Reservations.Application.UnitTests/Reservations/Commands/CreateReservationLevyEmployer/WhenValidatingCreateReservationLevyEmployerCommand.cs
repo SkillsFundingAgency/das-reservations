@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -88,9 +89,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.False(result.IsValid());
-            Assert.True(result.ValidationDictionary.ContainsKey(nameof(command.AccountId)));
-            Assert.True(result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)));
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountId)).Should().BeTrue();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)).Should().BeTrue();
 
         }
         [Test]
@@ -107,7 +108,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.True(result.IsValid());
+            result.IsValid().Should();
 
         }
         [Test]
@@ -124,9 +125,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.False(result.IsValid());
-            Assert.True(result.ValidationDictionary.ContainsKey(nameof(command.AccountId)));
-            Assert.False(result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)));
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountId)).Should().BeTrue();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)).Should().BeFalse();
 
         }
         [Test]
@@ -143,9 +144,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.False(result.IsValid());
-            Assert.False(result.ValidationDictionary.ContainsKey(nameof(command.AccountId)));
-            Assert.True(result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)));
+            result.IsValid().Should();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountId)).Should().BeFalse();
+            result.ValidationDictionary.ContainsKey(nameof(command.AccountLegalEntityId)).Should().BeTrue();
         }
 
         [TestCase(null)]
@@ -195,7 +196,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsTrue(result.FailedTransferReceiverCheck);
+            result.FailedTransferReceiverCheck.Should().BeTrue();
         }
 
         [Test]
@@ -216,7 +217,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsFalse(result.FailedTransferReceiverCheck);
+            result.FailedTransferReceiverCheck.Should().BeFalse();
         }
 
         [Test]
@@ -236,8 +237,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             _apiClient.Verify(x=>x.Get<AccountReservationStatusResponse>(
                 It.Is<AccountReservationStatusRequest>(c=>c.BaseUrl.Equals(ExpectedUrl) 
                  && c.AccountId.Equals(ExpectedAccountId))), Times.Once);
-            Assert.IsFalse(result.FailedAutoReservationCheck);
-            Assert.IsTrue(result.FailedAgreementSignedCheck);
+
+            result.FailedAutoReservationCheck.Should().BeFalse();
+            result.FailedAgreementSignedCheck.Should().BeTrue();
         }
 
         [Test]
@@ -254,7 +256,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsTrue(result.FailedAutoReservationCheck);
+            result.FailedAutoReservationCheck.Should().BeTrue();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -40,8 +41,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://test.local/123/{controller}/{action}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://test.local/123/{controller}/{action}");
         }
 
         [Test]
@@ -60,8 +61,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://test.local/{id}/{controller}/{action}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://test.local/{id}/{controller}/{action}");
         }
 
         [Test]
@@ -78,8 +79,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://test.local/{id}/{controller}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://test.local/{id}/{controller}");
         }
 
         [Test]
@@ -94,8 +95,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://test.local/{controller}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://test.local/{controller}");
         }
 
         [Test]
@@ -112,8 +113,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://{subDomain}.test.local/{controller}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://{subDomain}.test.local/{controller}");
         }
 
         [Test]
@@ -138,8 +139,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://{subDomain}.test.local.approvals/{folder}/{controller}", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://{subDomain}.test.local.approvals/{folder}/{controller}");
         }
 
         [Test]
@@ -158,8 +159,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             });
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"https://{subDomain}.test.local/{controller}?test=12345", actual);
+            actual.Should().NotBeNull();
+            actual.Should().Be($"https://{subDomain}.test.local/{controller}?test=12345");
         }
     }
 }
