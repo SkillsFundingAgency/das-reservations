@@ -14,7 +14,7 @@ public static class AuthorizationServiceRegistrations
     public static void AddAuthorizationServices(this IServiceCollection services)
     {
         // This ensures the way claims are mapped are consistent with version 7 of OpenIdConnect
-        Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        //Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
         services.AddAuthorization(options =>
         {
