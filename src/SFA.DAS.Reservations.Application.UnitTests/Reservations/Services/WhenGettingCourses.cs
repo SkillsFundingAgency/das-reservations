@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             var exists = await _service.CourseExists("6");
 
             //Assert
-            Assert.IsTrue(exists);
+            exists.Should().BeTrue();
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
             var exists = await _service.CourseExists("60");
 
             //Assert
-            Assert.IsFalse(exists);
+            exists.Should().BeFalse();
         }
     }
 }

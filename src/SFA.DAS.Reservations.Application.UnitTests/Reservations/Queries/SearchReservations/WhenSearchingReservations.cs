@@ -20,11 +20,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
     public class WhenSearchingReservations
     {
         [Test, MoqAutoData]
-        public void And_Invalid_Then_Throws_Validation_Exception(
+        public async Task And_Invalid_Then_Throws_Validation_Exception(
             SearchReservationsQuery query,
             ValidationResult validationResult,
             string propertyName,
-            [Frozen]Mock<IValidator<SearchReservationsQuery>> mockValidator,
+            [Frozen] Mock<IValidator<SearchReservationsQuery>> mockValidator,
             SearchReservationsQueryHandler handler)
         {
             validationResult.AddError(propertyName);
@@ -33,9 +33,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.Search
                 .Setup(validator => validator.ValidateAsync(query))
                 .ReturnsAsync(validationResult);
 
-            Func<Task> act = async () => { await handler.Handle(query, CancellationToken.None); };
-
-            act.Should().ThrowExactly<ValidationException>()
+            Func<Task> act = async () => { await handler.Handle(query, CancellationToken.None); }; 
+            
+            (await act.Should().ThrowExactlyAsync<ValidationException>())
                 .Which.ValidationResult.MemberNames.First(c => c.StartsWith(propertyName)).Should().NotBeNullOrEmpty();
         }
 

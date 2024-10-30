@@ -13,14 +13,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Providers.Queries.GetTruste
             GetTrustedEmployerQueryValidator validator)
         {
             var query = new GetTrustedEmployersQuery();
-            
+
             var result = await validator.ValidateAsync(query);
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(GetTrustedEmployersQuery.UkPrn))
-                .WhichValue.Should().Be($"{nameof(GetTrustedEmployersQuery.UkPrn)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(GetTrustedEmployersQuery.UkPrn)} has not been supplied");
         }
 
         [Test, AutoData]

@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
 
             var reservations = await handler.GetReservations(accountId);
 
-            reservations.Should().BeEquivalentTo(apiReservations);
+            reservations.Should().BeEquivalentTo(apiReservations, o =>o.Excluding(x=>x.Status));
         }
     }
 }

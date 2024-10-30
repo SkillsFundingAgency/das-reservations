@@ -14,14 +14,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetRes
             GetReservationQueryValidator validator)
         {
             var query = new GetReservationQuery();
-            
+
             var result = await validator.ValidateAsync(query);
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(GetReservationQuery.Id))
-                .WhichValue.Should().Be($"{nameof(GetReservationQuery.Id)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(GetReservationQuery.Id)} has not been supplied");
         }
 
         [Test, AutoData]

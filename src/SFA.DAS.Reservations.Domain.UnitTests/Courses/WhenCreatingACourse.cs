@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Courses;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
@@ -19,9 +20,9 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var actual = new Course (expectedCourseId, expectedCourseTitle,expectedCourseLevel );
 
             //Assert
-            Assert.AreEqual(expectedCourseId, actual.Id);
-            Assert.AreEqual(expectedCourseTitle, actual.Title);
-            Assert.AreEqual(expectedCourseLevel, actual.Level);
+            expectedCourseId.Should().Be(actual.Id);
+            expectedCourseTitle.Should().Be(actual.Title);
+            expectedCourseLevel.Should().Be(actual.Level);
         }
 
         [TestCase("")]
@@ -35,8 +36,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var course = new Course("",expectedTitle,3);
 
             //Assert
-            Assert.AreEqual(expectedString, course.CourseDescription);
-            Assert.AreEqual(expectedString, course.Title);
+            expectedString.Should().Be(course.CourseDescription);
+            expectedString.Should().Be(course.Title);
 
         }
 
@@ -47,7 +48,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var actualApprenticeship = new Course("", "Some title", 1);
 
             //Assert
-            Assert.AreEqual("Some title - Level 1", actualApprenticeship.CourseDescription);
+            actualApprenticeship.CourseDescription.Should().Be("Some title - Level 1");
         }
 
         [Test]
@@ -60,8 +61,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var course = new Course(null, null, 0);
 
             //Assert
-            Assert.AreEqual(expectedString, course.CourseDescription);
+            course.CourseDescription.Should().Be(expectedString);
         }
-
     }
 }

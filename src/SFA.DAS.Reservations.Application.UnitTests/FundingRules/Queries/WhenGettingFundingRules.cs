@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
                 _handler.Handle(new GetFundingRulesQuery(), new CancellationToken()));
 
             //Assert
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().Be(expectedException);
         }
 
     }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ProjectGuid>46AF087C-AE5F-40E0-9829-9EAE17E9BC07</ProjectGuid>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -24,27 +24,27 @@
         <PackageReference Include="Azure.Identity" Version="1.12.1" />
         <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.33" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="6.0.33" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.33" />
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.17" />
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.33" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="8.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="8.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
         <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.7.1" />
+        <PackageReference Include="Polly" Version="8.4.2" />
         <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89" />
-        <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
-        <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+        <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
+        <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.1" />
         <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
         <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
-        <PackageReference Include="SFA.DAS.GovUK.Auth" Version="17.1.80" />
+        <PackageReference Include="SFA.DAS.GovUK.Auth" Version="17.1.104" />
         <PackageReference Include="SFA.DAS.Http" Version="3.2.69" />
-        <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
         <PackageReference Include="SFA.DAS.Provider.Idams.Stub.Extensions" Version="1.0.14" />
         <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
         <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
         <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
     </ItemGroup>
 
@@ -60,9 +60,6 @@
         </Content>
         <Content Update="appsettings.Development.json">
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-        <Content Update="nlog.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
         <Content Update="Views\ProviderReservations\ChooseEmployer.cshtml">
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

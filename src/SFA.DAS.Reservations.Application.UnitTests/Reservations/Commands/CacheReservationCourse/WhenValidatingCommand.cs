@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         [Test]
         public async Task Then_If_ReservationId_Is_Invalid_Then_Fail()
         {
-            var command = new  CacheReservationCourseCommand
+            var command = new CacheReservationCourseCommand
             {
                 Id = Guid.Empty,
                 SelectedCourseId = "1"
@@ -37,8 +37,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.Id))
-                .WhichValue.Should().Be($"{nameof( CacheReservationCourseCommand.Id)} has not been supplied");
+                .Should().ContainKey(nameof(CacheReservationCourseCommand.Id))
+                .WhoseValue.Should().Be($"{nameof(CacheReservationCourseCommand.Id)} has not been supplied");
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         {
             _courseService.Setup(s => s.CourseExists(It.IsAny<string>())).ReturnsAsync(false);
 
-            var command = new  CacheReservationCourseCommand
+            var command = new CacheReservationCourseCommand
             {
                 Id = Guid.NewGuid(),
                 SelectedCourseId = ""
@@ -58,16 +58,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationCourseCommand.SelectedCourseId))
-                .WhichValue.Should().Be("Select which apprenticeship training your apprentice will take");
+                .WhoseValue.Should().Be("Select which apprenticeship training your apprentice will take");
         }
 
-        
+
         [Test]
         public async Task Then_If_CourseId_Is_Invalid_Then_Fail()
         {
             _courseService.Setup(s => s.CourseExists(It.IsAny<string>())).ReturnsAsync(false);
 
-            var command = new  CacheReservationCourseCommand
+            var command = new CacheReservationCourseCommand
             {
                 Id = Guid.NewGuid(),
                 SelectedCourseId = "123"
@@ -78,8 +78,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
-                .Should().ContainKey(nameof( CacheReservationCourseCommand.SelectedCourseId))
-                .WhichValue.Should().Be("Selected course does not exist");
+                .Should().ContainKey(nameof(CacheReservationCourseCommand.SelectedCourseId))
+                .WhoseValue.Should().Be("Selected course does not exist");
         }
 
         [Test]

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetAccountFundingRules;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using Moq;
@@ -60,8 +61,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result =  await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedRules,result.AccountFundingRules);
-            Assert.AreEqual(expectedRules.GlobalRules.First(), result.AccountFundingRules.GlobalRules.First());
+            result.AccountFundingRules.Should().Be(expectedRules);
+            result.AccountFundingRules.GlobalRules.First().Should().Be(expectedRules.GlobalRules.First());
 
         }
 
@@ -130,8 +131,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedRules.GlobalRules.First().RuleType, result.ActiveRule.RuleType);
-
+            result.ActiveRule.RuleType.Should().Be(expectedRules.GlobalRules.First().RuleType);
         }
 
 
@@ -166,7 +166,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedRules.GlobalRules.First(x=>x!=null).RuleType, result.ActiveRule.RuleType);
+            result.ActiveRule.RuleType.Should().Be(expectedRules.GlobalRules.First(x => x != null).RuleType);
         }
 
         [Test, MoqAutoData]
@@ -206,7 +206,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(GlobalRuleType.DynamicPause, result.ActiveRule.RuleType);
+            result.ActiveRule.RuleType.Should().Be(GlobalRuleType.DynamicPause);
         }
 
         [Test, MoqAutoData]
@@ -230,9 +230,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             var result = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.IsNull(result.ActiveRule);
-
+            result.ActiveRule.Should().BeNull();
         }
     }
-
 }

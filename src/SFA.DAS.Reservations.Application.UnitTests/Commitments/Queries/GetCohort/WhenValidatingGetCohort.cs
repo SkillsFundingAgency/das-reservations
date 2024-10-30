@@ -13,14 +13,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
             GetCohortQueryValidator validator)
         {
             var query = new GetCohortQuery();
-            
+
             var result = await validator.ValidateAsync(query);
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(GetCohortQuery.CohortId))
-                .WhichValue.Should().Be($"{nameof(GetCohortQuery.CohortId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(GetCohortQuery.CohortId)} has not been supplied");
         }
 
         [Test, AutoData]

@@ -16,17 +16,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             var validator = new CacheReservationStartDateCommandValidator();
             var command = new CacheReservationStartDateCommand
             {
-                TrainingDate = new TrainingDateModel{StartDate = DateTime.Now}
+                TrainingDate = new TrainingDateModel { StartDate = DateTime.Now }
             };
 
             var result = await validator.ValidateAsync(command);
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
-           
+
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationStartDateCommand.Id))
-                .WhichValue.Should().Be($"{nameof(CacheReservationStartDateCommand.Id)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationStartDateCommand.Id)} has not been supplied");
         }
 
         [Test]
@@ -42,10 +42,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
-            
+
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationStartDateCommand.TrainingDate))
-                .WhichValue.Should().Be($"{nameof(CacheReservationStartDateCommand.TrainingDate)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationStartDateCommand.TrainingDate)} has not been supplied");
         }
 
         [Test]
@@ -62,12 +62,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
             result.IsValid().Should().BeFalse();
             result.ValidationDictionary.Count.Should().Be(1);
-            
+
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationStartDateCommand.TrainingDate))
-                .WhichValue.Should().Be($"{nameof(CacheReservationStartDateCommand.TrainingDate.StartDate)} must be set on {nameof(CacheReservationStartDateCommand.TrainingDate)}");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationStartDateCommand.TrainingDate.StartDate)} must be set on {nameof(CacheReservationStartDateCommand.TrainingDate)}");
         }
-       
+
         [Test]
         public async Task And_All_Fields_Valid_Then_Valid()
         {

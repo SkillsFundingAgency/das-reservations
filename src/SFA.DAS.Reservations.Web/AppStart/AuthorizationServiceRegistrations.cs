@@ -13,6 +13,7 @@ public static class AuthorizationServiceRegistrations
 {
     public static void AddAuthorizationServices(this IServiceCollection services)
     {
+
         services.AddAuthorization(options =>
         {
             options.AddPolicy(PolicyNames.HasEmployerAccount, policy =>

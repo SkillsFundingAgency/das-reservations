@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
         public async Task And_No_Id_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.Id))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.Id)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.Id)} has not been supplied");
         }
 
         [Test, MoqAutoData]
@@ -122,8 +122,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
 
         [Test, MoqAutoData]
         public async Task And_AccountId_Less_Than_One_Then_Invalid(
-            CacheReservationEmployerCommand command, 
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            CacheReservationEmployerCommand command,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             ConfigureRulesServiceWithNoGlobalRules(rulesService);
@@ -135,14 +135,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountId))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountId)} has not been supplied");
         }
 
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityId_Less_Than_One_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -155,14 +155,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityId))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityId)} has not been supplied");
         }
 
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityName_Null_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -175,14 +175,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityName))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityName)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityName)} has not been supplied");
         }
 
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityName_Whitespace_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -195,14 +195,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityName))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityName)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityName)} has not been supplied");
         }
 
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityPublicHashedId_Null_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -215,14 +215,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId)} has not been supplied");
         }
 
         [Test, MoqAutoData]
         public async Task And_AccountLegalEntityPublicHashedId_Whitespace_Then_Invalid(
             CacheReservationEmployerCommand command,
             [Frozen] Mock<IMediator> mockMediator,
-            [Frozen]Mock<IFundingRulesService> rulesService,
+            [Frozen] Mock<IFundingRulesService> rulesService,
             CacheReservationEmployerCommandValidator validator)
         {
             SetupAccountLegalEntityAsNonLevy(mockMediator);
@@ -235,7 +235,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Cache
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId))
-                .WhichValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CacheReservationEmployerCommand.AccountLegalEntityPublicHashedId)} has not been supplied");
         }
 
         [Test, MoqAutoData]

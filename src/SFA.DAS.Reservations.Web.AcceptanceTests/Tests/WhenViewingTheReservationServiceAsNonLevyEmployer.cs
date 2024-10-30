@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
+using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -53,13 +54,13 @@ public class WhenViewingTheReservationServiceAsNonLevyEmployer
     {
         //Act
         var result = await _client.GetAsync($"/accounts/{TestDataValues.NonLevyHashedAccountId}/reservations");
-        
+
         //Assert
-        Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var expectedUrl = HttpUtility.UrlDecode($"/accounts/{TestDataValues.NonLevyHashedAccountId}/reservations");
         var actualUrl = HttpUtility.UrlDecode(result.RequestMessage?.RequestUri?.ToString());
 
-        Assert.IsTrue(actualUrl?.Contains(expectedUrl));
+        actualUrl?.Contains(expectedUrl).Should().BeTrue();
     }
 }

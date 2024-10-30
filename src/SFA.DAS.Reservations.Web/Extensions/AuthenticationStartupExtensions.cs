@@ -17,6 +17,10 @@ public static class AuthenticationStartupExtensions
 {
     public static IServiceCollection SetupProviderAuth(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
+        // This ensures the way claims are mapped are consistent with version 7 of OpenIdConnect
+        // but this only applies on the Provider side
+        Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
         if (configuration["ReservationsWeb:UseDfESignIn"] != null && configuration["ReservationsWeb:UseDfESignIn"].Equals("true", StringComparison.CurrentCultureIgnoreCase))
         {
             services.AddAndConfigureDfESignInAuthentication(

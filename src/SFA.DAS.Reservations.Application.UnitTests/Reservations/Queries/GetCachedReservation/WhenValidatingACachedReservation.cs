@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             {
                 Id = Guid.NewGuid(),
                 AccountId = 0,
-                TrainingDate = new TrainingDateModel{StartDate = DateTime.Now},
+                TrainingDate = new TrainingDateModel { StartDate = DateTime.Now },
                 AccountLegalEntityName = "Test Name"
             };
 
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetCac
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary
                 .Should().ContainKey(nameof(CachedReservation.AccountId))
-                .WhichValue.Should().Be($"{nameof(CachedReservation.AccountId)} has not been supplied");
+                .WhoseValue.Should().Be($"{nameof(CachedReservation.AccountId)} has not been supplied");
         }
 
         [Test, AutoData]

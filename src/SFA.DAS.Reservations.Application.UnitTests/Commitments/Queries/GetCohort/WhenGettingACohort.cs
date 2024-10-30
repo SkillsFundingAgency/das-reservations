@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
@@ -36,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
             var result = await handler.Handle(query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(expectedCohort, result.Cohort);
+            result.Cohort.Should().Be(expectedCohort);
         }
 
         [Test, MoqAutoData]
@@ -80,7 +81,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Commitments.Queries.GetCoho
             var actualException = Assert.ThrowsAsync<Exception>(() => handler.Handle(query, CancellationToken.None));
 
             //Assert
-            Assert.AreEqual(exception, actualException);
+            actualException.Should().Be(exception);
         }
 
         [Test, MoqAutoData]
