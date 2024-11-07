@@ -205,7 +205,7 @@ public class ProviderReservationsController : ReservationsBaseController
                     viewModel.UkPrn
                 });
             }
-            //var id = RouteData.Values["id"] as string ?? string.Empty;
+
             var reservationId = viewModel.Id ?? Guid.NewGuid();
 
             if (!viewModel.Id.HasValue)
