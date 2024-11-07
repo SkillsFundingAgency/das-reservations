@@ -31,8 +31,8 @@ public class ProviderReservationsController : ReservationsBaseController
     private readonly ISessionStorageService<GetTrustedEmployersResponse> _sessionStorageService;
 
     public ProviderReservationsController(
-        IMediator mediator, 
-        IExternalUrlHelper externalUrlHelper, 
+        IMediator mediator,
+        IExternalUrlHelper externalUrlHelper,
         IEncodingService encodingService,
         ISessionStorageService<GetTrustedEmployersResponse> sessionStorageService) : base(mediator)
     {
@@ -45,11 +45,11 @@ public class ProviderReservationsController : ReservationsBaseController
     public async Task<IActionResult> Index(ReservationsRouteModel routeModel)
     {
         var backLink = routeModel.IsFromManage.HasValue && routeModel.IsFromManage.Value
-            ? Url.RouteUrl(RouteNames.ProviderManage,routeModel)
+            ? Url.RouteUrl(RouteNames.ProviderManage, routeModel)
             : _externalUrlHelper.GenerateDashboardUrl();
 
         var viewResult = await CheckNextGlobalRule(RouteNames.ProviderStart, ProviderClaims.ProviderUkprn, backLink, RouteNames.ProviderSaveRuleNotificationChoiceNoReservation);
-            
+
         if (viewResult == null)
         {
             return RedirectToRoute(RouteNames.ProviderStart, routeModel);
@@ -73,18 +73,18 @@ public class ProviderReservationsController : ReservationsBaseController
         if (activeGlobalRule != null)
         {
             var backLink = isFromManage
-                ? Url.RouteUrl(RouteNames.ProviderManage, new {ukPrn, isFromManage})
-                : _externalUrlHelper.GenerateDashboardUrl(); 
+                ? Url.RouteUrl(RouteNames.ProviderManage, new { ukPrn, isFromManage })
+                : _externalUrlHelper.GenerateDashboardUrl();
 
-            switch(activeGlobalRule.RuleType)
+            switch (activeGlobalRule.RuleType)
             {
-                case GlobalRuleType.FundingPaused: 
+                case GlobalRuleType.FundingPaused:
                     return View("ProviderFundingPaused", backLink);
 
                 case GlobalRuleType.DynamicPause:
                     viewModel.ActiveGlobalRule = new GlobalRuleViewModel(activeGlobalRule);
                     break;
-            }               
+            }
         }
 
         var employers = (await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = ukPrn })).Employers.ToList();
@@ -106,11 +106,11 @@ public class ProviderReservationsController : ReservationsBaseController
             throw new ArgumentException("UkPrn must be set", nameof(ReservationsRouteModel.UkPrn));
         }
 
-        var getTrustedEmployersResponse = _sessionStorageService.Get(); 
+        var getTrustedEmployersResponse = _sessionStorageService.Get();
 
         if (getTrustedEmployersResponse == null)
         {
-            getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery {UkPrn = routeModel.UkPrn.Value});
+            getTrustedEmployersResponse = await _mediator.Send(new GetTrustedEmployersQuery { UkPrn = routeModel.UkPrn.Value });
             _sessionStorageService.Store(getTrustedEmployersResponse);
         }
 
@@ -162,7 +162,7 @@ public class ProviderReservationsController : ReservationsBaseController
     }
 
     [HttpGet]
-    [Route("confirm-employer/{id?}", Name=RouteNames.ProviderConfirmEmployer)]
+    [Route("confirm-employer/{id?}", Name = RouteNames.ProviderConfirmEmployer)]
     public async Task<IActionResult> ConfirmEmployer(ConfirmEmployerViewModel viewModel)
     {
         _sessionStorageService.Delete();
@@ -205,19 +205,22 @@ public class ProviderReservationsController : ReservationsBaseController
                     viewModel.UkPrn
                 });
             }
+            //var id = RouteData.Values["id"] as string ?? string.Empty;
+            var reservationId = viewModel.Id ?? Guid.NewGuid();
 
-            var reservationId = Guid.NewGuid();
-
-            await _mediator.Send(new CacheReservationEmployerCommand
+            if (!viewModel.Id.HasValue)
             {
-                Id = reservationId,
-                AccountId = _encodingService.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId),
-                AccountLegalEntityId = _encodingService.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId),
-                AccountLegalEntityName = viewModel.AccountLegalEntityName,
-                AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
-                UkPrn = viewModel.UkPrn,
-                AccountName = viewModel.AccountName
-            });
+                await _mediator.Send(new CacheReservationEmployerCommand
+                {
+                    Id = reservationId,
+                    AccountId = _encodingService.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId),
+                    AccountLegalEntityId = _encodingService.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId),
+                    AccountLegalEntityName = viewModel.AccountLegalEntityName,
+                    AccountLegalEntityPublicHashedId = viewModel.AccountLegalEntityPublicHashedId,
+                    UkPrn = viewModel.UkPrn,
+                    AccountName = viewModel.AccountName
+                });
+            }
 
             return RedirectToRoute(RouteNames.ProviderApprenticeshipTraining, new
             {
@@ -243,7 +246,7 @@ public class ProviderReservationsController : ReservationsBaseController
     }
 
     [HttpGet]
-    [Route("employer-agreement-not-signed/{id?}", Name=RouteNames.ProviderEmployerAgreementNotSigned)]
+    [Route("employer-agreement-not-signed/{id?}", Name = RouteNames.ProviderEmployerAgreementNotSigned)]
     public async Task<IActionResult> EmployerAgreementNotSigned(ReservationsRouteModel routeModel, string id)
     {
 
@@ -251,11 +254,11 @@ public class ProviderReservationsController : ReservationsBaseController
         {
             id = routeModel.AccountLegalEntityPublicHashedId;
         }
-            
-        var result = await _mediator.Send(new GetAccountLegalEntityQuery {AccountLegalEntityPublicHashedId = id});
+
+        var result = await _mediator.Send(new GetAccountLegalEntityQuery { AccountLegalEntityPublicHashedId = id });
         var viewModel = new EmployerAgreementNotSignedViewModel
         {
-            AccountName = result.LegalEntity.AccountLegalEntityName, 
+            AccountName = result.LegalEntity.AccountLegalEntityName,
             DashboardUrl = _externalUrlHelper.GenerateDashboardUrl(null),
             BackUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value ? routeModel.PreviousPage : "",
             IsUrl = routeModel.IsFromSelect.HasValue && routeModel.IsFromSelect.Value
