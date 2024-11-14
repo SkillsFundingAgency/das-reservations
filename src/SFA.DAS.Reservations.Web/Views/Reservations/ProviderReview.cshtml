@@ -12,8 +12,17 @@
 
 @if (!string.IsNullOrEmpty(Model.BackLink))
 {
-    <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+    <a id="back-link" class="govuk-back-link"
+       href="@Url.RouteUrl(Model.BackLink, new
+       {
+           ukPrn,
+           id = reservationId,
+           Model.RouteModel.PublicHashedEmployerAccountId
+       })">
+        Back
+    </a>
 }
+
 
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">

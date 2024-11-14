@@ -22,11 +22,14 @@
                            ViewData.ModelState["StartDate"].Errors != null &&
                            ViewData.ModelState["StartDate"].Errors.Any();
 
+    var ukPrn = (string)ViewContext.RouteData.Values["ukPrn"];
+    var reservationId = (string)ViewContext.RouteData.Values["id"];
+
     var routeData = new Dictionary<string, string>
     {
         {"CohortReference",Model.CohortRef},
         {"employerAccountId", (string)ViewContext.RouteData.Values["employerAccountId"]},
-        {"id", (string)ViewContext.RouteData.Values["id"]}
+        {"id", reservationId}
     };
 
     if (Model.IsProvider)
@@ -49,7 +52,10 @@
     {
         if (string.IsNullOrEmpty(Model.CohortRef))
         {
-            <a asp-route="@Model.BackLink" class="govuk-back-link">Back</a>
+            <a id="back-link" class="govuk-back-link" href="@Url.RouteUrl(Model.BackLink, new { 
+                    ukPrn, 
+                    Id = reservationId
+                })">Back</a>
         }
         else
         {

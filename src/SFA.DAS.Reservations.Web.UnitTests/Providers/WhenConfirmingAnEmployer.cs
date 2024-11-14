@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -32,6 +33,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
+            viewModel.Id = null;
+
             encodingService.Setup(x => x.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId))
                 .Returns(accountId);
             encodingService.Setup(x => x.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
@@ -39,7 +42,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
-   
+
             await controller.ProcessConfirmEmployer(viewModel);
 
             mockMediator.Verify(m => m.Send(It.Is<CacheReservationEmployerCommand>(c =>
@@ -49,6 +52,32 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 c.AccountLegalEntityName.Equals(viewModel.AccountLegalEntityName) &&
                 c.AccountName.Equals(viewModel.AccountName) &&
                 c.UkPrn.Equals(viewModel.UkPrn)), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_If_Confirmed_The_Choosen_Employer_Is_NotStored_If_ReservationId_NotNull(
+            long accountId,
+            long accountLegalEntityId,
+            [Frozen] Mock<IMediator> mockMediator,
+            [Frozen] Mock<IEncodingService> encodingService,
+            [NoAutoProperties] ProviderReservationsController controller,
+            ConfirmEmployerViewModel viewModel)
+        {
+            viewModel.Confirm = true;
+
+            encodingService.Setup(x => x.Decode(viewModel.AccountPublicHashedId, EncodingType.PublicAccountId))
+                .Returns(accountId);
+            encodingService.Setup(x => x.Decode(viewModel.AccountLegalEntityPublicHashedId, EncodingType.PublicAccountLegalEntityId))
+                .Returns(accountLegalEntityId);
+
+            mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(Unit.Value);
+
+            var result = await controller.ProcessConfirmEmployer(viewModel);
+            var redirectResult = result as RedirectToRouteResult;
+
+            mockMediator.Verify(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            viewModel.Id.ToString().Should().Be(redirectResult.RouteValues["Id"].ToString());
         }
 
         [Test, MoqAutoData]
@@ -62,7 +91,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
-   
+
             await controller.ProcessConfirmEmployer(viewModel);
 
             mockMediator.Verify(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -77,6 +106,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
+            viewModel.Id = null;
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
@@ -86,15 +116,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                 {
                     GlobalRules = new List<GlobalRule>()
                 });
-   
+
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
             var redirectResult = result as RedirectToRouteResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.AreEqual(RouteNames.ProviderApprenticeshipTraining, redirectResult.RouteName);
-            Assert.AreEqual(viewModel.UkPrn,redirectResult.RouteValues["UkPrn"]);
-            Assert.AreEqual(viewModel.AccountPublicHashedId,redirectResult.RouteValues["PublicHashedEmployerAccountId"]);
+            redirectResult.Should().NotBeNull();
+            redirectResult.RouteName.Should().Be(RouteNames.ProviderApprenticeshipTraining);
+            redirectResult.RouteValues["UkPrn"].Should().BeEquivalentTo(viewModel.UkPrn);
+            redirectResult.RouteValues["PublicHashedEmployerAccountId"].Should().BeEquivalentTo(viewModel.AccountPublicHashedId);
         }
 
         [Test, MoqAutoData]
@@ -105,6 +135,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
             ConfirmEmployerViewModel viewModel)
         {
             viewModel.Confirm = true;
+            viewModel.Id = null;
 
             var validationResult = new Application.Validation.ValidationResult();
             validationResult.AddError(nameof(viewModel.AccountPublicHashedId), "Reservation limit has been reached for this account");
@@ -117,13 +148,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             var viewResult = result as ViewResult;
 
-            Assert.IsNotNull(viewResult);
-            
-            Assert.AreEqual("ReservationLimitReached", viewResult.ViewName);
-            
+            viewResult.Should().NotBeNull();
+
+            viewResult.ViewName.Should().Be("ReservationLimitReached");
+
         }
-
-
 
         [Test, MoqAutoData]
         public async Task Then_If_Not_Confirmed_User_Is_Redirected_Back_To_Start_Step(
@@ -136,14 +165,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
 
             mockMediator.Setup(m => m.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Unit.Value);
-   
+
             var result = await controller.ProcessConfirmEmployer(viewModel);
 
             var redirectResult = result as RedirectToRouteResult;
 
-            Assert.IsNotNull(redirectResult);
-            Assert.AreEqual(RouteNames.ProviderChooseEmployer, redirectResult.RouteName);
-            Assert.AreEqual(viewModel.UkPrn,redirectResult.RouteValues["UkPrn"]);
+            redirectResult.Should().NotBeNull();
+            redirectResult.RouteName.Should().Be(RouteNames.ProviderChooseEmployer);
+            redirectResult.RouteValues["UkPrn"].Should().Be(viewModel.UkPrn);
         }
     }
 }

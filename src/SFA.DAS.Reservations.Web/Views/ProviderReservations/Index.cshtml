@@ -1,7 +1,6 @@
 ﻿@model ProviderStartViewModel
 @{
     ViewData["Title"] = "Reserve funding for non-levy employers";
-    var fromManageRouteData = (new Dictionary<string, string> { { "IsFromManage", "true" } });
 
     ViewBag.GaData.Vpv = "/reservations/start";
     
@@ -10,7 +9,7 @@
 
 @if (Model.IsFromManage)
 {
-    <a asp-route="@RouteNames.ProviderManage" asp-all-route-data="@fromManageRouteData" class="govuk-back-link">Back</a>
+    <a id="back-link" class="govuk-back-link" href="@Url.RouteUrl(RouteNames.ProviderManage, new { ukPrn })">Back</a>
 }
 else
 {

@@ -5,7 +5,7 @@
     ViewBag.GaData.Vpv = "/reservations/confirm-employer";
 }
 
-<a asp-route="@RouteNames.ProviderChooseEmployer" class="govuk-back-link">Back</a>
+<a id="back-link" class="govuk-back-link" href="@Url.RouteUrl(RouteNames.ProviderChooseEmployer, new { Model.UkPrn })">Back</a>
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
