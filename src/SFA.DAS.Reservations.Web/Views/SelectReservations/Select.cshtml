@@ -3,6 +3,7 @@
     ViewData["Title"] = "Reservations";
 
     var firstReservationId = Model.AvailableReservations.FirstOrDefault()?.ReservationId;
+    var hashedAccountId = Context.Request.RouteValues[RouteValueKeys.HashedAccountId];
 
     var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
 
@@ -46,8 +47,13 @@
                 </div>
             }
 
-            <h1 class="govuk-heading-l">Choose a Reservation</h1>
+            <h1 class="govuk-heading-l">Select a Reservation</h1>
 
+            <p class="govuk-body">These are your existing reservations.</p>
+            <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
+            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a></p>
+            <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
+            
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
                 <input asp-for="AccountId" type="hidden" />
@@ -73,19 +79,6 @@
                                     </label>
                                     <span class="govuk-hint govuk-radios__hint">
                                         Created in @availableReservation.CreatedDateDescription
-                                    </span>
-                                </div>
-                            }
-                            @if (Model.MoreReservationsAvailable)
-                            {
-                                <div class="govuk-radios__divider">or</div>
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0", "9")">
-                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
-                                        Reserve new funding
-                                    </label>
-                                    <span class="govuk-hint govuk-radios__hint">
-                                        Continue adding apprentice details
                                     </span>
                                 </div>
                             }
