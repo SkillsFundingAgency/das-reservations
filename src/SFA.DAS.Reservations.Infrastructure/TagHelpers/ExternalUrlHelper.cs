@@ -32,7 +32,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
 
     public string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId,
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
-        bool isEmptyEmployerCohort = false, string transferSenderId = "", string encodedPledgeApplicationId= "", string journeyData = "")
+        bool isEmptyEmployerCohort = false, string transferSenderId = "",
+        string encodedPledgeApplicationId= "", string journeyData = "", Guid? addApprenticeshipCacheKey = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -79,6 +80,18 @@ public class ExternalUrlHelper : IExternalUrlHelper
         if (!string.IsNullOrEmpty(encodedPledgeApplicationId))
         {
             queryString += $"&encodedPledgeApplicationId={encodedPledgeApplicationId}";
+        }
+
+        if (addApprenticeshipCacheKey.HasValue)
+        {
+            if (string.IsNullOrWhiteSpace(queryString))
+            {
+                queryString = $"?addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+            }
+            else
+            {
+                queryString += $"&addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+            }
         }
 
         string controller = "unapproved", action, id;
@@ -133,7 +146,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
     }
 
     public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false, 
-        string journeyData = "", string accountLegalEntityHashedId = "")
+        string journeyData = "", string accountLegalEntityHashedId = "", Guid? addApprenticeshipCacheKey = null)
     {
         var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : "";
 
@@ -158,6 +171,18 @@ public class ExternalUrlHelper : IExternalUrlHelper
             else
             {
                 queryString += $"&accountLegalEntityHashedId={accountLegalEntityHashedId}";
+            }
+        }
+
+        if (addApprenticeshipCacheKey.HasValue)
+        {
+            if (string.IsNullOrWhiteSpace(queryString))
+            {
+                queryString = $"?addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+            }
+            else
+            {
+                queryString += $"&addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
             }
         }
 

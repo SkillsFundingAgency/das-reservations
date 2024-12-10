@@ -476,7 +476,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             formModel.FromReview = false;
             _urlHelper.Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn,
-                    string.Empty, formModel.CohortRef, false, It.IsAny<string>(), string.Empty))
+                    string.Empty, formModel.CohortRef, false, It.IsAny<string>(), string.Empty, null))
                 .Returns(cohortDetailsUrl);
             formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
             _controller.ModelState.AddModelError("StartDate", "StartDate");

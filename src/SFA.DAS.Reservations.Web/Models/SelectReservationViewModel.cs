@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string BackLink { get; set; }
         public uint? ProviderId { get; set; }
         public bool MoreReservationsAvailable { get; set; }
+        public Guid? AddApprenticeshipCacheKey { get; set; }
     }
 }

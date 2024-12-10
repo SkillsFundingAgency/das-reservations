@@ -1,4 +1,5 @@
-﻿using AutoFixture.NUnit3;
+﻿using System;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -96,6 +97,27 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             actualUrl.Should().Be(
                 $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?" +
                          $"providerId={ukprn}&journeyData={journeyData}");
+        }
+
+        [Test, MoqAutoData]
+        public void Then_Uses_AddApprenticeshipCacheKey(
+            string accountId,
+            uint ukprn,
+            string journeyData,
+            Guid addApprenticeshipCacheKey,
+            [Frozen] ReservationsWebConfiguration options,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+            options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, 
+                journeyData, addApprenticeshipCacheKey: addApprenticeshipCacheKey);
+
+            actualUrl.Should().Be(
+                $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?" +
+                         $"providerId={ukprn}&journeyData={journeyData}&addApprenticeshipCacheKey={addApprenticeshipCacheKey}");
         }
     }
 }
