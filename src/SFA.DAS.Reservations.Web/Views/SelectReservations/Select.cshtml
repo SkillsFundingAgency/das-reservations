@@ -41,7 +41,7 @@
                         </div>
                         <p>
                             You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
-                            <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                            <a asp-external-controller="unapproved" class="govuk-link" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
                         </p>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
 
             <p class="govuk-body">These are your existing reservations.</p>
             <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
-            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a></p>
+            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a></p>
             <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
             
             <form method="post">
