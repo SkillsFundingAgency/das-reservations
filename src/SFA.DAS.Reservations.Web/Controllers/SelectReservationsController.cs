@@ -296,7 +296,7 @@ public class SelectReservationsController(
             var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                 routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
+                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.AddApprenticeshipCacheKey);
 
             return Redirect(continueRoute);
         }
@@ -339,7 +339,7 @@ public class SelectReservationsController(
         string hashedAccountId, 
         Guid? userId, 
         string encodedPledgeApplicationId,
-        Guid? addApprenticeshipCacheId)
+        Guid? addApprenticeshipCacheKey)
     {
         var levyReservation = await mediator.Send(new CreateReservationLevyEmployerCommand
         {
@@ -366,7 +366,7 @@ public class SelectReservationsController(
                 accountLegalEntityPublicHashedId, "", ukPrn, null,
                 cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
                 transferSenderId, encodedPledgeApplicationId, journeyData,
-                addApprenticeshipCacheKey: addApprenticeshipCacheId);
+                addApprenticeshipCacheKey);
         }
 
         return string.Empty;
