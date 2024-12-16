@@ -85,6 +85,19 @@
                                     </span>
                                 </div>
                             }
+                            @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
+                            {
+                                <div class="govuk-radios__divider">or</div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="CreateNew" name="SelectedReservationId" type="radio" value="@Guid.Empty.ToString().Replace("0", "9")">
+                                    <label class="govuk-label govuk-radios__label govuk-label--s" for="CreateNew">
+                                        Reserve new funding
+                                    </label>
+                                    <span class="govuk-hint govuk-radios__hint">
+                                        Continue adding apprentice details
+                                    </span>
+                                </div>
+                            }
                         </div>
                     </fieldset>
                 </div>
