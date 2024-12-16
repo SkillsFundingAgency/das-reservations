@@ -84,6 +84,42 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
+        public void Then_Uses_Unapproved_Controller_With_ApprenticeshipSessionKey_When_There_Is_A_ApprenticeshipSessionKey(
+           Guid reservationId,
+           string accountLegalEntityPublicHashedId,
+           uint ukPrn,
+           string accountHashedId,
+           Guid apprenticeshipSessionKey,
+           DateTime startDate,
+           [Frozen] ReservationsWebConfiguration webConfig,
+           [Frozen] Mock<IConfiguration> config,
+           ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+
+            var originalConfigUrl = webConfig.EmployerApprenticeUrl;
+            webConfig.EmployerApprenticeUrl = $"https://{webConfig.EmployerApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                null,
+                ukPrn,
+                startDate,
+                "",
+                accountHashedId,
+                true,
+                apprenticeshipSessionKey: apprenticeshipSessionKey);
+
+            var expectedUrl = $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}" +
+                $"&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}" +
+                $"&providerId={ukPrn}" +               
+                $"&startMonthYear={startDate:MMyyyy}" +
+                $"&apprenticeshipSessionKey={apprenticeshipSessionKey}";
+
+            actualUrl.Should().Be(expectedUrl);
+        }
+
+        [Test, MoqAutoData]
         public void Then_Uses_Journey_Data(
             Guid reservationId,
             string accountLegalEntityPublicHashedId,

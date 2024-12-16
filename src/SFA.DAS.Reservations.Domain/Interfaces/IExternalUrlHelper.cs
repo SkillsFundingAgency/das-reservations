@@ -20,9 +20,9 @@ namespace SFA.DAS.Reservations.Domain.Interfaces
         string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId, string courseId,
             uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
             bool isEmptyEmployerCohort = false, string transferSenderId = "", string encodedPledgeApplicationId = "",
-            string journeyData = "");
+            string journeyData = "", Guid? apprenticeshipSessionKey = null);
         string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false,
-            string journeyData = "", string accountLegalEntityPublicHashedId = "");
+            string journeyData = "", string accountLegalEntityHashedId = "", Guid? apprenticeshipSessionKey = null);
         string GenerateDashboardUrl(string accountId = null);
         string GenerateConfirmEmployerUrl(uint ukprn, string employerAccountLegalEntityPublicHashedId);
     }

@@ -86,7 +86,7 @@ public class SelectReservationsController(
                 viewModel.TransferSenderId, viewModel.JourneyData,
                 cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                 routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
-                routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId);
+                routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId, viewModel.ApprenticeshipSessionKey);
 
             if (!string.IsNullOrEmpty(redirectResult))
             {
@@ -122,7 +122,7 @@ public class SelectReservationsController(
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
-                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
+                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey);
 
                 return Redirect(continueRoute);
             }
@@ -246,7 +246,8 @@ public class SelectReservationsController(
 
             var url = urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
-                viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect, journeyData: viewModel.JourneyData);
+                viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
+                journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey);
 
             var addApprenticeUrl = url;
 
@@ -295,7 +296,7 @@ public class SelectReservationsController(
             var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                 routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData);
+                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey);
 
             return Redirect(continueRoute);
         }
@@ -329,7 +330,16 @@ public class SelectReservationsController(
                configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private async Task<string> CheckCanAutoReserve(long accountId, string transferSenderId, string journeyData, string accountLegalEntityPublicHashedId, uint? ukPrn, string cohortRef, string hashedAccountId, Guid? userId, string encodedPledgeApplicationId)
+    private async Task<string> CheckCanAutoReserve(long accountId,
+        string transferSenderId, 
+        string journeyData, 
+        string accountLegalEntityPublicHashedId, 
+        uint? ukPrn, 
+        string cohortRef, 
+        string hashedAccountId, 
+        Guid? userId, 
+        string encodedPledgeApplicationId,
+        Guid? apprenticeshipSessionKey)
     {
         var levyReservation = await mediator.Send(new CreateReservationLevyEmployerCommand
         {
@@ -352,11 +362,11 @@ public class SelectReservationsController(
 
             }
 
-
             return urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                 accountLegalEntityPublicHashedId, "", ukPrn, null,
                 cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
-                transferSenderId, encodedPledgeApplicationId, journeyData);
+                transferSenderId, encodedPledgeApplicationId, journeyData,
+                apprenticeshipSessionKey);
         }
 
         return string.Empty;
@@ -411,6 +421,6 @@ public class SelectReservationsController(
         }
 
         return urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-            viewModel.CohortReference, journeyData: viewModel.JourneyData);
+            viewModel.CohortReference, journeyData: viewModel.JourneyData, apprenticeshipSessionKey: viewModel.ApprenticeshipSessionKey);
     }
 }

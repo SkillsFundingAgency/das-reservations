@@ -314,7 +314,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.FromReview = true;
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, string.Empty,
-                    cachedReservationResult.CohortRef, false, It.IsAny<string>(), string.Empty))
+                    cachedReservationResult.CohortRef, false, It.IsAny<string>(), string.Empty, null))
                 .Returns(cohortDetailsUrl);
 
             var result = await controller.ApprenticeshipTraining(routeModel);
