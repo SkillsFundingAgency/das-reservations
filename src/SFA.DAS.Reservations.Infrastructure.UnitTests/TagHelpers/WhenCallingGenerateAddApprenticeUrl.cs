@@ -84,12 +84,12 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_Unapproved_Controller_With_AddApprenticeshipCacheKey_When_There_Is_A_AddApprenticeshipCacheKey(
+        public void Then_Uses_Unapproved_Controller_With_ApprenticeshipSessionKey_When_There_Is_A_ApprenticeshipSessionKey(
            Guid reservationId,
            string accountLegalEntityPublicHashedId,
            uint ukPrn,
            string accountHashedId,
-           Guid addApprenticeshipCacheKey,
+           Guid apprenticeshipSessionKey,
            DateTime startDate,
            [Frozen] ReservationsWebConfiguration webConfig,
            [Frozen] Mock<IConfiguration> config,
@@ -108,13 +108,13 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 "",
                 accountHashedId,
                 true,
-                addApprenticeshipCacheKey: addApprenticeshipCacheKey);
+                apprenticeshipSessionKey: apprenticeshipSessionKey);
 
             var expectedUrl = $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/apprentice?reservationId={reservationId}" +
                 $"&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}" +
                 $"&providerId={ukPrn}" +               
                 $"&startMonthYear={startDate:MMyyyy}" +
-                $"&addApprenticeshipCacheKey={addApprenticeshipCacheKey}";
+                $"&apprenticeshipSessionKey={apprenticeshipSessionKey}";
 
             actualUrl.Should().Be(expectedUrl);
         }

@@ -100,11 +100,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
         }
 
         [Test, MoqAutoData]
-        public void Then_Uses_AddApprenticeshipCacheKey(
+        public void Then_Uses_ApprenticeshipSessionKey(
             string accountId,
             uint ukprn,
             string journeyData,
-            Guid addApprenticeshipCacheKey,
+            Guid apprenticeshipSessionKey,
             [Frozen] ReservationsWebConfiguration options,
             [Frozen] Mock<IConfiguration> config,
             ExternalUrlHelper urlHelper)
@@ -113,11 +113,11 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             options.EmployerApprenticeUrl = $"https://{options.EmployerApprenticeUrl}";
 
             var actualUrl = urlHelper.GenerateCohortDetailsUrl(ukprn, accountId, string.Empty, true, 
-                journeyData, addApprenticeshipCacheKey: addApprenticeshipCacheKey);
+                journeyData, apprenticeshipSessionKey: apprenticeshipSessionKey);
 
             actualUrl.Should().Be(
                 $"{options.EmployerApprenticeUrl}/{accountId}/unapproved/add/assign?" +
-                         $"providerId={ukprn}&journeyData={journeyData}&addApprenticeshipCacheKey={addApprenticeshipCacheKey}");
+                         $"providerId={ukprn}&journeyData={journeyData}&apprenticeshipSessionKey={apprenticeshipSessionKey}");
         }
     }
 }

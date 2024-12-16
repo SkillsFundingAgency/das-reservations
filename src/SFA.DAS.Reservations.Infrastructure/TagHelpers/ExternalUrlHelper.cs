@@ -33,7 +33,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
     public string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId,
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "",
-        string encodedPledgeApplicationId= "", string journeyData = "", Guid? addApprenticeshipCacheKey = null)
+        string encodedPledgeApplicationId= "", string journeyData = "", Guid? apprenticeshipSessionKey = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -82,15 +82,15 @@ public class ExternalUrlHelper : IExternalUrlHelper
             queryString += $"&encodedPledgeApplicationId={encodedPledgeApplicationId}";
         }
 
-        if (addApprenticeshipCacheKey.HasValue)
+        if (apprenticeshipSessionKey.HasValue)
         {
             if (string.IsNullOrWhiteSpace(queryString))
             {
-                queryString = $"?addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+                queryString = $"?apprenticeshipSessionKey={apprenticeshipSessionKey.Value}";
             }
             else
             {
-                queryString += $"&addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+                queryString += $"&apprenticeshipSessionKey={apprenticeshipSessionKey.Value}";
             }
         }
 
@@ -146,7 +146,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
     }
 
     public string GenerateCohortDetailsUrl(uint? ukprn, string accountId, string cohortRef, bool isEmptyCohort = false, 
-        string journeyData = "", string accountLegalEntityHashedId = "", Guid? addApprenticeshipCacheKey = null)
+        string journeyData = "", string accountLegalEntityHashedId = "", Guid? apprenticeshipSessionKey = null)
     {
         var queryString = isEmptyCohort && ukprn.HasValue ? $"?providerId={ukprn}" : "";
 
@@ -174,15 +174,15 @@ public class ExternalUrlHelper : IExternalUrlHelper
             }
         }
 
-        if (addApprenticeshipCacheKey.HasValue)
+        if (apprenticeshipSessionKey.HasValue)
         {
             if (string.IsNullOrWhiteSpace(queryString))
             {
-                queryString = $"?addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+                queryString = $"?apprenticeshipSessionKey={apprenticeshipSessionKey.Value}";
             }
             else
             {
-                queryString += $"&addApprenticeshipCacheKey={addApprenticeshipCacheKey.Value}";
+                queryString += $"&apprenticeshipSessionKey={apprenticeshipSessionKey.Value}";
             }
         }
 

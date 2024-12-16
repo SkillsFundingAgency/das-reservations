@@ -232,7 +232,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(reservationsResult);
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty, viewModel.AddApprenticeshipCacheKey))
+                    viewModel.CohortReference, false, viewModel.JourneyData, string.Empty, viewModel.ApprenticeshipSessionKey))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -244,7 +244,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actualModel.Should().NotBeNull();
             actualModel.CohortReference.Should().Be(viewModel.CohortReference);
             actualModel.TransferSenderId.Should().Be(viewModel.TransferSenderId);
-            actualModel.AddApprenticeshipCacheKey.Should().Be(viewModel.AddApprenticeshipCacheKey);
+            actualModel.ApprenticeshipSessionKey.Should().Be(viewModel.ApprenticeshipSessionKey);
             actualModel.BackLink.Should().Be(cohortDetailsUrl);
             actualModel.AvailableReservations.Should().BeEquivalentTo(
                 reservationsResult.Reservations
@@ -275,7 +275,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             employer.AccountId = expectedAccountId;
             viewModel.TransferSenderId = string.Empty;
             viewModel.EncodedPledgeApplicationId = "";
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
             controller.ControllerContext = new ControllerContext
@@ -392,7 +392,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     false, viewModel.TransferSenderId,
                     viewModel.EncodedPledgeApplicationId, 
                     viewModel.JourneyData, 
-                    viewModel.AddApprenticeshipCacheKey))
+                    viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationLevyResult);
@@ -475,7 +475,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(createReservationLevyResult.ReservationId,
                     routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn.Value,
                     null, viewModel.CohortReference, routeModel.EmployerAccountId, 
-                    false,viewModel.TransferSenderId, viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.AddApprenticeshipCacheKey))
+                    false,viewModel.TransferSenderId, viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
            
             //Act
@@ -511,7 +511,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.CohortReference = string.Empty;
             viewModel.TransferSenderId = string.Empty;
             viewModel.EncodedPledgeApplicationId = "";
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             employer.AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId;
             employer.AccountId = expectedAccountId;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
@@ -579,7 +579,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             viewModel.TransferSenderId = "";
             viewModel.EncodedPledgeApplicationId = "";
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             routeModel.AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId;
           
 
@@ -824,7 +824,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //Arrange
             routeModel.Id = Guid.Empty;
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -986,7 +986,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //Arrange
             routeModel.Id = Guid.Empty;
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
@@ -1046,7 +1046,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
             controller.ControllerContext = new ControllerContext
@@ -1109,7 +1109,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             //Arrange
             routeModel.Id = Guid.Empty;
             routeModel.UkPrn = null;
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, Guid.NewGuid().ToString());
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
             controller.ControllerContext = new ControllerContext
@@ -1168,7 +1168,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             //Arrange
             routeModel.Id = Guid.Empty;
-            viewModel.AddApprenticeshipCacheKey = null;
+            viewModel.ApprenticeshipSessionKey = null;
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ThrowsAsync(new EmployerAgreementNotSignedException(1,1));
