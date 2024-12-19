@@ -3,6 +3,7 @@
     ViewData["Title"] = "Reservations";
 
     var firstReservationId = Model.AvailableReservations.FirstOrDefault()?.ReservationId;
+    var hashedAccountId = Context.Request.RouteValues[RouteValueKeys.HashedAccountId];
 
     var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
 
@@ -40,13 +41,19 @@
                         </div>
                         <p>
                             You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
-                            <a asp-external-controller="unapproved" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                            <a asp-external-controller="unapproved" class="govuk-link" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
                         </p>
                     </div>
                 </div>
             }
 
-            <h1 class="govuk-heading-l">Choose a Reservation</h1>
+            <h1 class="govuk-heading-l">Select a Reservation</h1>
+
+            <p class="govuk-body">These are your existing reservations.</p>
+            <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
+            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a></p>
+            <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
+           
 
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
@@ -54,6 +61,8 @@
                 <input asp-for="TransferSenderId" type="hidden"/>
                 <input asp-for="ProviderId" type="hidden"/>
                 <input asp-for="JourneyData" type="hidden"/>
+                
+                <h1 class="govuk-heading-m">Which reservation would you like to select?</h1>
 
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">                    
@@ -69,14 +78,14 @@
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="SelectedReservationId-@availableReservation.ReservationId" name="SelectedReservationId" type="radio" value="@availableReservation.ReservationId">
                                     <label class="govuk-label govuk-radios__label" for="SelectedReservationId-@availableReservation.ReservationId">
-                                        <b>@availableReservation.CourseDescription</b> starting between @availableReservation.TrainingDateDescription
+                                        <b>@availableReservation.CourseDescription</b>
                                     </label>
                                     <span class="govuk-hint govuk-radios__hint">
-                                        Created in @availableReservation.CreatedDateDescription
+                                        Starting between @availableReservation.TrainingDateDescription                                    
                                     </span>
                                 </div>
                             }
-                            @if (Model.MoreReservationsAvailable)
+                            @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
                             {
                                 <div class="govuk-radios__divider">or</div>
                                 <div class="govuk-radios__item">
@@ -92,7 +101,6 @@
                         </div>
                     </fieldset>
                 </div>
-
                 <button type="submit" draggable="false" class="govuk-button">
                     Continue
                 </button>

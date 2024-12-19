@@ -232,7 +232,7 @@ public class SelectReservationsController(
             viewModel.AvailableReservations = availableReservationsResult.Reservations
                 .Select(reservation => new AvailableReservationViewModel(reservation));
 
-            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select funding or reserve new funding");
+            ModelState.AddModelError(nameof(viewModel.SelectedReservationId), "Select a reservation");
 
             viewModel.BackLink = backUrl;
 
