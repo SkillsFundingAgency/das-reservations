@@ -33,7 +33,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
     public string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId,
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "",
-        string encodedPledgeApplicationId= "", string journeyData = "", Guid? apprenticeshipSessionKey = null)
+        string encodedPledgeApplicationId= "", string journeyData = "", Guid? apprenticeshipSessionKey = null, 
+        bool? beforeProviderSelected = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -95,8 +96,13 @@ public class ExternalUrlHelper : IExternalUrlHelper
         }
 
         string controller = "unapproved", action, id;
-            
-        if (ukPrn.HasValue && !isEmptyEmployerCohort)
+
+        if (beforeProviderSelected == true)
+        {
+            action = "add/set-reservation";
+            id = accountHashedId;
+        }
+        else if (ukPrn.HasValue && !isEmptyEmployerCohort)
         {
             action = "add/apprentice";
             id = ukPrn.ToString();
@@ -116,7 +122,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
         {
             controller += $"/{cohortRef}";
             action = !string.IsNullOrEmpty(courseId) && !string.IsNullOrEmpty(accountHashedId) 
-                ? "apprentices/add/select-delivery-model" :"apprentices/add";
+                ? "apprentices/add/select-delivery-model" : "apprentices/add";
         }
 
         var urlParameters = new UrlParameters
