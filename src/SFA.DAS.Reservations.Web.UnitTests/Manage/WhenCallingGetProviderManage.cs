@@ -170,7 +170,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 false,
                 "",
                 "",
-                ""))
+                "",
+                null))
                 .Returns(expectedUrl);
 
             var result = await controller.ProviderManage(routeModel, filterModel) as ViewResult;

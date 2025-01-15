@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(result);
             externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(null, routeModel.EmployerAccountId,
                 routeModel.CohortReference, routeModel.CohortReference == string.Empty,
-                It.IsAny<string>(), string.Empty)).Returns(expectedBackUrl);
+                It.IsAny<string>(), string.Empty, null)).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;
@@ -126,7 +126,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ReturnsAsync(result);
             externalUrlHelper.Setup(x => x.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
                 routeModel.CohortReference, routeModel.CohortReference == string.Empty,
-                It.IsAny<string>(), string.Empty)).Returns(expectedBackUrl);
+                It.IsAny<string>(), string.Empty, null)).Returns(expectedBackUrl);
 
             //act 
             var view = await controller.SelectCourseRuleCheck(routeModel) as ViewResult;
