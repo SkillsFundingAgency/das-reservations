@@ -122,7 +122,7 @@ public class SelectReservationsController(
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
-                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey);
+                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected);
 
                 return Redirect(continueRoute);
             }
@@ -247,7 +247,7 @@ public class SelectReservationsController(
             var url = urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey);
+                journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey.Value, beforeProviderSelected: viewModel.BeforeProviderSelected);
 
             var addApprenticeUrl = url;
 
@@ -296,7 +296,7 @@ public class SelectReservationsController(
             var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                 routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey);
+                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected);
 
             return Redirect(continueRoute);
         }
