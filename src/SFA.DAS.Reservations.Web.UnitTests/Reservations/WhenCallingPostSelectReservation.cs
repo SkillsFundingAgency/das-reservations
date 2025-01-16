@@ -134,6 +134,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            viewModel.ApprenticeshipSessionKey = null;
             routeModel.Id = Guid.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -144,7 +145,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -230,6 +231,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+            viewModel.ApprenticeshipSessionKey = null;
             routeModel.Id = Guid.Empty;
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -240,7 +242,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId, routeModel.UkPrn.Value));
             mockUrlHelper
                 .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty))
+                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
                 .Returns(cohortDetailsUrl);
 
             //Act
@@ -269,7 +271,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    false, string.Empty, string.Empty, viewModel.JourneyData))
+                    false, string.Empty, string.Empty, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -297,7 +299,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, viewModel.ProviderId,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    false, string.Empty, string.Empty, viewModel.JourneyData))
+                    false, string.Empty, string.Empty, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -328,7 +330,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, string.Empty, routeModel.EmployerAccountId,
-                    true, string.Empty, string.Empty, viewModel.JourneyData))
+                    true, string.Empty, string.Empty, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -359,7 +361,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 .Setup(helper => helper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                     routeModel.AccountLegalEntityPublicHashedId, reservationResult.Course.Id, routeModel.UkPrn.Value,
                     reservationResult.StartDate, viewModel.CohortReference, routeModel.EmployerAccountId,
-                    true, string.Empty, string.Empty, viewModel.JourneyData))
+                    true, string.Empty, string.Empty, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey))
                 .Returns(addApprenticeUrl);
 
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -480,6 +482,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.UkPrn = null;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
             viewModel.CohortReference = null;
+            viewModel.ApprenticeshipSessionKey = null;
             routeModel.Id = Guid.Empty;
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId)).Returns(expectedAccountId);
             var matchedEmployer = employersResponse.AccountLegalEntities.First();
@@ -495,7 +498,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockUrlHelper.Setup(x => x.GenerateAddApprenticeUrl(null, routeModel.AccountLegalEntityPublicHashedId, "",
                 viewModel.ProviderId,
                 null, viewModel.CohortReference, routeModel.EmployerAccountId, true, "",
-                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData)).Returns("https://addroute");
+                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey)).Returns("https://addroute");
 
             //Act
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
@@ -520,6 +523,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         {
             configuration.Setup(x => x["AuthType"]).Returns("employer");
             routeModel.UkPrn = null;
+            viewModel.ApprenticeshipSessionKey = null;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
             routeModel.Id = Guid.Empty;
             encodingService.Setup(x => x.Decode(routeModel.EmployerAccountId, EncodingType.AccountId))
@@ -540,7 +544,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 viewModel.ProviderId,
                 null, viewModel.CohortReference, routeModel.EmployerAccountId,
                 string.IsNullOrEmpty(viewModel.CohortReference), "",
-                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData)).Returns("https://add-another-route");
+                viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey)).Returns("https://add-another-route");
 
             //Act
             var result = await controller.PostSelectReservation(routeModel, viewModel) as RedirectResult;
