@@ -247,7 +247,7 @@ public class SelectReservationsController(
             var url = urlHelper.GenerateAddApprenticeUrl(viewModel.SelectedReservationId.Value,
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey.Value, beforeProviderSelected: viewModel.BeforeProviderSelected);
+                journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey, beforeProviderSelected: viewModel.BeforeProviderSelected);
 
             var addApprenticeUrl = url;
 
