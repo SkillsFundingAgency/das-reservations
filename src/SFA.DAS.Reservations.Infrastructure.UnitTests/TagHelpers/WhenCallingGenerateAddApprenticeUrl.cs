@@ -326,5 +326,42 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&transferSenderId={transferSenderId}";
             actualUrl.Should().Be(expectedUrl);
         }
+
+        [Test, MoqAutoData]
+        public void Then_Uses_Unapproved_SetReservation_For_Select_Journey_With_CourseId_And_Empty_Cohort(
+            Guid reservationId,
+            string accountLegalEntityPublicHashedId,
+            string accountHashedId,
+            string courseId,
+            uint ukPrn,
+            DateTime startDate,
+            [Frozen] ReservationsWebConfiguration webConfig,
+            [Frozen] Mock<IConfiguration> config,
+            ExternalUrlHelper urlHelper)
+        {
+            config.Setup(x => x["AuthType"]).Returns("employer");
+
+            var originalConfigUrl = webConfig.EmployerApprenticeUrl;
+            webConfig.EmployerApprenticeUrl = $"https://{webConfig.EmployerApprenticeUrl}";
+
+            var actualUrl = urlHelper.GenerateAddApprenticeUrl(reservationId,
+                accountLegalEntityPublicHashedId,
+                courseId,
+                null,
+                startDate,
+                "",
+                accountHashedId,
+                true, 
+                null,
+                null,
+                null,
+                null,
+                true);
+
+            var expectedUrl = $"https://{originalConfigUrl}/{accountHashedId}/unapproved/add/set-reservation?reservationId={reservationId}&accountLegalEntityHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}";
+
+            actualUrl.Should().Be(expectedUrl);
+        }
+
     }
 }
