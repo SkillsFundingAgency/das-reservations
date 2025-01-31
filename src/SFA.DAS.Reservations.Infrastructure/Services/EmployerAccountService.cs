@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using SFA.DAS.GovUK.Auth.Employer;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -13,7 +14,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Infrastructure.Services;
 
-public class EmployerAccountService : IEmployerAccountService
+public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerAccountService
 {
     private readonly IReservationsOuterApiClient _reservationsOuterApiClient;
     private readonly ReservationsOuterApiConfiguration _outerApiConfiguration;
@@ -57,7 +58,27 @@ public class EmployerAccountService : IEmployerAccountService
     {
         var request = new GetAccountUsersRequest(_outerApiConfiguration.ApiBaseUrl, accountId);
         var response = await _reservationsOuterApiClient.Get<GetAccountUsersApiResponse>(request);
-        
+
         return response.AccountUsers.Select(model => (EmployerAccountUser)model);
+    }
+
+    async Task<EmployerUserAccounts> IGovAuthEmployerAccountService.GetUserAccounts(string userId, string email)
+    {
+        var accountsRequest = new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email);
+        var apiResponse = await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(accountsRequest);
+
+        return new EmployerUserAccounts
+        {
+            EmployerAccounts = apiResponse.UserAccounts != null ? apiResponse.UserAccounts.Select(c => new EmployerUserAccountItem
+            {
+                Role = c.Role,
+                AccountId = c.AccountId,
+                EmployerName = c.EmployerName,
+            }).ToList() : [],
+            FirstName = apiResponse.FirstName,
+            IsSuspended = apiResponse.IsSuspended,
+            LastName = apiResponse.LastName,
+            EmployerUserId = apiResponse.UserId,
+        };
     }
 }
