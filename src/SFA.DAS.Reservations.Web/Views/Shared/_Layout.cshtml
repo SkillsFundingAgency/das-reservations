@@ -129,6 +129,10 @@
     <script src="js/app.min.js"></script>
     <script src="/js/app.js" no-cdn></script>
     <script src="/js/autocomplete.js" no-cdn></script>
+    @if (User.Identity is { IsAuthenticated: true })
+    {
+        <script src="/js/sessionTimeout.js" asp-append-version="true"></script>
+    }
     <script>
         window.DASFrontend.initAll();
     </script>
