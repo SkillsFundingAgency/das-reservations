@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_And_ValidationException_Then_Redirect_To_ProviderError(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            Employer employer,
+            Domain.Employers.Employer employer,
             ValidationException validationException,
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] SelectReservationsController controller)
@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Ukprn_Then_Gets_Reservations_For_Employer_Account(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            Employer employer,
+            Domain.Employers.Employer employer,
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] SelectReservationsController controller)
@@ -199,7 +199,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             string cohortDetailsUrl,
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            Employer employer,
+            Domain.Employers.Employer employer,
             GetAvailableReservationsResult reservationsResult,
             [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
             [Frozen] Mock<IMediator> mockMediator,
@@ -255,7 +255,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task AndHasLevyPayingEmployer_ThenCreatesReservationInTheBackground(
             ReservationsRouteModel routeModel,
-            Employer employer,
+            Domain.Employers.Employer employer,
             GetLegalEntitiesResponse employersResponse,
             long expectedAccountId,
             Guid? expectedUserId,
@@ -358,7 +358,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         )
         {
             //Arrange
-            var employer = new Employer
+            var employer = new Domain.Employers.Employer
             {
                 AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId,
                 AccountId = expectedAccountId,
@@ -428,7 +428,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         )
         {
             //Arrange
-            var employer = new Employer
+            var employer = new Domain.Employers.Employer
             {
                 AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId,
                 AccountId = expectedAccountId,
@@ -490,7 +490,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         [Test, MoqAutoData]
         public async Task And_Has_Levy_Paying_Employer_With_No_Transfer_Id_And_No_CohortRef_Then_Redirects_To_Add_An_Apprentice_For_Empty_Cohort_Journey(
             ReservationsRouteModel routeModel,
-            Employer employer,
+            Domain.Employers.Employer employer,
             GetLegalEntitiesResponse employersResponse,
             long expectedAccountId,
             Guid? expectedUserId,
@@ -570,7 +570,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         )
         {
             //Arrange
-            var employer = new Employer
+            var employer = new Domain.Employers.Employer
             {
                 AccountLegalEntityPublicHashedId = expectedAccountLegalEntityPublicHashedId,
                 AccountId = expectedAccountId,
@@ -1216,7 +1216,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
        string confirmEmployerUrl,
        ReservationsRouteModel routeModel,
        SelectReservationViewModel viewModel,
-       Employer employer,
+       Domain.Employers.Employer employer,
        GetAvailableReservationsResult reservationsResult,
        [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
        [Frozen] Mock<IMediator> mockMediator,
