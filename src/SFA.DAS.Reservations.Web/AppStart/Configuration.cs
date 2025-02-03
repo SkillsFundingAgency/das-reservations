@@ -78,7 +78,7 @@ public static class ConfigurationExtensions
         services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
         services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
 
-        services.AddTransient<ICustomClaims, NullCustomClaimsService>();
+        services.AddTransient<ICustomClaims, EmptyCustomClaimsService>();
         services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 
         services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();

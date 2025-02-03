@@ -6,7 +6,7 @@ using SFA.DAS.GovUK.Auth.Services;
 
 namespace SFA.DAS.Reservations.Web.Services;
 
-public class NullCustomClaimsService : ICustomClaims
+public class EmptyCustomClaimsService : ICustomClaims
 {
     public Task<IEnumerable<Claim>> GetClaims(TokenValidatedContext tokenValidatedContext)
     {
