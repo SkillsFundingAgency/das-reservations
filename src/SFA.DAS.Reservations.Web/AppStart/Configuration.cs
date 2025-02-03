@@ -13,6 +13,7 @@ using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart;
 
@@ -77,7 +78,7 @@ public static class ConfigurationExtensions
         services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
         services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
 
-        //services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
+        services.AddTransient<ICustomClaims, NullCustomClaimsService>();
         services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 
         services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
