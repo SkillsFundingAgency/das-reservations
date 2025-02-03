@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,9 +30,31 @@ public class HomeController : Controller
         _configuration = configuration.Value;
     }
 
+    [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
     [Route("signout",Name = RouteNames.ProviderSignOut)]
+    [HttpGet("service/signout")]
     public IActionResult SignOut()
     {
+        if (IsThisAnEmployer())
+        {
+            var schemes = new List<string>
+            {
+                CookieAuthenticationDefaults.AuthenticationScheme
+            };
+            _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
+
+            if (!stubAuth)
+            {
+                schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
+            }
+
+            return SignOut(new AuthenticationProperties
+            {
+                RedirectUri = "",
+                AllowRefresh = true
+            }, schemes.ToArray());
+        }
+
         var useAuthScheme = _configuration.UseDfESignIn
             ? OpenIdConnectDefaults.AuthenticationScheme
             : WsFederationDefaults.AuthenticationScheme;
@@ -46,26 +69,27 @@ public class HomeController : Controller
             useAuthScheme);
     }
 
-    [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
-    public IActionResult SignOutEmployer()
-    {
-        var schemes = new List<string>
-        {
-            CookieAuthenticationDefaults.AuthenticationScheme
-        };
-        _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
-        if (!stubAuth)
-        {
-            schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
-        }
-            
-        return SignOut(new AuthenticationProperties
-            {
-                RedirectUri = "",
-                AllowRefresh = true
-            },
-            schemes.ToArray());
-    }
+    //[Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
+    //[Route("service/signout")]
+    //public IActionResult SignOutEmployer()
+    //{
+    //    var schemes = new List<string>
+    //    {
+    //        CookieAuthenticationDefaults.AuthenticationScheme
+    //    };
+    //    _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
+    //    if (!stubAuth)
+    //    {
+    //        schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
+    //    }
+
+    //    return SignOut(new AuthenticationProperties
+    //    {
+    //        RedirectUri = "",
+    //        AllowRefresh = true
+    //    },
+    //        schemes.ToArray());
+    //}
 
 
     [Route("signoutcleanup")]
@@ -131,4 +155,10 @@ public class HomeController : Controller
         return View();
     }
 #endif
+
+    private bool IsThisAnEmployer()
+    {
+        return _config["AuthType"] != null &&
+               _config["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+    }
 }
