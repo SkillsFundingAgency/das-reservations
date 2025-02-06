@@ -291,7 +291,7 @@
     {
       "condition": "[equals(parameters('enableFailedRequestAlert'), true())]",
       "apiVersion": "2021-04-01",
-      "name": "[concat('application-insights-', variables('uiAppServiceName'), '-alert-', parameters('utcValue'))]",
+      "name": "[concat('application-insights-', variables('employerAppServiceName'), '-alert-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -302,7 +302,7 @@
         },
         "parameters": {
           "serviceName": {
-            "value": "[variables('uiAppServiceName')]"
+            "value": "[variables('employerAppServiceName')]"
           },
           "applicationInsightsResourceId": {
             "value": "[parameters('applicationInsightsResourceId')]"
@@ -375,6 +375,10 @@
                 {
                   "name": "FeatureToggleOn",
                   "value": "[parameters('featureToggleOn')]"
+                },
+                {
+                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                  "value": "[parameters('applicationInsightsConnectionString')]"
                 }
               ]
             }
@@ -393,6 +397,31 @@
       "dependsOn": [
         "[variables('resourceGroupName')]"
       ]
+    },
+    {
+      "condition": "[equals(parameters('enableFailedRequestAlert'), true())]",
+      "apiVersion": "2021-04-01",
+      "name": "[concat('application-insights-', variables('providerAppServiceName'), '-alert-', parameters('utcValue'))]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'application-insights-failed-requests-alert.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "serviceName": {
+            "value": "[variables('providerAppServiceName')]"
+          },
+          "applicationInsightsResourceId": {
+            "value": "[parameters('applicationInsightsResourceId')]"
+          },
+          "alertActionGroupResourceId": {
+            "value": "[parameters('alertActionGroupResourceId')]"
+          }
+        }
+      }
     },
     {
       "apiVersion": "2020-06-01",
