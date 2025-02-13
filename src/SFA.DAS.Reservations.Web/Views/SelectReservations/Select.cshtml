@@ -78,11 +78,11 @@
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="SelectedReservationId-@availableReservation.ReservationId" name="SelectedReservationId" type="radio" value="@availableReservation.ReservationId">
                                     <label class="govuk-label govuk-radios__label" for="SelectedReservationId-@availableReservation.ReservationId">
-                                        <b>@availableReservation.CourseDescription</b>
+                                        @availableReservation.CourseDescription
                                     </label>
-                                    <span class="govuk-hint govuk-radios__hint">
+                                    <div class="govuk-hint govuk-radios__hint">
                                         Starting between @availableReservation.TrainingDateDescription                                    
-                                    </span>
+                                    </div>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
