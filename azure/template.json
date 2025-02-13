@@ -247,10 +247,6 @@
                   "value": "[parameters('cdnUrl')]"
                 },
                 {
-                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                  "value": "[reference(concat(variables('employerAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
-                },
-                {
                   "name": "AuthType",
                   "value": "employer"
                 },
