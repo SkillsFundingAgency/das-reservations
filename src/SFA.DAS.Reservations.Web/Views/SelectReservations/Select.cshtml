@@ -51,7 +51,7 @@
 
             <p class="govuk-body">These are your existing reservations.</p>
             <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
-            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a></p>
+            <p class="govuk-body">If you cannot find the reservation you need, you can <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a>.</p>
             <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
            
 
@@ -78,11 +78,11 @@
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="SelectedReservationId-@availableReservation.ReservationId" name="SelectedReservationId" type="radio" value="@availableReservation.ReservationId">
                                     <label class="govuk-label govuk-radios__label" for="SelectedReservationId-@availableReservation.ReservationId">
-                                        <b>@availableReservation.CourseDescription</b>
+                                        @availableReservation.CourseDescription
                                     </label>
-                                    <span class="govuk-hint govuk-radios__hint">
+                                    <div class="govuk-hint govuk-radios__hint">
                                         Starting between @availableReservation.TrainingDateDescription                                    
-                                    </span>
+                                    </div>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
