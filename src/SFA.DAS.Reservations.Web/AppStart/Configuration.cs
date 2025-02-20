@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SFA.DAS.Encoding;
 using SFA.DAS.GovUK.Auth.Authentication;
+using SFA.DAS.GovUK.Auth.Employer;
 using SFA.DAS.GovUK.Auth.Services;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -12,6 +13,7 @@ using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization;
 using SFA.DAS.Reservations.Web.Infrastructure.Authorization.Helpers;
+using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AppStart;
 
@@ -62,6 +64,7 @@ public static class ConfigurationExtensions
         services.Configure<ReservationsOuterApiConfiguration>(configuration.GetSection("ReservationsOuterApi"));
         services.AddSingleton(config => config.GetService<IOptions<ReservationsOuterApiConfiguration>>().Value);
 
+        services.AddTransient<IGovAuthEmployerAccountService, EmployerAccountService>();
         services.AddTransient<IEmployerAccountService, EmployerAccountService>();
 
         services.AddSingleton<IAuthorizationHandler, HasProviderOrEmployerAccountAuthorisationHandler>();
@@ -75,7 +78,7 @@ public static class ConfigurationExtensions
         services.AddSingleton<ICreateCohortAuthorizationHelper, CreateCohortAuthorizationHelper>();
         services.AddSingleton<IAccessCohortAuthorizationHelper, AccessCohortAuthorizationHelper>();
 
-        services.AddTransient<ICustomClaims, EmployerAccountPostAuthenticationClaimsHandler>();
+        services.AddTransient<ICustomClaims, EmptyCustomClaimsService>();
         services.AddTransient<IStubAuthenticationService, StubAuthenticationService>();
 
         services.AddSingleton<ITrainingProviderAuthorizationHandler, TrainingProviderAuthorizationHandler>();
