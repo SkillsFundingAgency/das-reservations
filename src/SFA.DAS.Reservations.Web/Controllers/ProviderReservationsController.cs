@@ -123,7 +123,9 @@ public class ProviderReservationsController : ReservationsBaseController
         var eoiEmployers = getTrustedEmployersResponse.Employers
             .Where(e => string.IsNullOrWhiteSpace(routeModel.SearchTerm) ||
                         e.AccountName.Replace(" ", string.Empty).Contains(routeModel.SearchTerm.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase) ||
-                        e.AccountLegalEntityName.Replace(" ", string.Empty).Contains(routeModel.SearchTerm.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase))
+                        e.AccountLegalEntityName.Replace(" ", string.Empty).Contains(routeModel.SearchTerm.Replace(" ", string.Empty), StringComparison.CurrentCultureIgnoreCase)
+                        || e.AccountLegalEntityPublicHashedId.Contains(routeModel.SearchTerm, StringComparison.CurrentCultureIgnoreCase)
+                        )
             .ToList();
 
 

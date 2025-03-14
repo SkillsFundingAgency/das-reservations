@@ -60,6 +60,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
         [MoqInlineAutoData("ltd", "AccountName", true, 3, "Sainsbury's", "Asda")]
         [MoqInlineAutoData("xxx", "AccountName", true, 0, null, null)]
         [MoqInlineAutoData("tesco", "AccountName", true, 1, "Tesco", "Tesco")]
+        [MoqInlineAutoData("XTESCO", null, false, 1, null, null)]
+        [MoqInlineAutoData("XA", null, false, 2, null, null)]
         [MoqInlineAutoData(null, "AccountLegalEntityName", false, 6, "1 Lidl Plc", "6 Morrisons Ltd")]
         [MoqInlineAutoData("ltd", "AccountLegalEntityName", false, 3, "2 Sainsbury's Ltd", "6 Morrisons Ltd")]
         [MoqInlineAutoData("xxx", "AccountLegalEntityName", false, 0, null, null)]
@@ -121,42 +123,48 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Providers
                     AccountId = 1,
                     AccountName = "Tesco",
                     AccountLegalEntityId = 1,
-                    AccountLegalEntityName = "3 Tesco Limited"
+                    AccountLegalEntityName = "3 Tesco Limited",
+                    AccountLegalEntityPublicHashedId = "XTESCO"
                 },
                 new AccountLegalEntity
                 {
                     AccountId = 2,
                     AccountName = "Asda",
                     AccountLegalEntityId = 2,
-                    AccountLegalEntityName = "5 Asda Ltd"
+                    AccountLegalEntityName = "5 Asda Ltd",
+                    AccountLegalEntityPublicHashedId = "XASDA"
                 },
                 new AccountLegalEntity
                 {
                     AccountId = 3,
                     AccountName = "Lidl",
                     AccountLegalEntityId = 3,
-                    AccountLegalEntityName = "1 Lidl Plc"
+                    AccountLegalEntityName = "1 Lidl Plc",
+                    AccountLegalEntityPublicHashedId = "XLIDL"
                 },
                 new AccountLegalEntity
                 {
                     AccountId = 4,
                     AccountName = "Morrisons",
                     AccountLegalEntityId = 4,
-                    AccountLegalEntityName = "6 Morrisons Ltd"
+                    AccountLegalEntityName = "6 Morrisons Ltd",
+                    AccountLegalEntityPublicHashedId = "XMORRISONS"
                 },
                 new AccountLegalEntity
                 {
                     AccountId = 5,
                     AccountName = "Sainsbury's",
                     AccountLegalEntityId = 5,
-                    AccountLegalEntityName = "2 Sainsbury's Ltd"
+                    AccountLegalEntityName = "2 Sainsbury's Ltd",
+                    AccountLegalEntityPublicHashedId = "XSAINSBURYS"
                 },
                 new AccountLegalEntity
                 {
                     AccountId = 6,
                     AccountName = "Aldi",
                     AccountLegalEntityId = 6,
-                    AccountLegalEntityName = "4 Aldi"
+                    AccountLegalEntityName = "4 Aldi",
+                    AccountLegalEntityPublicHashedId = "XALDI"
                 },
             };
         }

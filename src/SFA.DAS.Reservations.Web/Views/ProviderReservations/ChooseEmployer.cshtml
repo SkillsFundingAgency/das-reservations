@@ -21,7 +21,7 @@
             <form method="get" action="@Url.RouteUrl(RouteNames.ProviderChooseEmployer)">
                 <div class="app-search-form">
                     <label for="search-form" class="govuk-body">
-                        Search employer name or account name
+                        Search by employer name, account name or agreement ID
                     </label>
                     <div class="app-search-form__group">
                         <input id="search-form" title="Search" name="searchTerm" value="@Model.SearchTerm" class="form-control app-search-form__input app-autocomplete" type="text" data-autocomplete-url="@Url.RouteUrl(RouteNames.ProviderChooseEmployerSearch)">
@@ -84,7 +84,7 @@
                         };
 
                         <tr class="govuk-table__row">
-                            <th class="govuk-table__header" scope="row">@employer.AccountLegalEntityName</th>
+                            <td class="govuk-table__cell" scope="row">@employer.AccountLegalEntityName</td>
                             <td class="govuk-table__cell">@employer.AccountName</td>
                             @if (employer.AgreementSigned)
                             {
