@@ -25,6 +25,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         _outerApiConfiguration = outerApiConfiguration.Value;
     }
 
+    //TODO this needs removing and the EmployerAccountAuthorizationHAndler changing to call GetUserAccounts
     public async Task<List<Claim>> GetClaim(string userId, string claimType, string email)
     {
         var claims = new List<Claim>();
