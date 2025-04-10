@@ -4,7 +4,7 @@
 
     var firstReservationId = Model.AvailableReservations.FirstOrDefault()?.ReservationId;
     var hashedAccountId = Context.Request.RouteValues[RouteValueKeys.HashedAccountId];
-    var providerId = Context.Request.RouteValues[RouteValueKeys.ProviderId];
+    var ukprn = Context.Request.RouteValues[RouteValueKeys.UkPrn];
     
     var customErrorKeys = new Dictionary<string, string> { { "SelectedReservationId", $"SelectedReservationId-{firstReservationId}" } };
 
@@ -61,7 +61,7 @@
                 }
                 else
                 {
-                    <a asp-route="@RouteNames.ProviderManage" asp-route-ukPrn="@providerId" class="govuk-link" target="_blank">manage your reservations</a>
+                    <a asp-route="@RouteNames.ProviderManage" asp-route-ukPrn="@ukprn" class="govuk-link" target="_blank">manage your reservations</a>
                 }.
                 </p>
             <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
