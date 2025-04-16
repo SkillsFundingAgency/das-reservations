@@ -44,7 +44,8 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         {
             Role = c.Role,
             AccountId = c.AccountId,
-            EmployerName = c.EmployerName
+            EmployerName = c.EmployerName,
+            ApprenticeshipEmployerType = c.ApprenticeshipEmployerType
         });
 
         var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
