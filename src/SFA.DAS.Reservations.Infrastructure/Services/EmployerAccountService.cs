@@ -63,7 +63,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         return response.AccountUsers.Select(model => (EmployerAccountUser)model);
     }
 
-    async Task<EmployerUserAccounts> IGovAuthEmployerAccountService.GetUserAccounts(string userId, string email)
+    public async Task<EmployerUserAccounts> GetUserAccounts(string userId, string email)
     {
         var accountsRequest = new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email);
         var apiResponse = await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(accountsRequest);
@@ -75,6 +75,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
                 Role = c.Role,
                 AccountId = c.AccountId,
                 EmployerName = c.EmployerName,
+                ApprenticeshipEmployerType = c.ApprenticeshipEmployerType
             }).ToList() : [],
             FirstName = apiResponse.FirstName,
             IsSuspended = apiResponse.IsSuspended,
