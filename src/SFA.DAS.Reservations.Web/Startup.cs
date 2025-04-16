@@ -181,7 +181,6 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapSessionKeepAliveEndpoint();
             endpoints.MapDefaultControllerRoute();
         });
     }

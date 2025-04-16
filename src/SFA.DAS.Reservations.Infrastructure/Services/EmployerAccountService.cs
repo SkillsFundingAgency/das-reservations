@@ -25,6 +25,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         _outerApiConfiguration = outerApiConfiguration.Value;
     }
 
+    //TODO this needs removing and the EmployerAccountAuthorizationHAndler changing to call GetUserAccounts
     public async Task<List<Claim>> GetClaim(string userId, string claimType, string email)
     {
         var claims = new List<Claim>();
@@ -43,7 +44,8 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         {
             Role = c.Role,
             AccountId = c.AccountId,
-            EmployerName = c.EmployerName
+            EmployerName = c.EmployerName,
+            ApprenticeshipEmployerType = c.ApprenticeshipEmployerType
         });
 
         var accountsAsJson = JsonConvert.SerializeObject(accounts.ToDictionary(k => k.AccountId));
@@ -62,7 +64,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
         return response.AccountUsers.Select(model => (EmployerAccountUser)model);
     }
 
-    async Task<EmployerUserAccounts> IGovAuthEmployerAccountService.GetUserAccounts(string userId, string email)
+    public async Task<EmployerUserAccounts> GetUserAccounts(string userId, string email)
     {
         var accountsRequest = new GetUserAccountsRequest(_outerApiConfiguration.ApiBaseUrl, userId, email);
         var apiResponse = await _reservationsOuterApiClient.Get<GetUserAccountsResponse>(accountsRequest);
@@ -74,6 +76,7 @@ public class EmployerAccountService : IEmployerAccountService, IGovAuthEmployerA
                 Role = c.Role,
                 AccountId = c.AccountId,
                 EmployerName = c.EmployerName,
+                ApprenticeshipEmployerType = c.ApprenticeshipEmployerType
             }).ToList() : [],
             FirstName = apiResponse.FirstName,
             IsSuspended = apiResponse.IsSuspended,
