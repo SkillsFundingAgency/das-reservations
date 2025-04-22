@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using SFA.DAS.GovUK.Auth.Employer;
 
 namespace SFA.DAS.Reservations.Domain.Employers.Api;
 
 public class GetUserAccountsResponse
 {   
-    [JsonProperty("userId")]
+    [JsonProperty("employerUserId")]
     public string UserId { get; set; }
     [JsonProperty("isSuspended")]
     public bool IsSuspended { get; set; }
@@ -25,5 +26,7 @@ public class EmployerIdentifier
     public string EmployerName { get; set; }
     [JsonProperty("role")]
     public string Role { get; set; }
+    [JsonProperty("apprenticeshipEmployerType")]
+    public ApprenticeshipEmployerType ApprenticeshipEmployerType { get; set; }
 }
 
