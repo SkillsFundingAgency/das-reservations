@@ -33,8 +33,8 @@ public class ExternalUrlHelper : IExternalUrlHelper
     public string GenerateAddApprenticeUrl(Guid? reservationId, string accountLegalEntityPublicHashedId,
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "",
-        string encodedPledgeApplicationId= "", string journeyData = "", Guid? apprenticeshipSessionKey = null, 
-        bool? beforeProviderSelected = null)
+        string encodedPledgeApplicationId = "", string journeyData = "", Guid? apprenticeshipSessionKey = null, 
+        bool? beforeProviderSelected = null, bool? ilrMode = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -104,7 +104,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
         }
         else if (ukPrn.HasValue && !isEmptyEmployerCohort)
         {
-            action = "add/apprentice";
+            action = ilrMode == true ? "add/learners/select" : "add/apprentice";
             id = ukPrn.ToString();
         }
         else if (ukPrn.HasValue)
