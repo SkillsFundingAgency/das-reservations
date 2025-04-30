@@ -265,9 +265,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
                 startDate,
                 "",
                 "",
-                ilrMode:true);
+                useIlrData:true);
 
-            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/learners/select?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}";
+            var expectedUrl = $"https://{originalConfigUrl}/{ukPrn}/unapproved/add/apprentice?reservationId={reservationId}&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}&startMonthYear={startDate:MMyyyy}&courseCode={courseId}&useIlrData=true";
             actualUrl.Should().Be(expectedUrl);
         }
 
