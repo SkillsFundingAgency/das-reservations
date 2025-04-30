@@ -248,7 +248,7 @@ public class SelectReservationsController(
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
                 journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey, beforeProviderSelected: viewModel.BeforeProviderSelected,
-                ilrMode: viewModel.IlrMode);
+                ilrMode: viewModel.UseIlrData);
 
             var addApprenticeUrl = url;
 
