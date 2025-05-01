@@ -122,7 +122,7 @@ public class SelectReservationsController(
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
-                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected, viewModel.UseIlrData);
+                    "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected, routeModel.UseIlrData);
 
                 return Redirect(continueRoute);
             }
@@ -248,7 +248,7 @@ public class SelectReservationsController(
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
                 journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey, beforeProviderSelected: viewModel.BeforeProviderSelected,
-                ilrMode: viewModel.UseIlrData);
+                ilrMode: routeModel.UseIlrData);
 
             var addApprenticeUrl = url;
 

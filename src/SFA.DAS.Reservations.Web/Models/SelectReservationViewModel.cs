@@ -17,6 +17,5 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool MoreReservationsAvailable { get; set; }
         public Guid? ApprenticeshipSessionKey { get; set; }
         public bool? BeforeProviderSelected { get; set; }
-        public bool? UseIlrData { get; set; }
     }
 }
