@@ -46,7 +46,7 @@ public class SelectReservationsController(
     {
         var backUrl = GetBackUrl(routeModel, viewModel);
         var moreReservationsAvailable = true;
-        logger.LogInformation("RouteModel : UseIlrData {0}", routeModel.UseIlrData);
+        logger.LogInformation("{TypeName} GET routeModel: {Model}", nameof(SelectReservationsController), JsonConvert.SerializeObject(routeModel));
         try
         {
             var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
