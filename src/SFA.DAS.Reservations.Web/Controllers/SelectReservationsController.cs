@@ -46,7 +46,7 @@ public class SelectReservationsController(
     {
         var backUrl = GetBackUrl(routeModel, viewModel);
         var moreReservationsAvailable = true;
-
+        logger.LogInformation("RouteModel : UseIlrData {0}", routeModel.UseIlrData);
         try
         {
             var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
@@ -118,7 +118,7 @@ public class SelectReservationsController(
                 {
                     return View("ReservationLimitReached", backUrl);
                 }
-
+                logger.LogInformation("Generating Add ApprenticeUrl : UseIlrData {0}", routeModel.UseIlrData);
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
