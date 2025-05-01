@@ -86,7 +86,7 @@ public class SelectReservationsController(
                 viewModel.TransferSenderId, viewModel.JourneyData,
                 cacheReservationEmployerCommand.AccountLegalEntityPublicHashedId,
                 routeModel.UkPrn ?? viewModel.ProviderId, viewModel.CohortReference,
-                routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId, viewModel.ApprenticeshipSessionKey);
+                routeModel.EmployerAccountId, userId, viewModel.EncodedPledgeApplicationId, viewModel.ApprenticeshipSessionKey, routeModel.UseIlrData);
 
             if (!string.IsNullOrEmpty(redirectResult))
             {
@@ -118,7 +118,7 @@ public class SelectReservationsController(
                 {
                     return View("ReservationLimitReached", backUrl);
                 }
-                logger.LogInformation("Generating Add ApprenticeUrl : UseIlrData {0}", routeModel.UseIlrData);
+                logger.LogInformation("Generating Employer Add ApprenticeUrl : UseIlrData {0}", routeModel.UseIlrData);
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
                     viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
@@ -248,7 +248,7 @@ public class SelectReservationsController(
                 routeModel.AccountLegalEntityPublicHashedId, reservation.Course.Id, routeModel.UkPrn ?? viewModel.ProviderId, reservation.StartDate,
                 viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
                 journeyData: viewModel.JourneyData, apprenticeshipSessionKey:viewModel.ApprenticeshipSessionKey, beforeProviderSelected: viewModel.BeforeProviderSelected,
-                ilrMode: routeModel.UseIlrData);
+                useIlrData: routeModel.UseIlrData);
 
             var addApprenticeUrl = url;
 
@@ -340,7 +340,8 @@ public class SelectReservationsController(
         string hashedAccountId, 
         Guid? userId, 
         string encodedPledgeApplicationId,
-        Guid? apprenticeshipSessionKey)
+        Guid? apprenticeshipSessionKey,
+        bool? useIlrData)
     {
         var levyReservation = await mediator.Send(new CreateReservationLevyEmployerCommand
         {
@@ -363,11 +364,12 @@ public class SelectReservationsController(
 
             }
 
+            logger.LogInformation("Generating Levy ProviderAdd ApprenticeUrl : UseIlrData {0}", useIlrData);
             return urlHelper.GenerateAddApprenticeUrl(levyReservation.ReservationId,
                 accountLegalEntityPublicHashedId, "", ukPrn, null,
                 cohortRef, hashedAccountId, string.IsNullOrEmpty(cohortRef) && isEmployerSelect,
                 transferSenderId, encodedPledgeApplicationId, journeyData,
-                apprenticeshipSessionKey);
+                apprenticeshipSessionKey, null, useIlrData);
         }
 
         return string.Empty;
