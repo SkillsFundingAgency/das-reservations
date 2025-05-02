@@ -82,7 +82,9 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid?>(),
-                    It.IsAny<bool?>()))
+                    It.IsAny<bool?>(),
+                    It.IsAny<bool?>()
+                    ))
                 .Returns(expectedUrl);
 
             getReservationsResult.Reservations.ToList().ForEach(c =>
@@ -148,6 +150,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
                 "",
                 "",
                 "",
+                null,
                 null,
                 null))
                 .Returns(expectedUrl);
