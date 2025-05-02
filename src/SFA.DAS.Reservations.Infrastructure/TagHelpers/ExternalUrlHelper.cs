@@ -34,7 +34,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "",
         string encodedPledgeApplicationId = "", string journeyData = "", Guid? apprenticeshipSessionKey = null, 
-        bool? beforeProviderSelected = null, bool? useIlrData = null)
+        bool? beforeProviderSelected = null, bool? useLearnerData = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -73,9 +73,9 @@ public class ExternalUrlHelper : IExternalUrlHelper
             queryString += "&autocreated=true";
         }
 
-        if (useIlrData == true)
+        if (useLearnerData == true)
         {
-            queryString += "&useIlrData=true";
+            queryString += "&useLearnerData=true";
         }
 
         if (!string.IsNullOrEmpty(transferSenderId))
