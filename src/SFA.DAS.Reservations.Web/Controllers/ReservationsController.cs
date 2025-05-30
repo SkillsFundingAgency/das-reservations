@@ -420,6 +420,7 @@ public class ReservationsController : ReservationsBaseController
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
                     model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
                     journeyData: model.JourneyData);
+                _logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
                 return Redirect(addApprenticeUrl);
 
             default:
