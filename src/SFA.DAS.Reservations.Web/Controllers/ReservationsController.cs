@@ -419,7 +419,11 @@ public class ReservationsController : ReservationsBaseController
                 var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
                     model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
-                    journeyData: model.JourneyData);
+                    journeyData: model.JourneyData, useLearnerData: routeModel.UseLearnerData);
+
+                _logger.LogInformation($"routeModel.AccountLegalEntityPublicHashedId: {routeModel.AccountLegalEntityPublicHashedId}");
+                _logger.LogInformation($"routeModel.EmployerAccountId: {routeModel.EmployerAccountId}");
+                _logger.LogInformation($"routeModel.UseLearnerData: {routeModel.UseLearnerData}");
                 _logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
                 return Redirect(addApprenticeUrl);
 
