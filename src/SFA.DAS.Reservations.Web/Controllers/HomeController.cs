@@ -17,18 +17,13 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(
+    IConfiguration config,
+    IStubAuthenticationService stubAuthenticationService,
+    IOptions<ReservationsWebConfiguration> configuration)
+    : Controller
 {
-    private readonly IConfiguration _config;
-    private readonly IStubAuthenticationService _stubAuthenticationService;
-    private readonly ReservationsWebConfiguration _configuration;
-
-    public HomeController(IConfiguration config, IStubAuthenticationService stubAuthenticationService, IOptions<ReservationsWebConfiguration> configuration)
-    {
-        _config = config;
-        _stubAuthenticationService = stubAuthenticationService;
-        _configuration = configuration.Value;
-    }
+    private readonly ReservationsWebConfiguration _configuration = configuration.Value;
 
     [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
     [Route("signout", Name = RouteNames.ProviderSignOut)]
@@ -41,7 +36,7 @@ public class HomeController : Controller
             {
                 CookieAuthenticationDefaults.AuthenticationScheme
             };
-            _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
+            _ = bool.TryParse(config["StubAuth"], out var stubAuth);
 
             if (!stubAuth)
             {
@@ -67,6 +62,15 @@ public class HomeController : Controller
             },
             CookieAuthenticationDefaults.AuthenticationScheme,
             useAuthScheme);
+    }
+    
+    [Route("~/p-signed-out", Name = "p-signed-out")]
+    [AllowAnonymous]
+    public IActionResult ProviderSignedOut()
+    {
+        var autoSignOut = TempData["AutoSignOut"] as bool? ?? false;
+        var viewModel = new AutoSignOutViewModel(_configuration.DashboardUrl);
+        return autoSignOut ? View("AutoSignOut", viewModel) : Redirect(_configuration.DashboardUrl);
     }
 
     [Route("signoutcleanup")]
@@ -105,7 +109,7 @@ public class HomeController : Controller
     [Route("SignIn-Stub")]
     public IActionResult SigninStub()
     {
-        return View("SigninStub", new List<string> { _config["StubId"], _config["StubEmail"] });
+        return View("SigninStub", new List<string> { config["StubId"], config["StubEmail"] });
     }
     [HttpPost]
     [Route("SignIn-Stub")]
@@ -113,10 +117,10 @@ public class HomeController : Controller
     {
         var model = new StubAuthUserDetails
         {
-            Email = _config["StubEmail"],
-            Id = _config["StubId"]
+            Email = config["StubEmail"],
+            Id = config["StubId"]
         };
-        var claims = await _stubAuthenticationService.GetStubSignInClaims(model);
+        var claims = await stubAuthenticationService.GetStubSignInClaims(model);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claims,
             new AuthenticationProperties());
@@ -135,7 +139,7 @@ public class HomeController : Controller
 
     private bool IsThisAnEmployer()
     {
-        return _config["AuthType"] != null &&
-               _config["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+        return config["AuthType"] != null &&
+               config["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
     }
 }
