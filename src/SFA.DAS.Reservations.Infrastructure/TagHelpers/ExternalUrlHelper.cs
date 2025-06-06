@@ -73,9 +73,9 @@ public class ExternalUrlHelper : IExternalUrlHelper
             queryString += "&autocreated=true";
         }
 
-        if (useLearnerData == true)
+        if (useLearnerData.HasValue)
         {
-            queryString += "&useLearnerData=true";
+            queryString += $"&useLearnerData={useLearnerData.ToString().ToLower()}";
         }
 
         if (!string.IsNullOrEmpty(transferSenderId))

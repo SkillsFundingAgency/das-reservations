@@ -375,7 +375,8 @@ public class ReservationsController : ReservationsBaseController
             CourseId = queryResult.Course?.Id,
             UkPrn = queryResult.UkPrn ?? routeModel.ProviderId,
             CohortRef = routeModel.CohortReference,
-            JourneyData = routeModel.JourneyData
+            JourneyData = routeModel.JourneyData,
+            UseLearnerData = routeModel.UseLearnerData
         };
 
         var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
@@ -419,7 +420,10 @@ public class ReservationsController : ReservationsBaseController
                 var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
                     model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
-                    journeyData: model.JourneyData);
+                    journeyData: model.JourneyData, useLearnerData: model.UseLearnerData);
+
+                _logger.LogInformation($"model.UseLearnerData: {model.UseLearnerData}");
+                _logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
                 return Redirect(addApprenticeUrl);
 
             default:
@@ -427,7 +431,6 @@ public class ReservationsController : ReservationsBaseController
                 return Redirect(homeUrl);
         }
     }
-
 
     private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
         bool isProvider,
