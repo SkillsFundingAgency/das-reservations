@@ -30,7 +30,7 @@ public static class AuthenticationStartupExtensions
                 typeof(CustomServiceRole),
                 ClientName.ProviderRoatp,
                 "/signout",
-                "");
+                "/p-signed-out");
         }
         else
         {

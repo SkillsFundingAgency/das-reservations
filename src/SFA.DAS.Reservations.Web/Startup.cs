@@ -95,12 +95,21 @@ public class Startup
             .GetSection("ReservationsWeb")
             .Get<ReservationsWebConfiguration>();
 
-        services.AddMvc(options => { options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters)); })
+        services
+            .AddMvc(options =>
+            {
+                options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
+                options.Conventions.Add(new KeepAliveControllerConvention(_configuration));
+            })
             .AddControllersAsServices();
 
-        services.AddHttpsRedirection(options => { options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443; });
+        services.AddHttpsRedirection(options =>
+        {
+            options.HttpsPort = _configuration["Environment"] == "LOCAL" ? 5001 : 443;
+        });
 
-        services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
+        services.AddMediatR(configuration =>
+            configuration.RegisterServicesFromAssembly(typeof(CreateReservationCommandHandler).Assembly));
         services.AddMediatRValidation();
         services.AddCommitmentsApi();
 
@@ -110,7 +119,10 @@ public class Startup
         }
         else
         {
-            services.AddStackExchangeRedisCache(options => { options.Configuration = reservationsWebConfig.RedisCacheConnectionString; });
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = reservationsWebConfig.RedisCacheConnectionString;
+            });
         }
 
         services.AddSession(options =>
@@ -179,9 +191,6 @@ public class Startup
         app.UseSession();
         app.UseRouting();
         app.UseAuthorization();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapDefaultControllerRoute();
-        });
+        app.UseEndpoints(endpoints => { endpoints.MapDefaultControllerRoute(); });
     }
 }
