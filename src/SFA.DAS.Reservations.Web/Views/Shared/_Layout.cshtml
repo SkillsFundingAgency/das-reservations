@@ -1,6 +1,10 @@
 ﻿@inject IConfiguration Configuration
 @{
     var tagManagerCode = "GTM-TD56SF5";
+
+    var slidingExpiryTimeoutMinutes = 1;
+    var modalWarningTimer = slidingExpiryTimeoutMinutes * 0.7;
+    var remainingSessionTimer = slidingExpiryTimeoutMinutes * 0.3 * 60;
 }
 @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
 {
@@ -37,7 +41,7 @@
     <!-- End Google Tag Manager -->
 </head>
 
-<body class="govuk-template__body ">
+<body class="govuk-template__body" data-timeout="@modalWarningTimer" data-modalcount="@remainingSessionTimer">
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=@tagManagerCode" height="0" width="0"
