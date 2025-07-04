@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using FluentAssertions;
@@ -25,7 +24,6 @@ public class WhenSigningOut
     {
         // Arrange
         rootConfig.Setup(x => x["AuthType"]).Returns("provider");
-        configuration.UseDfESignIn = true;
         configuration.DashboardUrl = redirectUrl;
 
         // Act
@@ -35,27 +33,6 @@ public class WhenSigningOut
         result.Should().NotBeNull();
         result.AuthenticationSchemes.Should().Contain(CookieAuthenticationDefaults.AuthenticationScheme);
         result.AuthenticationSchemes.Should().Contain(OpenIdConnectDefaults.AuthenticationScheme);
-    }
-
-    [Test, MoqAutoData]
-    public void Then_It_Signs_ProviderUserOut_With_WsFederation(
-        string redirectUrl,
-        [Frozen] Mock<IConfiguration> rootConfig,
-        [Frozen] ReservationsWebConfiguration configuration,
-        [NoAutoProperties] HomeController controller)
-    {
-        // Arrange
-        rootConfig.Setup(x => x["AuthType"]).Returns("provider");
-        configuration.UseDfESignIn = false;
-        configuration.DashboardUrl = redirectUrl;
-
-        // Act
-        var result = controller.SignOut() as SignOutResult;
-        
-        // Assert
-        result.Should().NotBeNull();
-        result.AuthenticationSchemes.Should().Contain(CookieAuthenticationDefaults.AuthenticationScheme);
-        result.AuthenticationSchemes.Should().Contain(WsFederationDefaults.AuthenticationScheme);
     }
     
     [Test, MoqAutoData]

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -55,9 +54,7 @@ public class HomeController(
         }
 
         logger.LogInformation("TEMP: Signing out Provider");
-        var useAuthScheme = _configuration.UseDfESignIn
-            ? OpenIdConnectDefaults.AuthenticationScheme
-            : WsFederationDefaults.AuthenticationScheme;
+        var useAuthScheme = OpenIdConnectDefaults.AuthenticationScheme;
 
         return SignOut(
             new AuthenticationProperties
