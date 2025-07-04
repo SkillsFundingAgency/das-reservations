@@ -8,23 +8,18 @@ using SFA.DAS.Reservations.Web.Models;
 namespace SFA.DAS.Reservations.Web.Controllers;
 
 [Route("error")]
-public class ErrorController : Controller
+public class ErrorController(
+    IConfiguration configuration,
+    IOptions<ReservationsWebConfiguration> reservationsWebConfiguration)
+    : Controller
 {
-    private readonly IConfiguration _configuration;
-    private readonly ReservationsWebConfiguration _reservationsWebConfiguration;
-
-    public ErrorController(IConfiguration configuration, IOptions<ReservationsWebConfiguration> reservationsWebConfiguration)
-    {
-        _configuration = configuration;
-        _reservationsWebConfiguration = reservationsWebConfiguration.Value;
-    }
+    private readonly ReservationsWebConfiguration _reservationsWebConfiguration = reservationsWebConfiguration.Value;
 
     [Route("403", Name = RouteNames.Error403)]
     public IActionResult AccessDenied()
     {
-        return View(new Error403ViewModel(_configuration["ResourceEnvironmentName"])
+        return View(new Error403ViewModel(configuration["ResourceEnvironmentName"])
         {
-            UseDfESignIn = _reservationsWebConfiguration.UseDfESignIn,
             DashboardUrl = _reservationsWebConfiguration.DashboardUrl,
         });
     }

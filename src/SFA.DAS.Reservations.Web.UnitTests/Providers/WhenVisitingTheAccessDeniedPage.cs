@@ -8,48 +8,43 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
 using SFA.DAS.Reservations.Web.Models;
 
-namespace SFA.DAS.Reservations.Web.UnitTests.Providers
+namespace SFA.DAS.Reservations.Web.UnitTests.Providers;
+
+public class WhenVisitingTheAccessDeniedPage
 {
-    public class WhenVisitingTheAccessDeniedPage
+    private Mock<IConfiguration> _configuration;
+    private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
+    private string _dashboardUrl;
+    private ErrorController Sut { get; set; }
+
+    [Test]
+    [TestCase("test", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
+    [TestCase("pp", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
+    [TestCase("local", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
+    [TestCase("prd", "https://services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
+    public void ThenReturnsTheAccessDeniedModel(string env, string helpLink)
     {
-        private Mock<IConfiguration> _configuration;
-        private Mock<IOptions<ReservationsWebConfiguration>> _reservationsConfiguration;
-        private bool _useDfESignIn;
-        private string _dashboardUrl;
-        private ErrorController Sut { get; set; }
+        var fixture = new Fixture();
+        _dashboardUrl = fixture.Create<string>();
 
-        [Test]
-        [TestCase("test", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
-        [TestCase("pp", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
-        [TestCase("local", "https://test-services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
-        [TestCase("prd", "https://services.signin.education.gov.uk/approvals/select-organisation?action=request-service")]
-        public void ThenReturnsTheAccessDeniedModel(string env, string helpLink)
+        var mockReservationsConfig = new ReservationsWebConfiguration
         {
-            var fixture = new Fixture();
-            _useDfESignIn = fixture.Create<bool>();
-            _dashboardUrl = fixture.Create<string>();
+            DashboardUrl = _dashboardUrl
+        };
 
-            var mockReservationsConfig = new ReservationsWebConfiguration
-            {
-                UseDfESignIn = _useDfESignIn,
-                DashboardUrl = _dashboardUrl
-            };
+        _configuration = new Mock<IConfiguration>();
+        _reservationsConfiguration = fixture.Freeze<Mock<IOptions<ReservationsWebConfiguration>>>();
 
-            _configuration = new Mock<IConfiguration>();
-            _reservationsConfiguration = fixture.Freeze<Mock<IOptions<ReservationsWebConfiguration>>>();
+        _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
+        _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);
 
-            _configuration.Setup(x => x["ResourceEnvironmentName"]).Returns(env);
-            _reservationsConfiguration.Setup(ap => ap.Value).Returns(mockReservationsConfig);
+        Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object);
 
-            Sut = new ErrorController(_configuration.Object, _reservationsConfiguration.Object);
+        var result = (ViewResult)Sut.AccessDenied();
 
-            var result = (ViewResult)Sut.AccessDenied();
-
-            Assert.That(result, Is.Not.Null);
-            var actualModel = result?.Model as Error403ViewModel;
-            Assert.That(actualModel?.HelpPageLink, Is.EqualTo(helpLink));
-            Assert.AreEqual(actualModel?.UseDfESignIn, _useDfESignIn);
-            Assert.AreEqual(actualModel?.DashboardUrl, _dashboardUrl);
-        }
+        Assert.That(result, Is.Not.Null);
+        var actualModel = result?.Model as Error403ViewModel;
+        Assert.That(actualModel?.HelpPageLink, Is.EqualTo(helpLink));
+        Assert.AreEqual(actualModel?.DashboardUrl, _dashboardUrl);
     }
 }

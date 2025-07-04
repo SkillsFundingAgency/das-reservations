@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.GovUK.Auth.Models;
 using SFA.DAS.GovUK.Auth.Services;
@@ -17,56 +18,61 @@ using SFA.DAS.Reservations.Web.Models;
 
 namespace SFA.DAS.Reservations.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(
+    IConfiguration config,
+    IStubAuthenticationService stubAuthenticationService,
+    IOptions<ReservationsWebConfiguration> configuration,
+    ILogger<HomeController> logger)
+    : Controller
 {
-    private readonly IConfiguration _config;
-    private readonly IStubAuthenticationService _stubAuthenticationService;
-    private readonly ReservationsWebConfiguration _configuration;
-
-    public HomeController(IConfiguration config, IStubAuthenticationService stubAuthenticationService, IOptions<ReservationsWebConfiguration> configuration)
-    {
-        _config = config;
-        _stubAuthenticationService = stubAuthenticationService;
-        _configuration = configuration.Value;
-    }
+    private readonly ReservationsWebConfiguration _configuration = configuration.Value;
 
     [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
     [Route("signout", Name = RouteNames.ProviderSignOut)]
     [HttpGet("service/signout")]
-    public IActionResult SignOut()
+    public async Task SignOut([FromQuery] bool autoSignOut = false)
     {
+        logger.LogInformation("TEMP: Signing out");
         if (IsThisAnEmployer())
         {
+            logger.LogInformation("TEMP: Signing out Employer");
             var schemes = new List<string>
             {
                 CookieAuthenticationDefaults.AuthenticationScheme
             };
-            _ = bool.TryParse(_config["StubAuth"], out var stubAuth);
+            _ = bool.TryParse(config["StubAuth"], out var stubAuth);
 
             if (!stubAuth)
             {
                 schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
             }
 
-            return SignOut(new AuthenticationProperties
+            await Task.WhenAll(schemes.Select(s => HttpContext.SignOutAsync(s)));
+        }
+        else
+        {
+            logger.LogInformation("TEMP: Signing out Provider");
+            var schemes = new List<string>
             {
-                RedirectUri = "",
-                AllowRefresh = true
-            }, schemes.ToArray());
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                OpenIdConnectDefaults.AuthenticationScheme
+            };
+
+            await Task.WhenAll(schemes.Select(s => HttpContext.SignOutAsync(s)));
         }
 
-        var useAuthScheme = _configuration.UseDfESignIn
-            ? OpenIdConnectDefaults.AuthenticationScheme
-            : WsFederationDefaults.AuthenticationScheme;
-
-        return SignOut(
-            new AuthenticationProperties
-            {
-                RedirectUri = "",
-                AllowRefresh = true
-            },
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            useAuthScheme);
+        TempData["AutoSignOut"] = autoSignOut;
+    }
+    
+    [Route("~/p-signed-out", Name = "p-signed-out")]
+    [AllowAnonymous]
+    public IActionResult ProviderSignedOut()
+    {
+        logger.LogInformation("TEMP: Provider signed out");
+        logger.LogInformation("TEMP: DashboardUrl: {DashboardUrl}", _configuration.DashboardUrl);
+        var autoSignOut = TempData["AutoSignOut"] as bool? ?? false;
+        var viewModel = new AutoSignOutViewModel(_configuration.DashboardUrl);
+        return autoSignOut ? View("AutoSignOut", viewModel) : Redirect(_configuration.DashboardUrl);
     }
 
     [Route("signoutcleanup")]
@@ -105,7 +111,7 @@ public class HomeController : Controller
     [Route("SignIn-Stub")]
     public IActionResult SigninStub()
     {
-        return View("SigninStub", new List<string> { _config["StubId"], _config["StubEmail"] });
+        return View("SigninStub", new List<string> { config["StubId"], config["StubEmail"] });
     }
     [HttpPost]
     [Route("SignIn-Stub")]
@@ -113,10 +119,10 @@ public class HomeController : Controller
     {
         var model = new StubAuthUserDetails
         {
-            Email = _config["StubEmail"],
-            Id = _config["StubId"]
+            Email = config["StubEmail"],
+            Id = config["StubId"]
         };
-        var claims = await _stubAuthenticationService.GetStubSignInClaims(model);
+        var claims = await stubAuthenticationService.GetStubSignInClaims(model);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claims,
             new AuthenticationProperties());
@@ -135,7 +141,7 @@ public class HomeController : Controller
 
     private bool IsThisAnEmployer()
     {
-        return _config["AuthType"] != null &&
-               _config["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
+        return config["AuthType"] != null &&
+               config["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase);
     }
 }

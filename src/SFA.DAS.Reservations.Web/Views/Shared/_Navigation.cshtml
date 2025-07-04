@@ -6,46 +6,28 @@
     <nav class="das-account-header das-account-header--provider">
         <div class="govuk-width-container">
             <p class="das-account-header__title" id="account-header-title">Your training provider account</p>
-            @if (ReservationsWebConfig.Value.UseDfESignIn)
-            {
-                <div class="das-user-navigation" id="das-user-navigation" aria-label="Account settings">
-                    <ul class="das-user-navigation__list">
-                        <li class="das-user-navigation__list-item" role="menuitem">
-                            <a asp-external-controller="" class="das-user-navigation__link">@Context.User.Identity.Name</a>
-                        </li>
-                        <li class="das-user-navigation__list-item das-user-navigation__list-item--has-sub-menu" role="menuitem">
-                            <a href="/" class="das-user-navigation__link">Settings</a>
-                            <ul class="das-user-navigation__sub-menu js-hidden">
-                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                    <a asp-external-controller="change-signin-details" class="das-user-navigation__sub-menu-link">Change your sign-in details</a>
-                                </li>
-                                <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
-                                    <a asp-external-controller="notification-settings" class="das-user-navigation__sub-menu-link">Notification settings</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="das-user-navigation__list-item" role="menuitem">
-                            <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
-                        </li>
-                    </ul>
-                </div>
-            }
-            else
-            {
-                <dic class="das-user-navigation" id="user-nav" aria-label="Account settings">
-                    <ul class="das-user-navigation__list" role="menu">
-                        <li class="das-user-navigation__list-item" role="menuitem">
-                            <a asp-external-controller="" class="das-user-navigation__link">@Context.User.Identity.Name</a>
-                        </li>
-                        <li class="das-user-navigation__list-item" role="menuitem">
-                            <a asp-external-controller="notification-settings" class="das-user-navigation__link">Notification settings</a>
-                        </li>
-                        <li class="das-user-navigation__list-item" role="menuitem">
-                            <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
-                        </li>
-                    </ul>
-                </dic>
-            }
+
+            <div class="das-user-navigation" id="das-user-navigation" aria-label="Account settings">
+                <ul class="das-user-navigation__list">
+                    <li class="das-user-navigation__list-item" role="menuitem">
+                        <a asp-external-controller="" class="das-user-navigation__link">@Context.User.Identity.Name</a>
+                    </li>
+                    <li class="das-user-navigation__list-item das-user-navigation__list-item--has-sub-menu" role="menuitem">
+                        <a href="/" class="das-user-navigation__link">Settings</a>
+                        <ul class="das-user-navigation__sub-menu js-hidden">
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
+                                <a asp-external-controller="change-signin-details" class="das-user-navigation__sub-menu-link">Change your sign-in details</a>
+                            </li>
+                            <li class="das-user-navigation__sub-menu-list-item" role="menuitem">
+                                <a asp-external-controller="notification-settings" class="das-user-navigation__sub-menu-link">Notification settings</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="das-user-navigation__list-item" role="menuitem">
+                        <a asp-route="@RouteNames.ProviderSignOut" class="das-user-navigation__link">Sign out</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 }
