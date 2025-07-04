@@ -57,7 +57,7 @@ public class HomeController(
         return SignOut(
             new AuthenticationProperties
             {
-                RedirectUri = "",
+                RedirectUri = "/p-signed-out",
                 AllowRefresh = true
             },
             CookieAuthenticationDefaults.AuthenticationScheme,
