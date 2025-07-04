@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.GovUK.Auth.Models;
 using SFA.DAS.GovUK.Auth.Services;
@@ -20,7 +21,8 @@ namespace SFA.DAS.Reservations.Web.Controllers;
 public class HomeController(
     IConfiguration config,
     IStubAuthenticationService stubAuthenticationService,
-    IOptions<ReservationsWebConfiguration> configuration)
+    IOptions<ReservationsWebConfiguration> configuration,
+    ILogger<HomeController> logger)
     : Controller
 {
     private readonly ReservationsWebConfiguration _configuration = configuration.Value;
@@ -30,8 +32,10 @@ public class HomeController(
     [HttpGet("service/signout")]
     public IActionResult SignOut()
     {
+        logger.LogInformation("TEMP: Signing out");
         if (IsThisAnEmployer())
         {
+            logger.LogInformation("TEMP: Signing out Employer");
             var schemes = new List<string>
             {
                 CookieAuthenticationDefaults.AuthenticationScheme
@@ -50,6 +54,7 @@ public class HomeController(
             }, schemes.ToArray());
         }
 
+        logger.LogInformation("TEMP: Signing out Provider");
         var useAuthScheme = _configuration.UseDfESignIn
             ? OpenIdConnectDefaults.AuthenticationScheme
             : WsFederationDefaults.AuthenticationScheme;
@@ -68,6 +73,8 @@ public class HomeController(
     [AllowAnonymous]
     public IActionResult ProviderSignedOut()
     {
+        logger.LogInformation("TEMP: Provider signed out");
+        logger.LogInformation("TEMP: DashboardUrl: {DashboardUrl}", _configuration.DashboardUrl);
         var autoSignOut = TempData["AutoSignOut"] as bool? ?? false;
         var viewModel = new AutoSignOutViewModel(_configuration.DashboardUrl);
         return autoSignOut ? View("AutoSignOut", viewModel) : Redirect(_configuration.DashboardUrl);
