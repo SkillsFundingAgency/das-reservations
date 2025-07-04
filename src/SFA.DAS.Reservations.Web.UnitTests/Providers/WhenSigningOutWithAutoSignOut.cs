@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,10 +18,10 @@ using SFA.DAS.Testing.AutoFixture;
 namespace SFA.DAS.Reservations.Web.UnitTests.Providers;
 
 [TestFixture]
-public class WhenSigningOut
+public class WhenSigningOutWithAutoSignOut
 {
     [Test, MoqAutoData]
-    public async Task Then_It_Signs_ProviderUserOut_With_DfESignIn(
+    public async Task Then_It_Signs_ProviderUserOut_With_AutoSignOut(
         string redirectUrl,
         [Frozen] Mock<IConfiguration> rootConfig,
         [Frozen] ReservationsWebConfiguration configuration,
@@ -44,10 +44,10 @@ public class WhenSigningOut
         controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
         // Act
-        await controller.SignOut();
+        await controller.SignOut(autoSignOut: true);
         
         // Assert
-        controller.TempData["AutoSignOut"].Should().Be(false);
+        controller.TempData["AutoSignOut"].Should().Be(true);
         
         mockAuthService.Verify(x => x.SignOutAsync(
             It.IsAny<HttpContext>(), 
@@ -58,9 +58,9 @@ public class WhenSigningOut
             OpenIdConnectDefaults.AuthenticationScheme, 
             It.IsAny<AuthenticationProperties>()), Times.Once);
     }
-    
+
     [Test, MoqAutoData]
-    public async Task Then_It_Signs_EmployerUserOut_With_StubAuth(
+    public async Task Then_It_Signs_EmployerUserOut_With_StubAuth_And_AutoSignOut(
         string redirectUrl,
         [Frozen] Mock<IConfiguration> rootConfig,
         [Frozen] ReservationsWebConfiguration configuration,
@@ -84,10 +84,10 @@ public class WhenSigningOut
         controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
         // Act
-        await controller.SignOut();
+        await controller.SignOut(autoSignOut: true);
         
         // Assert
-        controller.TempData["AutoSignOut"].Should().Be(false);
+        controller.TempData["AutoSignOut"].Should().Be(true);
         
         mockAuthService.Verify(x => x.SignOutAsync(
             It.IsAny<HttpContext>(), 
@@ -100,7 +100,7 @@ public class WhenSigningOut
     }
 
     [Test, MoqAutoData]
-    public async Task Then_It_Signs_EmployerUserOut_With_OpenIdConnect(
+    public async Task Then_It_Signs_EmployerUserOut_With_OpenIdConnect_And_AutoSignOut(
         string redirectUrl,
         [Frozen] Mock<IConfiguration> rootConfig,
         [Frozen] ReservationsWebConfiguration configuration,
@@ -113,7 +113,8 @@ public class WhenSigningOut
         controller.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
         
         var mockAuthService = new Mock<IAuthenticationService>();
-        mockAuthService.Setup(x => x.SignOutAsync(It.IsAny<HttpContext>(), It.IsAny<string>(), It.IsAny<AuthenticationProperties>()))
+        mockAuthService
+            .Setup(x => x.SignOutAsync(It.IsAny<HttpContext>(), It.IsAny<string>(), It.IsAny<AuthenticationProperties>()))
             .Returns(Task.CompletedTask);
         
         var httpContext = new DefaultHttpContext
@@ -124,10 +125,10 @@ public class WhenSigningOut
         controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
         // Act
-        await controller.SignOut();
+        await controller.SignOut(autoSignOut: true);
         
         // Assert
-        controller.TempData["AutoSignOut"].Should().Be(false);
+        controller.TempData["AutoSignOut"].Should().Be(true);
         
         mockAuthService.Verify(x => x.SignOutAsync(
             It.IsAny<HttpContext>(), 

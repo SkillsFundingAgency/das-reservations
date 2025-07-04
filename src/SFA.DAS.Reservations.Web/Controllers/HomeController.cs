@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,7 +30,7 @@ public class HomeController(
     [Route("accounts/signout", Name = RouteNames.EmployerSignOut)]
     [Route("signout", Name = RouteNames.ProviderSignOut)]
     [HttpGet("service/signout")]
-    public IActionResult SignOut()
+    public async Task SignOut([FromQuery] bool autoSignOut = false)
     {
         logger.LogInformation("TEMP: Signing out");
         if (IsThisAnEmployer())
@@ -46,24 +47,21 @@ public class HomeController(
                 schemes.Add(OpenIdConnectDefaults.AuthenticationScheme);
             }
 
-            return SignOut(new AuthenticationProperties
+            await Task.WhenAll(schemes.Select(s => HttpContext.SignOutAsync(s)));
+        }
+        else
+        {
+            logger.LogInformation("TEMP: Signing out Provider");
+            var schemes = new List<string>
             {
-                RedirectUri = "",
-                AllowRefresh = true
-            }, schemes.ToArray());
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                OpenIdConnectDefaults.AuthenticationScheme
+            };
+
+            await Task.WhenAll(schemes.Select(s => HttpContext.SignOutAsync(s)));
         }
 
-        logger.LogInformation("TEMP: Signing out Provider");
-        var useAuthScheme = OpenIdConnectDefaults.AuthenticationScheme;
-
-        return SignOut(
-            new AuthenticationProperties
-            {
-                RedirectUri = "/p-signed-out",
-                AllowRefresh = true
-            },
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            useAuthScheme);
+        TempData["AutoSignOut"] = autoSignOut;
     }
     
     [Route("~/p-signed-out", Name = "p-signed-out")]
