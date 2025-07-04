@@ -57,6 +57,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             viewModel.AccountLegalEntityName.Should().Be(cachedReservationResult.AccountLegalEntityName);
             viewModel.AccountLegalEntityPublicHashedId.Should().Be(cachedReservationResult.AccountLegalEntityPublicHashedId);
             viewModel.RouteModel.FromReview.Should().BeTrue();
+            viewModel.ApprenticeshipType.Should().Be(cachedReservationResult.ApprenticeshipType);
         }
 
         [Test, MoqAutoData]
