@@ -79,6 +79,14 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:KeyVaultIdentifier", "https://local.test.com"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:LoginSlidingExpiryTimeOutInMinutes", "30"),
                 new KeyValuePair<string, string>("GovUkOidcConfiguration:GovLoginSessionConnectionString", "https://local.test.com"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:BaseUrl", "https://local.test.com"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration_ProviderRoatp:ClientId", "test"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration_ProviderRoatp:Secret", "test"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:APIServiceUrl", "https://local.test.com"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:APIServiceId", "test"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:APIServiceSecret", "test"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:LoginSlidingExpiryTimeOutInMinutes", "30"),
+                new KeyValuePair<string, string>("DfEOidcConfiguration:Scopes", "openid email profile organisation"),
                 new KeyValuePair<string, string>("ResourceEnvironmentName", "test"),
             }
         };

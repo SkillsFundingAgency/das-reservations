@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -8,7 +7,6 @@ using SFA.DAS.DfESignIn.Auth.Enums;
 using SFA.DAS.GovUK.Auth.AppStart;
 using SFA.DAS.GovUK.Auth.Configuration;
 using SFA.DAS.GovUK.Auth.Models;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
 using SFA.DAS.Reservations.Web.AppStart;
 
@@ -16,32 +14,20 @@ namespace SFA.DAS.Reservations.Web.Extensions;
 
 public static class AuthenticationStartupExtensions
 {
-    public static IServiceCollection SetupProviderAuth(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+    public static IServiceCollection SetupProviderAuth(this IServiceCollection services, IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         // This ensures the way claims are mapped are consistent with version 7 of OpenIdConnect
         // but this only applies on the Provider side
         Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-        if (configuration["ReservationsWeb:UseDfESignIn"] != null && configuration["ReservationsWeb:UseDfESignIn"].Equals("true", StringComparison.CurrentCultureIgnoreCase))
-        {
-            services.AddAndConfigureDfESignInAuthentication(
-                configuration,
-                "SFA.DAS.ProviderApprenticeshipService",
-                typeof(CustomServiceRole),
-                ClientName.ProviderRoatp,
-                "/signout",
-                "");
-        }
-        else
-        {
-            var providerIdamsConfiguration = configuration
-                .GetSection("ProviderIdams")
-                .Get<ProviderIdamsConfiguration>();
-
-            services.AddAndConfigureProviderAuthentication(providerIdamsConfiguration,
-                configuration,
-                environment);
-        }
+        services.AddAndConfigureDfESignInAuthentication(
+            configuration,
+            "SFA.DAS.ProviderApprenticeshipService",
+            typeof(CustomServiceRole),
+            ClientName.ProviderRoatp,
+            "/signout",
+            "/p-signed-out");
 
         return services;
     }
