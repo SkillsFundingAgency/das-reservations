@@ -34,7 +34,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
         string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
         bool isEmptyEmployerCohort = false, string transferSenderId = "",
         string encodedPledgeApplicationId = "", string journeyData = "", Guid? apprenticeshipSessionKey = null, 
-        bool? beforeProviderSelected = null, bool? useLearnerData = null)
+        bool? beforeProviderSelected = null)
     {
         var queryString = $"?reservationId={reservationId}";
 
@@ -71,11 +71,6 @@ public class ExternalUrlHelper : IExternalUrlHelper
         if (isLevyAccount)
         {
             queryString += "&autocreated=true";
-        }
-
-        if (useLearnerData.HasValue)
-        {
-            queryString += $"&useLearnerData={useLearnerData.ToString().ToLower()}";
         }
 
         if (!string.IsNullOrEmpty(transferSenderId))

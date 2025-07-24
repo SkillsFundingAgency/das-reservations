@@ -33,8 +33,5 @@ namespace SFA.DAS.Reservations.Web.Models
         [FromQuery]
         public bool ReverseSort { get; set; }
 
-        [FromQuery]
-        public bool? UseLearnerData { get; set; }
-
     }
 }
