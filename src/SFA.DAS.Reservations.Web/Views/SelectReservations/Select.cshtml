@@ -52,20 +52,14 @@
 
             <h1 class="govuk-heading-l">Select a Reservation</h1>
 
-            <p class="govuk-body">These are your existing reservations.</p>
-            <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
-            <p class="govuk-body">If you cannot find the reservation you need, you can 
-                @if (isEmployer)
-                {
-                    <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a>
-                }
-                else
-                {
-                    <a asp-route="@RouteNames.ProviderManage" asp-route-ukPrn="@ukprn" class="govuk-link" target="_blank">manage your reservations</a>
-                }.
-                </p>
-            <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
-           
+            @if (isEmployer)
+            {
+                <p class="govuk-body">These are your existing reservations.</p>
+                <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
+                <p class="govuk-body">If you cannot find the reservation you need, you can 
+                <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a>
+                <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
+            }
 
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
@@ -97,7 +91,7 @@
                                     </div>
                                 </div>
                             }
-                            @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
+                            @if (/*!string.IsNullOrWhiteSpace(Model.CohortReference) && */ Model.MoreReservationsAvailable)
                             {
                                 <div class="govuk-radios__divider">or</div>
                                 <div class="govuk-radios__item">
