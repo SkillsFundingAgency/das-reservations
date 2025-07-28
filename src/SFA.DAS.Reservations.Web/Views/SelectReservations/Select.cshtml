@@ -57,7 +57,8 @@
                 <p class="govuk-body">These are your existing reservations.</p>
                 <p class="govuk-body">You can add multiple reservations, but you'll need to do this one at a time.</p>
                 <p class="govuk-body">If you cannot find the reservation you need, you can 
-                <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a>
+                    <a asp-route="@RouteNames.EmployerManage" class="govuk-link" asp-route-employerAccountId="@hashedAccountId" target="_blank">manage your reservations</a>
+                </p>
                 <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
             }
 
@@ -91,7 +92,7 @@
                                     </div>
                                 </div>
                             }
-                            @if (/*!string.IsNullOrWhiteSpace(Model.CohortReference) && */ Model.MoreReservationsAvailable)
+                            @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
                             {
                                 <div class="govuk-radios__divider">or</div>
                                 <div class="govuk-radios__item">
