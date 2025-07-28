@@ -77,10 +77,10 @@ public class SelectReservationsController(
                     viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
             }
 
-            if (IsThisAnEmployer())
-            {
+            //if (IsThisAnEmployer())
+            //{
                 moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
-            }
+            //}
 
             var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                 viewModel.TransferSenderId, viewModel.JourneyData,

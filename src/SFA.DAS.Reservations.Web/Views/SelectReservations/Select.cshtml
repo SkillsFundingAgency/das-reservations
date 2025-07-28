@@ -61,7 +61,6 @@
                 </p>
                 <p class="govuk-body">If your apprentice's course or level has changed since you reserved funds, you can change this when you add apprentice details.</p>
             }
-
             <form method="post">
                 <input asp-for="CohortReference" type="hidden" />
                 <input asp-for="AccountId" type="hidden" />
@@ -70,7 +69,10 @@
                 <input asp-for="JourneyData" type="hidden"/>
                 <input asp-for="ApprenticeshipSessionKey" type="hidden"/>
                 <input asp-for="BeforeProviderSelected" type="hidden" />
-                <h1 class="govuk-heading-m">Which reservation would you like to select?</h1>
+                @if (isEmployer)
+                {
+                    <h1 class="govuk-heading-m">Which reservation would you like to select?</h1>
+                }
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">                    
                         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("SelectedReservationId"))
@@ -92,7 +94,7 @@
                                     </div>
                                 </div>
                             }
-                            @if (!string.IsNullOrWhiteSpace(Model.CohortReference) && Model.MoreReservationsAvailable)
+                            @if ((!string.IsNullOrWhiteSpace(Model.CohortReference) || !isEmployer) && Model.MoreReservationsAvailable)
                             {
                                 <div class="govuk-radios__divider">or</div>
                                 <div class="govuk-radios__item">
