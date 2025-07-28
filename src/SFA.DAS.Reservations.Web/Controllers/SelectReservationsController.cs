@@ -112,8 +112,8 @@ public class SelectReservationsController(
                 return View(ViewNames.Select, viewModel);
             }
 
-            if (IsThisAnEmployer())
-            {
+            //if (IsThisAnEmployer())
+            //{
                 if (!moreReservationsAvailable)
                 {
                     return View("ReservationLimitReached", backUrl);
@@ -125,13 +125,13 @@ public class SelectReservationsController(
                     "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected, routeModel.UseLearnerData);
 
                 return Redirect(continueRoute);
-            }
+            //}
 
-            await mediator.Send(cacheReservationEmployerCommand);
+            //await mediator.Send(cacheReservationEmployerCommand);
 
-            routeModel.Id = cacheReservationEmployerCommand.Id;
+            //routeModel.Id = cacheReservationEmployerCommand.Id;
 
-            return RedirectToRoute(apprenticeshipTrainingRouteName, routeModel);
+            //return RedirectToRoute(apprenticeshipTrainingRouteName, routeModel);
         }
         catch (ValidationException e)
         {
@@ -255,7 +255,7 @@ public class SelectReservationsController(
             return Redirect(addApprenticeUrl);
         }
 
-        if (isEmployerSelect && viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
+        if (viewModel.SelectedReservationId == Guid.Parse(Guid.Empty.ToString().Replace("0", "9")))
         {
             createViaAutoReservation = true;
         }
@@ -275,6 +275,7 @@ public class SelectReservationsController(
                 });
 
                 cacheReservationEmployerCommand = response.Command;
+                cacheReservationEmployerCommand.CreateViaAutoReservation = createViaAutoReservation;
             }
             else
             {
