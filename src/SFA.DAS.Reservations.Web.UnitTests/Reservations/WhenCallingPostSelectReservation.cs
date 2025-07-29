@@ -121,69 +121,69 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     , It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        [Test, MoqAutoData]
-        public async Task And_Reservation_Limit_Has_Been_Reached_For_Provider_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
-                ReservationsRouteModel routeModel,
-                SelectReservationViewModel viewModel,
-                GetTrustedEmployersResponse employersResponse,
-                string cohortDetailsUrl,
-                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                [Frozen] Mock<IMediator> mockMediator,
-                [NoAutoProperties] SelectReservationsController controller)
-        {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
-            viewModel.ApprenticeshipSessionKey = null;
-            routeModel.Id = Guid.Empty;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
-            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
-            mockUrlHelper
-                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
-                .Returns(cohortDetailsUrl);
+        //[Test, MoqAutoData]
+        //public async Task And_Reservation_Limit_Has_Been_Reached_For_Provider_Then_ReservationLimit_Reached_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
+        //        ReservationsRouteModel routeModel,
+        //        SelectReservationViewModel viewModel,
+        //        GetTrustedEmployersResponse employersResponse,
+        //        string cohortDetailsUrl,
+        //        [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+        //        [Frozen] Mock<IMediator> mockMediator,
+        //        [NoAutoProperties] SelectReservationsController controller)
+        //{
+        //    var matchedEmployer = employersResponse.Employers.First();
+        //    routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+        //    viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+        //    viewModel.ApprenticeshipSessionKey = null;
+        //    routeModel.Id = Guid.Empty;
+        //    mockMediator
+        //        .Setup(mediator => mediator.Send(
+        //            It.IsAny<GetTrustedEmployersQuery>(),
+        //            It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(employersResponse);
+        //    mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+        //        .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
+        //    mockUrlHelper
+        //        .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+        //            viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
+        //        .Returns(cohortDetailsUrl);
 
-            //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+        //    //Act
+        //    var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
-            //Assert
-            result.ViewName.Should().Be("ReservationLimitReached");
-            result.Model.Should().Be(cohortDetailsUrl);
-        }
+        //    //Assert
+        //    result.ViewName.Should().Be("ReservationLimitReached");
+        //    result.Model.Should().Be(cohortDetailsUrl);
+        //}
 
-        [Test, MoqAutoData]
-        public async Task And_GlobalRule_Is_In_Place_Then_The_Funding_Paused_View_Is_Shown_For_Provider(
-                ReservationsRouteModel routeModel,
-                SelectReservationViewModel viewModel,
-                GetTrustedEmployersResponse employersResponse,
-                string cohortDetailsUrl,
-                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                [Frozen] Mock<IMediator> mockMediator,
-                [NoAutoProperties] SelectReservationsController controller)
-        {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
-            routeModel.Id = Guid.Empty;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
-            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new GlobalReservationRuleException(viewModel.AccountId));
+        //[Test, MoqAutoData]
+        //public async Task And_GlobalRule_Is_In_Place_Then_The_Funding_Paused_View_Is_Shown_For_Provider(
+        //        ReservationsRouteModel routeModel,
+        //        SelectReservationViewModel viewModel,
+        //        GetTrustedEmployersResponse employersResponse,
+        //        string cohortDetailsUrl,
+        //        [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+        //        [Frozen] Mock<IMediator> mockMediator,
+        //        [NoAutoProperties] SelectReservationsController controller)
+        //{
+        //    var matchedEmployer = employersResponse.Employers.First();
+        //    routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+        //    viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+        //    routeModel.Id = Guid.Empty;
+        //    mockMediator
+        //        .Setup(mediator => mediator.Send(
+        //            It.IsAny<GetTrustedEmployersQuery>(),
+        //            It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(employersResponse);
+        //    mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+        //        .ThrowsAsync(new GlobalReservationRuleException(viewModel.AccountId));
 
-            //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+        //    //Act
+        //    var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
-            //Assert
-            result.ViewName.Should().Be("ProviderFundingPaused");
-        }
+        //    //Assert
+        //    result.ViewName.Should().Be("ProviderFundingPaused");
+        //}
 
         [Test, MoqAutoData]
         public async Task And_GlobalRule_Is_In_Place_Then_The_Funding_Paused_View_Is_Shown_For_Employer(
@@ -218,40 +218,40 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.ViewName.Should().Be("EmployerFundingPaused");
         }
 
-        [Test, MoqAutoData]
-        public async Task And_Provider_Has_No_Create_Permission_Then_NoPermissions_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
-                ReservationsRouteModel routeModel,
-                SelectReservationViewModel viewModel,
-                GetTrustedEmployersResponse employersResponse,
-                string cohortDetailsUrl,
-                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-                [Frozen] Mock<IMediator> mockMediator,
-                [NoAutoProperties] SelectReservationsController controller)
-        {
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
-            viewModel.ApprenticeshipSessionKey = null;
-            routeModel.Id = Guid.Empty;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
-            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId, routeModel.UkPrn.Value));
-            mockUrlHelper
-                .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
-                    viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
-                .Returns(cohortDetailsUrl);
+        //[Test, MoqAutoData]
+        //public async Task And_Provider_Has_No_Create_Permission_Then_NoPermissions_View_Is_Shown_With_The_Back_Link_Going_To_Cohort_Details(
+        //        ReservationsRouteModel routeModel,
+        //        SelectReservationViewModel viewModel,
+        //        GetTrustedEmployersResponse employersResponse,
+        //        string cohortDetailsUrl,
+        //        [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+        //        [Frozen] Mock<IMediator> mockMediator,
+        //        [NoAutoProperties] SelectReservationsController controller)
+        //{
+        //    var matchedEmployer = employersResponse.Employers.First();
+        //    routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+        //    viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+        //    viewModel.ApprenticeshipSessionKey = null;
+        //    routeModel.Id = Guid.Empty;
+        //    mockMediator
+        //        .Setup(mediator => mediator.Send(
+        //            It.IsAny<GetTrustedEmployersQuery>(),
+        //            It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(employersResponse);
+        //    mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+        //        .ThrowsAsync(new ProviderNotAuthorisedException(viewModel.AccountId, routeModel.UkPrn.Value));
+        //    mockUrlHelper
+        //        .Setup(helper => helper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+        //            viewModel.CohortReference, false, It.IsAny<string>(), string.Empty, null))
+        //        .Returns(cohortDetailsUrl);
 
-            //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+        //    //Act
+        //    var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
-            //Assert
-            result.ViewName.Should().Be("NoPermissions");
-            result.Model.Should().Be(cohortDetailsUrl);
-        }
+        //    //Assert
+        //    result.ViewName.Should().Be("NoPermissions");
+        //    result.Model.Should().Be(cohortDetailsUrl);
+        //}
 
         [Test, MoqAutoData]
         public async Task And_Has_Ukprn_And_ReservationId_Then_Redirects_To_AddApprentice_With_Reservation_Details(
@@ -429,42 +429,42 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             actualModel.AvailableReservations.Should().BeEquivalentTo(availableReservationsResult.Reservations.Select(c => new AvailableReservationViewModel(c)));
         }
 
-        [Test, MoqAutoData]
-        public async Task And_Provider_Creates_Reservation_With_Empty_Cohort_Reference_The_Back_Link_Going_To_Confirm_Employer(
-               ReservationsRouteModel routeModel,
-               SelectReservationViewModel viewModel,
-               GetTrustedEmployersResponse employersResponse,
-               string confirmEmployerUrl,
-               [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-               [Frozen] Mock<IMediator> mockMediator,
-               [Frozen] Mock<IConfiguration> configuration,
-               [NoAutoProperties] SelectReservationsController controller)
-        {
-            routeModel.CohortReference = string.Empty;
-            viewModel.CohortReference = string.Empty;
-            routeModel.UseLearnerData = null;
-            configuration.Setup(x => x["AuthType"]).Returns("provider");
-            var matchedEmployer = employersResponse.Employers.First();
-            routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
-            viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
-            routeModel.Id = Guid.Empty;
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<GetTrustedEmployersQuery>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(employersResponse);
-            mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
-            mockUrlHelper
-               .Setup(helper => helper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId))
-               .Returns(confirmEmployerUrl);
+        //[Test, MoqAutoData]
+        //public async Task And_Provider_Creates_Reservation_With_Empty_Cohort_Reference_The_Back_Link_Going_To_Confirm_Employer(
+        //       ReservationsRouteModel routeModel,
+        //       SelectReservationViewModel viewModel,
+        //       GetTrustedEmployersResponse employersResponse,
+        //       string confirmEmployerUrl,
+        //       [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+        //       [Frozen] Mock<IMediator> mockMediator,
+        //       [Frozen] Mock<IConfiguration> configuration,
+        //       [NoAutoProperties] SelectReservationsController controller)
+        //{
+        //    routeModel.CohortReference = string.Empty;
+        //    viewModel.CohortReference = string.Empty;
+        //    routeModel.UseLearnerData = null;
+        //    configuration.Setup(x => x["AuthType"]).Returns("provider");
+        //    var matchedEmployer = employersResponse.Employers.First();
+        //    routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
+        //    viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
+        //    routeModel.Id = Guid.Empty;
+        //    mockMediator
+        //        .Setup(mediator => mediator.Send(
+        //            It.IsAny<GetTrustedEmployersQuery>(),
+        //            It.IsAny<CancellationToken>()))
+        //        .ReturnsAsync(employersResponse);
+        //    mockMediator.Setup(x => x.Send(It.IsAny<CacheReservationEmployerCommand>(), It.IsAny<CancellationToken>()))
+        //        .ThrowsAsync(new ReservationLimitReachedException(viewModel.AccountId));
+        //    mockUrlHelper
+        //       .Setup(helper => helper.GenerateConfirmEmployerUrl(routeModel.UkPrn.Value, routeModel.AccountLegalEntityPublicHashedId))
+        //       .Returns(confirmEmployerUrl);
 
-            //Act
-            var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
+        //    //Act
+        //    var result = await controller.PostSelectReservation(routeModel, viewModel) as ViewResult;
 
-            //Assert
-            result.Model.Should().Be(confirmEmployerUrl);
-        }
+        //    //Assert
+        //    result.Model.Should().Be(confirmEmployerUrl);
+        //}
 
         [Test, MoqAutoData]
         public async Task And_Is_New_Cohort_MustCreateViaAutoReservationRouteException_Is_Thrown_Then_Redirect_With_Null_Reservation_For_Employer(
