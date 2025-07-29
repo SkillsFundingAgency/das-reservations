@@ -102,6 +102,7 @@ public class SelectReservationsController(
 
             if (!string.IsNullOrEmpty(redirectResult))
             {
+                logger.LogInformation("redirect to {0}", redirectResult);
                 if (redirectResult == RouteNames.Error500)
                 {
                     return RedirectToRoute(redirectResult);
