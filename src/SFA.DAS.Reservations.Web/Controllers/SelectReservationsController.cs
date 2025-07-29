@@ -79,6 +79,7 @@ public class SelectReservationsController(
 
             //if (IsThisAnEmployer())
             //{
+                logger.LogInformation("Getting if reservations are available");
                 moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
             //}
 
@@ -112,12 +113,13 @@ public class SelectReservationsController(
                 return View(ViewNames.Select, viewModel);
             }
 
-            //if (IsThisAnEmployer())
-            //{
-                if (!moreReservationsAvailable)
-                {
-                    return View("ReservationLimitReached", backUrl);
-                }
+            if (!moreReservationsAvailable)
+            {
+                return View("ReservationLimitReached", backUrl);
+            }
+
+            if (IsThisAnEmployer())
+            {
                 logger.LogInformation("Generating Employer Add ApprenticeUrl : UseLearnerData {0}", routeModel.UseLearnerData);
                 var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
                     routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
@@ -125,13 +127,13 @@ public class SelectReservationsController(
                     "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected, routeModel.UseLearnerData);
 
                 return Redirect(continueRoute);
-            //}
+            }
 
-            //await mediator.Send(cacheReservationEmployerCommand);
+            await mediator.Send(cacheReservationEmployerCommand);
 
-            //routeModel.Id = cacheReservationEmployerCommand.Id;
+            routeModel.Id = cacheReservationEmployerCommand.Id;
 
-            //return RedirectToRoute(apprenticeshipTrainingRouteName, routeModel);
+            return RedirectToRoute(apprenticeshipTrainingRouteName, routeModel);
         }
         catch (ValidationException e)
         {
