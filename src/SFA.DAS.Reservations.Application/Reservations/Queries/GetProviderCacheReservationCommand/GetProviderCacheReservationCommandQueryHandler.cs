@@ -85,6 +85,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
 
             return new GetProviderCacheReservationCommandResponse
             {
+                LegalEntity = legalEntity,
                 Command = new CacheReservationEmployerCommand
                 {
                     AccountLegalEntityName = legalEntity.AccountLegalEntityName,

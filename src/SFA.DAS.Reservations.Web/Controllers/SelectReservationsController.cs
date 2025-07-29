@@ -53,6 +53,7 @@ public class SelectReservationsController(
             var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
             CacheReservationEmployerCommand cacheReservationEmployerCommand;
             Guid? userId = null;
+            AccountLegalEntity accountLegalEntity = null;
             if (routeModel.UkPrn.HasValue)
             {
                 var response = await mediator.Send(new GetProviderCacheReservationCommandQuery
@@ -64,6 +65,7 @@ public class SelectReservationsController(
                 });
 
                 cacheReservationEmployerCommand = response.Command;
+                accountLegalEntity = response.LegalEntity;
 
                 apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
             }
@@ -78,11 +80,19 @@ public class SelectReservationsController(
                     viewModel.CohortReference, viewModel.ProviderId, viewModel.JourneyData);
             }
 
-            //if (IsThisAnEmployer())
-            //{
-                logger.LogInformation("Getting if reservations are available");
-                moreReservationsAvailable = await MoreReservationsAreAvailable(routeModel.EmployerAccountId);
-            //}
+            if (IsThisAnEmployer())
+            {
+                logger.LogInformation("Getting reservations are available for Employer");
+                moreReservationsAvailable = await MoreReservationsAreAvailableForEmployer(routeModel.EmployerAccountId);
+            }
+            else
+            {
+                logger.LogInformation("Getting reservations are available for Provider");
+                if (accountLegalEntity != null)
+                {
+                    moreReservationsAvailable = await MoreReservationsAreAvailable(accountLegalEntity.AccountId);
+                }
+            }
 
             var redirectResult = await CheckCanAutoReserve(cacheReservationEmployerCommand.AccountId,
                 viewModel.TransferSenderId, viewModel.JourneyData,
@@ -205,10 +215,14 @@ public class SelectReservationsController(
         }
     }
 
-    private async Task<bool> MoreReservationsAreAvailable(string employerAccountId)
+    private Task<bool> MoreReservationsAreAvailableForEmployer(string employerAccountId)
     {
         var accountId = encodingService.Decode(employerAccountId, EncodingType.AccountId);
+        return MoreReservationsAreAvailable(accountId);
+    }
 
+    private async Task<bool> MoreReservationsAreAvailable(long accountId)
+    {
         var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
         return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
     }
