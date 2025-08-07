@@ -204,15 +204,8 @@ public class SelectReservationsController(
         }
         catch (MustCreateViaAutoReservationRouteException)
         {
-            logger.LogInformation("Generating Employer Add ApprenticeUrl : UseLearnerData {0}", routeModel.UseLearnerData);
-            var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
-                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
-                viewModel.CohortReference, routeModel.EmployerAccountId,
-                string.IsNullOrEmpty(viewModel.CohortReference) && IsThisAnEmployer(),
-                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey,
-                viewModel.BeforeProviderSelected, routeModel.UseLearnerData);
-
-            return Redirect(continueRoute);
+            logger.LogInformation("MustCreateViaAutoReservationRouteException thrown, redirecting to Add Apprentice page.");
+            return Redirect(GenerateAddApprenticeUrl(routeModel, viewModel));
         }
         catch (Exception e)
         {
@@ -225,6 +218,29 @@ public class SelectReservationsController(
     {
         var accountId = encodingService.Decode(employerAccountId, EncodingType.AccountId);
         return MoreReservationsAreAvailable(accountId);
+    }
+
+    private string GenerateAddApprenticeUrl(ReservationsRouteModel routeModel, SelectReservationViewModel viewModel)
+    {
+        if (IsThisAnEmployer())
+        {
+            logger.LogInformation("Generating Employer Add ApprenticeUrl : UseLearnerData {0}",
+                routeModel.UseLearnerData);
+            var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
+                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
+                viewModel.CohortReference, routeModel.EmployerAccountId,
+                string.IsNullOrEmpty(viewModel.CohortReference),
+                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey,
+                viewModel.BeforeProviderSelected, routeModel.UseLearnerData);
+            return continueRoute;
+        }
+        logger.LogInformation("Generating Provider Add ApprenticeUrl : UseLearnerData {0}",
+            routeModel.UseLearnerData);
+        var route = urlHelper.GenerateAddApprenticeUrlForProvider(null,
+            routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
+            viewModel.CohortReference, routeModel.EmployerAccountId,
+            viewModel.JourneyData, routeModel.UseLearnerData);
+        return route;
     }
 
     private async Task<bool> MoreReservationsAreAvailable(long accountId)

@@ -141,6 +141,58 @@ public class ExternalUrlHelper : IExternalUrlHelper
         return GenerateAddApprenticeUrl(urlParameters);
     }
 
+    public string GenerateAddApprenticeUrlForProvider(Guid? reservationId, string accountLegalEntityPublicHashedId,
+        string courseId, uint? ukPrn, DateTime? startDate, string cohortRef, string accountHashedId,
+        string journeyData = "", bool? useLearnerData = null)
+    {
+        var queryString = $"?reservationId={reservationId}";
+
+        if (!string.IsNullOrWhiteSpace(accountLegalEntityPublicHashedId))
+        {
+            queryString += $"&employerAccountLegalEntityPublicHashedId={accountLegalEntityPublicHashedId}";
+        }
+
+        if (startDate.HasValue)
+        {
+            queryString += $"&startMonthYear={startDate:MMyyyy}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(courseId))
+        {
+            queryString += $"&courseCode={courseId}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(journeyData))
+        {
+            queryString += $"&journeyData={journeyData}";
+        }
+
+        if (useLearnerData.HasValue)
+        {
+            queryString += $"&useLearnerData={useLearnerData.ToString().ToLower()}";
+        }
+
+        string controller = $"{ukPrn}/unapproved", action;
+
+        if (string.IsNullOrWhiteSpace(cohortRef))
+        {
+            action = "/add-apprentice";
+        }
+        else
+        {
+            action = $"/{cohortRef}/apprentices/add";
+        }
+
+        var urlParameters = new UrlParameters
+        {
+            Controller = controller,
+            Action = action,
+            QueryString = queryString
+        };
+
+        return GenerateAddApprenticeUrl(urlParameters);
+    }
+
 
     /// <summary>
     /// usage https://subDomain.baseUrl/folder/id/controller/action?queryString
