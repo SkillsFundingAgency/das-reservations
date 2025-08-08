@@ -334,12 +334,8 @@ public class SelectReservationsController(
         }
         catch (MustCreateViaAutoReservationRouteException)
         {
-            var continueRoute = urlHelper.GenerateAddApprenticeUrl(null,
-                routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
-                viewModel.CohortReference, routeModel.EmployerAccountId, string.IsNullOrEmpty(viewModel.CohortReference) && isEmployerSelect,
-                "", viewModel.EncodedPledgeApplicationId, viewModel.JourneyData, viewModel.ApprenticeshipSessionKey, viewModel.BeforeProviderSelected);
-
-            return Redirect(continueRoute);
+            logger.LogInformation("MustCreateViaAutoReservationRouteException thrown, redirecting to Add Apprentice page.");
+            return Redirect(GenerateAddApprenticeUrl(routeModel, viewModel));
         }
         catch (ProviderNotAuthorisedException e)
         {
