@@ -237,8 +237,8 @@ public class SelectReservationsController(
         logger.LogInformation("Generating Provider Add ApprenticeUrl : UseLearnerData {0}",
             routeModel.UseLearnerData);
         var route = urlHelper.GenerateAddApprenticeUrlForProvider(null,
-            routeModel.AccountLegalEntityPublicHashedId, "", viewModel.ProviderId, null,
-            viewModel.CohortReference, routeModel.EmployerAccountId,
+            routeModel.AccountLegalEntityPublicHashedId, "", routeModel.UkPrn, null,
+            routeModel.CohortReference, routeModel.EmployerAccountId,
             viewModel.JourneyData, routeModel.UseLearnerData);
         return route;
     }
