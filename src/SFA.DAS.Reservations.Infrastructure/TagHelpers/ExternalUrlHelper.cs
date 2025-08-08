@@ -174,7 +174,7 @@ public class ExternalUrlHelper : IExternalUrlHelper
 
         string controller = $"{ukPrn}/unapproved", action;
 
-        action = string.IsNullOrWhiteSpace(cohortRef) ? "/add-apprentice" : $"/{cohortRef}/apprentices/add";
+        action = string.IsNullOrWhiteSpace(cohortRef) ? "add-apprentice" : $"{cohortRef}/apprentices/add";
 
         var urlParameters = new UrlParameters
         {
