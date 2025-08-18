@@ -246,7 +246,14 @@ public class SelectReservationsController(
     private async Task<bool> MoreReservationsAreAvailable(long accountId)
     {
         var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
-        return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
+
+        if (response.AccountFundingRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
+            response.AccountFundingRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     [HttpPost]
