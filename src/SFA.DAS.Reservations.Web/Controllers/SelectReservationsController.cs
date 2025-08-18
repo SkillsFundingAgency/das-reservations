@@ -255,8 +255,10 @@ public class SelectReservationsController(
         if (response.AccountFundingRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
             response.AccountFundingRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
         {
+            logger.LogWarning("Account {AccountId} has reached the reservation limit.", accountId);
             return false;
         }
+        logger.LogInformation("Account {AccountId} has not reached the reservation limit.", accountId);
         return true;
     }
 
