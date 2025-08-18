@@ -90,7 +90,7 @@ public class SelectReservationsController(
                 logger.LogInformation("Getting reservations are available for Provider");
                 if (accountLegalEntity != null)
                 {
-                    moreReservationsAvailable = await MoreReservationsAreAvailable(accountLegalEntity.AccountId);
+                    moreReservationsAvailable = await MoreReservationsAreAvailableViaProvider(accountLegalEntity.AccountId);
                 }
             }
 
@@ -246,15 +246,20 @@ public class SelectReservationsController(
     private async Task<bool> MoreReservationsAreAvailable(long accountId)
     {
         var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
+        return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
+    }
 
+    private async Task<bool> MoreReservationsAreAvailableViaProvider(long accountId)
+    {
+        var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
         if (response.AccountFundingRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
             response.AccountFundingRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
         {
             return false;
         }
-
         return true;
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
