@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Extensions;
@@ -14,30 +15,24 @@ using SFA.DAS.Reservations.Application.Validation;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCacheReservationCommand
 {
-    public class GetProviderCacheReservationCommandQueryHandler : IRequestHandler<GetProviderCacheReservationCommandQuery, GetProviderCacheReservationCommandResponse>
+    public class GetProviderCacheReservationCommandQueryHandler(
+        IMediator mediator,
+        IValidator<GetProviderCacheReservationCommandQuery> validator,
+        ILogger<GetProviderCacheReservationCommandQueryHandler> logger)
+        : IRequestHandler<GetProviderCacheReservationCommandQuery, GetProviderCacheReservationCommandResponse>
     {
-        private readonly IMediator _mediator;
-        private readonly IValidator<GetProviderCacheReservationCommandQuery> _validator;
-
-        public GetProviderCacheReservationCommandQueryHandler(IMediator mediator,
-            IValidator<GetProviderCacheReservationCommandQuery> validator)
-        {
-            _mediator = mediator;
-            _validator = validator;
-        }
-
         public async Task<GetProviderCacheReservationCommandResponse> Handle(
             GetProviderCacheReservationCommandQuery query, 
             CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(query);
+            var validationResult = await validator.ValidateAsync(query);
 
             if (!validationResult.IsValid())
             {
                 throw new ValidationException(validationResult.ConvertToDataAnnotationsValidationResult(), null, null);
             }
 
-            var accounts = await _mediator.Send(
+            var accounts = await mediator.Send(
                 new GetTrustedEmployersQuery { UkPrn = query.UkPrn }, cancellationToken);
             
             var matchedAccount = accounts.Employers.SingleOrDefault(employer =>
@@ -45,6 +40,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
 
             if (matchedAccount != null)
             {
+                logger.LogInformation("Matched Employer Legal Entity from trusted list, {0}", matchedAccount.AccountId);
                 return new GetProviderCacheReservationCommandResponse
                 {
                     Command = new CacheReservationEmployerCommand
@@ -60,8 +56,9 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
                     }
                 };
             }
-           
-            var result = await _mediator.Send(new GetAccountLegalEntityQuery
+
+            logger.LogInformation("Looking For Legal Entity by query.AccountLegalEntityPublicHashedId, {0}", query.AccountLegalEntityPublicHashedId);
+            var result = await mediator.Send(new GetAccountLegalEntityQuery
             {
                 AccountLegalEntityPublicHashedId = query.AccountLegalEntityPublicHashedId
             }, cancellationToken);
@@ -75,13 +72,17 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetProviderCache
 
             if (query.CohortId.HasValue)
             {
-                var cohort = await _mediator.Send(new GetCohortQuery { CohortId = query.CohortId.Value }, cancellationToken);
+                logger.LogInformation("Looking For Legal Entity by query.CohortId, {0}", query.CohortId);
+                var cohort = await mediator.Send(new GetCohortQuery { CohortId = query.CohortId.Value }, cancellationToken);
 
                 if (cohort.Cohort.AccountLegalEntityId != legalEntity.AccountLegalEntityId)
                 {
                     throw new ProviderNotAuthorisedException(legalEntity.AccountId, query.UkPrn);
                 }
             }
+
+            logger.LogInformation("Legal entity: AccountLegalEntityName {0}, AccountLegalEntityPublicHashedId {1}, AccountId {2} ", 
+                legalEntity.AccountLegalEntityName, legalEntity.AccountLegalEntityPublicHashedId, legalEntity.AccountId);
 
             return new GetProviderCacheReservationCommandResponse
             {

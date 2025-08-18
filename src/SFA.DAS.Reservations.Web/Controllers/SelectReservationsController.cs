@@ -87,7 +87,7 @@ public class SelectReservationsController(
             }
             else
             {
-                logger.LogInformation("Getting reservations are available for Provider, accountLegalEntity.AccountId {0}", accountLegalEntity?.AccountId);
+                logger.LogInformation("Getting reservations are available for Provider, accountLegalEntity.AccountId {0}, HashedAleId {1}", accountLegalEntity?.AccountId, routeModel.AccountLegalEntityPublicHashedId);
                 if (accountLegalEntity != null)
                 {
                     moreReservationsAvailable = await MoreReservationsAreAvailableViaProvider(accountLegalEntity.AccountId);
