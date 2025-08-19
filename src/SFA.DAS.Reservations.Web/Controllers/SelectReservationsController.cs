@@ -249,20 +249,6 @@ public class SelectReservationsController(
         return response == null || response.ActiveRule == null || response.ActiveRule.RuleType == GlobalRuleType.None;
     }
 
-    private async Task<bool> MoreReservationsAreAvailableViaProvider(long accountId)
-    {
-        var response = await mediator.Send(new GetAccountFundingRulesQuery { AccountId = accountId });
-        if (response.AccountFundingRules.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
-            response.AccountFundingRules.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
-        {
-            logger.LogWarning("Account {AccountId} has reached the reservation limit.", accountId);
-            return false;
-        }
-        logger.LogInformation("Account {AccountId} has not reached the reservation limit.", accountId);
-        return true;
-    }
-
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = nameof(PolicyNames.AccessCohort))]
