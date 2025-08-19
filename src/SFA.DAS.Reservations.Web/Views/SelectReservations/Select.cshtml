@@ -42,10 +42,26 @@
                         <div class="govuk-notification-banner__heading">
                             You cannot create a new funding reservation
                         </div>
-                        <p>
-                            You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
-                            <a asp-external-controller="unapproved" class="govuk-link" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
-                        </p>
+                        @if (isEmployer)
+                        {
+                            <p>
+                                You can edit the course and start date of an existing reservation. or delete the draft apprentices using a reservation in
+                                <a asp-external-controller="unapproved" class="govuk-link" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]">Apprentice requests</a>.
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                                You can do one of the following
+                                <ul class="govuk-list govuk-list--bullet">
+                                    <li>use one of the existing reservations and edit the course or start date when you add apprentice details</li>
+                                    <li>
+                                        delete draft apprentices using a reservation in
+                                        <a asp-external-controller="unapproved" class="govuk-link" asp-external-subdomain="approvals" asp-external-id="@ViewContext.RouteData.Values["ukPrn"]">Apprentice requests</a>.
+                                    </li>
+                                </ul>
+                            </p>
+                        })
                     </div>
                 </div>
             }
