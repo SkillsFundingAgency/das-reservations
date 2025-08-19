@@ -53,7 +53,7 @@ public class SelectReservationsController(
             var apprenticeshipTrainingRouteName = RouteNames.EmployerSelectCourseRuleCheck;
             CacheReservationEmployerCommand cacheReservationEmployerCommand;
             Guid? userId = null;
-            AccountLegalEntity accountLegalEntity = null;
+            long? accountId = null;
             if (routeModel.UkPrn.HasValue)
             {
                 var response = await mediator.Send(new GetProviderCacheReservationCommandQuery
@@ -65,7 +65,7 @@ public class SelectReservationsController(
                 });
 
                 cacheReservationEmployerCommand = response.Command;
-                accountLegalEntity = response.LegalEntity;
+                accountId = cacheReservationEmployerCommand.AccountId;
 
                 apprenticeshipTrainingRouteName = RouteNames.ProviderApprenticeshipTrainingRuleCheck;
             }
@@ -87,10 +87,10 @@ public class SelectReservationsController(
             }
             else
             {
-                logger.LogInformation("Getting reservations are available for Provider, accountLegalEntity.AccountId {0}, HashedAleId {1}", accountLegalEntity?.AccountId, routeModel.AccountLegalEntityPublicHashedId);
-                if (accountLegalEntity != null)
+                logger.LogInformation("Getting reservations are available for Provider, accountLegalEntity.AccountId {0}, HashedAleId {1}", accountId, routeModel.AccountLegalEntityPublicHashedId);
+                if (accountId != null)
                 {
-                    moreReservationsAvailable = await MoreReservationsAreAvailableViaProvider(accountLegalEntity.AccountId);
+                    moreReservationsAvailable = await MoreReservationsAreAvailable(accountId.Value);
                 }
             }
 
