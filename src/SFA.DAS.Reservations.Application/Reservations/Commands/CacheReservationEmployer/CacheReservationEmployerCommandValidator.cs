@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetTrustedEmployers;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
@@ -9,16 +10,13 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservationEmployer;
 
-public class CacheReservationEmployerCommandValidator : IValidator<CacheReservationEmployerCommand>
+public class CacheReservationEmployerCommandValidator(
+    IFundingRulesService rulesService,
+    IMediator mediator,
+    ILogger<CacheReservationEmployerCommandValidator> logger)
+    : IValidator<CacheReservationEmployerCommand>
 {
-    private readonly IFundingRulesService _rulesService;
-    private readonly IMediator _mediator;
-
-    public CacheReservationEmployerCommandValidator(IFundingRulesService rulesService, IMediator mediator)
-    {
-        _rulesService = rulesService;
-        _mediator = mediator;
-    }
+    private ILogger<CacheReservationEmployerCommandValidator> _logger = logger;
 
     public async Task<ValidationResult> ValidateAsync(CacheReservationEmployerCommand command)
     {
@@ -35,14 +33,15 @@ public class CacheReservationEmployerCommandValidator : IValidator<CacheReservat
         }
         else
         {
-            var accountFundingRulesApiResponse = await _rulesService.GetAccountFundingRules(command.AccountId);
+            var accountFundingRulesApiResponse = await rulesService.GetAccountFundingRules(command.AccountId);
             if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) &&
                 accountFundingRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.ReservationLimit) > 0)
             {
+                _logger.LogWarning("Account {AccountId} has reached the reservation limit.", command.AccountId);
                 result.FailedRuleValidation = true;
             }
 
-            var globalRulesApiResponse = await _rulesService.GetFundingRules();
+            var globalRulesApiResponse = await rulesService.GetFundingRules();
             if (globalRulesApiResponse.GlobalRules != null 
                 && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused) 
                 && globalRulesApiResponse.GlobalRules.Count(c => c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom) > 0)
@@ -69,7 +68,7 @@ public class CacheReservationEmployerCommandValidator : IValidator<CacheReservat
 
         if (command.UkPrn.HasValue && !command.IsEmptyCohortFromSelect)
         {
-            var accounts = await _mediator.Send(
+            var accounts = await mediator.Send(
                 new GetTrustedEmployersQuery { UkPrn = command.UkPrn.Value });
                 
             var matchedAccount = accounts?.Employers?.SingleOrDefault(employer =>

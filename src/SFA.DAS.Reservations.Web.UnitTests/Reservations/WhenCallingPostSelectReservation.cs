@@ -126,11 +126,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
+                GetProviderCacheReservationCommandResponse providerCacheResponse,
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
                 [NoAutoProperties] SelectReservationsController controller)
         {
+            mockMediator.Setup(m => m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerCacheResponse);
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -161,11 +164,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
+                GetProviderCacheReservationCommandResponse providerCacheResponse,
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
                 [NoAutoProperties] SelectReservationsController controller)
         {
+            mockMediator.Setup(m => m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerCacheResponse);
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -223,11 +229,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 ReservationsRouteModel routeModel,
                 SelectReservationViewModel viewModel,
                 GetTrustedEmployersResponse employersResponse,
+                GetProviderCacheReservationCommandResponse providerCacheResponse,
                 string cohortDetailsUrl,
                 [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                 [Frozen] Mock<IMediator> mockMediator,
                 [NoAutoProperties] SelectReservationsController controller)
         {
+            mockMediator.Setup(m => m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerCacheResponse);
             var matchedEmployer = employersResponse.Employers.First();
             routeModel.AccountLegalEntityPublicHashedId = matchedEmployer.AccountLegalEntityPublicHashedId;
             viewModel.SelectedReservationId = Guid.Parse(Guid.Empty.ToString().Replace("0", "9"));
@@ -434,12 +443,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                ReservationsRouteModel routeModel,
                SelectReservationViewModel viewModel,
                GetTrustedEmployersResponse employersResponse,
+               GetProviderCacheReservationCommandResponse providerCacheResponse,
                string confirmEmployerUrl,
                [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
                [Frozen] Mock<IMediator> mockMediator,
                [Frozen] Mock<IConfiguration> configuration,
                [NoAutoProperties] SelectReservationsController controller)
         {
+            mockMediator.Setup(m => m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(providerCacheResponse);
             routeModel.CohortReference = string.Empty;
             viewModel.CohortReference = string.Empty;
             routeModel.UseLearnerData = null;

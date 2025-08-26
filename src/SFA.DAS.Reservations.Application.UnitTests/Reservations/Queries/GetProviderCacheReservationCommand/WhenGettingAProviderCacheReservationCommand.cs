@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Commitments.Queries.GetCohort;
@@ -43,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetPro
                 CohortId = 123
             };
 
-            _handler = new GetProviderCacheReservationCommandQueryHandler(_mediator.Object, _validator.Object);
+            _handler = new GetProviderCacheReservationCommandQueryHandler(_mediator.Object, _validator.Object, Mock.Of<ILogger<GetProviderCacheReservationCommandQueryHandler>>());
 
             _expectedEmployer = new AccountLegalEntity
             {
