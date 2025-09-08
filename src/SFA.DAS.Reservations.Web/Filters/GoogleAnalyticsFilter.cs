@@ -1,5 +1,4 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Employers.Api;
