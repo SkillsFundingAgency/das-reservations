@@ -27,9 +27,9 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Check your reservation</h1>
+            <h1 class="govuk-heading-xl">Confirm your reservation</h1>
 
-            <p>
+            <p class="govuk-body">
                 You are reserving funding for a non-levy employer to take on an apprentice. <br />
             </p>
 
@@ -89,6 +89,7 @@
             </div>
 
             <form method="post" asp-route="@Model.ConfirmRouteName">
+                <div class="govuk-button-group">
                 <button type="submit" draggable="false" class="govuk-button">
                     Confirm
                 </button>
@@ -101,6 +102,7 @@
                            Model.RouteModel.PublicHashedEmployerAccountId
                        })" class="govuk-link"
                        id="cancel-request-link">Cancel</a>
+                </div>
                 </div>
             </form>
         </div>

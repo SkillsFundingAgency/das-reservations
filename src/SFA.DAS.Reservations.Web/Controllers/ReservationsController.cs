@@ -296,12 +296,6 @@ public class ReservationsController : ReservationsBaseController
                     var reviewViewModel = new ReviewViewModel(routeModel, viewModel);
                     return View(reviewViewName, reviewViewModel);
                 }
-
-                if (!viewModel.Reserve.Value)
-                {
-                    var homeUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
-                    return Redirect(homeUrl);
-                }
             }
 
             Guid? userId = null;

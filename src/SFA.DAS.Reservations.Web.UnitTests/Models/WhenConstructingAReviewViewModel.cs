@@ -58,8 +58,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 AccountLegalEntityName = AccountLegalEntityName,
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
                 CourseDescription = CourseDescription,
-                TrainingDate = startDate,
-                Reserve = ExpectedReserve
+                TrainingDate = startDate
             };
             
             //Act
@@ -67,7 +66,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             //Assert
             AssertAllProperties(actual, ukPrn, startDate);
-            Assert.AreEqual(ExpectedReserve, actual.Reserve);
         }
 
         private void AssertAllProperties(ReviewViewModel actual, uint? ukPrn, TrainingDateModel startDate)

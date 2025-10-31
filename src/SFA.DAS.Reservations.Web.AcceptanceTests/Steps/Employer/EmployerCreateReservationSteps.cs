@@ -25,8 +25,8 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         private string _reviewRedirectUrl;
 
         public EmployerCreateReservationSteps(
-            EmployerTestServiceProvider serviceProvider, 
-            TestData testData) 
+            EmployerTestServiceProvider serviceProvider,
+            TestData testData)
             : base(serviceProvider, testData)
         {
         }
@@ -36,14 +36,16 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             SetupNonLevyEmployerTestData();
         }
-        
+
         [Given(@"I have reached my reservation limit")]
         public void GivenIHaveReachedMyReservationLimit()
         {
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
             mock.Setup(x => x.Get<GetAccountFundingRulesApiResponse>(It.IsAny<GetAccountFundingRulesApiRequest>()))
-                .ReturnsAsync(new GetAccountFundingRulesApiResponse{GlobalRules = new List<GlobalRule>
+                .ReturnsAsync(new GetAccountFundingRulesApiResponse
+                {
+                    GlobalRules = new List<GlobalRule>
                 {
                     new GlobalRule
                     {
@@ -51,9 +53,10 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                         ActiveFrom = DateTime.UtcNow.AddMonths(-1),
                         Restriction = AccountRestriction.All
                     }
-                }});
+                }
+                });
         }
-        
+
         [When(@"I start the reservation journey")]
         public void WhenIStartTheReservationJourney()
         {
@@ -63,7 +66,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             controller.Url = mock.Object;
             TestData.ActionResult = controller.Start(TestData.ReservationRouteModel).Result;
         }
-        
+
         [Given(@"I have chosen a legal entity")]
         public void GivenIHaveChosenALegalEntity()
         {
@@ -136,7 +139,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
                 StartDate = trainingDateViewModel.SerializedModel,
                 AccountLegalEntityPublicHashedId = TestData.AccountLegalEntity.AccountLegalEntityPublicHashedId
             };
-          
+
             TestData.ActionResult = controller.PostApprenticeshipTraining(TestData.ReservationRouteModel, apprenticeshipTrainingFormModel)
                 .Result as ViewResult;
         }
@@ -146,13 +149,13 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var controller = Services.GetService<EmployerReservationsController>();
             TestData.ActionResult = controller.PostSelectCourse(TestData.ReservationRouteModel,
-                new PostSelectCourseViewModel {ApprenticeTrainingKnown = null, SelectedCourseId = null}).Result;
+                new PostSelectCourseViewModel { ApprenticeTrainingKnown = null, SelectedCourseId = null }).Result;
         }
 
         [When(@"I review my reservation and confirm")]
         public void WhenIReviewMyReservationAndConfirm()
         {
-            var result = PostReviewStep(true) as RedirectToRouteResult;
+            var result = PostReviewStep() as RedirectToRouteResult;
 
             result.Should().NotBeNull();
             result.RouteName.Should().Be(RouteNames.EmployerCompleted);
@@ -161,7 +164,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         [When(@"I review my reservation and I do not confirm")]
         public void WhenIReviewMyReservationAndIDoNotConfirm()
         {
-            var result = PostReviewStep(false) as RedirectResult;
+            var result = TestData.ActionResult as RedirectResult;
 
             result.Should().NotBeNull();
             _reviewRedirectUrl = result.Url;
@@ -171,7 +174,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         public void ThenIAmShownAValidationMessage(string viewName)
         {
             var result = TestData.ActionResult as ViewResult;
-            (result.ViewData.ModelState.ErrorCount!=0).Should().BeTrue();
+            (result.ViewData.ModelState.ErrorCount != 0).Should().BeTrue();
             result.ViewName.Should().Be(viewName);
         }
 
@@ -180,12 +183,12 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
         {
             var apiClient = Services.GetService<IApiClient>();
             var mock = Mock.Get(apiClient);
-            
+
             mock.Verify(x => x.Create<CreateReservationResponse>(It.Is<ReservationApiRequest>(
                 c => c.Id.Equals(TestData.ReservationRouteModel.Id) &&
                      c.CourseId.Equals(TestData.Course.Id) &&
                      c.UserId.Equals(TestData.UserId) &&
-                     c.StartDate.Equals(new DateTime(TestData.TrainingDate.StartDate.Year,TestData.TrainingDate.StartDate.Month,1).ToString("yyyy-MMM-dd"))
+                     c.StartDate.Equals(new DateTime(TestData.TrainingDate.StartDate.Year, TestData.TrainingDate.StartDate.Month, 1).ToString("yyyy-MMM-dd"))
             )), Times.Once);
         }
 
@@ -212,7 +215,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
             actualViewResult.ViewName.Should().Be("ReservationLimitReached");
         }
 
-        private IActionResult PostReviewStep(bool reserve)
+        private IActionResult PostReviewStep()
         {
 
             var controller = Services.GetService<ReservationsController>();
@@ -221,7 +224,6 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Employer
 
             var viewModel = new PostReviewViewModel
             {
-                Reserve = reserve,
                 TrainingDate = TestData.TrainingDate
             };
 

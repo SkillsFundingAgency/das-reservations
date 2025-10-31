@@ -79,10 +79,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps.Provider
             var controller = Services.GetService<ReservationsController>();
 
             var result = controller.PostReview(TestData.ReservationRouteModel,
-                new PostReviewViewModel
-                {
-                    Reserve = true
-                }).Result as RedirectToRouteResult;
+                new PostReviewViewModel()).Result as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderCompleted);
         }
