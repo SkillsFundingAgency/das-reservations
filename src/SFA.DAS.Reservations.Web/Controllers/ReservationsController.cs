@@ -274,7 +274,8 @@ public class ReservationsController : ReservationsBaseController
             cachedReservation.TrainingDate,
             cachedReservation.CourseDescription,
             cachedReservation.AccountLegalEntityName,
-            cachedReservation.AccountLegalEntityPublicHashedId);
+            cachedReservation.AccountLegalEntityPublicHashedId,
+            cachedReservation.ApprenticeshipType);
 
         return View(viewModel.ViewName, viewModel);
     }
