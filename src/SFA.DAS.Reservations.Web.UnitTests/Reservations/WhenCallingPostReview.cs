@@ -52,26 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.ViewName.Should().Be(ViewNames.EmployerReview);
             result.Model.Should().BeEquivalentTo(new ReviewViewModel(routeModel, viewModel));
-        }
-
-        [Test, MoqAutoData]
-        public async Task And_Reserve_False_And_No_Ukprn_Then_Redirect_To_Account_Home(
-            ReservationsRouteModel routeModel, 
-            PostReviewViewModel viewModel,
-            string expectedUrl,
-            [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
-            [NoAutoProperties] ReservationsController controller)
-        {
-            viewModel.Reserve = false;
-            routeModel.UkPrn = null;
-            mockUrlHelper
-                .Setup(helper => helper.GenerateDashboardUrl(routeModel.EmployerAccountId))
-                .Returns(expectedUrl);
-
-            var result = await controller.PostReview(routeModel, viewModel) as RedirectResult;
-
-            result.Url.Should().Be(expectedUrl);
-        }
+        }        
 
         [Test, MoqAutoData]
         public async Task Then_Sends_Create_Command_With_Correct_Values_Set(
@@ -97,7 +78,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             [NoAutoProperties] ReservationsController controller)
         {
             routeModel.UkPrn = null;
-            viewModel.Reserve = true;
             var claim = new Claim(EmployerClaims.IdamsUserIdClaimTypeIdentifier, expectedUserId.ToString());
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { claim }));
             controller.ControllerContext = new ControllerContext
@@ -129,7 +109,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 HttpContext = new DefaultHttpContext()
                 { User = user }
             };
-            viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationResult);
@@ -158,7 +137,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 HttpContext = new DefaultHttpContext()
                 { User = user }
             };
-            viewModel.Reserve = true;
+            
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationResult);
@@ -193,7 +172,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 HttpContext = new DefaultHttpContext()
                 { User = user }
             };
-            viewModel.Reserve = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<CreateReservationCommand>(), CancellationToken.None))
                 .ReturnsAsync(createReservationResult);
@@ -264,8 +242,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             {
                 HttpContext = new DefaultHttpContext()
                 { User = user }
-            };
-            viewModel.Reserve = true;
+            };           
             mockMediator
                 .Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(validationException);
@@ -313,7 +290,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 HttpContext = new DefaultHttpContext()
                 { User = user }
             };
-            viewModel.Reserve = true;
             mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(notFoundException);
 
