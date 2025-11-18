@@ -5,7 +5,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReviewViewModel
     {
-        public ReviewViewModel(ReservationsRouteModel routeModel, TrainingDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
+        public ReviewViewModel(ReservationsRouteModel routeModel, TrainingDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId, string apprenticeshipType = null)
         {
             ConfirmRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerPostReview :
@@ -31,6 +31,7 @@ namespace SFA.DAS.Reservations.Web.Models
             CourseDescription = courseDescription;
             AccountLegalEntityName = accountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
+            ApprenticeshipType = apprenticeshipType;
         }
 
         public ReviewViewModel(ReservationsRouteModel routeModel, PostReviewViewModel postReviewViewModel) :
@@ -50,6 +51,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityName { get;  }
         public string AccountLegalEntityPublicHashedId { get;  }
         public string ViewName { get; }
+        public string ApprenticeshipType { get; }
         public string BackLink { get;}
 
         private bool IsEmployerRoute(ReservationsRouteModel routeModel) => routeModel.UkPrn == null;
