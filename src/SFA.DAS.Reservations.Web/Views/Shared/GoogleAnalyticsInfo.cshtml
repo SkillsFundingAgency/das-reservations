@@ -1,29 +1,59 @@
-﻿<script>
-    @if (ViewBag.GaData == null)
+﻿@using System.Linq
+@{
+    object gaDataObject = ViewBag.GaData;
+    if (gaDataObject == null)
     {
-        ViewBag.GaData = new GaData();
+        gaDataObject = new GaData();
+        ViewBag.GaData = gaDataObject;
     }
+
+    string ReadProperty(string name, string defaultValue = "")
+    {
+        var property = gaDataObject.GetType().GetProperty(name);
+        if (property == null)
+        {
+            return defaultValue;
+        }
+
+        var value = property.GetValue(gaDataObject);
+        return value?.ToString() ?? defaultValue;
+    }
+
+    var extras = gaDataObject
+        .GetType()
+        .GetProperty("Extras")
+        ?.GetValue(gaDataObject) as IDictionary<string, string> ?? new Dictionary<string, string>();
+
+    var dataLoaded = ReadProperty("DataLoaded", "dataLoaded");
+    var userId = ReadProperty("UserId");
+    var vpv = ReadProperty("Vpv");
+    var acc = ReadProperty("Acc");
+    var ukPrn = ReadProperty("UkPrn");
+    var org = ReadProperty("Org");
+    var levyFlag = ReadProperty("LevyFlag");
+}
+<script>
     window.dataLayer = window.dataLayer || [];
     dataLayer.push({
-        'event': '@ViewBag.GaData.DataLoaded',
-        'userID': '@ViewBag.GaData.UserId',
-        'vpv': '@ViewBag.GaData.Vpv',
-        'acc': '@ViewBag.GaData.Acc',
-        'ukPrn': '@ViewBag.GaData.UkPrn',
-        'org': '',
-        'levyFlag': '@ViewBag.GaData.LevyFlag'
-        @if (ViewBag.GaData.Extras.Count>0)
+        'event': '@dataLoaded',
+        'userID': '@userId',
+        'vpv': '@vpv',
+        'acc': '@acc',
+        'ukPrn': '@ukPrn',
+        'org': '@org',
+        'levyFlag': '@levyFlag'
+        @if (extras.Any())
         {
             @Html.Raw(",");
         }
         @{
             var count = 0;
-            foreach (var extra in ViewBag.GaData.Extras)
+            foreach (var extra in extras)
             {
                 count++;
 
                 @Html.Raw($"'{extra.Key}' : '{extra.Value}'");
-                if (count < ViewBag.GaData.Extras.Count)
+                if (count < extras.Count)
                 {
                     @Html.Raw("," + Environment.NewLine);
                 }
