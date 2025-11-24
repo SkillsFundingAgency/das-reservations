@@ -22,6 +22,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.TagHelpers
             ExternalUrlHelper urlHelper)
         {
             config.Setup(x => x["AuthType"]).Returns("provider");
+            urlParameters.RelativeRoute = null;
 
             var originalConfigUrl = webConfig.ApprenticeUrl;
             webConfig.ApprenticeUrl = $"https://{webConfig.ApprenticeUrl}";
