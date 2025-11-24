@@ -1,3 +1,17 @@
-﻿@{
-    Layout = "_Layout";
+﻿@using System
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    // Use shared provider UI layout when in provider mode
+    // Otherwise use employer layout
+    var isProviderMode = Configuration["AuthType"]?.Equals("provider", StringComparison.OrdinalIgnoreCase) == true;
+    
+    if (isProviderMode)
+    {
+        Layout = "_ProviderLayout";
+    }
+    else
+    {
+        Layout = "_EmployerLayout";
+    }
 }

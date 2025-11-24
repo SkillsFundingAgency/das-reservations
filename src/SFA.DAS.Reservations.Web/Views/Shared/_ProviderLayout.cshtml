@@ -1,0 +1,27 @@
+@{
+    // the _Layout view is contained in the package SFA.DAS.Provider.Shared.UI
+    // ReSharper disable once Razor.LayoutNotResolved
+    Layout = "_Layout";
+}
+
+@RenderBody()
+
+@section Styles
+{
+    @await RenderSectionAsync("Styles", required: false)
+    <link href="/css/app.css" rel="stylesheet" no-cdn />
+}
+
+@section breadcrumb
+{
+    @await RenderSectionAsync("breadcrumb", required: false)
+}
+
+@section Scripts
+{
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script>
+    <script src="/js/app.js" no-cdn></script>
+    <script src="/js/autocomplete.js" no-cdn></script>
+}
+
