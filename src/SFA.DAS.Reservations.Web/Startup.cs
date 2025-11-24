@@ -138,7 +138,7 @@ public class Startup
                 .SetDefaultNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.Reservations)
                 .EnableCookieBanner()
                 .EnableGoogleAnalytics()
-                .SuppressNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.Recruit, SFA.DAS.Provider.Shared.UI.NavigationSection.StandardsAndTrainingVenues);
+                .SuppressNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.StandardsAndTrainingVenues);
         }
 
         services.AddHttpsRedirection(options =>
