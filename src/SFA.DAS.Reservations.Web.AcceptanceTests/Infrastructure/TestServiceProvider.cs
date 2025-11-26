@@ -68,6 +68,7 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("ReservationsWeb:EmployerApprenticeUrl", $"https://{TestDataValues.EmployerApprenticeUrl}"),
                 new KeyValuePair<string, string>("ReservationsWeb:FindApprenticeshipTrainingUrl", $"https://test"),
                 new KeyValuePair<string, string>("ReservationsWeb:ApprenticeshipFundingRulesUrl", $"https://test"),
+                new KeyValuePair<string, string>("ProviderSharedUIConfiguration:DashboardUrl", $"https://{TestDataValues.DashboardUrl}"),
                 new KeyValuePair<string, string>("ReservationsOuterApi:ApiBaseUrl", "https://local.test.com"),
                 new KeyValuePair<string, string>("ReservationsOuterApi:SubscriptionKey", ""),
                 new KeyValuePair<string, string>("ReservationsOuterApi:Version", "1.0"),

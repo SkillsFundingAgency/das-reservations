@@ -9,13 +9,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Logging;
+using SFA.DAS.Employer.Shared.UI;
+using SFA.DAS.Provider.Shared.UI.Startup;
 using SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.Reservations.Web.AppStart;
 using SFA.DAS.Reservations.Web.Extensions;
 using SFA.DAS.Reservations.Web.Filters;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.StartupConfig;
+using SFA.DAS.Reservations.Web.Infrastructure.ProviderSharedUi;
 
 namespace SFA.DAS.Reservations.Web;
 
@@ -75,6 +79,7 @@ public class Startup
         }
 
         services.AddServices(serviceParameters, _configuration);
+        services.AddScoped<SFA.DAS.Provider.Shared.UI.Extensions.IExternalUrlHelper, ProviderExternalUrlHelperAdapter>();
 
         services.AddAuthorizationServices();
 
@@ -94,13 +99,47 @@ public class Startup
             .GetSection("ReservationsWeb")
             .Get<ReservationsWebConfiguration>();
 
-        services
+        // Conditionally register Employer Shared UI services (required for employer layout and tag helpers)
+        if (_configuration.IsEmployerAuth())
+        {
+            var resourceEnvironmentName = _configuration["ResourceEnvironmentName"] ?? _configuration["Environment"] ?? "LOCAL";
+            services.AddMaMenuConfiguration(RouteNames.EmployerSignOut, resourceEnvironmentName);
+        }
+
+        // Register Provider Shared UI services when in provider mode
+        if (_configuration.IsProviderAuth())
+        {
+            services.AddProviderUiServiceRegistration(_configuration);
+        }
+
+        // Register adapter for provider shared UI tag helpers (required because tag helper is imported globally)
+        // This allows the provider tag helper to work in both employer and provider modes
+        // Registered after AddProviderUiServiceRegistration so it overrides the package's registration
+        services.AddScoped<SFA.DAS.Provider.Shared.UI.Extensions.IExternalUrlHelper, Infrastructure.ProviderSharedUi.ProviderExternalUrlHelperAdapter>();
+
+        var mvcBuilder = services
             .AddMvc(options =>
             {
                 options.Filters.Add(new GoogleAnalyticsFilter(serviceParameters));
                 options.Conventions.Add(new KeepAliveControllerConvention(_configuration));
+                
+                // Add provider GaData filter when in provider mode
+                if (_configuration.IsProviderAuth())
+                {
+                    options.Filters.Add(new Filters.ProviderGaDataFilter(serviceParameters));
+                }
             })
             .AddControllersAsServices();
+
+        // Configure provider shared UI navigation and filters when in provider mode
+        if (_configuration.IsProviderAuth())
+        {
+            mvcBuilder
+                .SetDefaultNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.Reservations)
+                .EnableCookieBanner()
+                .EnableGoogleAnalytics()
+                .SuppressNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.StandardsAndTrainingVenues);
+        }
 
         services.AddHttpsRedirection(options =>
         {

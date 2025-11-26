@@ -19,6 +19,8 @@
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "launchUrl": "10005760/reservations/manage",
+      //"launchUrl": "accounts/MNDGLK/reservations/manage",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

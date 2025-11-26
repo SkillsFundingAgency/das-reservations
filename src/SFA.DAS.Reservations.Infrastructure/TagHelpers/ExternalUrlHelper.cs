@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -275,6 +276,12 @@ public class ExternalUrlHelper : IExternalUrlHelper
         var urlString = new StringBuilder();
 
         urlString.Append(FormatBaseUrl(baseUrl, urlParameters.SubDomain, urlParameters.Folder));
+
+        if (!string.IsNullOrEmpty(urlParameters.RelativeRoute))
+        {
+            var combined = Path.Combine(urlString.ToString(), urlParameters.RelativeRoute);
+            return combined.Replace("\\", "/");
+        }
 
         if (!string.IsNullOrEmpty(urlParameters.Id))
         {

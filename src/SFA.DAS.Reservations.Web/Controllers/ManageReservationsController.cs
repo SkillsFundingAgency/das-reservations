@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.Shared.UI.Attributes;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
@@ -81,6 +82,7 @@ public class ManageReservationsController : Controller
 
     [Authorize(Policy = nameof(PolicyNames.HasProviderGotViewerOrHigherRoleOrIsEmployer))]
     [Route("{ukPrn}/reservations/manage", Name = RouteNames.ProviderManage)]
+    [SetNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.Reservations)]
     public async Task<IActionResult> ProviderManage(ReservationsRouteModel routeModel, ManageReservationsFilterModel filterModel)
     {
         try

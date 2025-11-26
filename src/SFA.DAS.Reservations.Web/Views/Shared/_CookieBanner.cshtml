@@ -1,0 +1,46 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    // Route to the appropriate cookie banner based on auth type
+    var isProviderMode = Configuration["AuthType"]?.Equals("provider", StringComparison.OrdinalIgnoreCase) == true;
+}
+
+@if (isProviderMode)
+{
+    @* Use provider shared UI cookie banner (no model required) *@
+    @* This will resolve to the provider shared UI's _CookieBanner from the RCL *@
+    @* We need to explicitly reference it to avoid the employer shared UI version *@
+    <div data-module="cookie-banner" role="region" aria-label="cookie banner" class="das-cookie-banner__wrap">
+        <div class="das-cookie-banner">
+            <div class="das-cookie-banner__wrapper govuk-width-container">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h2 class="govuk-heading-m das-cookie-banner__header">Tell us whether you accept cookies</h2>
+                        <p class="das-cookie-banner__message">We use <a asp-external-controller="cookie-details" class="govuk-link govuk-link--no-visited-state">cookies to collect information</a> about how you use this service. We use this information to make the service work as well as possible and improve this service.</p>
+                        <div class="das-cookie-banner__buttons">
+                            <div class="das-cookie-banner__button-wrap das-cookie-banner__button-accept">
+                                <button class="govuk-button das-cookie-banner__button" type="submit" data-accept-cookies="true">Accept all cookies</button>
+                            </div>
+                            <div class="das-cookie-banner__button-wrap das-cookie-banner__button-settings">
+                                <a asp-external-controller="cookies" class="govuk-button das-cookie-banner__button" role="button" id="btn-cookie-settings">Set cookie preferences</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="das-cookie-banner__confirmation govuk-width-container" tabindex="-1">
+                <p class="das-cookie-banner__confirmation-message">
+                    You've accepted all cookies. You can <a class="govuk-link" asp-external-controller="cookies" id="link-cookie-settings">change your cookie settings</a> at any time.
+                </p>
+                <button class="das-cookie-banner__hide-button" data-hide-cookie-banner="true" id="btn-hide-cookie-banner">Hide</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @* Use employer cookie banner (requires model) *@
+    @* For employer mode, we'll use the existing employer cookie banner partial *@
+    <partial name="_EmployerCookieBanner" />
+}
+

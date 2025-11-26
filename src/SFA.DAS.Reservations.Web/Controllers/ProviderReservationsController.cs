@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.Shared.UI.Attributes;
 using SFA.DAS.Reservations.Application.Exceptions;
 using SFA.DAS.Reservations.Application.FundingRules.Queries.GetFundingRules;
 using SFA.DAS.Reservations.Application.Providers.Queries.GetLegalEntityAccount;
@@ -22,6 +23,7 @@ namespace SFA.DAS.Reservations.Web.Controllers;
 
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
 [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
+[SetNavigationSection(Provider.Shared.UI.NavigationSection.Reservations)]
 [Route("{ukPrn}/reservations", Name = RouteNames.ProviderIndex)]
 public class ProviderReservationsController : ReservationsBaseController
 {

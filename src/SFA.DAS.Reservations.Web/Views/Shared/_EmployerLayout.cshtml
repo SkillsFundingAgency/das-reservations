@@ -1,10 +1,6 @@
 ﻿@inject IConfiguration Configuration
 @{
-    var tagManagerCode = "GTM-TD56SF5";
-}
-@if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
-{
-    tagManagerCode = "GTM-KWQBWGJ";
+    var tagManagerCode = "GTM-KWQBWGJ"; // Employer GTM code
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
@@ -50,17 +46,10 @@
 
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
-    @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
-    {
-        <partial name="_EmployerCookieBanner" />
-    }
-    else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
-    {
-        <partial name="_ProviderCookieBanner" />
-    }
+    <partial name="_EmployerCookieBanner" />
 
     <header
-        class="govuk-header das-header--no-border @(Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase) ? "das-header--provider-legacy" : "")"
+        class="govuk-header das-header--no-border"
         role="banner" data-module="header">
         <div class="govuk-header__container govuk-width-container">
             <div class="govuk-header__logo">
@@ -75,23 +64,16 @@
                 </a>
             </div>
             <div class="govuk-header__content">
-                @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
+                @if (ViewContext.RouteData.Values["employerAccountId"] == null)
                 {
-                    if (ViewContext.RouteData.Values["employerAccountId"] == null)
-                    {
-                        <a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service"
-                            class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
-                    }
-                    else
-                    {
-                        <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts"
-                            asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]"
-                            class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
-                    }
+                    <a asp-external-controller="accounts" asp-external-subdomain="accounts" asp-external-folder="service"
+                        class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
                 }
-                else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
+                else
                 {
-                    <a asp-external-controller="" class="govuk-header__link govuk-header__service-name">Apprenticeships</a>
+                    <a asp-external-controller="teams" asp-external-subdomain="accounts" asp-external-folder="accounts"
+                        asp-external-id="@ViewContext.RouteData.Values["employerAccountId"]"
+                        class="govuk-header__link govuk-header__link--service-name">Manage apprenticeships</a>
                 }
             </div>
         </div>
@@ -106,14 +88,7 @@
         @RenderBody()
     </div>
 
-    @if (Configuration["AuthType"].Equals("employer", StringComparison.CurrentCultureIgnoreCase))
-    {
-        <partial name="_EmployerFooter" />
-    }
-    else if (Configuration["AuthType"].Equals("provider", StringComparison.CurrentCultureIgnoreCase))
-    {
-        <partial name="_ProviderFooter" />
-    }
+    <partial name="_EmployerFooter" />
 
     <partial name="GoogleAnalyticsInfo" />
     <script type="module" src="/libs/govuk-frontend/govuk-frontend.min.js"></script>
