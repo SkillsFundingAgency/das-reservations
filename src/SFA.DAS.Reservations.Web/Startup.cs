@@ -23,16 +23,9 @@ using SFA.DAS.Reservations.Web.Infrastructure.ProviderSharedUi;
 
 namespace SFA.DAS.Reservations.Web;
 
-public class Startup
+public class Startup(IConfiguration configuration, IWebHostEnvironment environment)
 {
-    private readonly IConfiguration _configuration;
-    private readonly IWebHostEnvironment _environment;
-
-    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
-    {
-        _configuration = configuration.BuildDasConfiguration();
-        _environment = environment;
-    }
+    private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -90,7 +83,7 @@ public class Startup
 
         if (_configuration.IsProviderAuth())
         {
-            services.SetupProviderAuth(_configuration, _environment);
+            services.SetupProviderAuth(_configuration, environment);
         }
 
         services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
@@ -115,7 +108,7 @@ public class Startup
         // Register adapter for provider shared UI tag helpers (required because tag helper is imported globally)
         // This allows the provider tag helper to work in both employer and provider modes
         // Registered after AddProviderUiServiceRegistration so it overrides the package's registration
-        services.AddScoped<SFA.DAS.Provider.Shared.UI.Extensions.IExternalUrlHelper, Infrastructure.ProviderSharedUi.ProviderExternalUrlHelperAdapter>();
+        services.AddScoped<SFA.DAS.Provider.Shared.UI.Extensions.IExternalUrlHelper, ProviderExternalUrlHelperAdapter>();
 
         var mvcBuilder = services
             .AddMvc(options =>
@@ -126,7 +119,7 @@ public class Startup
                 // Add provider GaData filter when in provider mode
                 if (_configuration.IsProviderAuth())
                 {
-                    options.Filters.Add(new Filters.ProviderGaDataFilter(serviceParameters));
+                    options.Filters.Add(new ProviderGaDataFilter(serviceParameters));
                 }
             })
             .AddControllersAsServices();
@@ -135,10 +128,15 @@ public class Startup
         if (_configuration.IsProviderAuth())
         {
             mvcBuilder
-                .SetDefaultNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.Reservations)
+                .SetDefaultNavigationSection(Provider.Shared.UI.NavigationSection.Reservations)
                 .EnableCookieBanner()
                 .EnableGoogleAnalytics()
-                .SuppressNavigationSection(SFA.DAS.Provider.Shared.UI.NavigationSection.StandardsAndTrainingVenues);
+                .SuppressNavigationSection(Provider.Shared.UI.NavigationSection.StandardsAndTrainingVenues);
+        }
+
+        if (_configuration.IsEmployerAuth())
+        {
+            mvcBuilder.SetDefaultNavigationSection(NavigationSection.AccountsHome);
         }
 
         services.AddHttpsRedirection(options =>
@@ -171,9 +169,9 @@ public class Startup
             options.Cookie.IsEssential = true;
         });
 
-        services.AddDataProtection(reservationsWebConfig, _environment, _configuration.IsEmployerAuth());
+        services.AddDataProtection(reservationsWebConfig, environment, _configuration.IsEmployerAuth());
 
-        if (!_environment.IsDevelopment())
+        if (!environment.IsDevelopment())
         {
             services.AddHealthChecks()
                 .AddCheck<ReservationsApiHealthCheck>(
@@ -221,7 +219,7 @@ public class Startup
         });
         app.UseAuthentication();
 
-        if (!_environment.IsDevelopment())
+        if (!environment.IsDevelopment())
         {
             app.UseHealthChecks();
         }
