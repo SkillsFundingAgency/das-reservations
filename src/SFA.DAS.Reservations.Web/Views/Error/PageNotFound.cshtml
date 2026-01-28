@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewBag.GaData.Vpv = "/error/404";
 }
 <main class="govuk-main-wrapper " id="main-content" role="main">
@@ -20,7 +20,7 @@
             }
             else
             {
-                <p class="govuk-body">If you entered a web address, check that it's correct. Or you can <a asp-external-controller="service" asp-external-action="accounts">return to the homepage</a>.</p>
+                <p class="govuk-body">If you entered a web address, check that it's correct. Or you can <a asp-external-subdomain="accounts" asp-external-controller="service" asp-external-action="accounts">return to the homepage</a>.</p>
             }
 
 
