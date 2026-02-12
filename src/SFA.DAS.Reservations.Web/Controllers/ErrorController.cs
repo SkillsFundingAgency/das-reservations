@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
@@ -18,6 +18,7 @@ public class ErrorController(
     [Route("403", Name = RouteNames.Error403)]
     public IActionResult AccessDenied()
     {
+        ViewBag.ShowNav = false;
         return View(new Error403ViewModel(configuration["ResourceEnvironmentName"])
         {
             DashboardUrl = _reservationsWebConfiguration.DashboardUrl,
@@ -27,12 +28,14 @@ public class ErrorController(
     [Route("404", Name = RouteNames.Error404)]
     public IActionResult PageNotFound()
     {
+        ViewBag.ShowNav = false;
         return View();
     }
 
     [Route("500", Name = RouteNames.Error500)]
     public IActionResult ApplicationError()
     {
+        ViewBag.ShowNav = false;
         return View();
     }
 }
