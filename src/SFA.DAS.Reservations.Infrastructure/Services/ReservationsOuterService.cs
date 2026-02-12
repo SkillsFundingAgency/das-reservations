@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Domain.Courses.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -46,5 +47,10 @@ public class ReservationsOuterService(IReservationsOuterApiClient apiClient, IOp
     public async Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId)
     {
         return await apiClient.Get<GetAvailableDatesApiResponse>(new GetAvailableDatesApiRequest(_config.ApiBaseUrl, accountLegalEntityId));
+    }
+
+    public Task<GetCourseApiResponse> GetCourseDetails(string id)
+    {
+        return apiClient.Get<GetCourseApiResponse>(new GetCourseApiRequest(_config.ApiBaseUrl, id));
     }
 }

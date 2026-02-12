@@ -6,23 +6,20 @@ using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Validation;
 using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Infrastructure.Api;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
 {
-    public class GetCachedReservationQueryHandler : IRequestHandler<GetCachedReservationQuery, GetCachedReservationResult>
+    public class GetCachedReservationQueryHandler(
+        IValidator<IReservationQuery> validator,
+        ICachedReservationRespository cachedReservationRepository,
+        IReservationsOuterService outerApiService)
+        : IRequestHandler<GetCachedReservationQuery, GetCachedReservationResult>
     {
-        private readonly IValidator<IReservationQuery> _validator;
-        private readonly ICachedReservationRespository _cachedReservationRepository;
-
-        public GetCachedReservationQueryHandler(IValidator<IReservationQuery> validator, ICachedReservationRespository cachedReservationRepository)
-        {
-            _validator = validator;
-            _cachedReservationRepository = cachedReservationRepository;
-        }
-
         public async Task<GetCachedReservationResult> Handle(GetCachedReservationQuery request, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request);
+            string apprenticeshipType = null;
 
             if (!validationResult.IsValid())
             {
@@ -33,14 +30,20 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
 
             if (request.UkPrn != default(uint))
             {
-                cachedReservation =
-                    await _cachedReservationRepository.GetProviderReservation(request.Id, request.UkPrn);
+                cachedReservation = await cachedReservationRepository.GetProviderReservation(request.Id, request.UkPrn);
             }
             else
             {
                 cachedReservation =
-                    await _cachedReservationRepository.GetEmployerReservation(request.Id);
+                    await cachedReservationRepository.GetEmployerReservation(request.Id);
             }
+
+            if (cachedReservation != null)
+            {
+                var courseDetail = await outerApiService.GetCourseDetails(cachedReservation.CourseId);
+                apprenticeshipType = courseDetail?.ApprenticeshipType;
+            }
+
 
             return new GetCachedReservationResult
             {
@@ -51,6 +54,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                 AccountLegalEntityPublicHashedId = cachedReservation.AccountLegalEntityPublicHashedId,
                 CourseId = cachedReservation.CourseId,
                 CourseDescription = cachedReservation.CourseDescription,
+                ApprenticeshipType = apprenticeshipType,
                 TrainingDate = cachedReservation.TrainingDate,
                 AccountName = cachedReservation.AccountName,
                 CohortRef = cachedReservation.CohortRef,

@@ -69,7 +69,15 @@
                     </dd>
                 </dl>
             </div>
-
+            @if (Model.ApprenticeshipType == "FoundationApprenticeship")
+            {
+                <div class="govuk-inset-text">
+                    You’ve selected a foundation apprenticeship. Check
+                    <a target="_blank" class="govuk-link" href=" https://assets.publishing.service.gov.uk/media/682471b57293a87b6c75ebe0/Apprenticeship_funding_rules_2025_to_2026.pdf">
+                        who is eligible for funding for a foundation apprenticeship in the funding rules
+                    </a> before you continue. Foundation apprenticeships must start on or after 1 August 2025
+                </div>
+            }
             <form method="post" asp-route="@Model.ConfirmRouteName" asp-antiforgery="true">
                 <input type="hidden" asp-for="TrainingDate.StartDate"/>
                 <input type="hidden" asp-for="TrainingDate.EndDate"/>
