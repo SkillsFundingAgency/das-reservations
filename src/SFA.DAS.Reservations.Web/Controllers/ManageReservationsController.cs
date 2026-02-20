@@ -213,13 +213,12 @@ public class ManageReservationsController : Controller
                 return View(deleteViewName, viewModel);
             }
 
-            if (viewModel.Delete.HasValue && !viewModel.Delete.Value ||
-                !routeModel.Id.HasValue)
+            if (!routeModel.Id.HasValue)
             {
                 var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
 
                 routeModel.IsFromManage = true;
-                    
+
                 return RedirectToRoute(manageRoute, routeModel);
             }
 

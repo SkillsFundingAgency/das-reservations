@@ -12,5 +12,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
         public uint? UkPrn { get; set; }
+        public string StandardApprenticeshipType { get; set; }
     }
 }
