@@ -195,6 +195,90 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         }
 
         [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_But_UseLearnerData_False_Then_Gets_Reservations_For_Employer_Account_But_IncludeShortCourses_Is_False(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            Domain.Employers.Employer employer,
+            GetAvailableReservationsResult reservationsResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            [NoAutoProperties] SelectReservationsController controller)
+        {
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            routeModel.UseLearnerData = false;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
+                        CohortRef = routeModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAvailableReservationsQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationsResult);
+
+            await controller.SelectReservation(routeModel, viewModel);
+
+            mockMediator.Verify(mediator => mediator.Send(
+                It.Is<GetAvailableReservationsQuery>(query => query.AccountId == employer.AccountId && query.IncludeShortCourses == false),
+                It.IsAny<CancellationToken>()));
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_But_UseLearnerData_True_Then_Gets_Reservations_For_Employer_Account_But_IncludesShortCourses_Is_True(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            Domain.Employers.Employer employer,
+            GetAvailableReservationsResult reservationsResult,
+            [Frozen] Mock<IMediator> mockMediator,
+            [NoAutoProperties] SelectReservationsController controller)
+        {
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            routeModel.UseLearnerData = true;
+            mockMediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync((CreateReservationLevyEmployerResult)null);
+            mockMediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
+                        CohortRef = routeModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
+
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<GetAvailableReservationsQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(reservationsResult);
+
+            await controller.SelectReservation(routeModel, viewModel);
+
+            mockMediator.Verify(mediator => mediator.Send(
+                It.Is<GetAvailableReservationsQuery>(query => query.AccountId == employer.AccountId && query.IncludeShortCourses == true),
+                It.IsAny<CancellationToken>()));
+        }
+
+        [Test, MoqAutoData]
         public async Task And_The_Back_Link_Is_Generated_From_The_UrlHelper(
             string cohortDetailsUrl,
             ReservationsRouteModel routeModel,

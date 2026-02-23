@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Application.Validation.ValidationResult;
@@ -73,6 +74,34 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
             var result = await handler.Handle(query, CancellationToken.None);
 
             result.Reservations.Should().BeEquivalentTo(serviceReservations);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Returns_Mapped_Reservations_Excluding_ApprenticeshipUnits(
+            long accountId,
+            List<Reservation> serviceReservations,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IReservationService> mockService,
+            GetAvailableReservationsQueryHandler handler)
+        {
+            var query = new GetAvailableReservationsQuery { AccountId = accountId };
+            validationResult.ValidationDictionary.Clear();
+
+            serviceReservations[0].Course = new Course("1", "Title", 3, "ApprenticeshipUnit");
+            serviceReservations[1].Course = new Course("2", "Title", 3, "ApprenticeshipUnit");
+            serviceReservations.ForEach(reservation =>
+            {
+                reservation.Status = ReservationStatus.Pending;
+                reservation.IsExpired = false;
+            });
+            mockService
+                .Setup(client => client.GetReservations(accountId))
+                .ReturnsAsync(serviceReservations);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.Reservations.Should().NotContain(serviceReservations[0]);
+            result.Reservations.Should().NotContain(serviceReservations[1]);
         }
 
         [Test, MoqAutoData]
