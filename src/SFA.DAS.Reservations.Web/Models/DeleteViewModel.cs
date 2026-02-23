@@ -28,6 +28,8 @@ namespace SFA.DAS.Reservations.Web.Models
         }
 
         public uint? UkPrn { get; set; }
+
+        public bool? Delete { get; set; }
         public Guid Id { get; set; }
         public string StartDateDescription { get; set; }
         public string CourseDescription { get; set; }

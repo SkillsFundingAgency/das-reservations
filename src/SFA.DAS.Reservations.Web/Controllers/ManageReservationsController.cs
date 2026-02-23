@@ -208,12 +208,18 @@ public class ManageReservationsController : Controller
         var deleteViewName = isProvider ? ViewNames.ProviderDelete : ViewNames.EmployerDelete;
         try
         {
+            if(!isProvider && !viewModel.Delete.HasValue)
+            {
+                ModelState.AddModelError(nameof(viewModel.Delete), "Select whether you want to delete this reservation");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(deleteViewName, viewModel);
             }
 
-            if (!routeModel.Id.HasValue)
+            if ((!isProvider && viewModel.Delete.HasValue && !viewModel.Delete.Value )||
+                !routeModel.Id.HasValue)
             {
                 var manageRoute = isProvider ? RouteNames.ProviderManage : RouteNames.EmployerManage;
 
