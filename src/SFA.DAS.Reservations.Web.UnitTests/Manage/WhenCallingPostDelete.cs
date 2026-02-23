@@ -52,6 +52,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             [NoAutoProperties] ManageReservationsController controller)
         {
+            viewModel.Delete = true;
             routeModel.UkPrn = null;
             routeModel.Id = null;
 
@@ -156,8 +157,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] ManageReservationsController controller)
         {
-            routeModel.UkPrn = null;
             viewModel.Delete = true;
+            routeModel.UkPrn = null;
 
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
