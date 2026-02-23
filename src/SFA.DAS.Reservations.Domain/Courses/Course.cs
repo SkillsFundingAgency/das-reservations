@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
             Title = SetDefaultTitleIfEmpty(title);
             Id = id;
             Level = level;
-            StandardApprenticeshipType = standardApprenticeshipType;
+            LearnerType = standardApprenticeshipType;
         }
 
         [JsonProperty("CourseId")]
@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
 
         public string CourseDescription => Title.Equals("UNKNOWN", StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title} - Level {Level}";
 
-        public string StandardApprenticeshipType { get; }
+        public string LearnerType { get; }
 
         private static string SetDefaultTitleIfEmpty(string title)
         {

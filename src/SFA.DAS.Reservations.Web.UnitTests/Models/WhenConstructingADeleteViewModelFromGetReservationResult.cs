@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         {
             var viewModel = new DeleteViewModel(getReservationResult);
 
-            viewModel.StandardApprenticeshipType.Should().Be(getReservationResult.Course.StandardApprenticeshipType);
+            viewModel.LearnerType.Should().Be(getReservationResult.Course.LearnerType);
         }
 
         [Test, AutoData]
@@ -81,7 +81,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             var viewModel = new DeleteViewModel(getReservationResult);
 
-            viewModel.StandardApprenticeshipType.Should().BeNull();
+            viewModel.LearnerType.Should().BeNull();
         }
     }
 }
