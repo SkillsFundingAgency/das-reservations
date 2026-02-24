@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Web.Models
             AccountLegalEntityName = queryResult.AccountLegalEntityName;
             CourseDescription = queryResult.Course?.CourseDescription ??
                                 new Course(null, null, 0).CourseDescription;
-            LearnerType = queryResult.Course?.LearnerType;
+            LearningType = queryResult.Course?.LearningType;
         }
 
         public uint? UkPrn { get; set; }
@@ -34,6 +34,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string StartDateDescription { get; set; }
         public string CourseDescription { get; set; }
         public string AccountLegalEntityName { get; set; }
-        public string LearnerType { get; set; }
+        public string LearningType { get; set; }
     }
 }

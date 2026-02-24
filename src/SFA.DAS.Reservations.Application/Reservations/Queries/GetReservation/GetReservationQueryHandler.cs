@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                 AccountLegalEntityId = result.AccountLegalEntityId,
                 AccountLegalEntityName = result.AccountLegalEntityName,
                 UkPrn = result.ProviderId,
-                StandardApprenticeshipType = result.Course?.LearnerType ?? default,
+                StandardApprenticeshipType = result.Course?.LearningType ?? default,
             };
         }
     }
