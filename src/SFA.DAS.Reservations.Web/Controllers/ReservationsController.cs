@@ -448,7 +448,7 @@ public class ReservationsController(
 
         var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
 
-        var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId, courseId);
+        var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId, isProvider ? null : courseId);
         var firstDayOfCurrentMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
         var pastDates = (dates ?? Enumerable.Empty<TrainingDateModel>())

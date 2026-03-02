@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 
 namespace SFA.DAS.Reservations.Domain.Courses
@@ -19,6 +19,8 @@ namespace SFA.DAS.Reservations.Domain.Courses
         public string Title { get; }
 
         public int Level { get; }
+
+        public bool AllowPreviousDate { get; set; } = true;
 
         public string CourseDescription => Title.Equals("UNKNOWN",StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title} - Level {Level}";
 
