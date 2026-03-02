@@ -1,9 +1,9 @@
-﻿using MediatR;
+using MediatR;
 
-namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates
+namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
+
+public class GetAvailableDatesQuery : IRequest<GetAvailableDatesResult>
 {
-    public class GetAvailableDatesQuery : IRequest<GetAvailableDatesResult>
-    {
-        public long AccountLegalEntityId { get; set; }
-    }
+    public long AccountLegalEntityId { get; set; }
+    public string CourseId { get; set; }
 }

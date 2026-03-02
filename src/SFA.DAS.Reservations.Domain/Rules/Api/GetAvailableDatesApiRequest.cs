@@ -1,16 +1,16 @@
-﻿using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Interfaces;
 
 namespace SFA.DAS.Reservations.Domain.Rules.Api
 {
-    public class GetAvailableDatesApiRequest : IGetApiRequest
+    public class GetAvailableDatesApiRequest(string baseUrl, long accountLegalEntityId, string courseId = null)
+        : IGetApiRequest
     {
-        public GetAvailableDatesApiRequest(string baseUrl, long accountLegalEntityId)
-        {
-            BaseUrl = baseUrl;
-            AccountLegalEntityId = accountLegalEntityId;
-        }
-        public string BaseUrl { get; }
-        public long AccountLegalEntityId{ get; }
-        public string GetUrl => $"{BaseUrl}/rules/available-dates/{AccountLegalEntityId}";
+        public string BaseUrl { get; } = baseUrl;
+        private long AccountLegalEntityId { get; } = accountLegalEntityId;
+        private string CourseId { get; } = courseId;
+
+        public string GetUrl => string.IsNullOrEmpty(CourseId)
+            ? $"{BaseUrl}/rules/available-dates/{AccountLegalEntityId}"
+            : $"{BaseUrl}/rules/available-dates/{AccountLegalEntityId}?courseId={System.Uri.EscapeDataString(CourseId)}";
     }
 }

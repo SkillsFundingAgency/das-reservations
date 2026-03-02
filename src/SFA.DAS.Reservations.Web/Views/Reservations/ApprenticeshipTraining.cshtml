@@ -1,4 +1,4 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+@using SFA.DAS.Reservations.Web.Extensions
 @model ApprenticeshipTrainingViewModel
 @{
     ViewData["Title"] = "Select apprenticeship training course start date";
@@ -112,10 +112,6 @@
                             </h2>
                         </legend>
 
-                        <div class="govuk-hint">
-                            Apprenticeship already started.
-                        </div>
-
                         @if (startDateInvalid)
                         {
                             var startDateModelState = @ViewData.ModelState["StartDate"];
@@ -128,15 +124,21 @@
                             }
                         }
 
-                        <div class="govuk-radios govuk-!-margin-bottom-6">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
-                                <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
-                                    @Model.PastStartDate.StartDate.GetGDSLongDateString()
-                                </label>
+                        @if (Model.PastStartDate != null)
+                        {
+                            <div class="govuk-hint">
+                                Apprenticeship already started.
                             </div>
-                        </div>
-                        
+                            <div class="govuk-radios govuk-!-margin-bottom-6">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
+                                    <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
+                                        @Model.PastStartDate.StartDate.GetGDSLongDateString()
+                                    </label>
+                                </div>
+                            </div>
+                        }
+
                         <div class="govuk-hint">
                             Planned start date of the apprenticeship.
                         </div>

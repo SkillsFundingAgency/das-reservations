@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using SFA.DAS.CommitmentsV2.Types;
+using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Providers.Api;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules.Api;
@@ -12,5 +11,5 @@ public interface IReservationsOuterService
     Task<ProviderAccountResponse> GetProviderStatus(long ukprn);
     Task<GetAccountLegalEntitiesForProviderResponse> GetAccountProviderLegalEntitiesWithCreateCohort(long ukprn);
     Task<bool> CanAccessCohort(long partyId, long cohortId);
-    Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId);
+    Task<GetAvailableDatesApiResponse> GetAvailableDates(long accountLegalEntityId, string courseId = null);
 }

@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
 
             _service = new Mock<IReservationsOuterService>();
             _service
-                .Setup(s => s.GetAvailableDates(_query.AccountLegalEntityId))
+                .Setup(s => s.GetAvailableDates(_query.AccountLegalEntityId, _query.CourseId))
                 .ReturnsAsync(_expectedApiResponse);
 
             _handler = new GetAvailableDatesQueryHandler(_service.Object);
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
         public async Task Then_The_AvailableDates_Are_Returned()
         {
             //Act
-            var actual = await _handler.Handle(_query, new CancellationToken());
+            var actual = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
             actual.AvailableDates.Should().BeEquivalentTo(_expectedApiResponse.AvailableDates);
@@ -59,12 +59,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.FundingRules.Queries
             //Arrange
             var expectedException = new Exception();
             _service
-                .Setup(s => s.GetAvailableDates(It.IsAny<long>()))
+                .Setup(s => s.GetAvailableDates(It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(expectedException);
 
             //Act
             var actualException = Assert.ThrowsAsync<Exception>(() =>
-                _handler.Handle(new GetAvailableDatesQuery(), new CancellationToken()));
+                _handler.Handle(new GetAvailableDatesQuery(), CancellationToken.None));
 
             //Assert
             actualException.Should().Be(expectedException);

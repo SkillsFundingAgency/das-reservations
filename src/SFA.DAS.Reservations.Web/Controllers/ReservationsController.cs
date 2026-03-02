@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -34,30 +34,17 @@ namespace SFA.DAS.Reservations.Web.Controllers;
 [Authorize(Policy = nameof(PolicyNames.HasProviderOrEmployerAccount))]
 [Authorize(Policy = nameof(PolicyNames.HasProviderGotContributorOrHigherRoleOrIsEmployer))]
 [ServiceFilter(typeof(LevyNotPermittedFilter))]
-public class ReservationsController : ReservationsBaseController
+public class ReservationsController(
+    IMediator mediator,
+    ITrainingDateService trainingDateService,
+    IOptions<ReservationsWebConfiguration> configuration,
+    ILogger<ReservationsController> logger,
+    IEncodingService encodingService,
+    IExternalUrlHelper urlHelper)
+    : ReservationsBaseController(mediator)
 {
-    private readonly IMediator _mediator;
-    private readonly ITrainingDateService _trainingDateService;
-    private readonly ILogger<ReservationsController> _logger;
-    private readonly IEncodingService _encodingService;
-    private readonly ReservationsWebConfiguration _configuration;
-    private readonly IExternalUrlHelper _urlHelper;
-
-    public ReservationsController(
-        IMediator mediator,
-        ITrainingDateService trainingDateService,
-        IOptions<ReservationsWebConfiguration> configuration,
-        ILogger<ReservationsController> logger,
-        IEncodingService encodingService,
-        IExternalUrlHelper urlHelper) : base(mediator)
-    {
-        _mediator = mediator;
-        _trainingDateService = trainingDateService;
-        _logger = logger;
-        _encodingService = encodingService;
-        _configuration = configuration.Value;
-        _urlHelper = urlHelper;
-    }
+    private readonly IMediator _mediator = mediator;
+    private readonly ReservationsWebConfiguration _configuration = configuration.Value;
 
 
     [HttpGet]
@@ -68,7 +55,7 @@ public class ReservationsController : ReservationsBaseController
         //only comes from select
         var isProvider = routeModel.UkPrn != null;
         var redirectRouteName = isProvider ? RouteNames.ProviderApprenticeshipTraining : RouteNames.EmployerSelectCourse;
-        var backLink = _urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
+        var backLink = urlHelper.GenerateCohortDetailsUrl(routeModel.UkPrn, routeModel.EmployerAccountId,
             routeModel.CohortReference, string.IsNullOrEmpty(routeModel.CohortReference));
         var identifier = isProvider ? ProviderClaims.ProviderUkprn : EmployerClaims.IdamsUserIdClaimTypeIdentifier;
         var postRouteName = isProvider
@@ -118,7 +105,7 @@ public class ReservationsController : ReservationsBaseController
     [Route("accounts/{employerAccountId}/reservations/{id}/apprenticeship-training", Name = RouteNames.EmployerApprenticeshipTraining)]
     public async Task<IActionResult> ApprenticeshipTraining(ReservationsRouteModel routeModel)
     {
-        _logger.LogInformation(($"GET ApprenticeshipTraining for {routeModel.EmployerAccountId} "));
+        logger.LogInformation(($"GET ApprenticeshipTraining for {routeModel.EmployerAccountId} "));
 
         GetCachedReservationResult cachedReservation = null;
 
@@ -130,9 +117,9 @@ public class ReservationsController : ReservationsBaseController
 
         var hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId)
             ? routeModel.EmployerAccountId
-            : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
+            : (cachedReservation != null ? encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
 
-        _logger.LogInformation("Building BuildApprenticeshipTrainingViewModel");
+        logger.LogInformation("Building BuildApprenticeshipTrainingViewModel");
 
         var viewModel = await BuildApprenticeshipTrainingViewModel(
             routeModel.UkPrn != null,
@@ -166,7 +153,7 @@ public class ReservationsController : ReservationsBaseController
 
             hashedEmployerAccountId = !string.IsNullOrEmpty(routeModel.EmployerAccountId)
                 ? routeModel.EmployerAccountId
-                : (cachedReservation != null ? _encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
+                : (cachedReservation != null ? encodingService.Encode(cachedReservation.AccountId, EncodingType.AccountId) : null);
 
             if (!ModelState.IsValid)
             {
@@ -224,7 +211,7 @@ public class ReservationsController : ReservationsBaseController
         }
         catch (CachedReservationNotFoundException ex)
         {
-            _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
+            logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
             return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
         }
 
@@ -257,13 +244,13 @@ public class ReservationsController : ReservationsBaseController
                 errors.AppendLine(member);
             }
 
-            _logger.LogWarning($"Validation Error when reviewing a reservation: {errors}");
+            logger.LogWarning($"Validation Error when reviewing a reservation: {errors}");
 
             return RedirectToRoute(RouteNames.Error500);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, ex.Message);
+            logger.LogError(ex, ex.Message);
             return RedirectToRoute(RouteNames.Error500);
         }
 
@@ -326,12 +313,12 @@ public class ReservationsController : ReservationsBaseController
         }
         catch (ValidationException ex)
         {
-            _logger.LogWarning(ex, "Validation error when trying to create reservation from cached reservation.");
+            logger.LogWarning(ex, "Validation error when trying to create reservation from cached reservation.");
             return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
         }
         catch (CachedReservationNotFoundException ex)
         {
-            _logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
+            logger.LogWarning(ex, "Expected a cached reservation but did not find one.");
             return RedirectToRoute(routeModel.UkPrn.HasValue ? RouteNames.ProviderIndex : RouteNames.EmployerIndex, routeModel);
         }
 
@@ -393,12 +380,12 @@ public class ReservationsController : ReservationsBaseController
         {
             case CompletedReservationWhatsNext.RecruitAnApprentice:
                 var recruitUrl = routeModel.UkPrn.HasValue
-                    ? _urlHelper.GenerateUrl(new UrlParameters
+                    ? urlHelper.GenerateUrl(new UrlParameters
                     {
                         SubDomain = "recruit",
                         Id = routeModel.UkPrn.ToString()
                     })
-                    : _urlHelper.GenerateUrl(new UrlParameters
+                    : urlHelper.GenerateUrl(new UrlParameters
                     {
                         SubDomain = "recruit",
                         Folder = "accounts",
@@ -411,17 +398,17 @@ public class ReservationsController : ReservationsBaseController
                 return Redirect(_configuration.FindApprenticeshipTrainingUrl);
 
             case CompletedReservationWhatsNext.AddAnApprentice:
-                var addApprenticeUrl = _urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
+                var addApprenticeUrl = urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
                     routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
                     model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
                     journeyData: model.JourneyData, useLearnerData: model.UseLearnerData);
 
-                _logger.LogInformation($"model.UseLearnerData: {model.UseLearnerData}");
-                _logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
+                logger.LogInformation($"model.UseLearnerData: {model.UseLearnerData}");
+                logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
                 return Redirect(addApprenticeUrl);
 
             default:
-                var homeUrl = _urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
+                var homeUrl = urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
                 return Redirect(homeUrl);
         }
     }
@@ -438,7 +425,7 @@ public class ReservationsController : ReservationsBaseController
         string publicHashedEmployerAccountId = "")
 
     {
-        var accountLegalEntityId = _encodingService.Decode(
+        var accountLegalEntityId = encodingService.Decode(
             accountLegalEntityPublicHashedId,
             EncodingType.PublicAccountLegalEntityId);
 
@@ -448,33 +435,41 @@ public class ReservationsController : ReservationsBaseController
 
         if (!string.IsNullOrEmpty(hashedEmployerAccountId))
         {
-            decodedEmployerAccountId = _encodingService.Decode(
+            decodedEmployerAccountId = encodingService.Decode(
                 hashedEmployerAccountId,
                 EncodingType.AccountId);
         }
         else if (!string.IsNullOrEmpty(publicHashedEmployerAccountId))
         {
-            decodedEmployerAccountId = _encodingService.Decode(
+            decodedEmployerAccountId = encodingService.Decode(
                 publicHashedEmployerAccountId,
                 EncodingType.PublicAccountId);
         }
 
         var activeGlobalRule = await GetActiveGlobalRule(decodedEmployerAccountId);
 
-        var dates = await _trainingDateService.GetTrainingDates(accountLegalEntityId);
-        var previousMonth = new TrainingDateModel();
+        var dates = await trainingDateService.GetTrainingDates(accountLegalEntityId, courseId);
+        var firstDayOfCurrentMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
-        if (dates != null && dates.Any())
+        var pastDates = (dates ?? Enumerable.Empty<TrainingDateModel>())
+            .Where(d => d.StartDate < firstDayOfCurrentMonth)
+            .OrderBy(d => d.StartDate)
+            .ToList();
+        var possibleDateModels = (dates ?? Enumerable.Empty<TrainingDateModel>())
+            .Where(d => d.StartDate >= firstDayOfCurrentMonth)
+            .OrderBy(d => d.StartDate)
+            .ToList();
+
+        TrainingDateViewModel pastTrainingStartDateVm = null;
+        if (pastDates.Any())
         {
-            previousMonth = dates.First();
-            dates = dates.Skip(1);
+            var previousMonth = pastDates.Last();
+            pastTrainingStartDateVm = new TrainingDateViewModel(previousMonth, previousMonth.Equals(selectedTrainingDate));
         }
 
         var possibleDates = activeGlobalRule == null
-            ? dates.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
-            : dates.Where(d => d.StartDate >= activeGlobalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
-
-        var pastTrainingStartDateVm = new TrainingDateViewModel(previousMonth, previousMonth.Equals(selectedTrainingDate));
+            ? possibleDateModels.Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate)
+            : possibleDateModels.Where(d => d.StartDate >= activeGlobalRule.ActiveTo).Select(startDateModel => new TrainingDateViewModel(startDateModel, startDateModel.Equals(selectedTrainingDate))).OrderBy(model => model.StartDate);
 
         return new ApprenticeshipTrainingViewModel
         {
@@ -500,7 +495,7 @@ public class ReservationsController : ReservationsBaseController
             return routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.ProviderReview : RouteNames.ProviderConfirmEmployer;
         }
 
-        return _urlHelper.GenerateCohortDetailsUrl(ukPrn, string.Empty, cohortRef);
+        return urlHelper.GenerateCohortDetailsUrl(ukPrn, string.Empty, cohortRef);
     }
 
     private async Task<GlobalRule> GetActiveGlobalRule(long? employerAccountId = null)

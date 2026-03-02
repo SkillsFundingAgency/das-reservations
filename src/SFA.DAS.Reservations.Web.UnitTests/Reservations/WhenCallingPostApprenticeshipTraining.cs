@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
@@ -52,7 +52,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _cachedReservationResult = _fixture.Create<GetCachedReservationResult>();
 
             _mockTrainingDateService = new Mock<ITrainingDateService>();
-            _mockTrainingDateService.Setup(x => x.GetTrainingDates(It.IsAny<long>()))
+            _mockTrainingDateService
+                .Setup(x => x.GetTrainingDates(It.IsAny<long>(), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             _mediator = new Mock<IMediator>();
@@ -102,7 +103,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
 
-            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId), Times.Once);
+            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId, It.IsAny<string>()), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -222,7 +223,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             });
 
             mockStartDateService
-                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
@@ -276,7 +277,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             });
 
             mockStartDateService
-                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
