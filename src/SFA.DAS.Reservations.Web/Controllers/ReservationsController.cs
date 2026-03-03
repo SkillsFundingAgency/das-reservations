@@ -170,6 +170,21 @@ public class ReservationsController(
                 return View("ApprenticeshipTraining", model);
             }
 
+            if (isProvider && trainingDateModel != null && !string.IsNullOrWhiteSpace(formModel.SelectedCourseId))
+            {
+                var pastDateValidationResult = await ValidateProviderPastStartDate(
+                    formModel.SelectedCourseId,
+                    trainingDateModel,
+                    formModel,
+                    routeModel.UkPrn,
+                    hashedEmployerAccountId);
+                
+                if (pastDateValidationResult != null)
+                {
+                    return pastDateValidationResult;
+                }
+            }
+
             if (isProvider)
             {
                 var courseCommand = new CacheReservationCourseCommand
@@ -486,6 +501,45 @@ public class ReservationsController(
             BackLink = isProvider ? GetProviderBackLinkForApprenticeshipTrainingView(routeModelFromReview, cohortRef, ukPrn, hashedEmployerAccountId)
                 : routeModelFromReview.HasValue && routeModelFromReview.Value ? RouteNames.EmployerReview : RouteNames.EmployerSelectCourse
         };
+    }
+
+    /// <summary>
+    /// For provider flow only: when a past start date (month before current) is selected, ensures the course allows it (AllowPreviousDate).
+    /// Call only when isProvider, trainingDateModel and selectedCourseId are present. Returns a ViewResult when validation fails; otherwise null.
+    /// </summary>
+    private async Task<IActionResult> ValidateProviderPastStartDate(
+        string selectedCourseId,
+        TrainingDateModel trainingDateModel,
+        ApprenticeshipTrainingFormModel formModel,
+        uint? ukPrn,
+        string hashedEmployerAccountId)
+    {
+        var now = DateTime.UtcNow;
+        var isPastMonth = trainingDateModel.StartDate.Year < now.Year ||
+            (trainingDateModel.StartDate.Year == now.Year && trainingDateModel.StartDate.Month < now.Month);
+        
+        if (!isPastMonth)
+            return null;
+
+        var coursesResult = await _mediator.Send(new GetCoursesQuery());
+        var selectedCourse = coursesResult?.Courses?.FirstOrDefault(c => c.Id == selectedCourseId);
+        if (selectedCourse?.AllowPreviousDate != false)
+        {
+            return null;
+        }
+
+        ModelState.AddModelError("StartDate", "You cannot select a start date in the past for this apprenticeship type.");
+        var model = await BuildApprenticeshipTrainingViewModel(
+            isProvider: true,
+            formModel.AccountLegalEntityPublicHashedId,
+            formModel.SelectedCourseId,
+            trainingDateModel,
+            formModel.FromReview,
+            formModel.CohortRef,
+            ukPrn,
+            hashedEmployerAccountId);
+        
+        return View("ApprenticeshipTraining", model);
     }
 
     private string GetProviderBackLinkForApprenticeshipTrainingView(bool? routeModelFromReview, string cohortRef, uint? ukPrn, string accountId)
