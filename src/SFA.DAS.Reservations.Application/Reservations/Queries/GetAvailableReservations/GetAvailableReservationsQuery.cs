@@ -5,5 +5,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableRese
     public class GetAvailableReservationsQuery : IRequest<GetAvailableReservationsResult>
     {
         public long AccountId { get; set; }
+        public bool IncludeShortCourses { get; set; } = false;
     }
 }

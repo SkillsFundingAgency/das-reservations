@@ -113,7 +113,7 @@ public class SelectReservationsController(
             }
 
             var availableReservationsResult = await mediator.Send(
-                new GetAvailableReservationsQuery {AccountId = cacheReservationEmployerCommand.AccountId});
+                new GetAvailableReservationsQuery { AccountId = cacheReservationEmployerCommand.AccountId, IncludeShortCourses = IncludeShortCourses(routeModel) });
 
             if (availableReservationsResult.Reservations != null &&
                 availableReservationsResult.Reservations.Any())
@@ -212,6 +212,15 @@ public class SelectReservationsController(
             logger.LogError(e, "Error trying to render select reservation.");
             return RedirectToRoute(RouteNames.Error500);
         }
+    }
+
+    private bool IncludeShortCourses(ReservationsRouteModel routeModel)
+    {
+        if(IsThisAnEmployer())
+        {
+            return true;
+        }
+        return routeModel.UseLearnerData == true;
     }
 
     private Task<bool> MoreReservationsAreAvailableForEmployer(string employerAccountId)

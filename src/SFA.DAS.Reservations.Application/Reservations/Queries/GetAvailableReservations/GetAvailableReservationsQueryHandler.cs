@@ -31,7 +31,12 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableRese
             }
 
             var reservations = await _reservationService.GetReservations(request.AccountId);
-            
+
+            if (!request.IncludeShortCourses)
+            {
+                reservations = reservations.Where(r => r.Course.LearningType != "ApprenticeshipUnit");
+            }
+
             var result = new GetAvailableReservationsResult
             {
                 Reservations = reservations
