@@ -5,12 +5,12 @@ namespace SFA.DAS.Reservations.Domain.Courses
 {
     public class Course
     {
-        public Course(string id, string title, int level)
+        public Course(string id, string title, int level, string learningType = null)
         {
             Title = SetDefaultTitleIfEmpty(title);
             Id = id;
             Level = level;
-
+            LearningType = learningType;
         }
 
         [JsonProperty("CourseId")]
@@ -28,6 +28,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
         {
             return string.IsNullOrEmpty(title) ? "Unknown" : title;
         }
+        public string LearningType { get; }
     }
 }
 
