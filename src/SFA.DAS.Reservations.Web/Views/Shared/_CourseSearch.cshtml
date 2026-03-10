@@ -7,9 +7,9 @@
 </span>
 }
 <select id="SelectedCourseId" name="SelectedCourseId" class="govuk-select" aria-describedby="choose-apprenticeship-hint">
-    <option value="">Search for an apprenticeship </option>
+    <option value="" data-allow-previous-date="true">Search for an apprenticeship </option>
     @foreach (var course in Model.Courses)
     {
-        <option value="@course.Id" selected="@course.Selected">@course.Description</option>
+        <option value="@course.Id" selected="@course.Selected" data-allow-previous-date="@(course.AllowPreviousDate ? "true" : "false")">@course.Description</option>
     }
 </select>

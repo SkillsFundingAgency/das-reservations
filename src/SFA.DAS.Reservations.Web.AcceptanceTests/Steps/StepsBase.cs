@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Web.AcceptanceTests.Steps
 
         private void SetUpReservationServiceResponses(Mock<IReservationsOuterService> mock)
         {
-            mock.Setup(x => x.GetAvailableDates(TestData.AccountLegalEntity.AccountLegalEntityId))
+            mock.Setup(x => x.GetAvailableDates(TestData.AccountLegalEntity.AccountLegalEntityId, It.IsAny<string>()))
                .ReturnsAsync(
                    new GetAvailableDatesApiResponse
                    {

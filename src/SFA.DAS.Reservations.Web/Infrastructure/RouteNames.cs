@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Reservations.Web.Infrastructure
+namespace SFA.DAS.Reservations.Web.Infrastructure
 {
     public static class RouteNames
     {

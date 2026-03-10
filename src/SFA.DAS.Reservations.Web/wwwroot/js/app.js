@@ -1,4 +1,4 @@
-﻿var forms = $('.validate-auto-complete');
+var forms = $('.validate-auto-complete');
 var radioInputs = forms.find('.govuk-radios__input');
 var idSelectField = 'SelectedCourseId';
 
@@ -23,6 +23,9 @@ if (selectEl) {
                 requestedOption.selected = true;
             } else {
                 this.selectElement.selectedIndex = 0;
+            }
+            if (this.selectElement.id === idSelectField) {
+                this.selectElement.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
       
