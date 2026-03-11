@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
@@ -52,7 +52,8 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             _cachedReservationResult = _fixture.Create<GetCachedReservationResult>();
 
             _mockTrainingDateService = new Mock<ITrainingDateService>();
-            _mockTrainingDateService.Setup(x => x.GetTrainingDates(It.IsAny<long>()))
+            _mockTrainingDateService
+                .Setup(x => x.GetTrainingDates(It.IsAny<long>(), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             _mediator = new Mock<IMediator>();
@@ -102,7 +103,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
 
-            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId), Times.Once);
+            mockStartDateService.Verify(provider => provider.GetTrainingDates(accountLegalEntityId, It.IsAny<string>()), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -222,7 +223,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             });
 
             mockStartDateService
-                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
@@ -276,7 +277,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             });
 
             mockStartDateService
-                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId)))
+                .Setup(d => d.GetTrainingDates(It.Is<long>(x => x == accountLegalEntityId), It.IsAny<string>()))
                 .ReturnsAsync(GetMockTrainingDates());
 
             var result = await controller.PostApprenticeshipTraining(routeModel, apprenticeshipTrainingFormModel);
@@ -404,6 +405,34 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                     c.TrainingDate.Equals(trainingDateModel) &&
                     c.UkPrn.Equals(routeModel.UkPrn)),
                 It.IsAny<CancellationToken>()));
+        }
+
+        [Test, AutoData]
+        public async Task And_Provider_Selects_Past_Date_For_Apprenticeship_Unit_Course_Then_Returns_Validation_Error(
+            ReservationsRouteModel routeModel,
+            ApprenticeshipTrainingFormModel formModel)
+        {
+            routeModel.UkPrn = 12345;
+            var firstDayOfCurrentMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+            var pastStartDate = firstDayOfCurrentMonth.AddMonths(-1);
+            var trainingDateModel = new TrainingDateModel { StartDate = pastStartDate, EndDate = pastStartDate.AddMonths(1) };
+            formModel.StartDate = JsonConvert.SerializeObject(trainingDateModel);
+            formModel.SelectedCourseId = "STD-123";
+            formModel.AccountLegalEntityPublicHashedId = _cachedReservationResult.AccountLegalEntityPublicHashedId;
+
+            var apprenticeshipUnitCourse = new Course("STD-123", "Apprenticeship Unit Course", 4) { AllowPreviousDate = false };
+            _mediator.Setup(m => m.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetCoursesResult { Courses = new List<Course> { apprenticeshipUnitCourse } });
+
+            var result = await _controller.PostApprenticeshipTraining(routeModel, formModel);
+
+            var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+            viewResult.ViewName.Should().Be("ApprenticeshipTraining");
+            viewResult.ViewData.ModelState.Keys.Should().Contain("StartDate");
+            viewResult.ViewData.ModelState["StartDate"].Errors.Should().Contain(e =>
+                e.ErrorMessage == "You cannot select a start date in the past for this apprenticeship type.");
+            _mediator.Verify(mediator => mediator.Send(It.IsAny<CacheReservationCourseCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mediator.Verify(mediator => mediator.Send(It.IsAny<CacheReservationStartDateCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test, MoqAutoData]

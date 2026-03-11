@@ -3,22 +3,14 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses
+namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCourses;
+
+public class GetCoursesQueryHandler(ICourseService service) : IRequestHandler<GetCoursesQuery, GetCoursesResult>
 {
-    public class GetCoursesQueryHandler : IRequestHandler<GetCoursesQuery, GetCoursesResult>
+    public async Task<GetCoursesResult> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
     {
-        private readonly ICourseService _service;
-
-        public GetCoursesQueryHandler(ICourseService service)
-        {
-            _service = service;
-        }
-
-        public async Task<GetCoursesResult> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
-        {
-            var courses = await _service.GetCourses();
+        var courses = await service.GetCourses();
             
-            return new GetCoursesResult {Courses = courses};
-        }
+        return new GetCoursesResult {Courses = courses};
     }
 }

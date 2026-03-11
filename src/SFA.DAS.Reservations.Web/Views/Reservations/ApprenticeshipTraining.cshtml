@@ -1,4 +1,4 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+@using SFA.DAS.Reservations.Web.Extensions
 @model ApprenticeshipTrainingViewModel
 @{
     ViewData["Title"] = "Select apprenticeship training course start date";
@@ -112,10 +112,6 @@
                             </h2>
                         </legend>
 
-                        <div class="govuk-hint">
-                            Apprenticeship already started.
-                        </div>
-
                         @if (startDateInvalid)
                         {
                             var startDateModelState = @ViewData.ModelState["StartDate"];
@@ -128,15 +124,23 @@
                             }
                         }
 
-                        <div class="govuk-radios govuk-!-margin-bottom-6">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
-                                <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
-                                    @Model.PastStartDate.StartDate.GetGDSLongDateString()
-                                </label>
+                        @if (Model.PastStartDate != null)
+                        {
+                            <div id="past-start-date-block" class="govuk-!-margin-bottom-4">
+                                <div class="govuk-hint">
+                                    Apprenticeship already started.
+                                </div>
+                                <div class="govuk-radios govuk-!-margin-bottom-6">
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="StartDate-alreadyStarted" name="StartDate" type="radio" value="@Model.PastStartDate.SerializedModel" checked="@Model.PastStartDate.Checked">
+                                        <label class="govuk-label govuk-radios__label" for="StartDate-alreadyStarted">
+                                            @Model.PastStartDate.StartDate.GetGDSLongDateString()
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        
+                        }
+
                         <div class="govuk-hint">
                             Planned start date of the apprenticeship.
                         </div>
@@ -162,4 +166,36 @@
             </form>
         </div>
     </div>
+    @if (Model.IsProvider)
+    {
+        <script>
+            (function() {
+                var pastBlock = document.getElementById('past-start-date-block');
+                var select = document.getElementById('SelectedCourseId');
+                if (!select || !pastBlock) return;
+
+                var pastBlockOriginalContent = pastBlock.innerHTML;
+
+                function setPastBlockVisible(allowPreviousDate) {
+                    if (allowPreviousDate) {
+                        pastBlock.innerHTML = pastBlockOriginalContent;
+                        pastBlock.style.display = '';
+                    } else {
+                        pastBlock.innerHTML = '';
+                        pastBlock.style.display = 'none';
+                    }
+                }
+
+                function updateFromSelection() {
+                    console.log('Course select change triggered');
+                    var option = select.options[select.selectedIndex];
+                    var allow = option && option.getAttribute('data-allow-previous-date') === 'true';
+                    setPastBlockVisible(allow);
+                }
+
+                select.addEventListener('change', updateFromSelection);
+                updateFromSelection();
+            })();
+        </script>
+    }
 </main>

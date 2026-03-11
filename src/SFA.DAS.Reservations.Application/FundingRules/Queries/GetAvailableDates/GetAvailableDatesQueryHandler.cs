@@ -1,27 +1,20 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Interfaces;
 
-namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates
+namespace SFA.DAS.Reservations.Application.FundingRules.Queries.GetAvailableDates;
+
+public class GetAvailableDatesQueryHandler(IReservationsOuterService reservationOuterService)
+    : IRequestHandler<GetAvailableDatesQuery, GetAvailableDatesResult>
 {
-    public class GetAvailableDatesQueryHandler : IRequestHandler<GetAvailableDatesQuery, GetAvailableDatesResult>
+    public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
     {
-        private readonly IReservationsOuterService _reservationOuterService;
+        var availableDates = await reservationOuterService.GetAvailableDates(request.AccountLegalEntityId, request.CourseId);
 
-        public GetAvailableDatesQueryHandler(IReservationsOuterService reservationOuterService)
+        return new GetAvailableDatesResult
         {
-            _reservationOuterService = reservationOuterService;
-        }
-
-        public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
-        {
-            var availableDates = await _reservationOuterService.GetAvailableDates(request.AccountLegalEntityId);
-
-            return new GetAvailableDatesResult
-            {
-                AvailableDates = availableDates.AvailableDates
-            };
-        }
+            AvailableDates = availableDates.AvailableDates
+        };
     }
 }

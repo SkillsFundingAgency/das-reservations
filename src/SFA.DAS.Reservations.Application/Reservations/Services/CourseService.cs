@@ -9,66 +9,60 @@ using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
-namespace SFA.DAS.Reservations.Application.Reservations.Services
+namespace SFA.DAS.Reservations.Application.Reservations.Services;
+
+public class CourseService(
+    IApiClient apiClient,
+    IOptions<ReservationsApiConfiguration> options,
+    ICacheStorageService cacheService)
+    : ICourseService
 {
-    public class CourseService : ICourseService
+    private readonly ReservationsApiConfiguration _options = options.Value;
+
+    public async Task<ICollection<Course>> GetCourses()
     {
-        private readonly IApiClient _apiClient;
-        private readonly ReservationsApiConfiguration _options;
-        private readonly ICacheStorageService _cacheService;
+        var coursesLookUp = await GetCachedLookup();
 
-        public CourseService(IApiClient apiClient, IOptions<ReservationsApiConfiguration> options, ICacheStorageService cacheService)
+        return coursesLookUp.Values;
+    }
+
+    public async Task<Course> GetCourse(string id)
+    {
+        var coursesLookUp = await GetCachedLookup();
+
+        if (!coursesLookUp.TryGetValue(id, out var course))
         {
-            _apiClient = apiClient;
-            _options = options.Value;
-            _cacheService = cacheService;
+            throw new CourseNotFoundException(id);
         }
 
-        public async Task<ICollection<Course>> GetCourses()
-        {
-            var coursesLookUp = await GetCachedLookup();
+        return course;
+    }
 
-            return coursesLookUp.Values;
-        }
+    public async Task<bool> CourseExists(string id)
+    {
+        var coursesLookUp = await GetCachedLookup();
 
-        public async Task<Course> GetCourse(string id)
-        {
-            var coursesLookUp = await GetCachedLookup();
+        return coursesLookUp.ContainsKey(id);
+    }
 
-            if (!coursesLookUp.TryGetValue(id, out var course))
-            {
-                throw new CourseNotFoundException(id);
-            }
+    private async Task<IDictionary<string, Course>> GetCachedLookup()
+    {
+        var lookup = await cacheService.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)) ?? await CacheCoursesFromApi();
+        return lookup;
+    }
 
-            return course;
-        }
+    private async Task<IDictionary<string, Course>> CacheCoursesFromApi()
+    {
+        var apiRequest = new GetCoursesApiRequest(_options.Url);
 
-        public async Task<bool> CourseExists(string id)
-        {
-            var coursesLookUp = await GetCachedLookup();
+        var result = await apiClient.Get<GetCoursesApiResponse>(apiRequest);
 
-            return coursesLookUp.ContainsKey(id);
-        }
+        var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
 
-        private async Task<IDictionary<string, Course>> GetCachedLookup()
-        {
-            var lookup = await _cacheService.RetrieveFromCache<IDictionary<string, Course>>(nameof(CourseService)) ?? await CacheCoursesFromApi();
-            return lookup;
-        }
-
-        private async Task<IDictionary<string, Course>> CacheCoursesFromApi()
-        {
-            var apiRequest = new GetCoursesApiRequest(_options.Url);
-
-            var result = await _apiClient.Get<GetCoursesApiResponse>(apiRequest);
-
-            var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
-
-            await _cacheService.SaveToCache(nameof(CourseService), coursesLookUp, 24);
+        await cacheService.SaveToCache(nameof(CourseService), coursesLookUp, 24);
            
-            return coursesLookUp;
-        }
+        return coursesLookUp;
+    }
 
        
-    }
 }
