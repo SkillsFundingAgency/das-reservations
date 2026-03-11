@@ -171,8 +171,9 @@
         <script>
             (function() {
                 var pastBlock = document.getElementById('past-start-date-block');
-                var select = document.getElementById('SelectedCourseId');
+                var select = document.getElementById('SelectedCourseId-select') || document.getElementById('SelectedCourseId');
                 if (!select || !pastBlock) return;
+                if (!select.options) return;
 
                 var pastBlockOriginalContent = pastBlock.innerHTML;
 
@@ -187,13 +188,15 @@
                 }
 
                 function updateFromSelection() {
-                    console.log('Course select change triggered');
                     var option = select.options[select.selectedIndex];
                     var allow = option && option.getAttribute('data-allow-previous-date') === 'true';
                     setPastBlockVisible(allow);
                 }
 
                 select.addEventListener('change', updateFromSelection);
+                document.addEventListener('courseSelectionConfirmed', function(e) {
+                    setPastBlockVisible(e.detail.allowPreviousDate);
+                });
                 updateFromSelection();
             })();
         </script>

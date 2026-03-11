@@ -27,6 +27,9 @@ if (selectEl) {
             if (this.selectElement.id === idSelectField) {
                 this.selectElement.dispatchEvent(new Event('change', { bubbles: true }));
             }
+            var selectedOption = requestedOption || this.selectElement.options[this.selectElement.selectedIndex];
+            var allowPreviousDate = selectedOption && selectedOption.getAttribute('data-allow-previous-date') === 'true';
+            document.dispatchEvent(new CustomEvent('courseSelectionConfirmed', { detail: { allowPreviousDate: allowPreviousDate } }));
         }
       
     });
