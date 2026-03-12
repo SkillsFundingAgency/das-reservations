@@ -20,20 +20,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
     public class WhenCallingPostDelete
     {
         [Test, MoqAutoData]
-        public async Task And_Delete_Invalid_And_Has_Ukprn_Then_Shows_Provider_Delete_View_Again(
-            ReservationsRouteModel routeModel,
-            DeleteViewModel viewModel,
-            [NoAutoProperties] ManageReservationsController controller)
-        {
-            controller.ModelState.AddModelError("key", "error message");
-
-            var result = await controller.PostDelete(routeModel, viewModel) as ViewResult;
-
-            result.ViewName.Should().Be(ViewNames.ProviderDelete);
-            result.Model.Should().Be(viewModel);
-        }
-
-        [Test, MoqAutoData]
         public async Task And_Delete_Invalid_And_No_Ukprn_Then_Shows_Employer_Delete_View_Again(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
@@ -54,9 +40,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             DeleteViewModel viewModel,
             [NoAutoProperties] ManageReservationsController controller)
         {
-            viewModel.Delete = true;
             routeModel.Id = null;
-
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderManage);
@@ -85,7 +69,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] ManageReservationsController controller)
         {
-            viewModel.Delete = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
                 .Throws(validationException);
@@ -122,7 +105,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] ManageReservationsController controller)
         {
-            viewModel.Delete = true;
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
                 .Throws(exception);
@@ -142,6 +124,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         {
             routeModel.UkPrn = null;
             viewModel.Delete = true;
+
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<DeleteReservationCommand>(), It.IsAny<CancellationToken>()))
                 .Throws(exception);
@@ -158,8 +141,6 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
             [Frozen] Mock<IMediator> mockMediator,
             [NoAutoProperties] ManageReservationsController controller)
         {
-            viewModel.Delete = true;
-
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
             result.RouteName.Should().Be(RouteNames.ProviderDeleteCompleted);
@@ -189,24 +170,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Manage
         }
 
         [Test, MoqAutoData]
-        public async Task And_Delete_False_And_Has_Ukprn_Then_Redirects_To_Provider_Manage_Route(
+        public async Task And_Delet_Has_Ukprn_Then_Redirects_To_Provider_Delete_Completed_Route(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
             [NoAutoProperties] ManageReservationsController controller)
         {
             routeModel.IsFromManage = null;
             routeModel.UkPrn = 12345;
-            viewModel.Delete = false;
 
             var result = await controller.PostDelete(routeModel, viewModel) as RedirectToRouteResult;
 
-            result.RouteName.Should().Be(RouteNames.ProviderManage);
-            result.RouteValues.Should().ContainKey("IsFromManage");
-            result.RouteValues["IsFromManage"].Should().Be(true);
+            result.RouteName.Should().Be(RouteNames.ProviderDeleteCompleted);
         }
 
         [Test, MoqAutoData]
-        public async Task And_Delete_False_And_No_Ukprn_Then_Redirects_To_Employer_Manage_Route(
+        public async Task And_Delete_And_No_Ukprn_Then_Redirects_To_Employer_Manage_Route(
             ReservationsRouteModel routeModel,
             DeleteViewModel viewModel,
             [NoAutoProperties] ManageReservationsController controller)

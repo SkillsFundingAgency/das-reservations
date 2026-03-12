@@ -39,6 +39,15 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
+        public void Then_Sets_ApprenticeshipType(
+            GetReservationResult getReservationResult)
+        {
+            var viewModel = new DeleteViewModel(getReservationResult);
+
+            viewModel.LearningType.Should().Be(getReservationResult.Course.LearningType);
+        }
+
+        [Test, AutoData]
         public void And_Course_Null_Then_Sets_CourseDescription_Null(
             GetReservationResult getReservationResult)
         {
@@ -62,6 +71,17 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var viewModel = new DeleteViewModel(getReservationResult);
 
             viewModel.StartDateDescription.Should().Be(expectedDateDescription);
+        }
+
+        [Test, AutoData]
+        public void And_Course_Null_Then_Sets_ApprenticeshipType_Null(
+           GetReservationResult getReservationResult)
+        {
+            getReservationResult.Course = null;
+
+            var viewModel = new DeleteViewModel(getReservationResult);
+
+            viewModel.LearningType.Should().BeNull();
         }
     }
 }

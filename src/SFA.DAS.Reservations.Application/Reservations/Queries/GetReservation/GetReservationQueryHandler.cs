@@ -57,7 +57,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation
                 Course = result.Course ?? new Course(null,null,0),
                 AccountLegalEntityId = result.AccountLegalEntityId,
                 AccountLegalEntityName = result.AccountLegalEntityName,
-                UkPrn = result.ProviderId
+                UkPrn = result.ProviderId,
+                StandardApprenticeshipType = result.Course?.LearningType ?? default,
             };
         }
     }

@@ -1,5 +1,5 @@
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.Reservations.Domain.Courses
 {
@@ -31,4 +31,3 @@ namespace SFA.DAS.Reservations.Domain.Courses
         public string LearningType { get; }
     }
 }
-
