@@ -13,23 +13,26 @@ if (selectEl) {
         placeholder: 'Start typing to search apprenticeships',
         onConfirm: function (opt) {
             var txtInput = document.querySelector('#' + idSelectField);
-            var searchString = opt || txtInput.value;
-            var requestedOption = [].filter.call(this.selectElement.options,
-                function (option) {
-                    return (option.textContent || option.innerText) === searchString
-                }
-            )[0];
+            var searchString = (opt || (txtInput && txtInput.value) || '').trim();
+            var options = this.selectElement.options;
+            var requestedOption = [].filter.call(options, function (option) {
+                var text = (option.textContent || option.innerText || '').trim();
+                return text === searchString;
+            })[0];
+            if (!requestedOption && searchString.length > 0) {
+                requestedOption = [].filter.call(options, function (option) {
+                    return option.value === searchString;
+                })[0];
+            }
             if (requestedOption) {
                 requestedOption.selected = true;
             } else {
                 this.selectElement.selectedIndex = 0;
             }
-            if (this.selectElement.id === idSelectField) {
-                this.selectElement.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            var selectedOption = requestedOption || this.selectElement.options[this.selectElement.selectedIndex];
+            this.selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+            var selectedOption = options[this.selectElement.selectedIndex];
             var allowPreviousDate = selectedOption && selectedOption.getAttribute('data-allow-previous-date') === 'true';
-            document.dispatchEvent(new CustomEvent('courseSelectionConfirmed', { detail: { allowPreviousDate: allowPreviousDate } }));
+            document.dispatchEvent(new CustomEvent('courseSelectionConfirmed', { detail: { allowPreviousDate: !!allowPreviousDate } }));
         }
       
     });

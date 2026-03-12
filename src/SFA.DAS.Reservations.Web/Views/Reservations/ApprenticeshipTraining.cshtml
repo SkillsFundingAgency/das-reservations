@@ -195,7 +195,8 @@
 
                 select.addEventListener('change', updateFromSelection);
                 document.addEventListener('courseSelectionConfirmed', function(e) {
-                    setPastBlockVisible(e.detail.allowPreviousDate);
+                    var allow = e.detail && e.detail.allowPreviousDate === true;
+                    setPastBlockVisible(allow);
                 });
                 updateFromSelection();
             })();
