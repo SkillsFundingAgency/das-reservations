@@ -169,7 +169,7 @@
     @if (Model.IsProvider)
     {
         <script>
-            (function() {
+            document.addEventListener('DOMContentLoaded', function() {
                 var pastBlock = document.getElementById('past-start-date-block');
                 var select = document.getElementById('SelectedCourseId-select') || document.getElementById('SelectedCourseId');
                 if (!select || !pastBlock) return;
@@ -199,7 +199,7 @@
                     setPastBlockVisible(allow);
                 });
                 updateFromSelection();
-            })();
+            });
         </script>
     }
 </main>

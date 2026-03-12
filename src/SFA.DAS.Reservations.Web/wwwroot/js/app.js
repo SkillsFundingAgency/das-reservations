@@ -12,23 +12,32 @@ if (selectEl) {
         displayMenu: 'overlay',
         placeholder: 'Start typing to search apprenticeships',
         onConfirm: function (opt) {
-            var txtInput = document.querySelector('#' + idSelectField);
-            var searchString = (opt || (txtInput && txtInput.value) || '').trim();
             var options = this.selectElement.options;
-            var requestedOption = [].filter.call(options, function (option) {
-                var text = (option.textContent || option.innerText || '').trim();
-                return text === searchString;
-            })[0];
-            if (!requestedOption && searchString.length > 0) {
-                requestedOption = [].filter.call(options, function (option) {
-                    return option.value === searchString;
-                })[0];
-            }
-            if (requestedOption) {
+            var requestedOption = null;
+            var searchString = '';
+
+            if (opt && typeof opt === 'object' && opt.nodeName === 'OPTION') {
+                requestedOption = opt;
                 requestedOption.selected = true;
             } else {
-                this.selectElement.selectedIndex = 0;
+                var txtInput = document.querySelector('#' + idSelectField);
+                searchString = (typeof opt === 'string' ? opt : (txtInput && txtInput.value) || '').trim().replace(/\s+/g, ' ');
+                requestedOption = [].filter.call(options, function (option) {
+                    var text = (option.textContent || option.innerText || '').trim().replace(/\s+/g, ' ');
+                    return text === searchString;
+                })[0];
+                if (!requestedOption && searchString.length > 0) {
+                    requestedOption = [].filter.call(options, function (option) {
+                        return option.value === searchString;
+                    })[0];
+                }
+                if (requestedOption) {
+                    requestedOption.selected = true;
+                } else {
+                    this.selectElement.selectedIndex = 0;
+                }
             }
+
             this.selectElement.dispatchEvent(new Event('change', { bubbles: true }));
             var selectedOption = options[this.selectElement.selectedIndex];
             var allowPreviousDate = selectedOption && selectedOption.getAttribute('data-allow-previous-date') === 'true';
