@@ -1,4 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Courses;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
@@ -15,5 +18,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public Course Course { get; set; }
         public ReservationStatus Status { get; set; }
         public uint? ProviderId { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        LearningType? LearningType { get; set; }
     }
 }
