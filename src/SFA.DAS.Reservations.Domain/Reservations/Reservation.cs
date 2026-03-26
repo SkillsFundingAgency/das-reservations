@@ -19,6 +19,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public ReservationStatus Status { get; set; }
         public uint? ProviderId { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        LearningType? LearningType { get; set; }
+        public LearningType? LearningType { get; set; }
     }
 }

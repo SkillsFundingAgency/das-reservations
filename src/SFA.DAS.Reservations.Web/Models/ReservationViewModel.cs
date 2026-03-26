@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReservationViewModel : AddApprenticeViewModel
     {
-        public ReservationViewModel(Reservation reservation, string apprenticeUrl, uint? loggedInProviderId, LearningType? learningType) : base(apprenticeUrl)
+        public ReservationViewModel(Reservation reservation, string apprenticeUrl, uint? loggedInProviderId) : base(apprenticeUrl)
         {
             Id = reservation.Id;
             TrainingDate = new TrainingDateModel
@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Status = (ReservationStatusViewModel)reservation.Status;
             IsExpired = reservation.IsExpired;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
-            TrainingType = ConvertToDesc(learningType);
+            TrainingType = ConvertToDesc(reservation.LearningType);
             LegalEntityName = reservation.AccountLegalEntityName;
             CanProviderDeleteReservation = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
             DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
