@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Status = (ReservationStatusViewModel)reservation.Status;
             IsExpired = reservation.IsExpired;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
-            TrainingType = ConvertToDesc(reservation.LearningType);
+            TrainingType = reservation.Course?.LearningType;
             LegalEntityName = reservation.AccountLegalEntityName;
             CanProviderDeleteReservation = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
             DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
