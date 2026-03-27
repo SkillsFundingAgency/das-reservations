@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Web.Models
                 LearningType.Apprenticeship => "Apprenticeship",
                 LearningType.FoundationApprenticeship => "Foundation apprenticeship",
                 LearningType.ApprenticeshipUnit => "Apprenticeship unit",
-                _ => "Apprenticeship"
+                _ => "Apprenticeship*"
             };
         }
 
