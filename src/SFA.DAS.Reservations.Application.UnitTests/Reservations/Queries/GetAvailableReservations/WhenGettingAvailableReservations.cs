@@ -8,6 +8,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableReservations;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -66,6 +67,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
             {
                 reservation.Status = ReservationStatus.Pending;
                 reservation.IsExpired = false;
+                reservation.Course = new Course("1", "title", 1, LearningType.Apprenticeship);
             });
             mockService
                 .Setup(client => client.GetReservations(accountId))
@@ -87,8 +89,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Queries.GetAva
             var query = new GetAvailableReservationsQuery { AccountId = accountId };
             validationResult.ValidationDictionary.Clear();
 
-            serviceReservations[0].Course = new Course("1", "Title", 3, "ApprenticeshipUnit");
-            serviceReservations[1].Course = new Course("2", "Title", 3, "ApprenticeshipUnit");
+            serviceReservations[0].Course = new Course("1", "Title", 3, LearningType.ApprenticeshipUnit);
+            serviceReservations[1].Course = new Course("2", "Title", 3, LearningType.ApprenticeshipUnit);
             serviceReservations.ForEach(reservation =>
             {
                 reservation.Status = ReservationStatus.Pending;
