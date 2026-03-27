@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         }
 
         [Test, AutoData]
-        public void And_Course_Is_Null_Then_Sets_TrainingType_To_This(
+        public void And_Course_Is_Null_Then_Sets_TrainingType_To_Apprenticeship(
             Reservation reservation,
             string url,
             uint? loggedInProviderId)
@@ -81,11 +81,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
-            viewModel.TrainingType.Should().Be("Apprenticeship*");
+            viewModel.TrainingType.Should().Be("Apprenticeship");
         }
 
         [Test, AutoData]
-        public void And_LearningType_Not_Set_Defaults_To_This(
+        public void And_LearningType_Not_Set_Defaults_To_Apprenticeship(
             Reservation reservation,
             string url,
             uint? loggedInProviderId)
@@ -94,7 +94,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
             var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
-            viewModel.TrainingType.Should().Be("Apprenticeship*");
+            viewModel.TrainingType.Should().Be("Apprenticeship");
         }
 
         [Test, AutoData]

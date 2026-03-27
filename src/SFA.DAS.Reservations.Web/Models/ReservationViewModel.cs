@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             if (!learningType.HasValue)
             {
-                return "Apprenticeship*";
+                return LearningType.Apprenticeship.GetEnumDescription();
             }
             return learningType.Value.GetEnumDescription();
         }
