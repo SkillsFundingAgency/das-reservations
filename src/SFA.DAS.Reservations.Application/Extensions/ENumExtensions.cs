@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace SFA.DAS.Reservations.Application.Extensions;
 
-public static class ENumExtensions
+public static class EnumExtensions
 {
     public static T ToEnum<T>(this string value)
     {
