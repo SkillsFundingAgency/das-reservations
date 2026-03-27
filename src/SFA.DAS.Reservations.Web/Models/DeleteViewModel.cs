@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -34,6 +35,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public string StartDateDescription { get; set; }
         public string CourseDescription { get; set; }
         public string AccountLegalEntityName { get; set; }
-        public string LearningType { get; set; }
+        public LearningType? LearningType { get; set; }
     }
 }

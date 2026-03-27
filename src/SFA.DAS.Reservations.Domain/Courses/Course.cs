@@ -1,11 +1,12 @@
 using System;
 using Newtonsoft.Json;
+using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.Courses
 {
     public class Course
     {
-        public Course(string id, string title, int level, string learningType = null)
+        public Course(string id, string title, int level, LearningType? learningType = null)
         {
             Title = SetDefaultTitleIfEmpty(title);
             Id = id;
@@ -28,6 +29,6 @@ namespace SFA.DAS.Reservations.Domain.Courses
         {
             return string.IsNullOrEmpty(title) ? "Unknown" : title;
         }
-        public string LearningType { get; }
+        public LearningType? LearningType { get; }
     }
 }

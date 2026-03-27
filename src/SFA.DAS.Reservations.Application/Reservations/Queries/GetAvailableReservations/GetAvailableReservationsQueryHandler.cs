@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Services;
 using SFA.DAS.Reservations.Application.Validation;
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetAvailableRese
 
             if (!request.IncludeShortCourses)
             {
-                reservations = reservations.Where(r => r.Course.LearningType != "ApprenticeshipUnit");
+                reservations = reservations.Where(r => r.Course.LearningType != LearningType.ApprenticeshipUnit);
             }
 
             var result = new GetAvailableReservationsResult
