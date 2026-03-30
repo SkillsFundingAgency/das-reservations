@@ -32,6 +32,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations.Api
                     url.Append($"&selectedCourse={_request.Filter.SelectedCourse}");
                 if(!string.IsNullOrWhiteSpace(_request.Filter.SelectedStartDate)) 
                     url.Append($"&selectedStartDate={_request.Filter.SelectedStartDate}");
+                if (_request.Filter.SelectedLearningType.HasValue)
+                    url.Append($"&selectedLearningType={_request.Filter.SelectedLearningType}");
 
                 return url.ToString();
             }
