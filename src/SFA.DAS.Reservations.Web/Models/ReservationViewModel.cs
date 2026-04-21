@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -24,6 +25,7 @@ namespace SFA.DAS.Reservations.Web.Models
             DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
                 ? (loggedInProviderId == null ? RouteNames.EmployerDelete : RouteNames.ProviderDelete)
                 : string.Empty;
+            LearningType = reservation.Course?.LearningType;
         }
 
         public Guid Id { get; }
@@ -34,5 +36,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public TrainingDateModel TrainingDate { get; }
         public bool CanProviderDeleteReservation { get; }
         public string DeleteRouteName { get; }
+        public LearningType? LearningType { get; }
     }
 }
