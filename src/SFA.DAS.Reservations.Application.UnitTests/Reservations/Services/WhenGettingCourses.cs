@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Services
                         It.Is<IDictionary<string, Course>>(r => 
                             r.First().Key.Equals(_expectedApiCourses.First().Id) &&
                             r.Skip(1).First().Key.Equals(_expectedApiCourses.Skip(1).First().Id) &&
-                            r.Skip(2).First().Key.Equals(_expectedApiCourses.Skip(2).First().Id)), 24), Times.Once);
+                            r.Skip(2).First().Key.Equals(_expectedApiCourses.Skip(2).First().Id)), 1), Times.Once);
         }
 
         [Test]

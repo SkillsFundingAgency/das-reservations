@@ -59,7 +59,7 @@ public class CourseService(
 
         var coursesLookUp = result.Courses.ToDictionary(course => course.Id);
 
-        await cacheService.SaveToCache(nameof(CourseService), coursesLookUp, 24);
+        await cacheService.SaveToCache(nameof(CourseService), coursesLookUp, 1);
            
         return coursesLookUp;
     }
