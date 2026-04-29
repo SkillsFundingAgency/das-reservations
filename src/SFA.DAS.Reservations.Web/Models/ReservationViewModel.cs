@@ -27,13 +27,14 @@ namespace SFA.DAS.Reservations.Web.Models
             DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
                 ? (loggedInProviderId == null ? RouteNames.EmployerDelete : RouteNames.ProviderDelete)
                 : string.Empty;
+            LearningType = reservation.Course?.LearningType;
         }
 
         private string ConvertToTrainingTypeDescription(LearningType? learningType)
         {
             if (!learningType.HasValue)
             {
-                return LearningType.Apprenticeship.GetEnumDescription();
+                return Common.Domain.Types.LearningType.Apprenticeship.GetEnumDescription();
             }
             return learningType.Value.GetEnumDescription();
         }
@@ -46,5 +47,6 @@ namespace SFA.DAS.Reservations.Web.Models
         public TrainingDateModel TrainingDate { get; }
         public bool CanProviderDeleteReservation { get; }
         public string DeleteRouteName { get; }
+        public LearningType? LearningType { get; }
     }
 }

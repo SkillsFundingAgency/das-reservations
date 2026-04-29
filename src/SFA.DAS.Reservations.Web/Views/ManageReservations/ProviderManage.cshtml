@@ -1,4 +1,5 @@
-﻿@using SFA.DAS.Reservations.Web.Extensions
+﻿@using SFA.DAS.Reservations.Application.Extensions
+@using SFA.DAS.Reservations.Web.Extensions
 @model ManageViewModel
 @{
     ViewData["Title"] = "Manage existing funding reservations or create new reservations";
@@ -15,7 +16,7 @@
                 <div class="govuk-grid-column-two-thirds">
                     <h1 class="govuk-heading-xl">Funding for non-levy employers</h1>
                     <h2 class="govuk-heading-m">None of your employers have any funding to use.</h2>
-                    <p class="govuk-body">You need to reserve funding in order to add a new apprentice.</p>
+                    <p class="govuk-body">You need to reserve funding in order to add a new learner.</p>
                     <a asp-route="@RouteNames.ProviderIndex" asp-route-ukPrn="@Model.UkPrn" asp-route-isFromManage="true" role="button" tabindex="1" draggable="false" class="govuk-button">Reserve funding</a>
                 </div>
             </div>
@@ -134,8 +135,9 @@ else
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row" data-position="top">
                             <th class="govuk-table__header" scope="col">Employer</th>
-                            <th class="govuk-table__header" scope="col">Apprenticeship training</th>
-                            <th class="govuk-table__header" scope="col">Apprenticeship start date</th>
+                            <th class="govuk-table__header" scope="col">Training course</th>
+                            <th class="govuk-table__header" scope="col">Training type</th>
+                            <th class="govuk-table__header" scope="col">Start date</th>
                             <th class="govuk-table__header" scope="col"></th>
                             <th class="govuk-table__header" scope="col"></th>
                         </tr>
@@ -147,35 +149,38 @@ else
                             <tr class="govuk-table__row">
                                 <th class="govuk-table__header" data-label="Employer" scope="row">
                                     @reservation.LegalEntityName
-                                    <br />
-                                    @if (!reservation.IsExpired && reservation.Status != ReservationStatusViewModel.Pending)
-                                    {
-                                        <strong class="govuk-tag govuk-tag--inactive">used</strong>
-                                    }
                                 </th>
-                                <td class="govuk-table__cell" data-label="Apprenticeship training course">@reservation.CourseName</td>
+                                <td class="govuk-table__cell" data-label="Training course">@reservation.CourseName</td>
+                                <td class="govuk-table__cell" data-label="Training type">@reservation.LearningType?.GetEnumDescription()</td>
                                 <td class="govuk-table__cell no-wrap" data-label="Start date">
                                     <span class="das-no-wrap">
                                         @reservation.TrainingDate.GetGDSDateString()
                                     </span><br />
 
-                                    @if (reservation.IsExpired)
-                                    {
-                                        <strong class="govuk-tag govuk-tag--inactive">expired</strong>
-                                    }
+                                    
                                 </td>
                                 @if (!reservation.IsExpired && reservation.Status == ReservationStatusViewModel.Pending)
                                 {
                                     <td class="govuk-table__cell">
                                         <span class="das-no-wrap">
-                                            <a href="@reservation.ApprenticeUrl" class="govuk-link">Add apprentice</a>
+                                            <a href="@reservation.ApprenticeUrl" class="govuk-link">Add learner</a>
                                         </span>
-                                    </td>
-                                    <td class="govuk-table__cell">
                                         @if (reservation.CanProviderDeleteReservation)
                                         {
                                             <a asp-route="@reservation.DeleteRouteName" asp-route-ukPrn="@Model.UkPrn" asp-route-id="@reservation.Id" class="govuk-link">Delete</a>
                                         }
+                                    </td>
+                                }
+                                else if (!reservation.IsExpired && reservation.Status != ReservationStatusViewModel.Pending)
+                                {
+                                    <td class="govuk-table__cell">
+                                        <strong class="govuk-tag govuk-tag--inactive">USED</strong>
+                                    </td>
+                                }
+                                else if (reservation.IsExpired)
+                                {
+                                    <td class="govuk-table__cell">
+                                        <strong class="govuk-tag govuk-tag--inactive">EXPIRED</strong>
                                     </td>
                                 }
                                 else
