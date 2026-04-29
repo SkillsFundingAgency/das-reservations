@@ -1,5 +1,6 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
@@ -20,6 +21,7 @@ namespace SFA.DAS.Reservations.Web.Models
             Status = (ReservationStatusViewModel)reservation.Status;
             IsExpired = reservation.IsExpired;
             CourseName = reservation.Course != null ? reservation.Course.CourseDescription : "Unknown";
+            TrainingType = ConvertToTrainingTypeDescription(reservation.Course?.LearningType);
             LegalEntityName = reservation.AccountLegalEntityName;
             CanProviderDeleteReservation = !loggedInProviderId.HasValue || loggedInProviderId == reservation.ProviderId;
             DeleteRouteName = (ReservationStatusViewModel) reservation.Status == ReservationStatusViewModel.Pending && !reservation.IsExpired
@@ -28,11 +30,20 @@ namespace SFA.DAS.Reservations.Web.Models
             LearningType = reservation.Course?.LearningType;
         }
 
+        private string ConvertToTrainingTypeDescription(LearningType? learningType)
+        {
+            if (!learningType.HasValue)
+            {
+                return Common.Domain.Types.LearningType.Apprenticeship.GetEnumDescription();
+            }
+            return learningType.Value.GetEnumDescription();
+        }
         public Guid Id { get; }
         public ReservationStatusViewModel Status { get; }
         public bool IsExpired { get; set; }
         public string LegalEntityName { get; }
         public string CourseName { get; }
+        public string TrainingType { get; }
         public TrainingDateModel TrainingDate { get; }
         public bool CanProviderDeleteReservation { get; }
         public string DeleteRouteName { get; }
