@@ -23,7 +23,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                                           $"&searchTerm={filter.Filter.SearchTerm}" +
                                           $"&selectedEmployer={filter.Filter.SelectedEmployer}" +
                                           $"&selectedCourse={filter.Filter.SelectedCourse}" +
-                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}");
+                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}" +
+                                          $"&selectedLearningType={filter.Filter.SelectedLearningType}");
         }
 
         [Test, AutoData]
@@ -41,7 +42,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                                           $"&pageItemCount={filter.Filter.PageSize}" +
                                           $"&selectedEmployer={filter.Filter.SelectedEmployer}" +
                                           $"&selectedCourse={filter.Filter.SelectedCourse}" +
-                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}");
+                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}" +
+                                          $"&selectedLearningType={filter.Filter.SelectedLearningType}");
         }
 
         [Test, AutoData]
@@ -59,7 +61,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                                           $"&pageItemCount={filter.Filter.PageSize}" +
                                           $"&searchTerm={filter.Filter.SearchTerm}" +
                                           $"&selectedCourse={filter.Filter.SelectedCourse}" +
-                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}");
+                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}" +
+                                          $"&selectedLearningType={filter.Filter.SelectedLearningType}");
         }
 
         [Test, AutoData]
@@ -77,7 +80,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                                           $"&pageItemCount={filter.Filter.PageSize}" +
                                           $"&searchTerm={filter.Filter.SearchTerm}" +
                                           $"&selectedEmployer={filter.Filter.SelectedEmployer}" +
-                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}");
+                                          $"&selectedStartDate={filter.Filter.SelectedStartDate}" +
+                                          $"&selectedLearningType={filter.Filter.SelectedLearningType}");
         }
 
         [Test, AutoData]
@@ -95,7 +99,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
                                           $"&pageItemCount={filter.Filter.PageSize}" +
                                           $"&searchTerm={filter.Filter.SearchTerm}" +
                                           $"&selectedEmployer={filter.Filter.SelectedEmployer}" +
-                                          $"&selectedCourse={filter.Filter.SelectedCourse}");
+                                          $"&selectedCourse={filter.Filter.SelectedCourse}" +
+                                          $"&selectedLearningType={filter.Filter.SelectedLearningType}");
         }
 
         [Test, AutoData]
@@ -107,6 +112,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ReservationsApi
             filter.Filter.SelectedEmployer = null;
             filter.Filter.SelectedCourse = null;
             filter.Filter.SelectedStartDate = null;
+            filter.Filter.SelectedLearningType = null;
 
             var request = new SearchReservationsApiRequest(url, filter);
 

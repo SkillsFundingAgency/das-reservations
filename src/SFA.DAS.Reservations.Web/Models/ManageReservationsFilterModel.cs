@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
@@ -15,8 +18,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string SelectedEmployer { get; set; }
         public string SelectedCourse { get; set; }
         public string SelectedStartDate { get; set; }
-
-
+        public LearningType? SelectedLearningType { get; set; }
     }
 
     public class ManageReservationsFilterModel : ManageReservationsFilterModelBase
@@ -24,6 +26,8 @@ namespace SFA.DAS.Reservations.Web.Models
 		public IEnumerable<string> EmployerFilters { get; set; } = new List<string>();
         public IEnumerable<string> CourseFilters { get; set; } = new List<string>();
         public IEnumerable<string> StartDateFilters { get; set; } = new List<string>();
+        public IEnumerable<SelectListItem> LearningTypeFilters { get; set; } = new List<SelectListItem>();
+
         public const int PageSize = ReservationsWebConfigurationConstants.NumberOfReservationsPerSearchPage;
         public int PagedRecordsFrom => NumberOfRecordsFound == 0 ? 0 : (PageNumber - 1) * PageSize + 1;
         public int PagedRecordsTo {
@@ -92,7 +96,8 @@ namespace SFA.DAS.Reservations.Web.Models
         public bool SearchOrFiltersApplied => !string.IsNullOrWhiteSpace(SearchTerm)
                                      || !string.IsNullOrWhiteSpace(SelectedEmployer)
                                      || !string.IsNullOrWhiteSpace(SelectedCourse)
-                                     || !string.IsNullOrWhiteSpace(SelectedStartDate);
+                                     || !string.IsNullOrWhiteSpace(SelectedStartDate)
+                                     || SelectedLearningType.HasValue;
 
         public HtmlString FiltersUsedMessage
         {
@@ -103,6 +108,7 @@ namespace SFA.DAS.Reservations.Web.Models
                 if (!string.IsNullOrWhiteSpace(SelectedEmployer)) filters.Add(SelectedEmployer);
                 if (!string.IsNullOrWhiteSpace(SelectedCourse)) filters.Add(SelectedCourse);
                 if (!string.IsNullOrWhiteSpace(SelectedStartDate)) filters.Add(SelectedStartDate);
+                if (SelectedLearningType.HasValue) filters.Add(SelectedLearningType.GetEnumDescription());
 
                 if (filters.Count == 0) return HtmlString.Empty;
 
@@ -137,7 +143,8 @@ namespace SFA.DAS.Reservations.Web.Models
                 PageSize = PageSize,
                 SelectedEmployer = source.SelectedEmployer,
                 SelectedCourse = source.SelectedCourse,
-                SelectedStartDate = source.SelectedStartDate
+                SelectedStartDate = source.SelectedStartDate,
+                SelectedLearningType = source.SelectedLearningType
             };
         }
 
@@ -163,6 +170,10 @@ namespace SFA.DAS.Reservations.Web.Models
             if (!string.IsNullOrWhiteSpace(SelectedStartDate))
             {
                 routeData.Add("selectedStartDate", SelectedStartDate);
+            }
+            if (SelectedLearningType.HasValue)
+            {
+                routeData.Add("selectedLearningType", SelectedLearningType.ToString());
             }
 
             routeData.Add("pageNumber", pageNumber.ToString());
