@@ -19,10 +19,10 @@
             
             <partial name="_PageErrorsOverview"/>
             
-            <h1 class="govuk-heading-xl">Confirm your reservation</h1>
+            <h1 class="govuk-heading-xl">Check details and reserve funding</h1>
 
             <p class=" govuk-body">
-                You are reserving funding to take on an apprentice.<br/>
+                You are reserving funding to take on a learner.<br/>
             </p>
 
             <div class="govuk-summary-list">
@@ -42,7 +42,7 @@
 
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship training start date
+                        Training start date
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.TrainingDate.GetGDSDateString()
@@ -78,12 +78,12 @@
                 <input type="hidden" asp-for="CourseDescription"/>
                 <div class="govuk-button-group">
                 <button type="submit" draggable="false" class="govuk-button">
-                    Confirm
+                        Yes, I’d like to reserve funding
                 </button>
 
                 <div class="govuk-body">
                     <a asp-route="@Model.BackLink" asp-route-employerAccountId="@employerAccountId" asp-route-id="@reservationId" class="govuk-link"
-                       id="cancel-request-link">Cancel</a>
+                       id="cancel-request-link">No, back to my account</a>
                 </div>
                 </div>
             </form>
