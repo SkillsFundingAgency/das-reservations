@@ -19,12 +19,12 @@
 
         <partial name="_pageErrorsOverview" />
 
-        <h1 class="govuk-heading-xl">Choose organisation</h1>
+            <h1 class="govuk-heading-xl">Select organisation</h1>
 
             <form method="post" asp-route="@RouteNames.EmployerSelectLegalEntity" asp-route-employerAccountId="@employerAccountId" class="validate-auto-complete">
             <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                 <span id="choose-apprenticeship-hint" class="govuk-hint">
-                    Which organisation is named on the contract with the training provider for the apprentices you'd like to add?
+                        Which organisation is named on the contract with the training provider for these learners?
                 </span>
                 <fieldset class="govuk-fieldset">
 
@@ -49,18 +49,6 @@
                 </fieldset>
             </div>
 
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        What is a contract for services?
-                    </span>
-                </summary>
-                <div class="govuk-details__text">
-                    <p>A contract for services is a formal agreement between a buyer and a supplier.</p>
-                    <p>In this case, the contract is between the organisation that's buying apprenticeship training for their apprentices and the training provider that's training the apprentices.</p>
-                    <p>If you're and employer-provider, for example, you won't need a contract for services as your organisation is both the buyer and the supplier.</p>
-                </div>
-            </details>
             <button type="submit" class="govuk-button">
                 Save and continue
             </button>
