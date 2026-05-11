@@ -72,7 +72,7 @@
 
             @if (Model.IsProvider)
             {
-                <h1 class="govuk-heading-xl">Apprenticeship training</h1>
+                <h1 class="govuk-heading-xl">What is the training course?</h1>
             }
             else
             {
@@ -108,7 +108,7 @@
             
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m  @(Model.IsProvider ? "" : "govuk-visually-hidden")">
                             <h2 class="govuk-fieldset__heading">
-                                When will the apprenticeship training start?
+                                When will the training start?
                             </h2>
                         </legend>
 
@@ -142,7 +142,7 @@
                         }
 
                         <div class="govuk-hint">
-                            Planned start date of the apprenticeship.
+                            Planned start month of the training.
                         </div>
 
                         @await Html.PartialAsync("_GlobalRuleInfo", Model.ActiveGlobalRule)
@@ -161,7 +161,7 @@
                     </fieldset>
                 </div>
                 <button type="submit" class="govuk-button">
-                    Save and continue
+                    Continue
                 </button>
             </form>
         </div>
