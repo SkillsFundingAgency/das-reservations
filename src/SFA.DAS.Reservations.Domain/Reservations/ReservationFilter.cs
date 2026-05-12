@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Reservations.Domain.Reservations
+﻿using SFA.DAS.Common.Domain.Types;
+
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class ReservationFilter
     {
@@ -8,5 +10,6 @@
         public string SelectedEmployer { get; set; }
         public string SelectedCourse { get; set; }
         public string SelectedStartDate { get; set; }
+        public LearningType? SelectedLearningType { get; set; }
     }
 }

@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.Shared.UI.Attributes;
 using SFA.DAS.Reservations.Application.Exceptions;
+using SFA.DAS.Reservations.Application.Extensions;
 using SFA.DAS.Reservations.Application.Reservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservations;
@@ -97,6 +101,7 @@ public class ManageReservationsController : Controller
                     filterModel.SelectedEmployer = storedSearch.SelectedEmployer;
                     filterModel.SelectedStartDate = storedSearch.SelectedStartDate;
                     filterModel.PageNumber = storedSearch.PageNumber;
+                    filterModel.SelectedLearningType = storedSearch.SelectedLearningType;
                 }
                 routeModel.IsFromManage = false;
             }
@@ -116,6 +121,13 @@ public class ManageReservationsController : Controller
             filterModel.EmployerFilters = searchResult.EmployerFilters;
             filterModel.CourseFilters = searchResult.CourseFilters;
             filterModel.StartDateFilters = searchResult.StartDateFilters;
+            filterModel.LearningTypeFilters = Enum.GetValues<LearningType>()
+                .Select(x => new SelectListItem
+                {
+                    Text = x.GetEnumDescription(),
+                    Value = ((byte)x).ToString()
+                })
+                .ToList();
 
             foreach (var reservation in searchResult.Reservations)
             {
@@ -142,7 +154,8 @@ public class ManageReservationsController : Controller
                 || filterModel.PageNumber != 1
                 || !string.IsNullOrEmpty(filterModel.SelectedCourse)
                 || !string.IsNullOrEmpty(filterModel.SelectedEmployer)
-                || !string.IsNullOrEmpty(filterModel.SelectedStartDate))
+                || !string.IsNullOrEmpty(filterModel.SelectedStartDate)
+                || filterModel.SelectedLearningType.HasValue)
             {
                 _sessionStorageService.Store(filterModel);
             }
