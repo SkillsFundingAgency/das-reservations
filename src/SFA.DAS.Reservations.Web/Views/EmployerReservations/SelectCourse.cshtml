@@ -1,6 +1,6 @@
 ﻿@model EmployerSelectCourseViewModel
 @{
-    ViewData["Title"] = "Select apprenticeship training course";
+    ViewData["Title"] = "Select training course";
 
     ViewBag.GaData.Vpv = "/accounts/reservations/select-course";
     string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
@@ -23,14 +23,10 @@ else
             <form method="post" asp-route="@Model.RouteName" class="validate-auto-complete">
                 <input asp-for="CohortReference" type="hidden" />
 
-                
-
-
-
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                            <h1 class="govuk-heading-xl">Do you know which apprenticeship training your apprentice will take?</h1>
+                            <h1 class="govuk-heading-xl">Do you know which training course your learner will take?</h1>
                         </legend>
                         
 
