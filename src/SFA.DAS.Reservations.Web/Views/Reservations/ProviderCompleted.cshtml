@@ -13,7 +13,7 @@
             
             <div class="govuk-panel govuk-panel--confirmation">
                 <h1 class="govuk-panel__title">
-                    You have successfully reserved funding for apprenticeship training
+                    You have reserved funding for training
                 </h1>
             </div>
             <div class="govuk-summary-list">
@@ -27,7 +27,7 @@
                 </dl>
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship start date
+                        Start date
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.TrainingDateDescription
@@ -35,10 +35,20 @@
                 </dl>
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship training
+                        Training course
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.CourseDescription
+                        <details class="govuk-details govuk-!-margin-top-1" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">
+                                    Can I change the course?
+                                </span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                You can change the course when adding the learner details.
+                            </div>
+                        </details>
                     </dd>
                 </dl>
             </div>
@@ -48,7 +58,7 @@
             </h2>
 
             <p>
-                You can change the apprenticeship training course when you add an apprentice.
+                You can change the training course when you add a learner.
             </p>
 
             <p>
@@ -60,11 +70,11 @@
                     the employer
                 </li>
                 <li>
-                    the apprenticeship start date, outside of the 3 month window you selected
+                    the training start date, outside of the 3 month window you selected
                 </li>
             </ul>
             <p>
-                To select a different employer or apprenticeship training start date, you will need to start a new funding reservation.
+                To select a different employer or training course start date, you will need to start a new funding reservation.
             </p>
 
             <form method="post" asp-route="@RouteNames.ProviderCompleted">
@@ -82,7 +92,7 @@
                 <div class="govuk-form-group @(ViewData.ModelState.IsValid ? "" : "govuk-form-group--error")">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                            What's next?
+                            What you can do next
                         </legend>
                         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("WhatsNext"))
                         {
@@ -100,7 +110,7 @@
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="WhatsNext-add" name="WhatsNext" type="radio" value="@CompletedReservationWhatsNext.AddAnApprentice">
                                 <label class="govuk-label govuk-radios__label" for="WhatsNext-add">
-                                    Add apprentice's details
+                                    Add Learner details
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
