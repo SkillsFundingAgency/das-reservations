@@ -12,14 +12,14 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
         private const string AccountLegalEntityPublicHashedId = "123RDF";
         private const string CourseDescription = "Course 1";
         private const bool ExpectedReserve = true;
-       
 
-        [TestCase(null)]
-        [TestCase((uint)1564564)]
-        public void Then_The_Model_Is_Constructed_With_Correct_Route_Names(uint? ukPrn)
+        [TestCase(null, null)]
+        [TestCase((uint)1564564, Common.Domain.Types.LearningType.ApprenticeshipUnit)]
+        [TestCase((uint)1564564, Common.Domain.Types.LearningType.Apprenticeship)]
+        public void Then_The_Model_Is_Constructed_With_Correct_Route_Names(uint? ukPrn, Common.Domain.Types.LearningType? learningType)
         {
             //Arrange
-            var startDate = new TrainingDateModel{StartDate = DateTime.Now};
+            var startDate = new TrainingDateModel { StartDate = DateTime.Now };
 
             var reservationsRouteModel = new ReservationsRouteModel
             {
@@ -29,20 +29,21 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 EmployerAccountId = "123FDS",
                 FromReview = true
             };
-            
+
             //Act
-            var actual = new ReviewViewModel(reservationsRouteModel, startDate,CourseDescription,AccountLegalEntityName,AccountLegalEntityPublicHashedId);
+            var actual = new ReviewViewModel(reservationsRouteModel, startDate, CourseDescription, AccountLegalEntityName, AccountLegalEntityPublicHashedId, learningType);
 
             //Assert
             AssertAllProperties(actual, ukPrn, startDate);
         }
 
-        [TestCase(null)]
-        [TestCase((uint)1564564)]
-        public void Then_The_Model_Is_Constructed_With_Correct_Route_Names_Using_Other_Constructor(uint? ukPrn)
+        [TestCase(null, null)]
+        [TestCase((uint)1564564, Common.Domain.Types.LearningType.ApprenticeshipUnit)]
+        [TestCase((uint)1564564, Common.Domain.Types.LearningType.Apprenticeship)]
+        public void Then_The_Model_Is_Constructed_With_Correct_Route_Names_Using_Other_Constructor(uint? ukPrn, Common.Domain.Types.LearningType? learningType)
         {
             //Arrange
-            var startDate = new TrainingDateModel{StartDate = DateTime.Now};
+            var startDate = new TrainingDateModel { StartDate = DateTime.Now };
 
             var reservationsRouteModel = new ReservationsRouteModel
             {
@@ -58,9 +59,10 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
                 AccountLegalEntityName = AccountLegalEntityName,
                 AccountLegalEntityPublicHashedId = AccountLegalEntityPublicHashedId,
                 CourseDescription = CourseDescription,
-                TrainingDate = startDate
+                TrainingDate = startDate,
+                LearningType = learningType,
             };
-            
+
             //Act
             var actual = new ReviewViewModel(reservationsRouteModel, postReviewViewModel);
 
@@ -70,7 +72,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
 
         private void AssertAllProperties(ReviewViewModel actual, uint? ukPrn, TrainingDateModel startDate)
         {
-            Assert.AreEqual(AccountLegalEntityName,actual.AccountLegalEntityName);
+            Assert.AreEqual(AccountLegalEntityName, actual.AccountLegalEntityName);
             Assert.AreEqual(AccountLegalEntityPublicHashedId, actual.AccountLegalEntityPublicHashedId);
             Assert.AreEqual(CourseDescription, actual.CourseDescription);
             if (ukPrn == null)

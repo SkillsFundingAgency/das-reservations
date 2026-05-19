@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReservation
@@ -18,5 +19,6 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
         public bool EmployerHasSingleLegalEntity  { get; set; }
         public bool IsEmptyCohortFromSelect { get; set; }
         public uint? UkPrn { get; set; }
+        public LearningType? TrainingType { get; set; }
     }
 }

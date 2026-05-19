@@ -27,12 +27,14 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Confirm your reservation</h1>
+            <h1 class="govuk-heading-xl">Check and confirm your reservation</h1>
 
             <p class="govuk-body">
-                You are reserving funding for a non-levy employer to take on an apprentice. <br />
+                You are reserving funding for a non-levy employer to take on a learner. <br />
             </p>
-
+            <p class="govuk-body">
+                This will be paid directly to the training provider, who the employer will confirm at a later date.
+                </p>
             <div class="govuk-summary-list">
 
                 <dl class="govuk-summary-list__row">
@@ -50,7 +52,7 @@
 
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship training start date
+                        Start date
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.TrainingDate.GetGDSDateString()
@@ -64,7 +66,7 @@
 
                 <dl class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
-                        Apprenticeship training
+                        Training course
                     </dt>
                     <dd class="govuk-summary-list__value">
                         @Model.CourseDescription
@@ -76,13 +78,26 @@
                                 </span>
                             </summary>
                             <div class="govuk-details__text">
-                                You can change the course when adding an apprentice's details.
+                                You can change the course when adding an learner's details.
                             </div>
                         </details>
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" asp-route="@Model.ChangeCourseRouteName" asp-route-ukPrn="@ukPrn" asp-route-id="@reservationId">
                             Change
+                        </a>
+                    </dd>
+                </dl>
+
+                <dl class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Training type
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.TrainingType
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link" href="">
                         </a>
                     </dd>
                 </dl>
