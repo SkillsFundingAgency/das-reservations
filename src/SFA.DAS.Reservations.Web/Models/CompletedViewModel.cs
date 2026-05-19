@@ -16,6 +16,18 @@ namespace SFA.DAS.Reservations.Web.Models
         public string CohortRef { get; set; }
         public string JourneyData { get; set; }
         public bool? UseLearnerData { get; set; }
+        public string EmployerAccountId { get; set; }
+        public string PublicHashedEmployerAccountId { get; set; }
+        public Guid? Id { get; set; }
+        public string AccountLegalEntityPublicHashedId { get; set; }
+
+        public string FindApprenticeshipTrainingUrl { get; set; }
+
+        public string AddAnApprenticeUrl { get; set; }
+
+        public string HomepageUrl { get; set; }
+
+        public string RecruitUrl { get; set; }
     }
 
     public enum CompletedReservationWhatsNext

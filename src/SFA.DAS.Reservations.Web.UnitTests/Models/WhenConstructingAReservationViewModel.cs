@@ -1,6 +1,8 @@
 ﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Models;
@@ -67,6 +69,45 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Models
             var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
 
             viewModel.CourseName.Should().Be("Unknown");
+        }
+
+        [Test, AutoData]
+        public void And_Course_Is_Null_Then_Sets_TrainingType_To_Apprenticeship(
+            Reservation reservation,
+            string url,
+            uint? loggedInProviderId)
+        {
+            reservation.Course = null;
+
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
+
+            viewModel.TrainingType.Should().Be("Apprenticeship");
+        }
+
+        [Test, AutoData]
+        public void And_LearningType_Not_Set_Defaults_To_Apprenticeship(
+            Reservation reservation,
+            string url,
+            uint? loggedInProviderId)
+        {
+            reservation.Course = new Course("123", "Title", 2, null);
+
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
+
+            viewModel.TrainingType.Should().Be("Apprenticeship");
+        }
+
+        [Test, AutoData]
+        public void And_LearningType_Is_ApprenticeshipUnit_Set_Description(
+            Reservation reservation,
+            string url,
+            uint? loggedInProviderId)
+        {
+            reservation.Course = new Course("123", "Title", 2, LearningType.ApprenticeshipUnit);
+
+            var viewModel = new ReservationViewModel(reservation, url, loggedInProviderId);
+
+            viewModel.TrainingType.Should().Be("Apprenticeship Unit");
         }
 
         [Test, AutoData]

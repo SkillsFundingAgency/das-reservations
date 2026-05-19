@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Reservations.Queries.GetReservation;
+using SFA.DAS.Reservations.Domain.Interfaces;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Web.Controllers;
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
                 .ReturnsAsync(mediatorResult);
-            
+
             var result = await controller.Completed(routeModel);
 
             var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -84,7 +85,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             mockMediator
                 .Setup(mediator => mediator.Send(It.IsAny<GetReservationQuery>(), CancellationToken.None))
                 .ReturnsAsync(mediatorResult);
-            
+
             var result = await controller.Completed(routeModel);
 
             var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -102,6 +103,170 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             routeModel.Id = null;
 
             Assert.ThrowsAsync<ArgumentException>(() => controller.Completed(routeModel));
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_And_ValidationError_Then_Return_Provider_Completed_View(
+            ReservationsRouteModel routeModel,
+             [Frozen] Mock<IMediator> mockMediator,
+             GetReservationResult result,
+            [NoAutoProperties] ReservationsController controller)
+        {
+            routeModel.Id = Guid.NewGuid();
+            routeModel.UkPrn = null;
+
+            mockMediator.Setup(t => t.Send(It.IsAny<GetReservationQuery>(), It.IsAny<CancellationToken>())).
+                ReturnsAsync(result);
+
+            var actual = await controller.Completed(routeModel) as ViewResult;
+
+            actual.ViewName.Should().Be(ViewNames.EmployerCompleted);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_Then_Redirects_To_Recruit_Url(
+         ReservationsRouteModel routeModel,
+         [Frozen] Mock<IMediator> mockMediator,
+         [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+         [NoAutoProperties] ReservationsController controller)
+        {
+            routeModel.Id = Guid.NewGuid();
+            routeModel.UkPrn = 123456;
+            routeModel.UseLearnerData = true;
+            routeModel.EmployerAccountId = "1";
+
+            var result = new GetReservationResult()
+            {
+                UkPrn = routeModel.UkPrn,
+                AccountLegalEntityName = "Test",
+                StartDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddYears(1),
+                Course = new Domain.Courses.Course("1", "course1", 1),
+            };
+
+            var expectedUrl = $"https://recruit/{routeModel.UkPrn}";
+
+            mockUrlHelper
+             .Setup(h => h.GenerateUrl(
+                 It.Is<Domain.Interfaces.UrlParameters>(p =>
+                     p.Id == routeModel.UkPrn.ToString() && p.SubDomain == "recruit")))
+             .Returns(expectedUrl);
+
+            mockMediator.Setup(t => t.Send(It.IsAny<GetReservationQuery>(),
+                It.IsAny<CancellationToken>())).
+                ReturnsAsync(result);
+
+            var actual = await controller.Completed(routeModel) as ViewResult;
+
+            var model = actual.Model.Should().BeOfType<CompletedViewModel>().Subject;
+            model.RecruitUrl.Should().Be(expectedUrl);
+
+            mockUrlHelper.Verify(x => x.GenerateUrl(It.Is<Domain.Interfaces.UrlParameters>(p => p.SubDomain == "recruit" && p.Id == routeModel.UkPrn.ToString())), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_Then_Redirects_To_HomePage_Url(
+         ReservationsRouteModel routeModel,
+         [Frozen] Mock<IMediator> mockMediator,
+         [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+         [NoAutoProperties] ReservationsController controller)
+        {
+            routeModel.Id = Guid.NewGuid();
+            routeModel.UkPrn = 123456;
+            routeModel.UseLearnerData = true;
+            routeModel.EmployerAccountId = "1";
+
+            var result = new GetReservationResult()
+            {
+                UkPrn = routeModel.UkPrn,
+                AccountLegalEntityName = "Test",
+                StartDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddYears(1),
+                Course = new Domain.Courses.Course("1", "course1", 1),
+            };
+
+            var expectedUrl = $"https://dashboard/home";
+
+            mockUrlHelper
+             .Setup(h => h.GenerateDashboardUrl(It.Is<string>(y => y == routeModel.EmployerAccountId)))
+             .Returns(expectedUrl);
+
+            mockMediator.Setup(t => t.Send(It.IsAny<GetReservationQuery>(),
+                It.IsAny<CancellationToken>())).
+                ReturnsAsync(result);
+
+            var actual = await controller.Completed(routeModel) as ViewResult;
+
+            var model = actual.Model.Should().BeOfType<CompletedViewModel>().Subject;
+            model.HomepageUrl.Should().Be(expectedUrl);
+            mockUrlHelper.Verify(x => x.GenerateDashboardUrl(It.Is<string>(p => p == routeModel.EmployerAccountId)), Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_Has_Ukprn_Then_Redirects_To_AddApprentice_Url(
+         ReservationsRouteModel routeModel,
+         [Frozen] Mock<IMediator> mockMediator,
+         [Frozen] Mock<IExternalUrlHelper> mockUrlHelper,
+         [NoAutoProperties] ReservationsController controller)
+        {
+            routeModel.Id = Guid.NewGuid();
+            routeModel.UkPrn = 123456;
+            routeModel.UseLearnerData = true;
+            routeModel.EmployerAccountId = "1";
+
+            var result = new GetReservationResult()
+            {
+                UkPrn = routeModel.UkPrn,
+                AccountLegalEntityName = "Test",
+                StartDate = DateTime.UtcNow,
+                ExpiryDate = DateTime.UtcNow.AddYears(1),
+                Course = new Domain.Courses.Course("1", "course1", 1),
+            };
+
+            var expectedUrl = $"https://apprentice/add";
+
+            mockUrlHelper
+             .Setup(h => h.GenerateAddApprenticeUrl(
+                 routeModel.Id.Value,
+                 routeModel.AccountLegalEntityPublicHashedId,
+                 result.Course.Id,
+                 result.UkPrn, result.StartDate,
+                 routeModel.CohortReference,
+                 routeModel.EmployerAccountId,
+                 It.IsAny<bool>(),
+                 It.IsAny<string>(),
+                 It.IsAny<string>(),
+                 routeModel.JourneyData,
+                 It.IsAny<Guid?>(),
+                 It.IsAny<bool?>(),
+                 routeModel.UseLearnerData
+                 )).Returns(expectedUrl);
+
+            mockMediator.Setup(t => t.Send(It.IsAny<GetReservationQuery>(),
+                It.IsAny<CancellationToken>())).
+                ReturnsAsync(result);
+
+            var actual = await controller.Completed(routeModel) as ViewResult;
+
+            var model = actual.Model.Should().BeOfType<CompletedViewModel>().Subject;
+            model.AddAnApprenticeUrl.Should().Be(expectedUrl);
+
+            mockUrlHelper
+            .Verify(h => h.GenerateAddApprenticeUrl(
+                routeModel.Id.Value,
+                routeModel.AccountLegalEntityPublicHashedId,
+                result.Course.Id,
+                result.UkPrn, result.StartDate,
+                routeModel.CohortReference,
+                routeModel.EmployerAccountId,
+                It.IsAny<bool>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                routeModel.JourneyData,
+                It.IsAny<Guid?>(),
+                It.IsAny<bool?>(),
+                routeModel.UseLearnerData
+                ), Times.Once);
         }
     }
 }
