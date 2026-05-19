@@ -56,7 +56,8 @@ namespace SFA.DAS.Reservations.Application.Reservations.Queries.GetCachedReserva
                 CohortRef = cachedReservation.CohortRef,
                 EmployerHasSingleLegalEntity = cachedReservation.EmployerHasSingleLegalEntity,
                 IsEmptyCohortFromSelect = cachedReservation.IsEmptyCohortFromSelect,
-                UkPrn = cachedReservation.UkPrn
+                UkPrn = cachedReservation.UkPrn,
+                TrainingType = cachedReservation.LearningType
             };
         }
     }

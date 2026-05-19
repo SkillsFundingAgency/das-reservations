@@ -61,6 +61,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
                 var course = new Course(null,null,0);
                 cachedReservation.CourseId = course.Id;
                 cachedReservation.CourseDescription = course.CourseDescription;
+                cachedReservation.LearningType = course.LearningType;
             }
             else
             {
@@ -68,6 +69,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CacheReservatio
 
                 cachedReservation.CourseId = course.Id;
                 cachedReservation.CourseDescription = course.CourseDescription;
+                cachedReservation.LearningType = course.LearningType;
             }
 
             await _cacheStorageService.SaveToCache(cachedReservation.Id.ToString(), cachedReservation, 1);
