@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Courses
             var actualApprenticeship = new Course("", "Some title", 1);
 
             //Assert
-            actualApprenticeship.CourseDescription.Should().Be("Some title - Level 1");
+            actualApprenticeship.CourseDescription.Should().Be("Some title, Level 1");
         }
 
         [Test]

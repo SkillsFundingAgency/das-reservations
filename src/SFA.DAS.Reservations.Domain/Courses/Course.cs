@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
 
         public bool AllowPreviousDate { get; set; } = true;
 
-        public string CourseDescription => Title.Equals("UNKNOWN",StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title} - Level {Level}";
+        public string CourseDescription => Title.Equals("UNKNOWN",StringComparison.CurrentCultureIgnoreCase) ? Title : $"{Title}, Level {Level}";
 
         private static string SetDefaultTitleIfEmpty(string title)
         {
