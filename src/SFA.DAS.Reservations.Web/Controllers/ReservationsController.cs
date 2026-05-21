@@ -46,7 +46,6 @@ public class ReservationsController(
     private readonly IMediator _mediator = mediator;
     private readonly ReservationsWebConfiguration _configuration = configuration.Value;
 
-
     [HttpGet]
     [Route("accounts/{employerAccountId}/reservations/{id}/select-course-rule-check", Name = RouteNames.EmployerSelectCourseRuleCheck)]
     [Route("{ukPrn}/reservations/{id}/select-course-rule-check", Name = RouteNames.ProviderApprenticeshipTrainingRuleCheck)]
@@ -61,7 +60,6 @@ public class ReservationsController(
         var postRouteName = isProvider
             ? RouteNames.ProviderSaveRuleNotificationChoice
             : RouteNames.EmployerSaveRuleNotificationChoice;
-
 
         var viewResult = await CheckNextGlobalRule(redirectRouteName, identifier, backLink, postRouteName);
         if (viewResult != null)
@@ -178,7 +176,7 @@ public class ReservationsController(
                     formModel,
                     routeModel.UkPrn,
                     hashedEmployerAccountId);
-                
+
                 if (pastDateValidationResult != null)
                 {
                     return pastDateValidationResult;
@@ -320,7 +318,6 @@ public class ReservationsController(
             routeModel.CohortReference = result.CohortRef;
             routeModel.JourneyData = result.JourneyData;
 
-
             if (result.IsEmptyCohortFromSelect)
             {
                 routeModel.ProviderId = result.ProviderId;
@@ -358,6 +355,26 @@ public class ReservationsController(
         var queryResult = await _mediator.Send(query);
         //todo: null check on result, redirect to error
 
+        var ukprn = queryResult.UkPrn ?? routeModel.ProviderId;
+
+        var addApprenticeUrl = urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
+                routeModel.AccountLegalEntityPublicHashedId, queryResult.Course?.Id, ukprn, queryResult.StartDate,
+                routeModel.CohortReference, routeModel.EmployerAccountId, routeModel.UkPrn == null && ukprn != null,
+                journeyData: routeModel.JourneyData, useLearnerData: routeModel.UseLearnerData);
+
+        var recruitUrl = routeModel.UkPrn.HasValue
+            ? urlHelper.GenerateUrl(new UrlParameters
+            {
+                SubDomain = "recruit",
+                Id = routeModel.UkPrn.ToString()
+            })
+            : urlHelper.GenerateUrl(new UrlParameters
+            {
+                SubDomain = "recruit",
+                Folder = "accounts",
+                Id = routeModel.EmployerAccountId
+            });
+
         var model = new CompletedViewModel
         {
             AccountLegalEntityName = queryResult.AccountLegalEntityName,
@@ -372,60 +389,18 @@ public class ReservationsController(
             UkPrn = queryResult.UkPrn ?? routeModel.ProviderId,
             CohortRef = routeModel.CohortReference,
             JourneyData = routeModel.JourneyData,
-            UseLearnerData = routeModel.UseLearnerData
+            UseLearnerData = routeModel.UseLearnerData,
+            Id = routeModel.Id.Value,
+            EmployerAccountId = routeModel.EmployerAccountId,
+            AccountLegalEntityPublicHashedId = routeModel.AccountLegalEntityPublicHashedId,
+            FindApprenticeshipTrainingUrl = _configuration.FindApprenticeshipTrainingUrl,
+            HomepageUrl = urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId),
+            AddAnApprenticeUrl = addApprenticeUrl,
+            RecruitUrl = recruitUrl
         };
 
         var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
         return View(viewName, model);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
-    [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerPostCompleted)]
-    public IActionResult PostCompleted(ReservationsRouteModel routeModel, CompletedViewModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
-            return View(viewName, model);
-        }
-
-        switch (model.WhatsNext)
-        {
-            case CompletedReservationWhatsNext.RecruitAnApprentice:
-                var recruitUrl = routeModel.UkPrn.HasValue
-                    ? urlHelper.GenerateUrl(new UrlParameters
-                    {
-                        SubDomain = "recruit",
-                        Id = routeModel.UkPrn.ToString()
-                    })
-                    : urlHelper.GenerateUrl(new UrlParameters
-                    {
-                        SubDomain = "recruit",
-                        Folder = "accounts",
-                        Id = routeModel.EmployerAccountId
-                    });
-
-                return Redirect(recruitUrl);
-
-            case CompletedReservationWhatsNext.FindApprenticeshipTraining:
-                return Redirect(_configuration.FindApprenticeshipTrainingUrl);
-
-            case CompletedReservationWhatsNext.AddAnApprentice:
-                var addApprenticeUrl = urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
-                    routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
-                    model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
-                    journeyData: model.JourneyData, useLearnerData: model.UseLearnerData);
-
-                logger.LogInformation($"model.UseLearnerData: {model.UseLearnerData}");
-                logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
-                return Redirect(addApprenticeUrl);
-
-            default:
-                var homeUrl = urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
-                return Redirect(homeUrl);
-        }
     }
 
     private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
@@ -517,7 +492,7 @@ public class ReservationsController(
         var now = DateTime.UtcNow;
         var isPastMonth = trainingDateModel.StartDate.Year < now.Year ||
             (trainingDateModel.StartDate.Year == now.Year && trainingDateModel.StartDate.Month < now.Month);
-        
+
         if (!isPastMonth)
             return null;
 
@@ -538,7 +513,7 @@ public class ReservationsController(
             formModel.CohortRef,
             ukPrn,
             hashedEmployerAccountId);
-        
+
         return View("ApprenticeshipTraining", model);
     }
 

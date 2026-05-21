@@ -1,7 +1,7 @@
 ﻿@model SFA.DAS.Reservations.Web.Models.EmployerStartViewModel
 
 @{
-    ViewData["Title"] = "Reserve funding to train and assess an apprentice";
+    ViewData["Title"] = "Reserve funding";
 
     ViewBag.GaData.Vpv = "/accounts/reservations";
     string employerAccountId = (string)ViewContext.RouteData.Values["employerAccountId"];
@@ -12,11 +12,11 @@
 <main class="govuk-main-wrapper " id="main-content" role="main">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Reserve funding to train and assess an apprentice</h1>
+            <h1 class="govuk-heading-xl">Reserve funding</h1>
             <p class="govuk-body">To reserve funding, you will need:</p>
             <ul class="govuk-list govuk-list--bullet">
-                <li>the month you expect the apprenticeship training to start</li>
-                <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">apprenticeship training course</a> the apprentice will take, which can be changed later</li>
+                <li>the month you expect the training to start</li>
+                <li>the <a href="@Model.FindApprenticeshipTrainingUrl" target="_blank" class="govuk-link">training course</a> the learner will take</li>
             </ul>
 
             <partial name="_GlobalRuleInfo" model="@Model.ActiveGlobalRule"/>
