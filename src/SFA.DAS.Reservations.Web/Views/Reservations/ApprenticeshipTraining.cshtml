@@ -72,7 +72,7 @@
 
             @if (Model.IsProvider)
             {
-                <h1 class="govuk-heading-xl">Apprenticeship training</h1>
+                <h1 class="govuk-heading-xl">What is the training course?</h1>
             }
             else
             {
@@ -88,10 +88,8 @@
                 @if (Model.IsProvider)
                 {
                     <div class="govuk-form-group @(courseInvalid ? "govuk-form-group--error" : "")">
-                        <h2 class="govuk-heading-m">Which apprenticeship training will the apprentice take?</h2>
-
                         <label class="govuk-label" for="course-search">
-                            Search for a course
+                            Start typing the name of the course and select from the suggestions
                         </label>
                         <partial name="_CourseSearch" />
                         <span id="choose-apprenticeship-hint" class="govuk-hint govuk-!-margin-top-4">
@@ -161,7 +159,7 @@
                     </fieldset>
                 </div>
                 <button type="submit" class="govuk-button">
-                    Save and continue
+                    Continue
                 </button>
             </form>
         </div>
