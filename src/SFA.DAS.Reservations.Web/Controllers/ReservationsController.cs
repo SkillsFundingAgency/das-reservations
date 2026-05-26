@@ -384,6 +384,7 @@ public class ReservationsController(
                 EndDate = queryResult.ExpiryDate
             }.GetGDSDateString(),
             CourseDescription = queryResult.Course.CourseDescription,
+            LearningType = queryResult.Course?.LearningType,
             StartDate = queryResult.StartDate,
             CourseId = queryResult.Course?.Id,
             UkPrn = queryResult.UkPrn ?? routeModel.ProviderId,

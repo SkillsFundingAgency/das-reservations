@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFA.DAS.Common.Domain.Types;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SFA.DAS.Reservations.Web.Models
@@ -9,6 +10,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public CompletedReservationWhatsNext? WhatsNext { get; set; }
         public string TrainingDateDescription { get; set; }
         public string CourseDescription { get; set; }
+        public LearningType? LearningType { get; set; } 
         public string AccountLegalEntityName { get; set; }
         public DateTime StartDate { get; set; }
         public string CourseId { get; set; }
