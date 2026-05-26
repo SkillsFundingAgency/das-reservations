@@ -403,6 +403,55 @@ public class ReservationsController(
         return View(viewName, model);
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Route("{ukPrn}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.ProviderPostCompleted)]
+    [Route("accounts/{employerAccountId}/reservations/{id}/completed/{accountLegalEntityPublicHashedId}", Name = RouteNames.EmployerPostCompleted)]
+    public IActionResult PostCompleted(ReservationsRouteModel routeModel, CompletedViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var viewName = routeModel.UkPrn.HasValue ? ViewNames.ProviderCompleted : ViewNames.EmployerCompleted;
+            return View(viewName, model);
+        }
+
+        switch (model.WhatsNext)
+        {
+            case CompletedReservationWhatsNext.RecruitAnApprentice:
+                var recruitUrl = routeModel.UkPrn.HasValue
+                    ? urlHelper.GenerateUrl(new UrlParameters
+                    {
+                        SubDomain = "recruit",
+                        Id = routeModel.UkPrn.ToString()
+                    })
+                    : urlHelper.GenerateUrl(new UrlParameters
+                    {
+                        SubDomain = "recruit",
+                        Folder = "accounts",
+                        Id = routeModel.EmployerAccountId
+                    });
+
+                return Redirect(recruitUrl);
+
+            case CompletedReservationWhatsNext.FindApprenticeshipTraining:
+                return Redirect(_configuration.FindApprenticeshipTrainingUrl);
+
+            case CompletedReservationWhatsNext.AddAnApprentice:
+                var addApprenticeUrl = urlHelper.GenerateAddApprenticeUrl(routeModel.Id.Value,
+                    routeModel.AccountLegalEntityPublicHashedId, model.CourseId, model.UkPrn, model.StartDate,
+                    model.CohortRef, routeModel.EmployerAccountId, routeModel.UkPrn == null && model.UkPrn != null,
+                    journeyData: model.JourneyData, useLearnerData: model.UseLearnerData);
+
+                logger.LogInformation($"model.UseLearnerData: {model.UseLearnerData}");
+                logger.LogInformation($"Redirecting to Add Apprentice URL: {addApprenticeUrl}");
+                return Redirect(addApprenticeUrl);
+
+            default:
+                var homeUrl = urlHelper.GenerateDashboardUrl(routeModel.EmployerAccountId);
+                return Redirect(homeUrl);
+        }
+    }
+
     private async Task<ApprenticeshipTrainingViewModel> BuildApprenticeshipTrainingViewModel(
         bool isProvider,
         string accountLegalEntityPublicHashedId,
