@@ -1,6 +1,6 @@
-﻿using SFA.DAS.Common.Domain.Types;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
