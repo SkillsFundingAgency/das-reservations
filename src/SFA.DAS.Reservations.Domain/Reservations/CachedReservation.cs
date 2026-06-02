@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
@@ -19,5 +20,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public bool EmployerHasSingleLegalEntity { get; set; }
         public bool IsEmptyCohortFromSelect { get; set; }
         public string JourneyData { get; set; }
+        public LearningType? LearningType { get;  set; }
     }
 }
