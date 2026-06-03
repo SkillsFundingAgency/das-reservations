@@ -1,11 +1,13 @@
-﻿using SFA.DAS.Reservations.Domain.Rules;
+﻿using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Application.Extensions;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Web.Infrastructure;
 
 namespace SFA.DAS.Reservations.Web.Models
 {
     public class ReviewViewModel
     {
-        public ReviewViewModel(ReservationsRouteModel routeModel, TrainingDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId)
+        public ReviewViewModel(ReservationsRouteModel routeModel, TrainingDateModel trainingDate, string courseDescription, string accountLegalEntityName, string accountLegalEntityPublicHashedId, LearningType? learningType)
         {
             ConfirmRouteName = IsEmployerRoute(routeModel) ?
                 RouteNames.EmployerPostReview :
@@ -31,6 +33,7 @@ namespace SFA.DAS.Reservations.Web.Models
             CourseDescription = courseDescription;
             AccountLegalEntityName = accountLegalEntityName;
             AccountLegalEntityPublicHashedId = accountLegalEntityPublicHashedId;
+            TrainingType = learningType?.GetEnumDescription();
         }
 
         public ReviewViewModel(ReservationsRouteModel routeModel, PostReviewViewModel postReviewViewModel) :
@@ -38,7 +41,8 @@ namespace SFA.DAS.Reservations.Web.Models
                 postReviewViewModel.TrainingDate,
                 postReviewViewModel.CourseDescription,
                 postReviewViewModel.AccountLegalEntityName,
-                postReviewViewModel.AccountLegalEntityPublicHashedId)
+                postReviewViewModel.AccountLegalEntityPublicHashedId,
+                postReviewViewModel.LearningType)
         { }
 
         public string ChangeCourseRouteName { get; }
@@ -51,7 +55,7 @@ namespace SFA.DAS.Reservations.Web.Models
         public string AccountLegalEntityPublicHashedId { get;  }
         public string ViewName { get; }
         public string BackLink { get;}
-
+        public string TrainingType { get; set; }
         private bool IsEmployerRoute(ReservationsRouteModel routeModel) => routeModel.UkPrn == null;
         
     }
