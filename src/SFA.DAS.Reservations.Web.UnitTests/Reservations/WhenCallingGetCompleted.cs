@@ -65,6 +65,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
                 EndDate = mediatorResult.ExpiryDate
             }.GetGDSDateString());
             model.CourseDescription.Should().Be(mediatorResult.Course.CourseDescription);
+            model.LearningType.Should().Be(mediatorResult.Course.LearningType);
             model.StartDate.Should().Be(mediatorResult.StartDate);
             model.CourseId.Should().Be(mediatorResult.Course.Id);
             model.UkPrn.Should().Be(mediatorResult.UkPrn);
