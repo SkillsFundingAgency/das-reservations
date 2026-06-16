@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <ProjectGuid>9F630170-308A-47A0-86A2-4C0220C05FC5</ProjectGuid>
-    <TargetFramework>net8.0</TargetFramework>
+	  <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="4.1.763" />
     <PackageReference Include="SFA.DAS.Common.Domain" Version="1.4.308" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
