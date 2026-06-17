@@ -19,18 +19,26 @@ public static class ConfigurationExtensions
     
     public static IConfiguration BuildDasConfiguration(this IConfiguration configuration)
     {
-        var config = new ConfigurationBuilder()
+        var isIntegrationTest = configuration["IsIntegrationTest"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
+
+        var configBuilder = new ConfigurationBuilder()
             .AddConfiguration(configuration)
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(Directory.GetCurrentDirectory());
+
 #if DEBUG
-            .AddJsonFile("appsettings.json", true)
-            .AddJsonFile("appsettings.Development.json", true)
+        if (!isIntegrationTest)
+        {
+            configBuilder
+                .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appsettings.Development.json", true);
+        }
 #endif
-            .AddEnvironmentVariables();
+
+        configBuilder.AddEnvironmentVariables();
 
         if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
-            config.AddAzureTableStorage(options =>
+            configBuilder.AddAzureTableStorage(options =>
                 {
                     options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
@@ -41,6 +49,6 @@ public static class ConfigurationExtensions
             );
         }
 
-        return config.Build();
+        return configBuilder.Build();
     }
 }

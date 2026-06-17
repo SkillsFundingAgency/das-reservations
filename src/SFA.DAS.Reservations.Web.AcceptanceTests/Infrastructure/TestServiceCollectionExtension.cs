@@ -6,14 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Moq;
+using SFA.DAS.Employer.Shared.UI;
 using SFA.DAS.Encoding;
 using SFA.DAS.GovUK.Auth.Employer;
+using SFA.DAS.Provider.Shared.UI.Startup;
 using SFA.DAS.Reservations.Domain.Employers;
 using SFA.DAS.Reservations.Domain.Employers.Api;
 using SFA.DAS.Reservations.Domain.Interfaces;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Rules.Api;
 using SFA.DAS.Reservations.Infrastructure.Api;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Services;
+using SFA.DAS.Reservations.Web.Extensions;
+using SFA.DAS.Reservations.Web.Infrastructure;
 using SFA.DAS.Reservations.Web.Services;
 
 namespace SFA.DAS.Reservations.Web.AcceptanceTests.Infrastructure;
@@ -49,6 +55,11 @@ public static class TestServiceCollectionExtension
                 .ReturnsAsync(new List<AccountLegalEntity> { data.AccountLegalEntity });
         }
 
+        apiClient.Setup(x => x.Get<GetAccountFundingRulesApiResponse>(It.IsAny<GetAccountFundingRulesApiRequest>()))
+            .ReturnsAsync(new GetAccountFundingRulesApiResponse { GlobalRules = new List<GlobalRule>() });
+        apiClient.Setup(x => x.Get<GetFundingRulesApiResponse>(It.IsAny<GetFundingRulesApiRequest>()))
+            .ReturnsAsync(new GetFundingRulesApiResponse { GlobalRules = new List<GlobalRule>() });
+
 
         var reservationsService = new Mock<IReservationsOuterService>();
 
@@ -72,5 +83,15 @@ public static class TestServiceCollectionExtension
 
         var physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
         serviceCollection.AddSingleton<IFileProvider>(physicalProvider);
+
+        if (configuration.IsEmployerAuth())
+        {
+            var resourceEnvironmentName = configuration["ResourceEnvironmentName"] ?? configuration["Environment"] ?? "LOCAL";
+            serviceCollection.AddMaMenuConfiguration(RouteNames.EmployerSignOut, resourceEnvironmentName);
+        }
+        else if (configuration.IsProviderAuth())
+        {
+            serviceCollection.AddProviderUiServiceRegistration(configuration);
+        }
     }
 }
