@@ -446,8 +446,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             var result = await _controller.PostApprenticeshipTraining(routeModel, formModel) as RedirectToRouteResult;
 
-            result.RouteValues.Should().ContainKey("Id")
-                .WhichValue.Should().Be(routeModel.Id);
+            result.RouteValues.Should().ContainKey("Id").WhoseValue.Should().Be(routeModel.Id);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
