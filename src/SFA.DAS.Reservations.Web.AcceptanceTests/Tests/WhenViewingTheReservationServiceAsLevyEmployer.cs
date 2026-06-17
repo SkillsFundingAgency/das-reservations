@@ -36,13 +36,12 @@ public class WhenViewingTheReservationServiceAsLevyEmployer
         _factory = new TestWebApplicationFactory("employer");
         _client = _factory.WithWebHostBuilder(builder =>
         {
-            builder.ConfigureServices(collection => collection.ConfigureTestServiceCollection(_factory.ConfigurationRoot, testData));
-            
             builder.ConfigureTestServices(services =>
             {
-                services.AddAuthentication( "IntegrationTest")
+                services.ConfigureTestServiceCollection(_factory.ConfigurationRoot, testData);
+                services.AddAuthentication("IntegrationTest")
                     .AddScheme<TestAuthenticationSchemeOptions, TestAuthenticationHandler>(
-                        "IntegrationTest", options => { options.EmployerAccountId =  TestDataValues.LevyHashedAccountId;});
+                        "IntegrationTest", options => { options.EmployerAccountId = TestDataValues.LevyHashedAccountId; });
             });
         }).CreateClient();
             

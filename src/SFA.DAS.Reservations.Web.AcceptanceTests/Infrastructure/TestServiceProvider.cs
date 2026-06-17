@@ -31,7 +31,7 @@ public class TestServiceProvider : IServiceProvider
     public TestServiceProvider(string authType)
     {
         var serviceCollection = new ServiceCollection();
-        var configuration = GenerateConfiguration(authType);
+        var configuration = GenerateConfiguration(authType, isIntegrationTest: true);
 
         var startup = new Startup(configuration, new TestHostEnvironment());
 
@@ -88,6 +88,7 @@ public class TestServiceProvider : IServiceProvider
                 new KeyValuePair<string, string>("DfEOidcConfiguration:LoginSlidingExpiryTimeOutInMinutes", "30"),
                 new KeyValuePair<string, string>("DfEOidcConfiguration:Scopes", "openid email profile organisation"),
                 new KeyValuePair<string, string>("ResourceEnvironmentName", "test"),
+                new KeyValuePair<string, string>("cdn:url", "https://das-at-frnt-end.azureedge.net"),
             }
         };
 
