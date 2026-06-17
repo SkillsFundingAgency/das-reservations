@@ -36,14 +36,12 @@ public class WhenViewingTheReservationServiceAsNonLevyEmployer
         _factory = new TestWebApplicationFactory("employer");
         _client = _factory.WithWebHostBuilder(builder =>
         {
-            builder.ConfigureServices(collection =>
-                collection.ConfigureTestServiceCollection(
-                    _factory.ConfigurationRoot, testData));
             builder.ConfigureTestServices(services =>
             {
+                services.ConfigureTestServiceCollection(_factory.ConfigurationRoot, testData);
                 services.AddAuthentication("IntegrationTest")
                     .AddScheme<TestAuthenticationSchemeOptions, TestAuthenticationHandler>(
-                        "IntegrationTest", options => { options.EmployerAccountId =  TestDataValues.NonLevyHashedAccountId;});
+                        "IntegrationTest", options => { options.EmployerAccountId = TestDataValues.NonLevyHashedAccountId; });
             });
         }).CreateClient();
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("IntegrationTest");
