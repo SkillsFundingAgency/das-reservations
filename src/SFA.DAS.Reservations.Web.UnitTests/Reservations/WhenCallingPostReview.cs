@@ -117,7 +117,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be(RouteNames.EmployerCompleted);
-            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
+            result.RouteValues.Should().ContainKey("id").WhoseValue.Should().NotBe(Guid.Empty);
         }
 
         [Test, MoqAutoData]
@@ -146,13 +146,13 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be(RouteNames.EmployerCompleted);
-            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
+            result.RouteValues.Should().ContainKey("id").WhoseValue.Should().NotBe(Guid.Empty);
             result.RouteValues.Should().ContainKey("cohortReference")
-                .WhichValue.Should().Be(createReservationResult.CohortRef);
+                .WhoseValue.Should().Be(createReservationResult.CohortRef);
             result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId")
-                .WhichValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
+                .WhoseValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
             result.RouteValues.Should().ContainKey("providerId")
-                .WhichValue.Should().Be(createReservationResult.ProviderId);
+                .WhoseValue.Should().Be(createReservationResult.ProviderId);
         }
 
         [Test, MoqAutoData]
@@ -181,7 +181,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be(RouteNames.EmployerCompleted);
             result.RouteValues.Should().ContainKey("journeyData")
-                .WhichValue.Should().Be(createReservationResult.JourneyData);
+                .WhoseValue.Should().Be(createReservationResult.JourneyData);
         }
 
         [Test, MoqAutoData]
@@ -200,11 +200,11 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
             result.Should().NotBeNull($"result was not a {typeof(RedirectToRouteResult)}");
             result.RouteName.Should().Be(RouteNames.ProviderCompleted);
-            result.RouteValues.Should().ContainKey("id").WhichValue.Should().NotBe(Guid.Empty);
+            result.RouteValues.Should().ContainKey("id").WhoseValue.Should().NotBe(Guid.Empty);
             result.RouteValues.Should().ContainKey("accountLegalEntityPublicHashedId")
-                .WhichValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
+                .WhoseValue.Should().Be(createReservationResult.AccountLegalEntityPublicHashedId);
             result.RouteValues.Should().ContainKey("cohortReference")
-                .WhichValue.Should().Be(createReservationResult.CohortRef);
+                .WhoseValue.Should().Be(createReservationResult.CohortRef);
         }
 
         [Test, MoqAutoData]

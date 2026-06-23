@@ -112,8 +112,7 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Employers
             //Assert
             Assert.IsNotNull(result);
 
-            result.RouteValues.Should().ContainKey("Id")
-                .WhichValue.Should().Be(routeModel.Id);
+            result.RouteValues.Should().ContainKey("Id").WhoseValue.Should().Be(routeModel.Id);
         }
 
         [Test, AutoData]//note cannot use moqautodata to construct controller here due to modelmetadata usage.
