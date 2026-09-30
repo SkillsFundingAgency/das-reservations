@@ -51,19 +51,29 @@
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="col">
                             <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                               aria-sort="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.AriaSortValue : ChooseEmployerViewModel.AriaSortDefaultValue)"
                                asp-route="@RouteNames.ProviderChooseEmployer"
                                asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountLegalEntityName), Model.SearchTerm)"
                                title="Sort the table by Employer">
                                 Employer
                             </a>
-                        </th>
+                            @if (Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName))
+                            {
+                               <p class="govuk-visually-hidden" aria-live="polite" role="status">Sorted by employer, @Model.AriaSortHelp</p>
+                            }
+                            </th>
                         <th class="govuk-table__header" scope="col">
                             <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
                                asp-route="@RouteNames.ProviderChooseEmployer"
+                               aria-sort="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.AriaSortValue : ChooseEmployerViewModel.AriaSortDefaultValue)"
                                asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountName), Model.SearchTerm)"
                                title="Sort the table by Employer">
                                 Account name
                             </a>
+                            @if(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName))
+                            {
+                                <p class="govuk-visually-hidden" aria-live="polite" role="status">Sorted by account name, , @Model.AriaSortHelp</p>
+                            }
                         </th>
                         <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
                         <th class="govuk-table__header" scope="col"><span class="govuk-visually-hidden">Action</span></th>

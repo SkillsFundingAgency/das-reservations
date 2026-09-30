@@ -6,6 +6,7 @@ namespace SFA.DAS.Reservations.Web.Models
     public class ChooseEmployerViewModel
     {
         public const string HeaderClassName = "das-table__sort";
+        public const string AriaSortDefaultValue = "none";
 
         public string SortedByHeaderClassName
         {
@@ -23,6 +24,30 @@ namespace SFA.DAS.Reservations.Web.Models
                 }
 
                 return sortedByHeaderClassName;
+            }
+        }
+
+        public string AriaSortValue
+        {
+            get
+            {
+                if (SortModel.ReverseSort)
+                {
+                    return "descending";
+                }
+                return "ascending";
+            }
+        }
+
+        public string AriaSortHelp
+        {
+            get
+            {
+                if (SortModel.ReverseSort)
+                {
+                    return "Z to A";
+                }
+                return "A to Z";
             }
         }
 
