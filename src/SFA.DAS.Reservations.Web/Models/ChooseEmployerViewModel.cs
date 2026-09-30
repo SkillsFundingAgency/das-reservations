@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Web.Models
         {
             get
             {
-                var sortedByHeaderClassName = HeaderClassName;
+                var sortedByHeaderClassName = "govuk-focused-text " + HeaderClassName;
 
                 if (SortModel.ReverseSort)
                 {
