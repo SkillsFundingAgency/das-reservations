@@ -46,7 +46,7 @@
             }
             else
             {
-                <table class="govuk-table das-table--double-arrows">
+                <table class="govuk-table das-table--double-arrows" data-module="moj-sortable-table">
                     <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="col">
@@ -68,7 +68,7 @@
                                aria-sort="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.AriaSortValue : ChooseEmployerViewModel.AriaSortDefaultValue)"
                                asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountName), Model.SearchTerm)"
                                title="Sort the table by Employer">
-                                    <span tabindex="-1" autofocus>Account name</span>
+                                    Account name
                             </a>
                             @if(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName))
                             {
