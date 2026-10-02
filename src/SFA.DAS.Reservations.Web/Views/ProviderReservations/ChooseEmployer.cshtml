@@ -62,13 +62,13 @@
                                <p class="govuk-visually-hidden" aria-live="polite" role="status">Sorted by employer, @Model.AriaSortHelp</p>
                             }
                             </th>
-                        <th class="govuk-table__header" scope="col">
-                            <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                            <th class="govuk-table__header" scope="col">
+                                <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
                                asp-route="@RouteNames.ProviderChooseEmployer"
                                aria-sort="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.AriaSortValue : ChooseEmployerViewModel.AriaSortDefaultValue)"
                                asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountName), Model.SearchTerm)"
                                title="Sort the table by Employer">
-                                Account name
+                                    <span tabindex="-1" autofocus>Account name</span>
                             </a>
                             @if(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName))
                             {
