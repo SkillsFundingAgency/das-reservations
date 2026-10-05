@@ -6,7 +6,6 @@ namespace SFA.DAS.Reservations.Web.Models
     public class ChooseEmployerViewModel
     {
         public const string HeaderClassName = "das-table__sort";
-        public const string AriaSortDefaultValue = "none";
 
         public string SortedByHeaderClassName
         {
