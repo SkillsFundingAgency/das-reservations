@@ -9,6 +9,11 @@
     };
 
     ViewBag.GaData.Vpv = "/reservations/choose-employer";
+
+    var employerSortField = nameof(AccountLegalEntity.AccountLegalEntityName);
+    var accountNameSortField = nameof(AccountLegalEntity.AccountName);
+    var sortedByEmployer = Model.SortModel?.SortField == employerSortField;
+    var sortedByAccountName = Model.SortModel?.SortField == accountNameSortField;
 }
 
 <a asp-action="Index" asp-controller="ProviderReservations" asp-all-route-data="@routeData" class="govuk-back-link">Back</a>
@@ -49,20 +54,30 @@
                 <table class="govuk-table das-table--double-arrows">
                     <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="col">
-                            <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountLegalEntityName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                        <th class="govuk-table__header" scope="col" aria-sort="@(sortedByEmployer ? Model.AriaSortValue : null)">
+                            <a data-sort-field="@employerSortField"
+                               class="@(sortedByEmployer ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
                                asp-route="@RouteNames.ProviderChooseEmployer"
-                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountLegalEntityName), Model.SearchTerm)"
+                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(employerSortField, Model.SearchTerm)"
                                title="Sort the table by Employer">
                                 Employer
+                                @if (sortedByEmployer)
+                                {
+                                    <span class="govuk-visually-hidden">, sorted @Model.AriaSortHelp</span>
+                                }
                             </a>
                         </th>
-                        <th class="govuk-table__header" scope="col">
-                            <a class="@(Model.SortModel.SortField == nameof(AccountLegalEntity.AccountName) ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
+                        <th class="govuk-table__header" scope="col" aria-sort="@(sortedByAccountName ? Model.AriaSortValue : null)">
+                            <a data-sort-field="@accountNameSortField"
+                               class="@(sortedByAccountName ? Model.SortedByHeaderClassName : ChooseEmployerViewModel.HeaderClassName)"
                                asp-route="@RouteNames.ProviderChooseEmployer"
-                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(nameof(AccountLegalEntity.AccountName), Model.SearchTerm)"
-                               title="Sort the table by Employer">
+                               asp-all-route-data="@Model.SortModel.BuildSortRouteData(accountNameSortField, Model.SearchTerm)"
+                               title="Sort the table by Account name">
                                 Account name
+                                @if (sortedByAccountName)
+                                {
+                                    <span class="govuk-visually-hidden">, sorted @Model.AriaSortHelp</span>
+                                }
                             </a>
                         </th>
                         <th class="govuk-table__header" scope="col">Agreement&nbsp;ID</th>
@@ -112,5 +127,25 @@
         </div>
     </div>
 </main>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var sortField = new URLSearchParams(window.location.search).get('SortField');
+            if (!sortField) {
+                return;
+            }
+
+            var links = document.querySelectorAll('[data-sort-field]');
+            for (var i = 0; i < links.length; i++) {
+                if (links[i].getAttribute('data-sort-field') === sortField) {
+                    links[i].focus({ focusVisible: true });
+                    return;
+                }
+            }
+        });
+    </script>
+}
 
 
