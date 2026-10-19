@@ -40,7 +40,7 @@
         <PackageReference Include="SFA.DAS.Provider.Idams.Stub.Extensions" Version="1.0.14" />
         <PackageReference Include="StackExchange.Redis" Version="3.0.0" />
         <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="2.0.0" />
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.10" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
         <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
     </ItemGroup>
 
