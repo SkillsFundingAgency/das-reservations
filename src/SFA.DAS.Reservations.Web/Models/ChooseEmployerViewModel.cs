@@ -26,6 +26,30 @@ namespace SFA.DAS.Reservations.Web.Models
             }
         }
 
+        public string AriaSortValue
+        {
+            get
+            {
+                if (SortModel.ReverseSort)
+                {
+                    return "descending";
+                }
+                return "ascending";
+            }
+        }
+
+        public string AriaSortHelp
+        {
+            get
+            {
+                if (SortModel.ReverseSort)
+                {
+                    return "Z to A";
+                }
+                return "A to Z";
+            }
+        }
+
         public string SearchTerm { get; set; }
 
         public SortModel SortModel { get; set; } 
