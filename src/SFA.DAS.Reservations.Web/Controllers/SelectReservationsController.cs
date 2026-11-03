@@ -176,6 +176,14 @@ public class SelectReservationsController(
         catch (TransferSenderNotAllowedException e)
         {
             logger.LogWarning(e, $"AccountId: {e.AccountId} does not have sender id {e.TransferSenderId} allowed).");
+
+            if (!string.IsNullOrWhiteSpace(e.PledgeApplicationStatus))
+            {
+                return View(
+                    "TransferApplicationUnavailable",
+                    TransferApplicationUnavailableViewModel.Create(e.PledgeApplicationStatus, backUrl));
+            }
+
             return RedirectToRoute(RouteNames.Error500);
         }
         catch (EmployerAgreementNotSignedException e)

@@ -46,13 +46,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             //Arrange
             validator.Setup(x => x.ValidateAsync(It.IsAny<CreateReservationLevyEmployerCommand>()))
-                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>( ),FailedTransferReceiverCheck = true});
+                .ReturnsAsync(new ValidationResult
+                {
+                    ValidationDictionary = new Dictionary<string, string>(),
+                    FailedTransferReceiverCheck = true,
+                    PledgeApplicationStatus = "FundsExpired"
+                });
 
             //Act
-            Assert.ThrowsAsync<TransferSenderNotAllowedException>(() => handler.Handle(request, CancellationToken.None));
+            var exception = Assert.ThrowsAsync<TransferSenderNotAllowedException>(() => handler.Handle(request, CancellationToken.None));
 
             //Assert
             validator.Verify(x => x.ValidateAsync(request), Times.Once());
+            exception.PledgeApplicationStatus.Should().Be("FundsExpired");
         }
 
         [Test, MoqAutoData]
