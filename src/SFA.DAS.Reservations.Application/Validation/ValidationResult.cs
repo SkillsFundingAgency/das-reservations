@@ -28,6 +28,7 @@ namespace SFA.DAS.Reservations.Application.Validation
         public bool FailedAuthorisationValidation { get; set; }
         public bool FailedGlobalRuleValidation { get; set; }
         public bool FailedTransferReceiverCheck { get; set; }
+        public string PledgeApplicationStatus { get; set; }
         public bool FailedAutoReservationCheck { get; set; }
         public bool FailedAgreementSignedCheck { get ; set ; }
 

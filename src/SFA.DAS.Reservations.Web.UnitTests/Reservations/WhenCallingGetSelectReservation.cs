@@ -424,6 +424,27 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
 
         }
 
+        [Test, MoqAutoData]
+        public async Task And_Has_Expired_Pledge_Application_Shows_Transfer_Application_Unavailable(
+            ReservationsRouteModel routeModel,
+            SelectReservationViewModel viewModel,
+            GetAvailableReservationsResult reservationsResult,
+            CreateReservationLevyEmployerResult createReservationLevyResult,
+            [Frozen] Mock<IMediator> mediator,
+            [NoAutoProperties] SelectReservationsController controller)
+        {
+            mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
+                .ThrowsAsync(new TransferSenderNotAllowedException(1, "1", "FundsExpired"));
+
+            var result = await controller.SelectReservation(routeModel, viewModel);
+
+            var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+            viewResult.ViewName.Should().Be("TransferApplicationUnavailable");
+            var model = viewResult.Model.Should().BeOfType<TransferApplicationUnavailableViewModel>().Subject;
+            model.StatusLabel.Should().Be("Funds no longer available");
+            model.BackUrl.Should().NotBeNullOrWhiteSpace();
+        }
+
 
         [Test, MoqAutoData]
         public async Task And_Has_Transfer_Sender_Which_Is_Valid_Goes_To_Create_Levy_Reservation_And_Redirects_To_Add_Apprentice(

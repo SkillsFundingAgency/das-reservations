@@ -6,11 +6,13 @@ namespace SFA.DAS.Reservations.Application.Exceptions
     {
         public long AccountId;
         public string TransferSenderId;
+        public string PledgeApplicationStatus;
 
-        public TransferSenderNotAllowedException(long accountId, string transferSenderId)
+        public TransferSenderNotAllowedException(long accountId, string transferSenderId, string pledgeApplicationStatus = null)
         {
             AccountId = accountId;
             TransferSenderId = transferSenderId;
+            PledgeApplicationStatus = pledgeApplicationStatus;
         }
     }
 }

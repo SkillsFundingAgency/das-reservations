@@ -183,6 +183,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
         {
             //Arrange
             TransferValidityResponse.IsValid = false;
+            TransferValidityResponse.PledgeApplicationStatus = "FundsExpired";
 
             var command = new CreateReservationLevyEmployerCommand
             {
@@ -197,6 +198,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             //Assert
             result.FailedTransferReceiverCheck.Should().BeTrue();
+            result.PledgeApplicationStatus.Should().Be("FundsExpired");
         }
 
         [Test]
@@ -218,6 +220,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Reservations.Commands.Creat
 
             //Assert
             result.FailedTransferReceiverCheck.Should().BeFalse();
+            result.PledgeApplicationStatus.Should().BeNull();
         }
 
         [Test]

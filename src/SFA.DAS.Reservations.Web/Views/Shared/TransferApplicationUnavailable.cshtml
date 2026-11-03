@@ -1,0 +1,18 @@
+@model SFA.DAS.Reservations.Web.Models.TransferApplicationUnavailableViewModel
+
+@{
+    ViewData["Title"] = "You cannot add learners";
+    ViewBag.GaData.Vpv = "/transfer-application-unavailable";
+}
+
+<a href="@Model.BackUrl" class="govuk-back-link">Back</a>
+
+<main class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">You cannot add learners</h1>
+            <p class="govuk-body">This transfer application cannot be used to add a learner to this cohort.</p>
+            <p class="govuk-body">The transfer application status is <strong>@Model.StatusLabel</strong>.</p>
+        </div>
+    </div>
+</main>

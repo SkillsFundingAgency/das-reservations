@@ -55,6 +55,7 @@ namespace SFA.DAS.Reservations.Application.Reservations.Commands.CreateReservati
                 var transferValidationResult = await _reservationsService.GetTransferValidity(query.TransferSenderId.Value, query.AccountId, pledgeApplicationId);
 
                 validationResult.FailedTransferReceiverCheck = !transferValidationResult.IsValid;
+                validationResult.PledgeApplicationStatus = transferValidationResult.PledgeApplicationStatus;
                 return validationResult;
             }
 
