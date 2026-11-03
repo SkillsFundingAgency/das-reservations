@@ -428,11 +428,28 @@ namespace SFA.DAS.Reservations.Web.UnitTests.Reservations
         public async Task And_Has_Expired_Pledge_Application_Shows_Transfer_Application_Unavailable(
             ReservationsRouteModel routeModel,
             SelectReservationViewModel viewModel,
-            GetAvailableReservationsResult reservationsResult,
-            CreateReservationLevyEmployerResult createReservationLevyResult,
+            Domain.Employers.Employer employer,
             [Frozen] Mock<IMediator> mediator,
             [NoAutoProperties] SelectReservationsController controller)
         {
+            routeModel.UkPrn = 123;
+            routeModel.AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId;
+            mediator.Setup(m =>
+                    m.Send(It.IsAny<GetProviderCacheReservationCommandQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new GetProviderCacheReservationCommandResponse
+                {
+                    Command = new CacheReservationEmployerCommand
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = employer.AccountId,
+                        AccountLegalEntityPublicHashedId = employer.AccountLegalEntityPublicHashedId,
+                        AccountLegalEntityId = employer.AccountLegalEntityId,
+                        AccountLegalEntityName = employer.AccountLegalEntityName,
+                        AccountName = employer.AccountName,
+                        CohortRef = routeModel.CohortReference,
+                        UkPrn = routeModel.UkPrn.Value
+                    }
+                });
             mediator.Setup(x => x.Send(It.IsAny<CreateReservationLevyEmployerCommand>(), CancellationToken.None))
                 .ThrowsAsync(new TransferSenderNotAllowedException(1, "1", "FundsExpired"));
 
